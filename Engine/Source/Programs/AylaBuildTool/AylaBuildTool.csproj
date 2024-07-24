@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DotNETUtilities\DotNETUtilities.csproj" />
-    <ProjectReference Include="..\VSCore\VSCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

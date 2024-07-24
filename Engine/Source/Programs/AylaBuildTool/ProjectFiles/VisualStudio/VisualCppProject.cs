@@ -2,17 +2,7 @@
 
 using System.Xml;
 
-using AE.Assemblies;
-using AE.BuildSettings;
-using AE.CompilerServices;
-using AE.Extensions;
-using AE.IO;
-using AE.Misc;
-using AE.Platform;
-using AE.Projects;
-using AE.Source;
-
-namespace AE.ProjectFiles.VisualStudio;
+namespace AylaEngine;
 
 public class VisualCppProject : VisualStudioProject
 {
@@ -144,7 +134,7 @@ public class VisualCppProject : VisualStudioProject
                     .Append(Path.Combine(moduleInfo.GeneratedIncludePath, moduleInfo.Name))
                     .Append(moduleInfo.GeneratedShaderPath)
                     .Append("$(IncludePath)");
-                var extensions = assembly.Rules.Type == Rules.ModuleRules.ModuleType.Library ? ".dll" : ".exe";
+                var extensions = assembly.Rules.Type == ModuleRules.ModuleType.Library ? ".dll" : ".exe";
 
                 var projectFile = string.Empty;
                 if (Workspace.IsTargetEngine == false)
@@ -400,13 +390,13 @@ public class VisualCppProject : VisualStudioProject
 
                         switch (assembly.Rules.Type)
                         {
-                            case Rules.ModuleRules.ModuleType.ConsoleApplication:
-                            case Rules.ModuleRules.ModuleType.Application:
+                            case ModuleRules.ModuleType.ConsoleApplication:
+                            case ModuleRules.ModuleType.Application:
                                 string executableName = Path.GetFileNameWithoutExtension(SourceDirectory);
                                 executable = TargetDirectory.Binaries.BinariesOut(TargetPlatform.Win64, Config).GetFile(executableName).WithExtensions("exe");
                                 commandArgs = string.Empty;
                                 break;
-                            case Rules.ModuleRules.ModuleType.Library:
+                            case ModuleRules.ModuleType.Library:
                                 executable = Global.EngineDirectory.Binaries.Root.GetHierarchy("Interop", Config.IsDebug() ? "Debug" : "Release").GetFile("Windows.Launch.Interop").WithExtensions(".exe");
                                 commandArgs = $"-GameAssembly {assembly.Name}";
                                 break;

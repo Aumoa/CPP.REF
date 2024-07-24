@@ -1,205 +1,74 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#include "System/IntegralTypes.h"
-#include "System/String.h"
+export module Core:IntegralTypes;
 
-static inline const wchar_t* GetNumberString(String InStr) noexcept
+export import :Std;
+export import :StaticClass;
+export import :PlatformTypes;
+
+export using int8 = PlatformTypes::int8;
+export using uint8 = PlatformTypes::uint8;
+export using int16 = PlatformTypes::int16;
+export using uint16 = PlatformTypes::uint16;
+export using int32 = PlatformTypes::int32;
+export using uint32 = PlatformTypes::uint32;
+export using int64 = PlatformTypes::int64;
+export using uint64 = PlatformTypes::uint64;
+export using byte = PlatformTypes::byte;
+
+export class String;
+
+export class CORE_API IntegralTypes : public StaticClass
 {
-    static thread_local wchar_t CachedStrBuf[256];
-    if (InStr[InStr.length()] == '\0')
-    {
-        return InStr.c_str();
-    }
-    else
-    {
-        memcpy(CachedStrBuf, InStr.c_str(), sizeof(wchar_t) * InStr.length());
-        CachedStrBuf[InStr.length()] = 0;
-        return CachedStrBuf;
-    }
-}
+public:
+	template<class T>
+	static constexpr bool IsIntegral() noexcept
+	{
+		return std::same_as<T, int8>
+			|| std::same_as<T, uint8>
+			|| std::same_as<T, int16>
+			|| std::same_as<T, uint16>
+			|| std::same_as<T, int32>
+			|| std::same_as<T, uint32>
+			|| std::same_as<T, int64>
+			|| std::same_as<T, uint64>;
+	}
 
-template<class TDest, class TInput>
-FORCEINLINE bool VerifyRange(TInput InputValue, int32 Err) noexcept
-{
-    if (Err == EINVAL || Err == ERANGE || std::numeric_limits<TDest>::lowest() > InputValue || std::numeric_limits<TDest>::max() < InputValue)
-    {
-        return false;
-    }
-    return true;
-}
+	static constexpr size_t Npos = ~size_t(0);
+};
 
-template<>
-String TIntegralType<int8>::ToString(const UnderlyingType& InValue)
+export template<class T>
+struct CORE_API TIntegralType
 {
-    return String(std::to_wstring(InValue));
-}
+	using UnderlyingType = T;
+	static_assert(IntegralTypes::IsIntegral<T>());
 
-template<>
-bool TIntegralType<int8>::TryParse(String InStr, int8& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    int32 Val = wcstol(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<int8>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<int8>(Val);
-    return true;
-}
+	T Value;
 
-template<>
-String TIntegralType<uint8>::ToString(const UnderlyingType& InValue)
-{
-    return String(std::to_wstring(InValue));
-}
+	inline TIntegralType() noexcept
+		: Value(0)
+	{
+	}
 
-template<>
-bool TIntegralType<uint8>::TryParse(String InStr, uint8& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    uint32 Val = wcstoul(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<uint8>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<uint8>(Val);
-    return true;
-}
+	inline constexpr TIntegralType(const T& Val) noexcept
+		: Value(Val)
+	{
+	}
 
-template<>
-String TIntegralType<int16>::ToString(const UnderlyingType& InValue)
-{
-    return String(std::to_wstring(InValue));
-}
+	inline constexpr TIntegralType(const TIntegralType& Val) noexcept
+		: Value(Val.Value)
+	{
+	}
 
-template<>
-bool TIntegralType<int16>::TryParse(String InStr, int16& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    int32 Val = wcstol(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<int16>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<int16>(Val);
-    return true;
-}
+	static String ToString(const T& InValue);
+	static bool TryParse(String InStr, T& OutValue, int32 Base = 10) noexcept;
+};
 
-template<>
-String TIntegralType<uint16>::ToString(const UnderlyingType& InValue)
-{
-    return String(std::to_wstring(InValue));
-}
-
-template<>
-bool TIntegralType<uint16>::TryParse(String InStr, uint16& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    uint32 Val = wcstoul(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<uint16>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<uint16>(Val);
-    return true;
-}
-
-template<>
-String TIntegralType<int32>::ToString(const UnderlyingType& InValue)
-{
-    return String(std::to_wstring(InValue));
-}
-
-template<>
-bool TIntegralType<int32>::TryParse(String InStr, int32& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    int32 Val = wcstol(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<int32>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<int32>(Val);
-    return true;
-}
-
-template<>
-String TIntegralType<uint32>::ToString(const UnderlyingType& InValue)
-{
-    return String(std::to_wstring(InValue));
-}
-
-template<>
-bool TIntegralType<uint32>::TryParse(String InStr, uint32& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    uint32 Val = wcstoul(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<uint32>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<uint32>(Val);
-    return true;
-}
-
-template<>
-String TIntegralType<int64>::ToString(const UnderlyingType& InValue)
-{
-    return String(std::to_wstring(InValue));
-}
-
-template<>
-bool TIntegralType<int64>::TryParse(String InStr, int64& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    int64 Val = wcstoll(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<int64>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<int64>(Val);
-    return true;
-}
-
-template<>
-String TIntegralType<uint64>::ToString(const UnderlyingType& InValue)
-{
-    return String(std::to_wstring(InValue));
-}
-
-template<>
-bool TIntegralType<uint64>::TryParse(String InStr, uint64& OutValue, int32 Base) noexcept
-{
-    int32& Err = errno = 0;
-    const wchar_t* StartPtr = GetNumberString(InStr);
-    wchar_t* EndPtr;
-    uint64 Val = wcstoull(StartPtr, &EndPtr, Base);
-    if (StartPtr == EndPtr || VerifyRange<uint64>(Val, Err) == false)
-    {
-        OutValue = 0;
-        return false;
-    }
-    OutValue = static_cast<uint64>(Val);
-    return true;
-}
+export using Int8 = TIntegralType<int8>;
+export using UInt8 = TIntegralType<uint8>;
+export using Int16 = TIntegralType<int16>;
+export using UInt16 = TIntegralType<uint16>;
+export using Int32 = TIntegralType<int32>;
+export using UInt32 = TIntegralType<uint32>;
+export using Int64 = TIntegralType<int64>;
+export using UInt64 = TIntegralType<uint64>;

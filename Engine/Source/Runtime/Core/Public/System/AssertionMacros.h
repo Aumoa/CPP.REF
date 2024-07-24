@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Platform/PlatformMacros.h"
-#include "Platform/PlatformProcess.h"
 
 #if DO_CHECK && !SHIPPING
 
