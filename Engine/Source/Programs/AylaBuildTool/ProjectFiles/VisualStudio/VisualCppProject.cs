@@ -45,7 +45,7 @@ public class VisualCppProject : VisualStudioProject
 
     public override (string, string) MapConfiguration(Configuration configuration, bool isEditor, TargetPlatform platform)
     {
-        return (configuration.ToString() + (isEditor ? "_Editor" : string.Empty), platform.ToString());
+        return (configuration.ToString() + (isEditor ? "_Editor" : string.Empty), platform.Architecture == Architecture.x64 ? "x64" : "Win32");
     }
 
     public override async Task GenerateProjectFilesAsync(List<VisualStudioProject> projects, CancellationToken cancellationToken = default)
@@ -111,15 +111,17 @@ public class VisualCppProject : VisualStudioProject
 
             BuildConfiguration.ForEach((configuration, isEditor, platform) =>
             {
+                var isDebug = configuration is Configuration.Debug or Configuration.DebugGame;
                 string app = isEditor ? "_Editor" : string.Empty;
                 var propertyGroup = project.AddElement("PropertyGroup");
                 var (name, vsTarget) = MapConfiguration(configuration, isEditor, platform);
                 propertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{name}|{vsTarget}'");
                 propertyGroup.SetAttribute("Label", "Configuration");
 
-                propertyGroup.AddElement("ConfigurationType").InnerText = "Makefile";
+                propertyGroup.AddElement("ConfigurationType").InnerText = "DynamicLibrary";
                 propertyGroup.AddElement("PlatformToolset").InnerText = "v143";
                 propertyGroup.AddElement("CharacterSet").InnerText = "Unicode";
+                propertyGroup.AddElement("UseDebugLibraries").InnerText = isDebug.ToString().ToLower();
             });
 
             import = project.AddElement("Import");
@@ -140,7 +142,8 @@ public class VisualCppProject : VisualStudioProject
                 IEnumerable<string> includePaths = ToolChain.GetRequiredIncludePaths(platform.Architecture)
                     .Concat(moduleInfo.PrivateIncludePaths)
                     .Append(Path.Combine(moduleInfo.GeneratedIncludePath, moduleInfo.Name))
-                    .Append(moduleInfo.GeneratedShaderPath);
+                    .Append(moduleInfo.GeneratedShaderPath)
+                    .Append("$(IncludePath)");
                 var extensions = assembly.Rules.Type == Rules.ModuleRules.ModuleType.Library ? ".dll" : ".exe";
 
                 var projectFile = string.Empty;
@@ -149,13 +152,23 @@ public class VisualCppProject : VisualStudioProject
                     projectFile = $"-ProjectFile \"{Workspace.ProjectFile}\"";
                 }
 
-                propertyGroup.AddElement("NMakeBuildCommandLine").InnerText = $"{buildToolPath} Build {projectFile} -Target {this.Name} -Config {configuration} {editorArgs}";
-                propertyGroup.AddElement("NMakeReBuildCommandLine").InnerText = $"{buildToolPath} Build {projectFile} -Clean -Target {this.Name} -Config {configuration} {editorArgs}";
-                propertyGroup.AddElement("NMakeCleanCommandLine").InnerText = $"{buildToolPath} Clean";
-                propertyGroup.AddElement("NMakeOutput").InnerText = TargetDirectory.Binaries.BinariesOut(platform, configuration).GetFile(assembly.Name + extensions);
-                propertyGroup.AddElement("OutDir").InnerText = TargetDirectory.Binaries.BinariesOut(platform, configuration);
-                propertyGroup.AddElement("IntDir").InnerText = TargetDirectory.Intermediate.Unused;
+                propertyGroup.AddElement("OutDir").InnerText = TargetDirectory.Binaries.BinariesOut(platform, configuration) + '\\';
+                propertyGroup.AddElement("IntDir").InnerText = TargetDirectory.Intermediate.Unused + '\\';
+                propertyGroup.AddElement("IncludePath").InnerText = string.Join(';', includePaths);
+                if (platform.Architecture == Architecture.x64)
+                {
+                    propertyGroup.AddElement("ExecutablePath").InnerText = "$(VC_ExecutablePath_x64);$(CommonExecutablePath)";
+                }
 
+                if (moduleInfo.DependModules.Contains("Core"))
+                {
+                    var ForcedIncludeFiles = propertyGroup.AddElement("ForcedIncludeFiles");
+                    ForcedIncludeFiles.InnerText = "CoreMinimal.h";
+                }
+            });
+
+            BuildConfiguration.ForEach((configuration, isEditor, platform) =>
+            {
                 List<string> macros = new();
                 PlatformGroup.ForEach(p =>
                 {
@@ -171,28 +184,25 @@ public class VisualCppProject : VisualStudioProject
 
                 bool isShipping = configuration == Configuration.Shipping;
                 bool doCheck = !isShipping;
+
                 macros.AddRange(moduleInfo.PrivateAdditionalMacros
                     .Concat(new[] { $"WITH_EDITOR={BoolToStr(isEditor)}", $"SHIPPING={BoolToStr(isShipping)}", $"DO_CHECK={BoolToStr(doCheck)}", "UNICODE", "_UNICODE" })
                     .Concat(moduleInfo.DependModules.Select(p => $"{p.ToUpper()}_API=__declspec(dllimport)"))
                     .Append($"{moduleInfo.Name.ToUpper()}_API=__declspec(dllexport)")
                     .Append($"PLATFORM_STRING=TEXT(\"{platform.ToString()}\")")
                     .Append($"CONFIG_STRING=TEXT(\"{configuration}\")")
+                    .Append("%(PreprocessorDefinitions)")
                     );
 
-                propertyGroup.AddElement("NMakeIncludeSearchPath").InnerText = string.Join(';', includePaths);
-                propertyGroup.AddElement("AdditionalOptions").InnerText = "/std:c++20 /Zc:preprocessor";
-                propertyGroup.AddElement("NMakePreprocessorDefinitions").InnerText = string.Join(';', macros);
-                propertyGroup.AddElement("UseStandardPreprocessor").InnerText = "true";
-                if (platform.Architecture == Architecture.x64)
-                {
-                    propertyGroup.AddElement("ExecutablePath").InnerText = "$(VC_ExecutablePath_x64);$(CommonExecutablePath)";
-                }
+                var itemDefinitionGroup = project.AddElement("ItemDefinitionGroup");
+                var (name, vsTarget) = MapConfiguration(configuration, isEditor, platform);
+                itemDefinitionGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{name}|{vsTarget}'");
 
-                if (moduleInfo.DependModules.Contains("Core"))
-                {
-                    var ForcedIncludeFiles = propertyGroup.AddElement("ForcedIncludeFiles");
-                    ForcedIncludeFiles.InnerText = "CoreMinimal.h";
-                }
+                var clCompile = itemDefinitionGroup.AddElement("ClCompile");
+                clCompile.AddElement("LanguageStandard").InnerText = "stdcpp20";
+                clCompile.AddElement("CompileAs").InnerText = "CompileAsCppModule";
+                clCompile.AddElement("PreprocessorDefinitions").InnerText = string.Join(';', macros);
+                clCompile.AddElement("UseStandardPreprocessor").InnerText = "true";
             });
 
             var ItemGroup = project.AddElement("ItemGroup");
