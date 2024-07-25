@@ -1,8 +1,6 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "IO/TextWriter.h"
-#include "System/RealTypes.h"
-#include "Platform/PlatformLocalization.h"
+import Core;
 
 TextWriter::TextWriter()
 	: CoreNewLine('\n')

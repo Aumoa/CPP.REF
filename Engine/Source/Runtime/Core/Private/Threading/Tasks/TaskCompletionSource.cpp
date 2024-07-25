@@ -1,10 +1,14 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+module;
 
-#include "Threading/Tasks/Task.h"
+#include "System/LanguageSupportMacros.h"
 
-template<class T = void>
+export module Core:TaskCompletionSource;
+
+export import :Task;
+
+export template<class T = void>
 class TaskCompletionSource
 {
 	template<class>

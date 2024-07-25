@@ -1,8 +1,18 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#include "System/ConstructorNotFoundException.h"
+module;
 
-ConstructorNotFoundException::ConstructorNotFoundException(String className)
-	: Exception(String::Format(TEXT("Constructor '{0}()' not found."), className))
+#include "System/LanguageSupportMacros.h"
+
+export module Core:ConstructorNotFoundException;
+
+export import :Exception;
+
+class CORE_API ConstructorNotFoundException : public Exception
 {
-}
+public:
+	ConstructorNotFoundException(String className)
+		: Exception(String::Format(TEXT("Constructor '{0}()' not found."), className))
+	{
+	}
+};

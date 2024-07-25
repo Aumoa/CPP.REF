@@ -1,9 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "System/DateTimeFormat.Localization.h"
-#include "System/DateTime.h"
-#include "Platform/PlatformLocalization.h"
-#include <chrono>
+import Core;
+
+#include "System/LanguageSupportMacros.h"
 
 namespace DateTimeFormat
 {

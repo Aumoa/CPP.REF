@@ -5,5 +5,7 @@ export module Core:Forward;
 export class String;
 export class DateTime;
 export class FileReference;
+export class DirectoryReference;
+export class IOCompletionOverlapped;
 
 export struct Radians;

@@ -2,9 +2,6 @@
 
 #pragma once
 
-#include "System/DateTime.h"
-#include <chrono>
-
 namespace DateTimeFormat
 {
 	struct LocalTimeOffset

@@ -6,7 +6,6 @@
 
 #if PLATFORM_WINDOWS
 
-#include "System/String.h"
 #include "System/AssertionMacros.h"
 
 #pragma push_macro("TEXT")

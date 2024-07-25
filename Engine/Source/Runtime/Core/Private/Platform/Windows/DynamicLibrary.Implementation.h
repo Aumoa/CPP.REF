@@ -4,7 +4,6 @@
 
 #define __ALLOW_PLATFORM_COMMON_H__
 
-#include "Platform/DynamicLibrary.h"
 #include "Platform/PlatformCommon.h"
 
 class DynamicLibrary::Implementation

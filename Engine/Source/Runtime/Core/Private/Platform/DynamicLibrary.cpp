@@ -1,33 +1,50 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#include "Platform/DynamicLibrary.h"
-#include "Platform/Windows/DynamicLibrary.Implementation.h"
+export module Core:DynamicLibrary;
 
-DynamicLibrary::DynamicLibrary()
+export import :String;
+export import :Action;
+export import :Func;
+
+export class CORE_API DynamicLibrary
 {
-}
+	class Implementation;
 
-DynamicLibrary::DynamicLibrary(String InLibraryName)
-	: LibraryName(InLibraryName)
-	, Impl(new Implementation(InLibraryName))
-{
-}
+private:
+	String LibraryName;
+	Implementation* Impl;
 
-DynamicLibrary::~DynamicLibrary() noexcept
-{
-	if (Impl)
+public:
+	DynamicLibrary();
+	DynamicLibrary(String InLibraryName);
+	~DynamicLibrary() noexcept;
+
+	bool IsValid() const;
+
+	template<class... TArgs>
+	Action<TArgs...> LoadAction(String Signature)
 	{
-		delete Impl;
-		Impl = nullptr;
+		void (*Ptr)() = InternalLoadFunction(Signature);
+		if (Ptr == nullptr)
+		{
+			return {};
+		}
+
+		return Action<TArgs...>(reinterpret_cast<void(*)(TArgs...)>(Ptr));
 	}
-}
 
-bool DynamicLibrary::IsValid() const
-{
-	return !LibraryName.IsEmpty() && Impl != nullptr && Impl->IsValid();
-}
+	template<class... TArgs>
+	Func<TArgs...> LoadFunction(String Signature)
+	{
+		void (*Ptr)() = InternalLoadFunction(Signature);
+		if (Ptr == nullptr)
+		{
+			return {};
+		}
 
-void (*DynamicLibrary::InternalLoadFunction(String Signature))()
-{
-	return Impl->LoadFunction(Signature);
-}
+		return Func<TArgs...>::FromAnonymous(Ptr);
+	}
+
+private:
+	void (*InternalLoadFunction(String Signature))();
+};

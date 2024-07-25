@@ -1,7 +1,6 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "IO/DirectoryReference.h"
-#include "IO/FileReference.h"
+import Core;
 
 [[nodiscard]] std::vector<FileReference> DirectoryReference::GetFiles(bool bRecursive) const
 {

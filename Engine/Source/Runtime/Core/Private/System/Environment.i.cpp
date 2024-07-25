@@ -1,11 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-#include "System/Environment.h"
-#include "IO/File.h"
-#include "System/Path.h"
-#include "System/InvalidOperationException.h"
-#include "Platform/PlatformProcess.h"
-#include "System/InvalidOperationException.h"
+import Core;
+
 #include <stdlib.h>
 
 String Environment::EngineDirectory;

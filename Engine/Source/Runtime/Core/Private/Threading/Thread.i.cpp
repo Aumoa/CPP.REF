@@ -1,10 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-#include "Threading/Thread.h"
-#include "Platform/PlatformProcess.h"
-#include "Platform/PlatformAtomics.h"
+import Core;
+
 #include "System/AssertionMacros.h"
-#include <thread>
 
 Thread::Thread() noexcept
 {

@@ -1,13 +1,16 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+module;
 
-#include "System/Action.h"
-#include "System/IntegralTypes.h"
 #include "System/AssertionMacros.h"
-#include "Platform/PlatformIO.h"
 
-class IOCompletionOverlapped
+export module Core:IOCompletionOverlapped;
+
+export import :Action;
+export import :IntegralTypes;
+export import :PlatformIO;
+
+export class IOCompletionOverlapped
 {
 	uint8 OverlappedBuffer[PlatformIO::OVERLAPPED_SIZE + sizeof(void*)];
 	Action<IOCompletionOverlapped*, size_t, int32> Work;

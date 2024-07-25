@@ -1,12 +1,12 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:TextReader;
 
-#include "System/String.h"
-#include "Threading/Tasks/Task.h"
-#include <stop_token>
+export import :String;
+export import :Task;
+export import :CancellationToken;
 
-class TextReader
+export class TextReader
 {
 protected:
 	TextReader() = default;
