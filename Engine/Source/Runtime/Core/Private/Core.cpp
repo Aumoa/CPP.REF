@@ -61,3 +61,6 @@ export import :File;
 export import :Environment;
 export import :Select;
 export import :DirectoryReference;
+export import :SeekOrigin;
+export import :Stream;
+export import :Name;

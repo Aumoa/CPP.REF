@@ -1,5 +1,9 @@
 // Copyright 2020-2024 Aumoa.lib. All right reserved.
 
+module;
+
+#include "System/LanguageSupportMacros.h"
+
 export module Core:Awaiter;
 
 export import :Std;
@@ -9,6 +13,11 @@ export import :Action;
 export import :TimeSpan;
 export import :DateTime;
 export import :InvalidOperationException;
+export import :CancellationToken;
+export import :Spinlock;
+export import :SpinlockConditionVariable;
+export import :VoidableOptional;
+export import :OperationCanceledException;
 
 export class AwaiterBase : public std::enable_shared_from_this<AwaiterBase>
 {
@@ -268,7 +277,7 @@ public:
 			Cancel();
 			return true;
 		}
-		
+
 		auto ScopedLock = std::unique_lock(Lock);
 		if (this->IsCancellationRequested())
 		{

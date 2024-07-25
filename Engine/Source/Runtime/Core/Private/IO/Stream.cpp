@@ -1,11 +1,12 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:Stream;
 
-#include "Threading/Tasks/Task.h"
-#include "IO/SeekOrigin.h"
+export import :Std;
+export import :Task;
+export import :SeekOrigin;
 
-class CORE_API Stream
+export class CORE_API Stream
 {
 protected:
 	Stream() = default;

@@ -1,5 +1,9 @@
 // Copyright 2020-2024 Aumoa.lib. All right reserved.
 
+module;
+
+#include "System/LanguageSupportMacros.h"
+
 export module Core:DirectoryReference;
 
 export import :Forward;

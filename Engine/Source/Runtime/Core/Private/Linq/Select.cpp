@@ -3,6 +3,7 @@
 export module Core:Select;
 
 export import :Std;
+export import <ranges>;
 
 export namespace Linq
 {

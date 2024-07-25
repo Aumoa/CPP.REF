@@ -4,11 +4,13 @@ module;
 
 #include "Platform/PlatformMacros.h"
 #include "System/AssertionMacros.h"
+#include "System/LanguageSupportMacros.h"
 
 export module Core:Environment;
 
 export import :StaticClass;
 export import :String;
+export import :PlatformProcess;
 
 export struct CORE_API Environment : public StaticClass
 {
@@ -34,7 +36,10 @@ export struct CORE_API Environment : public StaticClass
 	static void SetEnvironmentVariable(String InName, String InValue);
 	static String GetEnvironmentVariable(String InName);
 
-	static constexpr String NewLine = PLATFORM_NEWLINE;
+	static constexpr String NewLine()
+	{
+		return PLATFORM_NEWLINE;
+	}
 
 private:
 	static void Init();

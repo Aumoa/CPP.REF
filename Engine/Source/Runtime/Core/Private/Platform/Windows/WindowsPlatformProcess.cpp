@@ -13,6 +13,7 @@ export struct StackFrame;
 
 export class CORE_API WindowsPlatformProcess : public GenericPlatformProcess
 {
+public:
 	static bool IsDebuggerPresent() noexcept;
 	static void OutputDebugString(String InMessage) noexcept;
 

@@ -8,6 +8,8 @@ export module Core:VoidableOptional;
 
 export import :IntegralTypes;
 export import :Std;
+export import :PlatformProcess;
+export import :String;
 
 export template<class T>
 class VoidableOptional

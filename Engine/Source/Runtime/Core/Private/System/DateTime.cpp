@@ -2,7 +2,6 @@
 
 export module Core:DateTime;
 
-export import :System;
 export import :TimeSpan;
 export import :DateTimeFormat_Localization;
 
