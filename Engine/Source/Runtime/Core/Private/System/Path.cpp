@@ -1,13 +1,14 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:Path;
 
-#include "System/StaticClass.h"
-#include "System/String.h"
-#include <filesystem>
+export import :Std;
+export import :StaticClass;
+export import :String;
 
-struct Path : public StaticClass
+export class Path : public StaticClass
 {
+public:
 	static inline String GetFileName(String InPath)
 	{
 		return String(InPath.path().filename().wstring());

@@ -27,6 +27,8 @@ export import <compare>;
 export import <stop_token>;
 export import <queue>;
 export import <map>;
+export import <optional>;
+export import <span>;
 
 export import <cmath>;
 export import <cstdint>;

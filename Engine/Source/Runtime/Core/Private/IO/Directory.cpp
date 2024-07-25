@@ -1,81 +1,18 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#include "IO/Directory.h"
+export module Core:Directory;
 
-std::vector<String> Directory::GetFiles(String InPath, ESearchOption InSearchOption)
+export import :Std;
+export import :StaticClass;
+export import :String;
+export import :SearchOption;
+
+export class CORE_API Directory : public StaticClass
 {
-	std::vector<String> Files;
-
-	if (InSearchOption == ESearchOption::TopDirectoryOnly)
-	{
-		for (auto It : std::filesystem::directory_iterator(InPath.path()))
-		{
-			if (std::filesystem::is_regular_file(It.status()))
-			{
-				Files.emplace_back(It.path().wstring());
-			}
-		}
-	}
-	else
-	{
-		for (auto It : std::filesystem::recursive_directory_iterator(InPath.path()))
-		{
-			if (std::filesystem::is_regular_file(It.status()))
-			{
-				Files.emplace_back(It.path().wstring());
-			}
-		}
-	}
-
-	return Files;
-}
-
-std::vector<String> Directory::GetDirectories(String InPath, ESearchOption InSearchOption)
-{
-	std::vector<String> Files;
-
-	if (InSearchOption == ESearchOption::TopDirectoryOnly)
-	{
-		for (auto It : std::filesystem::directory_iterator(InPath.path()))
-		{
-			if (std::filesystem::is_directory(It.status()))
-			{
-				Files.emplace_back(It.path().wstring());
-			}
-		}
-	}
-	else
-	{
-		for (auto It : std::filesystem::recursive_directory_iterator(InPath.path()))
-		{
-			if (std::filesystem::is_directory(It.status()))
-			{
-				Files.emplace_back(It.path().wstring());
-			}
-		}
-	}
-
-	return Files;
-}
-
-bool Directory::Exists(String InPath)
-{
-	return std::filesystem::is_directory(InPath.path());
-}
-
-bool Directory::CreateDirectory(String InPath)
-{
-	return std::filesystem::create_directories(InPath.path());
-}
-
-void Directory::Delete(String InPath, bool bRecursive)
-{
-	if (bRecursive)
-	{
-		std::filesystem::remove_all(InPath.path());
-	}
-	else
-	{
-		std::filesystem::remove(InPath.path());
-	}
-}
+public:
+	static std::vector<String> GetFiles(String InPath, ESearchOption InSearchOption = ESearchOption::TopDirectoryOnly);
+	static std::vector<String> GetDirectories(String InPath, ESearchOption InSearchOption = ESearchOption::TopDirectoryOnly);
+	static bool Exists(String InPath);
+	static bool CreateDirectory(String InPath);
+	static void Delete(String InPath, bool bRecursive);
+};

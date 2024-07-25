@@ -1,11 +1,11 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:FileSystemReference;
 
-#include "System/String.h"
-#include "System/Path.h"
+export import :String;
+export import :Path;
 
-class CORE_API FileSystemReference
+export class CORE_API FileSystemReference
 {
 private:
 	String Value;

@@ -1,90 +1,37 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#include "Threading/Thread.h"
-#include "Platform/PlatformProcess.h"
-#include "Platform/PlatformAtomics.h"
-#include "System/AssertionMacros.h"
-#include <thread>
+export module Core:Thread;
 
-Thread::Thread() noexcept
+export import :Std;
+export import :String;
+
+export class CORE_API Thread
 {
-}
-
-Thread::Thread(const Thread& Thr) noexcept
-	: Impl(Thr.Impl)
-{
-	if (Impl)
+private:
+	struct Impl_t
 	{
-		PlatformAtomics::InterlockedIncrement(&Impl->Refs);
-	}
-}
+		void* Handle = nullptr;
+		size_t Refs = 0;
+	};
 
-Thread::Thread(Thread&& Thr) noexcept
-{
-	std::swap(Impl, Thr.Impl);
-}
+	Impl_t* Impl = nullptr;
 
-Thread::~Thread() noexcept
-{
-	if (Impl)
-	{
-		if (PlatformAtomics::InterlockedDecrement(&Impl->Refs) == 0)
-		{
-			PlatformProcess::DestroyCurrentThreadHandle(Impl->Handle);
-			delete Impl;
-		}
-	}
-}
+public:
+	Thread() noexcept;
+	Thread(const Thread& Thr) noexcept;
+	Thread(Thread&& Thr) noexcept;
+	~Thread() noexcept;
 
-void Thread::SetDescription(String InDescription) noexcept
-{
-	check(IsValid());
-	if (Impl)
-	{
-		PlatformProcess::SetThreadDescription(Impl->Handle, InDescription);
-	}
-}
+	constexpr bool IsValid() const noexcept { return Impl; }
+	constexpr void* NativeHandle() const noexcept { return Impl ? Impl->Handle : nullptr; }
 
-Thread& Thread::operator =(const Thread& Thr) noexcept
-{
-	Impl = Thr.Impl;
-	if (Impl)
-	{
-		PlatformAtomics::InterlockedIncrement(&Impl->Refs);
-	}
-	return *this;
-}
+	void SetDescription(String InDescription) noexcept;
 
-Thread& Thread::operator =(Thread&& Thr) noexcept
-{
-	if (Impl)
-	{
-		if (PlatformAtomics::InterlockedDecrement(&Impl->Refs) == 0)
-		{
-			PlatformProcess::DestroyCurrentThreadHandle(Impl->Handle);
-			delete Impl;
-		}
-	}
-	Impl = nullptr;
-	std::swap(Impl, Thr.Impl);
-	return *this;
-}
+	Thread& operator =(const Thread& Thr) noexcept;
+	Thread& operator =(Thread&& Thr) noexcept;
 
-size_t Thread::GetHardwareConcurrency() noexcept
-{
-	return (size_t)std::thread::hardware_concurrency();
-}
+	static size_t GetHardwareConcurrency() noexcept;
 
-Thread Thread::GetCurrentThread()
-{
-	static thread_local Thread LocalCache = []()
-	{
-		Thread Thr;
-		Thr.Impl = new Impl_t();
-		Thr.Impl->Handle = PlatformProcess::AllocateCurrentThreadHandle();
-		Thr.Impl->Refs = 1;
-		return Thr;
-	}();
-
-	return LocalCache;
-}
+public:
+	static Thread GetCurrentThread();
+};

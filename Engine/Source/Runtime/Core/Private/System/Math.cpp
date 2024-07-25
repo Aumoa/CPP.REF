@@ -7,11 +7,10 @@ module;
 export module Core:Math;
 
 export import :Std;
+export import :Forward;
 export import :PlatformTypes;
 export import :EaseFunction;
 export import :IntegralTypes;
-
-export struct Radians;
 
 /// <summary>
 /// Provide standard math functions.

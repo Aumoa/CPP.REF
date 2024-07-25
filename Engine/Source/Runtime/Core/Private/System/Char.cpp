@@ -8,9 +8,9 @@ export module Core:Char;
 
 export import :Std;
 export import :PlatformTypes;
+export import :Forward;
 
 export using char_t = PlatformTypes::char_t;
-export class String;
 
 export struct CORE_API Char
 {

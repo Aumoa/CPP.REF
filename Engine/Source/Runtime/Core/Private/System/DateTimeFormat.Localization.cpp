@@ -2,10 +2,9 @@
 
 export module Core:DateTimeFormat_Localization;
 
+export import :Forward;
 export import :StaticClass;
 export import :String;
-
-export class DateTime;
 
 export namespace DateTimeFormat
 {

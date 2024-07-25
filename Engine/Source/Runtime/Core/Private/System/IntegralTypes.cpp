@@ -3,6 +3,7 @@
 export module Core:IntegralTypes;
 
 export import :Std;
+export import :Forward;
 export import :StaticClass;
 export import :PlatformTypes;
 
@@ -15,8 +16,6 @@ export using uint32 = PlatformTypes::uint32;
 export using int64 = PlatformTypes::int64;
 export using uint64 = PlatformTypes::uint64;
 export using byte = PlatformTypes::byte;
-
-export class String;
 
 export class CORE_API IntegralTypes : public StaticClass
 {

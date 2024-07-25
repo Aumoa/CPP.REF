@@ -3,6 +3,7 @@
 export module Core;
 
 export import :Std;
+export import :Forward;
 export import :StaticClass;
 export import :GenericPlatformTypes;
 export import :WindowsPlatformTypes;
@@ -46,3 +47,17 @@ export import :Awaiter;
 export import :ToVector;
 export import :ThreadPool;
 export import :Task;
+export import :Path;
+export import :StackFrame;
+export import :Thread;
+export import :PerformanceTimer;
+export import :TextWriter;
+export import :SearchOption;
+export import :Directory;
+export import :StackTrace;
+export import :FileSystemReference;
+export import :TickTimer;
+export import :File;
+export import :Environment;
+export import :Select;
+export import :DirectoryReference;
