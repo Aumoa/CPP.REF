@@ -6,6 +6,7 @@ module;
 
 export module Core:Spinlock;
 
+export import :Std;
 export import :PlatformAtomics;
 
 export class Spinlock

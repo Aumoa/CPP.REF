@@ -1,14 +1,12 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
+
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "System/AssertionMacros.h"
+#include "Platform/PlatformCommon.h"
 
 import Core;
 
 #if PLATFORM_WINDOWS
-
-#define __ALLOW_PLATFORM_COMMON_H__
-
-#include "System/AssertionMacros.h"
-#include "Platform/PlatformCommon.h"
-#include "WindowsStandardStreamTextWriter.h"
 
 inline constexpr HANDLE GetHANDLE(void* Handle)
 {

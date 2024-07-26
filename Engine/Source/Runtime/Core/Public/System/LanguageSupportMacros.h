@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #define GENERATE_BITMASK_ENUM_OPERATORS(ClassType, ExportPrefix) \
 ExportPrefix inline constexpr ClassType operator |(ClassType Lhs, ClassType Rhs) noexcept \
 { \

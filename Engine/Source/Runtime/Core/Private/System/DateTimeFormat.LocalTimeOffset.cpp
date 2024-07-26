@@ -1,8 +1,13 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:DateTimeFormat_LocalTimeOffset;
 
-namespace DateTimeFormat
+export import :Std;
+export import :DateTime;
+
+using namespace std::chrono_literals;
+
+export namespace DateTimeFormat
 {
 	struct LocalTimeOffset
 	{

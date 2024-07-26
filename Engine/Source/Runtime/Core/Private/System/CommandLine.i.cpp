@@ -1,8 +1,8 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
-
-import Core;
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 #include "System/AssertionMacros.h"
+
+import Core;
 
 std::vector<String> CommandLine::Args;
 

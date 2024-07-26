@@ -8,7 +8,7 @@ export module Core:OperationCanceledException;
 
 export import :Exception;
 
-class CORE_API OperationCanceledException : public Exception
+export class CORE_API OperationCanceledException : public Exception
 {
 public:
 	OperationCanceledException(std::exception_ptr InInnerException = nullptr, std::source_location Src = std::source_location::current())

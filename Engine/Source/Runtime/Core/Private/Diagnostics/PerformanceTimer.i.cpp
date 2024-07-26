@@ -2,6 +2,8 @@
 
 import Core;
 
+using namespace std::chrono_literals;
+
 PerformanceTimer::PerformanceTimer(const PerformanceTimer& Rhs) noexcept
 	: StartTime(Rhs.StartTime)
 	, Elapsed(Rhs.Elapsed)

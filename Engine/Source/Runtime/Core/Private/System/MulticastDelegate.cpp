@@ -7,6 +7,7 @@ module;
 export module Core:MulticastDelegate;
 
 export import :Std;
+export import :AssertionMacros;
 export import :Delegate;
 export import :Referencer;
 export import :DelegateHandle;

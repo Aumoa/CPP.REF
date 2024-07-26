@@ -1,5 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+#include "System/LanguageSupportMacros.h"
+
 import Core;
 
 StackTrace::StackTrace() noexcept

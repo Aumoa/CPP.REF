@@ -1,8 +1,8 @@
 // Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-import Core;
-
 #include "System/AssertionMacros.h"
+
+import Core;
 
 Thread::Thread() noexcept
 {

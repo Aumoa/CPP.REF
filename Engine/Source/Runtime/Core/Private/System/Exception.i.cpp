@@ -1,5 +1,7 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+#include "System/LanguageSupportMacros.h"
+
 import Core;
 
 Exception::Exception(const String& InMessage, std::exception_ptr InInnerException, std::source_location Src) noexcept

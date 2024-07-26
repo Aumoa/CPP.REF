@@ -1,12 +1,11 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
+
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "Platform/PlatformCommon.h"
 
 import Core;
 
 #if PLATFORM_WINDOWS
-
-#define __ALLOW_PLATFORM_COMMON_H__
-
-#include "Platform/PlatformCommon.h"
 
 std::wstring WindowsPlatformLocalization::FromCodepage(std::string_view Str, int32 Codepage)
 {

@@ -6,6 +6,7 @@ export import :Std;
 export import :Spinlock;
 export import :SpinlockConditionVariable;
 export import :Action;
+export import :TimeSpan;
 
 export class CORE_API ThreadPool
 {
@@ -32,7 +33,7 @@ public:
 	static void UnbindHandle(void* NativeHandle);
 
 	static void QueueUserWorkItem(Action<> InWork);
-	static void QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork);
+	static void QueueDelayedUserWorkItem(const TimeSpan& InDur, Action<> InWork);
 
 	static void GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
 	static void GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);

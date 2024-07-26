@@ -1,17 +1,20 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+module;
 
-#include "System/String.h"
-#include "Platform/PlatformLocalization.h"
-#include <numbers>
+#include "System/LanguageSupportMacros.h"
 
-struct Degrees;
+export module Core:Radians;
+
+export import :Std;
+export import :Forward;
+export import :String;
+export import :PlatformLocalization;
 
 /// <summary>
 /// Represents the radians value.
 /// </summary>
-struct Radians
+export struct Radians
 {
 	float Value = 0;
 

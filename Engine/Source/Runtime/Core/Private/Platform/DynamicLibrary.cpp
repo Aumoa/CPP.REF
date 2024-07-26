@@ -8,7 +8,17 @@ export import :Func;
 
 export class CORE_API DynamicLibrary
 {
-	class Implementation;
+	class Implementation
+	{
+		void* handle;
+
+	public:
+		Implementation(String InLibraryName);
+		~Implementation() noexcept;
+
+		bool IsValid() const noexcept;
+		void (*LoadFunction(String Signature))();
+	};
 
 private:
 	String LibraryName;

@@ -1,9 +1,9 @@
 // Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-import Core;
-
 #include "System/AssertionMacros.h"
 #include "System/LanguageSupportMacros.h"
+
+import Core;
 
 FileStream::FileStream(String InFilename, EFileMode InFileMode, EFileAccessMode InAccessMode, EFileSharedMode InSharedMode)
 {

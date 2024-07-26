@@ -13,6 +13,7 @@ export import :Awaiter;
 export import :ThreadPool;
 export import :CancellationToken;
 export import :ToVector;
+export import :TimeSpan;
 
 template<class T>
 class VoidableVector : public std::vector<T>
@@ -289,7 +290,7 @@ public:
 		return Task<>(std::move(uAwaiter));
 	}
 
-	static Task<> Delay(std::chrono::milliseconds InDelay, CancellationToken sToken = {})
+	static Task<> Delay(const TimeSpan& InDelay, CancellationToken sToken = {})
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 
@@ -306,7 +307,7 @@ public:
 	{
 		static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask instead.");
 
-		static thread_local std::shared_ptr sAwaiter = []
+		static std::shared_ptr sAwaiter = []
 		{
 			auto ptr = std::make_shared<::Awaiter<void>>();
 			ptr->SetResult();

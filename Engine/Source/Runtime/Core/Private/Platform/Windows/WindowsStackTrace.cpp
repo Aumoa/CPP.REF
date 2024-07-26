@@ -1,21 +1,23 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+module;
+
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "Platform/PlatformCommon.h"
+#include "Platform/PlatformMacros.h"
+#undef __ALLOW_PLATFORM_COMMON_H__
+
+export module Core:WindowsStackTrace;
+
+export import :Std;
+export import :String;
+export import :Spinlock;
+export import :StackFrame;
+export import :PlatformLocalization;
 
 #if PLATFORM_WINDOWS
 
-#define __ALLOW_PLATFORM_COMMON_H__
-
-#include "System/String.h"
-#include "Threading/Spinlock.h"
-#include "Platform/PlatformCommon.h"
-#include "Platform/PlatformMacros.h"
-#include "Diagnostics/StackFrame.h"
-#include "Platform/PlatformLocalization.h"
-#include <map>
-#include <optional>
-
-struct ModuleInfo
+export struct ModuleInfo
 {
 	String ImageName;
 	String ModuleName;
@@ -23,7 +25,7 @@ struct ModuleInfo
 	size_t LoadSize;
 };
 
-class SymbolInstaller
+export class SymbolInstaller
 {
 	HANDLE hProcess = NULL;
 	bool bInitialized = false;
@@ -148,10 +150,10 @@ private:
 	}
 };
 
-static inline Spinlock Lck;
-static inline std::optional<SymbolInstaller> SymbolInst;
+static Spinlock Lck;
+static std::optional<SymbolInstaller> SymbolInst;
 
-class SymbolInfo
+export class SymbolInfo
 {
 	static constexpr const size_t MAX_NAME_LENGTH = 1024;
 	std::vector<uint8> SymbolBuf;
@@ -199,9 +201,7 @@ public:
 			return TEXT("<Unknown Symbol>");
 		}
 
-		static thread_local std::vector<char> sUndeco;
-		sUndeco.clear();
-		sUndeco.resize(MAX_NAME_LENGTH);
+		std::vector<char> sUndeco(MAX_NAME_LENGTH);
 
 		DWORD Len = UnDecorateSymbolName(this->GetRef().Name, sUndeco.data(), (DWORD)MAX_NAME_LENGTH, UNDNAME_COMPLETE);
 		if (Len == 0)
@@ -230,7 +230,7 @@ public:
 	}
 };
 
-inline PIMAGE_NT_HEADERS ImplSymbolLoad() noexcept
+export inline PIMAGE_NT_HEADERS ImplSymbolLoad() noexcept
 {
 	if (!SymbolInst.has_value())
 	{
@@ -239,7 +239,7 @@ inline PIMAGE_NT_HEADERS ImplSymbolLoad() noexcept
 	return SymbolInst->ReloadSymbols();
 }
 
-inline std::vector<StackFrame> ImplStacktrace(PIMAGE_NT_HEADERS Image, HANDLE hThread, CONTEXT* InContext) noexcept
+export inline std::vector<StackFrame> ImplStacktrace(PIMAGE_NT_HEADERS Image, HANDLE hThread, CONTEXT* InContext) noexcept
 {
 	if (Image == nullptr)
 	{
@@ -301,13 +301,11 @@ inline std::vector<StackFrame> ImplStacktrace(PIMAGE_NT_HEADERS Image, HANDLE hT
 	return StackFrames;
 }
 
-inline std::vector<StackFrame> Capture(HANDLE hThread, CONTEXT* InContext) noexcept
+export inline std::vector<StackFrame> Capture(HANDLE hThread, CONTEXT* InContext) noexcept
 {
 	std::unique_lock Lock(Lck);
 	PIMAGE_NT_HEADERS Image = ImplSymbolLoad();
 	return ImplStacktrace(Image, hThread, InContext);
 }
-
-#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

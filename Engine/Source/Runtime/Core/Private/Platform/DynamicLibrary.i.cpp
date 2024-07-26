@@ -2,8 +2,6 @@
 
 import Core;
 
-#include "Platform/Windows/DynamicLibrary.Implementation.h"
-
 DynamicLibrary::DynamicLibrary()
 {
 }

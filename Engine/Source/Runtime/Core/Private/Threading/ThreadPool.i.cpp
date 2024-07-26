@@ -1,5 +1,8 @@
 // Copyright 2020-2022 Aumoa.lib. All right reserved.
 
+#include "Platform/PlatformMacros.h"
+#include "System/LanguageSupportMacros.h"
+
 import Core;
 
 size_t ThreadPool::NumWorkerThreads;
@@ -61,10 +64,10 @@ void ThreadPool::QueueUserWorkItem(Action<> InWork)
 	Cv.NotifyOne();
 }
 
-void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork)
+void ThreadPool::QueueDelayedUserWorkItem(const TimeSpan& InDur, Action<> InWork)
 {
 	Initialize(0, 0);
-	auto Tp = std::chrono::steady_clock::now() + InDur;
+	auto Tp = std::chrono::steady_clock::now() + (std::chrono::nanoseconds)InDur;
 	std::unique_lock ScopedLock(DelayedLck);
 	DelayedWorks.emplace(Tp, std::move(InWork));
 	DelayedCv.NotifyOne();

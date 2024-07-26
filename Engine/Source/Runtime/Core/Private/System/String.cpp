@@ -1083,10 +1083,7 @@ public:
 
 public:
 	template<class... TArgs>
-	[[nodiscard]] static String Format(String InFormatStr, TArgs&&... InArgs)
-	{
-		return String(std::vformat(InFormatStr.wstring_view(), std::make_wformat_args(std::forward<TArgs>(InArgs)...)));
-	}
+	[[nodiscard]] static String Format(String InFormatStr, TArgs&&... InArgs);
 
 	template<std::ranges::input_range TStringArray>
 		requires std::convertible_to<std::ranges::range_value_t<TStringArray>, String>
@@ -1157,27 +1154,27 @@ private:
 	}
 };
 
-template<>
+export template<>
 struct std::formatter<String, wchar_t> : public std::formatter<std::wstring_view, wchar_t>
 {
-	template<class TFormatContext>
-	auto format(const String& InStr, TFormatContext& Context) const
+	template<class TString, class TFormatContext>
+	auto format(TString&& InStr, TFormatContext& Context) const
 	{
 		return std::formatter<std::wstring_view, wchar_t>::format((std::wstring_view)InStr, Context);
 	}
 };
 
-template<>
+export template<>
 struct std::formatter<String, char> : public std::formatter<std::string, char>
 {
-	template<class TFormatContext>
-	auto format(const String& InStr, TFormatContext& Context) const
+	template<class TString, class TFormatContext>
+	auto format(TString&& InStr, TFormatContext& Context) const
 	{
 		return std::formatter<std::string_view, char>::format((std::string)InStr, Context);
 	}
 };
 
-template<class T, class TChar> requires requires { { std::declval<T>().ToString() } -> std::convertible_to<String>; }
+export template<class T, class TChar> requires requires { { std::declval<T>().ToString() } -> std::convertible_to<String>; }
 struct std::formatter<T, TChar> : public std::formatter<String, TChar>
 {
 	template<class U, class TFormatContext>
@@ -1186,6 +1183,12 @@ struct std::formatter<T, TChar> : public std::formatter<String, TChar>
 		return std::formatter<String, TChar>::format(std::forward<U>(Obj).ToString(), Context);
 	}
 };
+
+template<class... TArgs>
+[[nodiscard]] String String::Format(String InFormatStr, TArgs&&... InArgs)
+{
+	return String(std::vformat(InFormatStr.wstring_view(), std::make_wformat_args(InArgs...)));
+}
 
 // Declared in CharType.h
 constexpr FORCEINLINE String Char::ToStringView(const char_t& Ch) noexcept

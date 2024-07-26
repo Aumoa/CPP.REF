@@ -1,5 +1,6 @@
 // Copyright 2020-2024 Aumoa.lib. All right reserved.
 
+#include <errno.h>
 #include "Platform/PlatformMacros.h"
 
 import Core;

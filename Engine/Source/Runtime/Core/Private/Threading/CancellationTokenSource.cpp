@@ -1,24 +1,123 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#include "Threading/CancellationTokenSource.h"
-#include "System/InvalidOperationException.h"
-#include "Threading/Tasks/Task.h"
+export module Core:CancellationTokenSource;
 
-void CancellationTokenSource::CancelAfter(const TimeSpan& delay)
+export import :Std;
+export import :CancellationToken;
+export import :TimeSpan;
+
+export class CORE_API CancellationTokenSource
 {
-	if (hasValue == false)
+	bool hasValue;
+	char native[sizeof(std::stop_source)];
+
+	CancellationTokenSource(const CancellationTokenSource&) noexcept = delete;
+	CancellationTokenSource& operator =(const CancellationTokenSource&) noexcept = delete;
+
+public:
+	inline CancellationTokenSource()
+		: hasValue(false)
 	{
-		ThrowInvalidOperationException();
 	}
 
-	std::ignore = Task<>::Delay(delay, GetToken()).ContinueWith([source = get_source()](Task<>) mutable
+	inline CancellationTokenSource(std::in_place_t)
+		: hasValue(true)
 	{
-		source.request_stop();
-	});
-}
+		new(native) std::stop_source;
+	}
 
-[[noreturn]]
-void CancellationTokenSource::ThrowInvalidOperationException()
-{
-	throw InvalidOperationException();
-}
+	inline CancellationTokenSource(CancellationTokenSource&& rhs) noexcept
+		: hasValue(rhs.hasValue)
+	{
+		if (hasValue)
+		{
+			new(native) std::stop_source(std::move(rhs.get_source()));
+			rhs.hasValue = false;
+		}
+	}
+
+	inline ~CancellationTokenSource() noexcept
+	{
+		if (hasValue)
+		{
+			get_source().~stop_source();
+			hasValue = false;
+		}
+	}
+
+	inline CancellationToken GetToken() const
+	{
+		if (hasValue == false)
+		{
+			ThrowInvalidOperationException();
+		}
+
+		CancellationToken token;
+		token.token = get_source().get_token();
+		return token;
+	}
+
+	inline void Cancel()
+	{
+		if (hasValue == false)
+		{
+			ThrowInvalidOperationException();
+		}
+
+		get_source().request_stop();
+	}
+
+	void CancelAfter(const TimeSpan& delay);
+
+	inline CancellationTokenSource& operator =(CancellationTokenSource&& rhs) noexcept
+	{
+		if (hasValue)
+		{
+			get_source().~stop_source();
+		}
+
+		hasValue = rhs.hasValue;
+		if (hasValue)
+		{
+			new(native) std::stop_source(std::move(rhs.get_source()));
+			rhs.hasValue = false;
+		}
+
+		return *this;
+	}
+
+	inline bool operator ==(const CancellationTokenSource& rhs) const noexcept
+	{
+		if (hasValue != rhs.hasValue)
+		{
+			return false;
+		}
+
+		if (hasValue == false)
+		{
+			return true;
+		}
+
+		return get_source() == rhs.get_source();
+	}
+
+public:
+	static inline CancellationTokenSource Create()
+	{
+		return CancellationTokenSource(std::in_place);
+	}
+
+private:
+	inline const std::stop_source& get_source() const noexcept
+	{
+		return *reinterpret_cast<const std::stop_source*>(native);
+	}
+
+	inline std::stop_source& get_source() noexcept
+	{
+		return *reinterpret_cast<std::stop_source*>(native);
+	}
+
+	[[noreturn]]
+	static void ThrowInvalidOperationException();
+};

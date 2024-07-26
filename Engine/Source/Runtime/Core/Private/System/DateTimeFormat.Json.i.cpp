@@ -1,9 +1,8 @@
 // Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-import Core;
-
 #include "System/LanguageSupportMacros.h"
-#include "DateTimeFormat.LocalTimeOffset.h"
+
+import Core;
 
 namespace DateTimeFormat
 {

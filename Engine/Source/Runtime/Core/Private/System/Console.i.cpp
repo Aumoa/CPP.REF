@@ -1,8 +1,8 @@
 // Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-import Core;
-
 #include <csignal>
+
+import Core;
 
 TextWriter& Console::Out = PlatformIO::GetStandardOutput();
 TextWriter& Console::Error = PlatformIO::GetStandardError();

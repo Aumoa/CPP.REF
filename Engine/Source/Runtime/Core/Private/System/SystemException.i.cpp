@@ -1,8 +1,8 @@
 // Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-import Core;
-
 #include "System/LanguageSupportMacros.h"
+
+import Core;
 
 SystemException::SystemException(int32 SystemCode) noexcept
 	: Exception(FormatMessage(SystemCode))

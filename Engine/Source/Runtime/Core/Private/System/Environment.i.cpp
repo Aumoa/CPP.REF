@@ -1,8 +1,8 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
-
-import Core;
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
 #include <stdlib.h>
+
+import Core;
 
 String Environment::EngineDirectory;
 
