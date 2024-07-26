@@ -1,39 +1,38 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#include "System/Console.h"
-#include "System/Action.h"
-#include "Platform/PlatformIO.h"
-#include <csignal>
+module;
 
-TextWriter& Console::Out = PlatformIO::GetStandardOutput();
-TextWriter& Console::Error = PlatformIO::GetStandardError();
+#include "System/LanguageSupportMacros.h"
 
-Console::CancelKeyPressedDelegate Console::CancelKeyPressed;
+export module Core:Console;
 
-inline namespace
+export import :ConsoleColor;
+export import :MulticastDelegate;
+export import :TextWriter;
+
+export class CORE_API Console
 {
-	Spinlock Lock;
+public:
+	static TextWriter& Out;
+	static TextWriter& Error;
 
-	void BroadcastSignalInterrupt(int)
+public:
+	static void Write(String Str);
+	static void WriteLine(String Str);
+
+	DECLARE_MULTICAST_DELEGATE(CancelKeyPressedDelegate);
+	static CancelKeyPressedDelegate CancelKeyPressed;
+
+public:
+	template<class... TArgs>
+	static void Write(String Format, TArgs&&... InArgs)
 	{
-		Console::CancelKeyPressed.Broadcast();
+		Write(String::Format(Format, std::forward<TArgs>(InArgs)...));
 	}
 
-	int SignalInit = +[]()
+	template<class... TArgs>
+	static void WriteLine(String Format, TArgs&&... InArgs)
 	{
-		signal(SIGINT, BroadcastSignalInterrupt);
-		return 0;
-	}();
-}
-
-void Console::Write(String Str)
-{
-	std::unique_lock ScopedLock(Lock);
-	Out.Write(Str);
-}
-
-void Console::WriteLine(String Str)
-{
-	std::unique_lock ScopedLock(Lock);
-	Out.WriteLine(Str);
-}
+		WriteLine(String::Format(Format, std::forward<TArgs>(InArgs)...));
+	}
+};

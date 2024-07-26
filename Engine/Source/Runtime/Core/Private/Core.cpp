@@ -99,3 +99,6 @@ export import :Delegate;
 export import :any_adaptor;
 export import :Any;
 export import :DelegateHandle;
+export import :MulticastDelegate;
+export import :ConsoleColor;
+export import :Console;

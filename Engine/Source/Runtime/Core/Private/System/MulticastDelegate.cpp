@@ -1,22 +1,25 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+module;
 
-#include "System/Delegate.h"
-#include "System/Referencer.h"
-#include "System/DelegateHandle.h"
-#include "Threading/Spinlock.h"
 #include "System/AssertionMacros.h"
-#include "Linq/Any.h"
-#include <unordered_map>
 
-template<class T>
+export module Core:MulticastDelegate;
+
+export import :Std;
+export import :Delegate;
+export import :Referencer;
+export import :DelegateHandle;
+export import :Spinlock;
+export import :Any;
+
+export template<class T>
 class MulticastDelegate
 {
 	static_assert(std::same_as<T, std::function<void>>, "invalid template argument.");
 };
 
-template<class... TArgs>
+export template<class... TArgs>
 class MulticastDelegate<void(TArgs...)>
 {
 	MulticastDelegate(const MulticastDelegate&) = delete;
