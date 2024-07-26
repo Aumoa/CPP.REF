@@ -1,13 +1,11 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:DelegateHandle;
 
-#include "System/IntegralTypes.h"
+export import :Forward;
+export import :IntegralTypes;
 
-template<class T>
-class MulticastDelegate;
-
-class DelegateHandle
+export class DelegateHandle
 {
 	template<class T>
 	friend class MulticastDelegate;

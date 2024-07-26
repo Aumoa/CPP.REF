@@ -144,5 +144,3 @@ public:
 		return Add(Delegate_t::CreateStatic(Val));
 	}
 };
-
-#define DECLARE_MULTICAST_DELEGATE(DelegateName, ...) using DelegateName = MulticastDelegate<void(__VA_ARGS__)>

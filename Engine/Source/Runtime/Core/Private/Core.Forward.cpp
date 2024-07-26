@@ -2,6 +2,9 @@
 
 export module Core:Forward;
 
+export template<class T>
+class MulticastDelegate;
+
 export class String;
 export class DateTime;
 export class FileReference;

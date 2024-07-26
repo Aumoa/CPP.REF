@@ -1,17 +1,17 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:DelegateObjectValidator;
 
-#include <memory>
+export import :Std;
 
-template<class T>
+export template<class T>
 struct DelegateObjectValidator
 {
 	static constexpr bool bSpecialized = false;
 	static constexpr bool bCanLock = false;
 };
 
-template<class T>
+export template<class T>
 struct DelegateObjectValidator<std::shared_ptr<T>>
 {
 	static constexpr bool bSpecialized = true;

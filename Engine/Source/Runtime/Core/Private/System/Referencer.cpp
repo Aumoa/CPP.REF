@@ -1,11 +1,14 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+module;
 
-#include "Platform/PlatformAtomics.h"
 #include "Platform/PlatformMacros.h"
 
-class CORE_API Referencer
+export module Core:Referencer;
+
+export import :PlatformAtomics;
+
+export class CORE_API Referencer
 {
 	volatile int32 Locks = 0;
 	volatile int32 Weaks = 0;

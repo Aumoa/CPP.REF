@@ -1,96 +1,18 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+export module Core:CommandLine;
 
-#include "System/CommandLine.h"
-#include "System/AssertionMacros.h"
-#include "Platform/PlatformLocalization.h"
+export import :Std;
+export import :String;
 
-std::vector<String> CommandLine::Args;
-
-void CommandLine::Init(int Argc, const char* const Argv[])
+export class CORE_API CommandLine
 {
-	check(Args.empty());
-	for (int i = 0; i < Argc; ++i)
-	{
-		Args.emplace_back(String::FromLiteral(Argv[i]));
-	}
-}
+	CommandLine() = delete;
 
-void CommandLine::Init(String CmdArgs)
-{
-	check(Args.empty());
-	bool bQuoted = false;
+private:
+	static std::vector<String> Args;
 
-	if (CmdArgs.IsEmpty())
-	{
-		return;
-	}
-
-	auto FlushCommand = [&](size_t Start, size_t End)
-	{
-		check(Start < End);
-		size_t Length = End - Start;
-		if (Length == 1 && Char::IsWhiteSpace(CmdArgs[Start]))
-		{
-			return End;
-		}
-
-		Args.emplace_back(CmdArgs.Substring(Start, Length));
-		return End;
-	};
-
-	size_t StartIndex = 0;
-	for (size_t i = 0; i < CmdArgs.length(); ++i)
-	{
-		if (bQuoted)
-		{
-			if (CmdArgs[i] == '"' && CmdArgs[i - 1] != '\\')
-			{
-				bQuoted = false;
-			}
-		}
-
-		if (Char::IsWhiteSpace(CmdArgs[i]))
-		{
-			StartIndex = FlushCommand(StartIndex, i);
-		}
-	}
-	FlushCommand(StartIndex, CmdArgs.length());
-}
-
-bool CommandLine::TryGetValue(String InName, String& OutValue)
-{
-	bool bCatchResult = false;
-	OutValue = String::GetEmpty();
-
-	for (auto& Cur : Args)
-	{
-		if (Cur.StartsWith(TEXT("-")))
-		{
-			if (bCatchResult)
-			{
-				// Command is not contains.
-				break;
-			}
-
-			String Command = Cur.Substring(1);
-			if (Command.Equals(InName, EStringComparison::CurrentCultureIgnoreCase))
-			{
-				bCatchResult = true;
-				continue;
-			}
-		}
-		else if (bCatchResult)
-		{
-			OutValue = Cur.Trim();
-			break;
-		}
-	}
-
-	return bCatchResult;
-}
-
-bool CommandLine::Contains(String InName)
-{
-	String _;
-	return TryGetValue(InName, _);
-}
+public:
+	static void Init(int Argc, const char* const Argv[]);
+	static void Init(String CmdArgs);
+	static bool TryGetValue(String InName, String& OutValue);
+	static bool Contains(String InName);
+};

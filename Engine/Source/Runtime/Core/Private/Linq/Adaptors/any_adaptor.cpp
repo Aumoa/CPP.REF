@@ -1,10 +1,10 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:any_adaptor;
 
-#include <ranges>
+export import :Std;
 
-namespace Linq::adaptors
+export namespace Linq::adaptors
 {
 	struct any_adaptor_closure
 	{

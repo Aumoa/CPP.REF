@@ -1,21 +1,23 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+module;
 
-#include "System/DelegateObjectValidator.h"
-#include "System/VoidableOptional.h"
-#include "System/ScopedRemover.h"
 #include "Platform/PlatformMacros.h"
-#include <concepts>
-#include <functional>
 
-template<class T>
+export module Core:Delegate;
+
+export import :Std;
+export import :DelegateObjectValidator;
+export import :VoidableOptional;
+export import :ScopedRemover;
+
+export template<class T>
 class Delegate
 {
 	static_assert(std::same_as<T, std::function<void>>, "invalid template argument.");
 };
 
-template<class TRet, class... TArgs> requires requires { std::declval<std::function<TRet(TArgs...)>>(); }
+export template<class TRet, class... TArgs> requires requires { std::declval<std::function<TRet(TArgs...)>>(); }
 class Delegate<TRet(TArgs...)>
 {
 public:

@@ -120,3 +120,4 @@ ExportPrefix inline constexpr auto operator <=>(ClassType Lhs, std::underlying_t
 
 
 #define TEXT(X) (String::FromLiteral(L ## X))
+#define DECLARE_MULTICAST_DELEGATE(DelegateName, ...) using DelegateName = MulticastDelegate<void(__VA_ARGS__)>

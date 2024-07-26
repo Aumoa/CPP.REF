@@ -1,8 +1,10 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2024 Aumoa.lib. All right reserved.
 
-#pragma once
+export module Core:ScopedRemover;
 
-template<class T>
+export import :Std;
+
+export template<class T>
 class ScopedRemover
 {
 private:
