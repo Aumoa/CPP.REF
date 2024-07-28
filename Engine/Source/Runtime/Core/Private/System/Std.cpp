@@ -29,6 +29,8 @@ export import <queue>;
 export import <map>;
 export import <optional>;
 export import <span>;
+export import <random>;
+export import <set>;
 
 export import <cmath>;
 export import <cstdint>;
