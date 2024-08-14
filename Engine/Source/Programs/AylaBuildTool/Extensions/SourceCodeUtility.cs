@@ -16,7 +16,7 @@ public static class SourceCodeUtility
 
     public static bool IsRuleFile(this FileReference file)
     {
-        return file.Extensions.ToLower() is "module.cs";
+        return file.FileName.EndsWith("module.cs", StringComparison.OrdinalIgnoreCase);
     }
 
     public static bool IsNatvisFile(this FileReference file)

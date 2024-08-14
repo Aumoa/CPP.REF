@@ -36,7 +36,7 @@ public class Core : ModuleRules
                 "dbghelp.lib",
                 "Rpcrt4.lib",
                 "Kernel32.lib",
-                "WS2_32.lib"
+                "Ws2_32.lib"
             });
         }
     }
