@@ -1,20 +1,26 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-export module Core:StreamWriter;
+#include "IO/StreamWriter.h"
 
-export import :TextWriter;
-export import :Stream;
-
-export class CORE_API StreamWriter : public TextWriter
+StreamWriter::StreamWriter(std::shared_ptr<Stream> InStream)
+	: CurrentStream_Capture(std::move(InStream))
+	, CurrentStream(CurrentStream_Capture.get())
 {
-private:
-	std::shared_ptr<Stream> CurrentStream_Capture;
-	Stream* CurrentStream = nullptr;
+}
 
-public:
-	StreamWriter(std::shared_ptr<Stream> InStream);
-	StreamWriter(Stream* InStreamPtr);
+StreamWriter::StreamWriter(Stream* InStreamPtr)
+	: CurrentStream(InStreamPtr)
+{
+}
 
-	virtual void Write(String Val) override;
-	virtual Task<> WriteAsync(String Val) override;
-};
+void StreamWriter::Write(String Val)
+{
+	std::string MbChars = Val.AsCodepage();
+	CurrentStream->Write({ (const uint8*)MbChars.c_str(), MbChars.length() });
+}
+
+Task<> StreamWriter::WriteAsync(String Val)
+{
+	std::string MbChars = Val.AsCodepage();
+	co_await CurrentStream->WriteAsync({ (const uint8*)MbChars.c_str(), MbChars.length() });
+}

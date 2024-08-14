@@ -1,100 +1,52 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-module;
+#include "System/Version.h"
+#include "System/ArgumentException.h"
 
-#include "System/LanguageSupportMacros.h"
-
-export module Core:Version;
-
-export import :IntegralTypes;
-export import :String;
-
-export struct CORE_API Version
+Version::Version(String InVersionStr)
 {
-	int32 Major;
-	int32 Minor;
-	int32 Build;
-	int32 Revision;
-
-	constexpr Version() noexcept
-		: Major(0)
-		, Minor(0)
-		, Build(0)
-		, Revision(0)
+	if (TryParse(InVersionStr, *this) == false)
 	{
+		throw ArgumentException(TEXT("Invalid version format."));
+	}
+}
+
+bool Version::TryParse(String InVersionStr, Version& OutVersion)
+{
+	size_t MajorEnd = InVersionStr.IndexOf('.');
+	if (MajorEnd == IntegralTypes::Npos)
+	{
+		return false;
 	}
 
-	Version(String InVersionStr);
-
-	constexpr Version(int32 InMajor, int32 InMinor, int32 InBuild = 0, int32 InRevision = 0) noexcept
-		: Major(InMajor)
-		, Minor(InMinor)
-		, Build(InBuild)
-		, Revision(InRevision)
+	if (Int32::TryParse(InVersionStr.SubstringView(0, MajorEnd), OutVersion.Major) == false)
 	{
+		return false;
 	}
 
-	constexpr Version(const Version& Rhs) noexcept
-		: Major(Rhs.Major)
-		, Minor(Rhs.Minor)
-		, Build(Rhs.Build)
-		, Revision(Rhs.Revision)
+	String Context = InVersionStr.SubstringView(MajorEnd + 1);
+	size_t MinorEnd = Context.IndexOf('.');
+	if (Int32::TryParse(Context.SubstringView(0, MinorEnd), OutVersion.Minor) == false)
 	{
+		return false;
 	}
 
-	String ToString() const
+	if (MinorEnd == IntegralTypes::Npos)
 	{
-		if (Revision != 0)
-		{
-			return String::Format(TEXT("{}.{}.{}.{}"), Major, Minor, Build, Revision);
-		}
-		else if (Build != 0)
-		{
-			return String::Format(TEXT("{}.{}.{}"), Major, Minor, Build);
-		}
-		else
-		{
-			return String::Format(TEXT("{}.{}"), Major, Minor);
-		}
+		return true;
 	}
 
-	static bool TryParse(String InVersionStr, Version& OutVersion);
-
-	constexpr auto operator <=>(const Version& Rhs) const noexcept
+	Context = Context.SubstringView(MinorEnd + 1);
+	size_t BuildEnd = Context.IndexOf('.');
+	if (Int32::TryParse(Context.SubstringView(0, BuildEnd), OutVersion.Build) == false)
 	{
-		if (auto V1 = Major <=> Rhs.Major; V1 != 0)
-		{
-			return V1;
-		}
-		else if (auto V2 = Minor <=> Rhs.Minor; V2 != 0)
-		{
-			return V2;
-		}
-		else if (auto V3 = Build <=> Rhs.Build; V3 != 0)
-		{
-			return V3;
-		}
-		else if (auto V4 = Revision <=> Rhs.Major; V4 != 0)
-		{
-			return V4;
-		}
-		return std::strong_ordering::equal;
+		return false;
 	}
 
-	constexpr auto operator ==(const Version& Rhs) const noexcept
+	if (BuildEnd == IntegralTypes::Npos)
 	{
-		return Major == Rhs.Major
-			&& Minor == Rhs.Minor
-			&& Build == Rhs.Build
-			&& Revision == Rhs.Revision;
+		return true;
 	}
 
-	constexpr Version& operator =(const Version& Rhs) noexcept
-	{
-		Major = Rhs.Major;
-		Minor = Rhs.Minor;
-		Build = Rhs.Build;
-		Revision = Rhs.Revision;
-		return *this;
-	}
-};
+	return Int32::TryParse(Context.SubstringView(BuildEnd + 1), OutVersion.Revision);
+}

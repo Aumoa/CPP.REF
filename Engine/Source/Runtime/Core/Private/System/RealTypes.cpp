@@ -1,45 +1,18 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-export module Core:RealTypes;
+#include "System/RealTypes.h"
+#include "System/String.h"
+#include "Platform/PlatformLocalization.h"
+#include <cstdlib>
 
-export import :Std;
-export import :Forward;
-export import :StaticClass;
-
-export class CORE_API RealTypes : public StaticClass
+template<>
+String TRealType<float>::ToString() const
 {
-public:
-	template<class T>
-	static constexpr bool IsReal() noexcept
-	{
-		return std::same_as<T, float>
-			|| std::same_as<T, double>;
-	}
-};
+	return String::Format(TEXT("{}"), Value);
+}
 
-export template<class T>
-struct TRealType
+template<>
+String TRealType<double>::ToString() const
 {
-	static_assert(RealTypes::IsReal<T>());
-	T Value;
-
-	inline TRealType() noexcept
-		: Value(0)
-	{
-	}
-
-	inline constexpr TRealType(const T& Val) noexcept
-		: Value(Val)
-	{
-	}
-
-	inline constexpr TRealType(const TRealType& Val) noexcept
-		: Value(Val.Value)
-	{
-	}
-
-	String ToString() const;
-};
-
-export using Single = TRealType<float>;
-export using Double = TRealType<double>;
+	return String::Format(TEXT("{}"), Value);
+}

@@ -193,11 +193,6 @@ public class VisualCppProject : VisualStudioProject
                 clCompile.AddElement("CompileAs").InnerText = "CompileAsCppModule";
                 clCompile.AddElement("PreprocessorDefinitions").InnerText = string.Join(';', macros);
                 clCompile.AddElement("UseStandardPreprocessor").InnerText = "true";
-
-                var link = itemDefinitionGroup.AddElement("Link");
-                link.AddElement("AdditionalDependencies").InnerText = string.Join(';', moduleInfo.PrivateAdditionalLibraries
-                    .Append("$(CoreLibraryDependencies)")
-                    .Append("%(AdditionalDependencies)"));
             });
 
             var ItemGroup = project.AddElement("ItemGroup");

@@ -1,26 +1,30 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-export module Core:Process;
+#include "Platform/Process.h"
+#include "Platform/PlatformProcess.h"
 
-export import :Std;
-export import :ProcessStartInfo;
-
-export class CORE_API Process
+Process::Process()
 {
-private:
-	ProcessStartInfo StartInfo;
-	void* ProcessHandle = nullptr;
+}
 
-private:
-	Process();
+Process::~Process() noexcept
+{
+	if (ProcessHandle)
+	{
+		PlatformProcess::CloseProcessHandle(ProcessHandle);
+		ProcessHandle = nullptr;
+	}
+}
 
-public:
-	~Process() noexcept;
+std::shared_ptr<Process> Process::Start(const ProcessStartInfo& InStartInfo)
+{
+	std::shared_ptr<Process> Ptr{ new Process() };
+	Ptr->StartInfo = InStartInfo;
+	Ptr->StartApplication();
+	return Ptr;
+}
 
-	const ProcessStartInfo& GetStartInfo() const { return StartInfo; }
-
-	static std::shared_ptr<Process> Start(const ProcessStartInfo& InStartInfo);
-
-private:
-	void StartApplication();
-};
+void Process::StartApplication()
+{
+	ProcessHandle = PlatformProcess::CreateProcess(StartInfo);
+}

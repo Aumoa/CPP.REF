@@ -1,21 +1,12 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-module;
+#include "System/NotSupportedException.h"
 
-#include "System/LanguageSupportMacros.h"
-
-export module Core:NotSupportedException;
-
-export import :Exception;
-
-export class CORE_API NotSupportedException : public Exception
+NotSupportedException::NotSupportedException(std::exception_ptr InInnerException)
+	: Exception(TEXT("The specified function or operation is not supported."), InInnerException)
 {
-	NotSupportedException(std::exception_ptr InInnerException)
-		: Exception(TEXT("The specified function or operation is not supported."), InInnerException)
-	{
-	}
+}
 
-	~NotSupportedException() noexcept
-	{
-	}
-};
+NotSupportedException::~NotSupportedException() noexcept
+{
+}

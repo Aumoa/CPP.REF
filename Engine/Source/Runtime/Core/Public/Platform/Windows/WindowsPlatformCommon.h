@@ -1,4 +1,4 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #pragma once
 
@@ -6,6 +6,7 @@
 
 #if PLATFORM_WINDOWS
 
+#include "System/String.h"
 #include "System/AssertionMacros.h"
 
 #pragma push_macro("TEXT")
@@ -44,6 +45,34 @@
 #undef GetEnvironmentVariable
 
 #pragma pop_macro("TEXT")
+
+using Microsoft::WRL::ComPtr;
+
+namespace WindowsPlatformCommon
+{
+	inline String GetErrorText(DWORD dwError)
+	{
+		static thread_local WCHAR Buf[1024] = {};
+		DWORD Len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwError, 0, Buf, 1024, NULL);
+		if (Len == 0)
+		{
+			return TEXT("Unknown error.");
+		}
+
+		return String(Buf, Len);
+	}
+
+	inline String GetErrorText()
+	{
+		return GetErrorText(::GetLastError());
+	}
+
+	[[noreturn]]
+	inline void ReportHResult(HRESULT Result)
+	{
+		checkf(SUCCEEDED(Result), TEXT("Failed to execute D3D12 operation. Error: 0x{:08X}"), Result);
+	}
+}
 
 #define HR(X) if (HRESULT Result = (X); FAILED(Result)) { WindowsPlatformCommon::ReportHResult(Result); }
 

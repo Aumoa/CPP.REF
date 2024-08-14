@@ -2,43 +2,45 @@
 
 #pragma once
 
-#define GENERATE_BITMASK_ENUM_OPERATORS(ClassType, ExportPrefix) \
-ExportPrefix inline constexpr ClassType operator |(ClassType Lhs, ClassType Rhs) noexcept \
+#include <type_traits>
+
+#define GENERATE_BITMASK_ENUM_OPERATORS(ClassType) \
+inline constexpr ClassType operator |(ClassType Lhs, ClassType Rhs) noexcept \
 { \
 	using T = std::underlying_type_t<ClassType>; \
 	return (ClassType)((T)Lhs | (T)Rhs); \
 } \
 \
-ExportPrefix inline constexpr ClassType operator &(ClassType Lhs, ClassType Rhs) noexcept \
+inline constexpr ClassType operator &(ClassType Lhs, ClassType Rhs) noexcept \
 { \
 	using T = std::underlying_type_t<ClassType>; \
 	return (ClassType)((T)Lhs & (T)Rhs); \
 } \
 \
-ExportPrefix inline constexpr ClassType& operator |=(ClassType& Lhs, ClassType Rhs) noexcept \
+inline constexpr ClassType& operator |=(ClassType& Lhs, ClassType Rhs) noexcept \
 { \
 	Lhs = Lhs | Rhs; \
 	return Lhs; \
 } \
 \
-ExportPrefix inline constexpr ClassType& operator &=(ClassType& Lhs, ClassType Rhs) noexcept \
+inline constexpr ClassType& operator &=(ClassType& Lhs, ClassType Rhs) noexcept \
 { \
 	Lhs = Lhs & Rhs; \
 	return Lhs; \
 } \
 \
-ExportPrefix inline constexpr ClassType operator ~(ClassType u) noexcept \
+inline constexpr ClassType operator ~(ClassType u) noexcept \
 { \
 	using T = std::underlying_type_t<ClassType>; \
 	return (ClassType)~(T)u; \
 } \
 \
-ExportPrefix inline constexpr bool operator ==(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
+inline constexpr bool operator ==(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
 { \
 	return static_cast<std::underlying_type_t<ClassType>>(Lhs) == Rhs; \
 } \
 \
-ExportPrefix inline constexpr auto operator <=>(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
+inline constexpr auto operator <=>(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
 { \
 	return static_cast<std::underlying_type_t<ClassType>>(Lhs) <=> Rhs; \
 }
@@ -115,8 +117,3 @@ ExportPrefix inline constexpr auto operator <=>(ClassType Lhs, std::underlying_t
 #define MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY_DOT() MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_DOT
 
 #define MACRO_RECURSIVE_FOR_EACH_DOT(Body, ...) MACRO_RECURSIVE_HELPER_FOR_EACH_DOT(Body __VA_OPT__(, __VA_ARGS__))
-
-
-#define TEXT(X) (String::FromLiteral(L ## X))
-#define DECLARE_MULTICAST_DELEGATE(DelegateName, ...) using DelegateName = MulticastDelegate<void(__VA_ARGS__)>
-#define DECLARE_MULTICAST_EVENT(EventName, ...) using EventName = MulticastEvent<void(__VA_ARGS__)>

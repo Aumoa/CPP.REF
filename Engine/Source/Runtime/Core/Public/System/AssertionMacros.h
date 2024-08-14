@@ -1,11 +1,20 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
 #pragma once
 
 #include "Platform/PlatformMacros.h"
-#include "System/LanguageSupportMacros.h"
+#include "Platform/PlatformProcess.h"
 
 #if DO_CHECK && !SHIPPING
+
+namespace AssertionMacros::details
+{
+	template<class TReturn, class TVerify>
+	TReturn FORCEINLINE DispatchCheckVerify(TVerify&& Verify) requires std::convertible_to<std::invoke_result_t<TVerify>, TReturn>
+	{
+		return Verify();
+	}
+}
 
 #define AE_CHECK_IMPL(Capture, Expr, Msg) \
 	if (UNLIKELY(!(Expr))) \

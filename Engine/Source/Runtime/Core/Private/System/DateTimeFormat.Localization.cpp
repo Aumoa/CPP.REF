@@ -1,15 +1,21 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-export module Core:DateTimeFormat_Localization;
+#include "System/DateTimeFormat.Localization.h"
+#include "System/DateTime.h"
+#include "Platform/PlatformLocalization.h"
+#include <chrono>
 
-export import :Forward;
-export import :StaticClass;
-export import :String;
-
-export namespace DateTimeFormat
+namespace DateTimeFormat
 {
-	struct CORE_API Localization : public StaticClass
+	String Localization::ToString(const DateTime& Time)
 	{
-		static String ToString(const DateTime& Time);
-	};
+		if (Time.IsUTC())
+		{
+			return String::Format(TEXT("{}"), Time.GetTimePoint());
+		}
+		else
+		{
+			return String::Format(TEXT("{}"), Time.GetLocalTime());
+		}
+	}
 }

@@ -1,14 +1,31 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-export module Core:WindowsPlatformMisc;
+#include "Platform/Windows/WindowsPlatformMisc.h"
 
-export import :GenericPlatformMisc;
-export import :String;
-export import :IntegralTypes;
+#if PLATFORM_WINDOWS
 
-export class CORE_API WindowsPlatformMisc : public GenericPlatformMisc
+#define __ALLOW_PLATFORM_COMMON_H__
+
+#include "Platform/PlatformLocalization.h"
+#include "Platform/PlatformCommon.h"
+
+int32 PlatformMisc::GetLastError() noexcept
 {
-public:
-	static int32 GetLastError() noexcept;
-	static String FormatSystemCode(int32 ErrorCode) noexcept;
-};
+	return (int32)::GetLastError();
+}
+
+String PlatformMisc::FormatSystemCode(int32 InSystemCode) noexcept
+{
+	static thread_local WCHAR Buf[1024] = {};
+	DWORD Len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)InSystemCode, 0, Buf, 1024, NULL);
+	if (Len == 0)
+	{
+		return TEXT("Unknown error.");
+	}
+
+	return String(Buf, Len);
+}
+
+#undef __ALLOW_PLATFORM_COMMON_H__
+
+#endif

@@ -1,32 +1,66 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-module;
+#include "System/Exception.h"
+#include "Diagnostics/StackTrace.h"
 
-#include "System/LanguageSupportMacros.h"
-
-export module Core:Exception;
-
-export import :Std;
-export import :String;
-export import :PlatformLocalization;
-
-export class CORE_API Exception
+Exception::Exception(const String& InMessage, std::exception_ptr InInnerException, std::source_location Src) noexcept
+	: Message(InMessage)
+	, InnerException(InInnerException)
+	, Src(Src)
+	, Stacktrace(StackTrace::Current().ToString())
 {
-	String Message;
-	std::exception_ptr InnerException;
-	std::source_location Src;
-	String Stacktrace;
+}
 
-public:
-	Exception(const String& InMessage = TEXT("An exception was thrown."), std::exception_ptr InInnerException = {}, std::source_location Src = std::source_location::current()) noexcept;
-	Exception(const Exception& Rhs) noexcept = default;
-	Exception(Exception&& Rhs) noexcept = default;
-	virtual ~Exception() noexcept;
+Exception::~Exception() noexcept
+{
+}
 
-	virtual String ToString() const noexcept;
+String Exception::ToString() const noexcept
+{
+	if (InnerException)
+	{
+		String Composed = String::Format(TEXT("{}: {}\n"), String(typeid(*this).name()), Message);
+		try
+		{
+			std::rethrow_exception(InnerException);
+		}
+		catch (const Exception& E)
+		{
+			Composed += String::Format(TEXT("---> {}\n"), E.ToString());
+		}
+		catch (const std::exception& E)
+		{
+			Composed += String::Format(TEXT("---> {}: {}\n"), String(typeid(E).name()), String(E.what()));
+		}
+		catch (...)
+		{
+			Composed += String::Format(TEXT("---> Unknown exception.\n"));
+		}
+		Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), Stacktrace);
+		return Composed;
+	}
+	else
+	{
+		return String::Format(TEXT("{}: {}\n{}"), String(typeid(*this).name()), Message, Stacktrace);
+	}
+}
 
-	virtual String GetMessage() const noexcept;
-	virtual std::exception_ptr GetInnerException() const noexcept;
-	virtual std::source_location GetSourceLocation() const noexcept;
-	virtual String GetStackTrace() const noexcept;
-};
+String Exception::GetMessage() const noexcept
+{
+	return Message;
+}
+
+std::exception_ptr Exception::GetInnerException() const noexcept
+{
+	return InnerException;
+}
+
+std::source_location Exception::GetSourceLocation() const noexcept
+{
+	return Src;
+}
+
+String Exception::GetStackTrace() const noexcept
+{
+	return Stacktrace;
+}

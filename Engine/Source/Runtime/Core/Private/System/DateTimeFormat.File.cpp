@@ -1,15 +1,25 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-export module Core:DateTimeFormat_File;
+#include "System/DateTimeFormat.File.h"
+#include "System/DateTime.h"
+#include "Platform/PlatformLocalization.h"
+#include <chrono>
 
-export import :Forward;
-export import :String;
-export import :StaticClass;
-
-export namespace DateTimeFormat
+namespace DateTimeFormat
 {
-	struct CORE_API File : public StaticClass
+	String File::ToString(const DateTime& Time)
 	{
-		static String ToString(const DateTime& Time);
-	};
+		const auto YMD = Time.GetYMD();
+
+		if (Time.IsUTC())
+		{
+			return String::Format(TEXT("{:0>2}-{:0>2}-{:0>2} UTC"),
+				(int)YMD.year(), (unsigned int)YMD.month(), (unsigned int)YMD.day());
+		}
+		else
+		{
+			return String::Format(TEXT("{:0>2}-{:0>2}-{:0>2}"),
+				(int)YMD.year(), (unsigned int)YMD.month(), (unsigned int)YMD.day());
+		}
+	}
 }

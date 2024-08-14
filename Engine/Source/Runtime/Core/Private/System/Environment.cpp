@@ -1,50 +1,39 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2022 Aumoa.lib. All right reserved.
 
-module;
+#include "System/Environment.h"
+#include "IO/File.h"
+#include "System/Path.h"
+#include "System/InvalidOperationException.h"
+#include "Platform/PlatformProcess.h"
+#include "System/InvalidOperationException.h"
+#include <stdlib.h>
 
-#include "Platform/PlatformMacros.h"
-#include "System/AssertionMacros.h"
-#include "System/LanguageSupportMacros.h"
+String Environment::EngineDirectory;
 
-export module Core:Environment;
-
-export import :StaticClass;
-export import :String;
-export import :PlatformProcess;
-
-export struct CORE_API Environment : public StaticClass
+void Environment::Init()
 {
-	static String GetCurrentDirectory()
+	static int Trap_init = (SetupEngineDirectory(), 0);
+}
+
+void Environment::SetupEngineDirectory()
+{
+	String Directory = PlatformProcess::FindEngineDirectory();
+	if (Directory.IsEmpty() == false)
 	{
-		Init();
-		return String(std::filesystem::current_path().wstring());
+		EngineDirectory = Directory;
 	}
+}
 
-	static void SetCurrentDirectory(String InPath)
+void Environment::SetEnvironmentVariable(String InName, String InValue)
+{
+	if (PlatformProcess::SetEnvironmentVariable(InName, InValue) == false)
 	{
-		Init();
-		std::filesystem::current_path(InPath.path());
+		throw InvalidOperationException();
 	}
+}
 
-	static String GetEngineDirectory()
-	{
-		Init();
-		check(EngineDirectory.IsEmpty() == false);
-		return EngineDirectory;
-	}
-
-	static void SetEnvironmentVariable(String InName, String InValue);
-	static String GetEnvironmentVariable(String InName);
-
-	static constexpr String NewLine()
-	{
-		return PLATFORM_NEWLINE;
-	}
-
-private:
-	static void Init();
-	static void SetupEngineDirectory();
-
-private:
-	static String EngineDirectory;
-};
+String Environment::GetEnvironmentVariable(String InName)
+{
+	// GetEnvironmentVariable is return literal capture.
+	return PlatformProcess::GetEnvironmentVariable(InName).Clone();
+}

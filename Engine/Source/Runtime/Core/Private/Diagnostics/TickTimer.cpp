@@ -1,19 +1,26 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-export module Core:TickTimer;
+#include "Diagnostics/TickTimer.h"
 
-export import :PerformanceTimer;
-export import :TimeSpan;
-
-export class CORE_API TickTimer
+TickTimer::TickTimer()
 {
-private:
-	PerformanceTimer Timer;
-	TimeSpan LastDur;
+}
 
-public:
-	TickTimer();
-	~TickTimer() noexcept;
+TickTimer::~TickTimer() noexcept
+{
+}
 
-	TimeSpan Tick() noexcept;
-};
+TimeSpan TickTimer::Tick() noexcept
+{
+	if (Timer.IsRunning() == false)
+	{
+		// Start timer when first tick is executing.
+		Timer.Start();
+		LastDur = TimeSpan::FromSeconds(0);
+	}
+
+	TimeSpan Cur = Timer.GetElapsed();
+	TimeSpan Del = Cur - LastDur;
+	LastDur = Cur;
+	return Del;
+}

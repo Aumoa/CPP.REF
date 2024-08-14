@@ -1,76 +1,20 @@
-// Copyright 2020-2024 Aumoa.lib. All right reserved.
+// Copyright 2020-2023 Aumoa.lib. All right reserved.
 
-export module Core:FileReference;
+#include "IO/FileReference.h"
+#include "IO/DirectoryReference.h"
 
-export import :Forward;
-export import :FileSystemReference;
-export import :File;
-export import :Path;
-export import :Environment;
-export import :InvalidOperationException;
-
-export class CORE_API FileReference : public FileSystemReference
+[[nodiscard]] FileReference FileReference::WithExtensions(String InExtensions) const
 {
-public:
-	FileReference() noexcept
+	if (InExtensions.IsEmpty())
 	{
+		return Path::Combine((String)GetDirectory(), GetName());
 	}
 
-	FileReference(String InPath) : FileSystemReference(InPath)
-	{
-	}
+	return Path::Combine((String)GetDirectory(), String::Format(TEXT("{0}.{1}"), GetName(), InExtensions));
+}
 
-	FileReference(const FileReference&) = default;
-	FileReference(FileReference&&) noexcept = default;
-
-	virtual bool IsExists() const override
-	{
-		return File::Exists(GetValue());
-	}
-
-	[[nodiscard]] FileReference GetAbsolute() const
-	{
-		if (IsPathFullQualified())
-		{
-			return FileReference(GetValue());
-		}
-		else
-		{
-			return FileReference(GetAbsolutePath());
-		}
-	}
-
-	[[nodiscard]] FileReference ToCurrentDirectoryBased() const
-	{
-		if (IsPathFullQualified())
-		{
-			throw InvalidOperationException();
-		}
-
-		return Path::Combine(Environment::GetCurrentDirectory(), GetValue());
-	}
-
-	void Delete() const
-	{
-		if (IsExists())
-		{
-			File::Delete(GetValue());
-		}
-	}
-
-	[[nodiscard]] String ReadAllText() const
-	{
-		return File::ReadAllText(GetValue());
-	}
-
-	[[nodiscard]] Task<String> ReadAllTextAsync(CancellationToken InCancellationToken = {}) const
-	{
-		return File::ReadAllTextAsync(GetValue(), InCancellationToken);
-	}
-
-	[[nodiscard]] FileReference WithExtensions(String InExtensions) const;
-	[[nodiscard]] DirectoryReference GetDirectory() const;
-
-	FileReference& operator =(const FileReference& Rhs) noexcept = default;
-	FileReference& operator =(FileReference&& Rhs) noexcept = default;
-};
+DirectoryReference FileReference::GetDirectory() const
+{
+	String DirectoryName = Path::GetDirectoryName(GetValue());
+	return DirectoryReference(DirectoryName);
+}
