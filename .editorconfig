@@ -67,8 +67,9 @@ csharp_style_expression_bodied_properties = true:silent
 csharp_style_expression_bodied_indexers = true:silent
 csharp_style_expression_bodied_accessors = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
-csharp_space_around_binary_operators = ignore
+csharp_space_around_binary_operators = before_and_after
 csharp_indent_labels = one_less_than_current
+csharp_style_expression_bodied_local_functions = false:silent
 
 [*.vb]
 #### 명명 스타일 ####
@@ -133,3 +134,4 @@ dotnet_style_allow_statement_immediately_after_block_experimental = true:silent
 tab_width = 4
 indent_size = 4
 end_of_line = crlf
+dotnet_style_coalesce_expression = true:suggestion
