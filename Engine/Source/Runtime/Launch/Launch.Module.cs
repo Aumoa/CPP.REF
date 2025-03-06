@@ -5,23 +5,12 @@ using AylaEngine;
 
 public class Launch : ModuleRules
 {
-    public Launch(TargetInfo targetInfo) : base(targetInfo)
+    public Launch()
     {
         Type = ModuleType.Application;
 
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "RHI",
-            "SlateCore",
-            "SlateRHIRenderer",
-            "Engine",
-            "Slate",
-            "CoreEd",
-            "MainFrame"
-        });
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "RHI", "SlateCore", "SlateRHIRenderer", "Engine", "Slate", "CoreEd", "MainFrame");
     }
 }

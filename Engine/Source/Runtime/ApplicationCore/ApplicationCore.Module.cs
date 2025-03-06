@@ -5,38 +5,21 @@ using AylaEngine;
 
 public class ApplicationCore : ModuleRules
 {
-    public ApplicationCore(TargetInfo targetInfo) : base(targetInfo)
+    public ApplicationCore()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "Numerics");
 
-        PublicDependencyModuleNames.AddRange(new[]
+        if (TargetInfo.Platform.Group == PlatformGroup.Windows)
         {
-            "Core",
-            "Numerics"
-        });
-
-        if (targetInfo.Platform.Group == PlatformGroup.Windows)
-        {
-            if (targetInfo.Platform.Architecture == Architecture.x64)
+            if (TargetInfo.Platform.Architecture == Architecture.X64)
             {
-                PrivateAdditionalMacros.AddRange(new[]
-                {
-                    "_WIN64"
-                });
+                AddPrivateAdditionalMacros("_WIN64");
             }
 
-            PrivateAdditionalLibraries.AddRange(new[]
-            {
-                "Gdi32.lib",
-                "gdiplus.lib"
-            });
-
-            PrivateDisableWarnings.AddRange(new[]
-            {
-                4245,
-                4458,
-            });
+            AddPrivateAdditionalLibraries("Gdi32.lib", "gdiplus.lib");
+            AddPrivateDisableWarnings(4245, 4458);
         }
     }
 }

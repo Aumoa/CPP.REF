@@ -5,16 +5,9 @@ using AylaEngine;
 
 public class ReflectionHeaderWorker : ModuleRules
 {
-    public ReflectionHeaderWorker(TargetInfo targetInfo) : base(targetInfo)
+    public ReflectionHeaderWorker()
     {
-        Type = ModuleType.ConsoleApplication;
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "Numerics",
-        });
-
-        PrivateIncludePaths.Add("Private");
+        AddPublicDependencyModuleNames("Core", "Numerics");
+        AddPrivateIncludePaths("Private");
     }
 }

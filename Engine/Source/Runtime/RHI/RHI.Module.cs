@@ -5,30 +5,16 @@ using AylaEngine;
 
 public class RHI : ModuleRules
 {
-    public RHI(TargetInfo targetInfo) : base(targetInfo)
+    public RHI()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "ApplicationCore");
+        AddPublicDisableWarnings(4324);
 
-        PublicDependencyModuleNames.AddRange(new[]
+        if (TargetInfo.Platform.Group == PlatformGroup.Windows)
         {
-            "Core",
-            "ApplicationCore"
-        });
-
-        PublicDisableWarnings.Add(4324);
-
-        if (targetInfo.Platform.Group == PlatformGroup.Windows)
-        {
-            PrivateAdditionalLibraries.AddRange(new[]
-            {
-                "dxgi.lib",
-                "d3d12.lib",
-                "d3d11.lib",
-                "d2d1.lib",
-                "User32.lib",
-                "dwrite.lib",
-            });
+            AddPrivateAdditionalLibraries("dxgi.lib", "d3d12.lib", "d3d11.lib", "d2d1.lib", "User32.lib", "dwrite.lib");
         }
     }
 }

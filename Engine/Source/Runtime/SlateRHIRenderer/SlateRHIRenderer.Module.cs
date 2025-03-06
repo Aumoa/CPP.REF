@@ -5,15 +5,10 @@ using AylaEngine;
 
 public class SlateRHIRenderer : ModuleRules
 {
-    public SlateRHIRenderer(TargetInfo targetInfo) : base(targetInfo)
+    public SlateRHIRenderer()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "SlateCore"
-        });
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "SlateCore");
     }
 }

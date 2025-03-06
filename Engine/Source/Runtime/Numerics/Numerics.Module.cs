@@ -5,20 +5,13 @@ using AylaEngine;
 
 public class Numerics : ModuleRules
 {
-    public Numerics(TargetInfo targetInfo) : base(targetInfo)
+    public Numerics()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core");
 
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core"
-        });
-
-        PublicDisableWarnings.AddRange(new[]
-        {
-            // In C11, unnamed union structure is allowed actually.
-            4201
-        });
+        // In C11, unnamed union structure is allowed actually.
+        AddPublicDisableWarnings(4201);
     }
 }

@@ -5,39 +5,18 @@ using AylaEngine;
 
 public class Core : ModuleRules
 {
-    public Core(TargetInfo targetInfo) : base(targetInfo)
+    public Core()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
 
-        PublicDisableWarnings.AddRange(new[]
+        AddPublicDisableWarnings(4251, 4275, 5105, 4005);
+        AddPrivateDisableWarnings(5106);
+
+        if (TargetInfo.Platform.Group == PlatformGroup.Windows)
         {
-            4251,
-            4275,
-            5105,
-            4005,
-        });
-
-        PrivateDisableWarnings.AddRange(new[]
-        {
-            5106,
-        });
-
-        if (targetInfo.BuildConfiguration.Platform.Group == PlatformGroup.Windows)
-        {
-            PublicAdditionalMacros.AddRange(new[]
-            {
-                "NOMINMAX",
-                "WIN32_LEAN_AND_MEAN"
-            });
-
-            PrivateAdditionalLibraries.AddRange(new[]
-            {
-                "dbghelp.lib",
-                "Rpcrt4.lib",
-                "Kernel32.lib",
-                "Ws2_32.lib"
-            });
+            AddPublicAdditionalMacros("NOMINMAX", "WIN32_LEAN_AND_MEAN");
+            AddPrivateAdditionalLibraries("dbghelp.lib", "Rpcrt4.lib", "Kernel32.lib", "Ws2_32.lib", "winsock2.lib");
         }
     }
 }

@@ -5,20 +5,14 @@ using AylaEngine;
 
 public class ShaderCompileWorker : ModuleRules
 {
-    public ShaderCompileWorker(TargetInfo targetInfo) : base(targetInfo)
+    public ShaderCompileWorker()
     {
-        Type = ModuleType.ConsoleApplication;
+        AddPublicDependencyModuleNames("Core");
+        AddPrivateIncludePaths("Private");
 
-        PublicDependencyModuleNames.AddRange(new[]
+        if (TargetInfo.Platform.Group == PlatformGroup.Windows)
         {
-            "Core"
-        });
-
-        PrivateIncludePaths.Add("Private");
-
-        if (targetInfo.Platform.Group == PlatformGroup.Windows)
-        {
-            PrivateAdditionalLibraries.Add("dxcompiler.lib");
+            AddPrivateAdditionalLibraries("dxcompiler.lib");
         }
     }
 }

@@ -5,17 +5,10 @@ using AylaEngine;
 
 public class SlateCore : ModuleRules
 {
-    public SlateCore(TargetInfo targetInfo) : base(targetInfo)
+    public SlateCore()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "Numerics",
-            "ApplicationCore",
-            "RenderCore",
-        });
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "Numerics", "ApplicationCore", "RenderCore");
     }
 }

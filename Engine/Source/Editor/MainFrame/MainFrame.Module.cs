@@ -5,17 +5,10 @@ using AylaEngine;
 
 public class MainFrame : ModuleRules
 {
-    public MainFrame(TargetInfo targetInfo) : base(targetInfo)
+    public MainFrame()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "SlateCore",
-            "Slate",
-            "Engine",
-        });
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "SlateCore", "Slate", "Engine");
     }
 }

@@ -5,15 +5,10 @@ using AylaEngine;
 
 public class Slate : ModuleRules
 {
-    public Slate(TargetInfo targetInfo) : base(targetInfo)
+    public Slate()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "SlateCore"
-        });
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "SlateCore");
     }
 }

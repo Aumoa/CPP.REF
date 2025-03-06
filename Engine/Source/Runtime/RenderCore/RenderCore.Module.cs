@@ -5,16 +5,10 @@ using AylaEngine;
 
 public class RenderCore : ModuleRules
 {
-    public RenderCore(TargetInfo targetInfo) : base(targetInfo)
+    public RenderCore()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "Numerics",
-            "RHI"
-        });
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "Numerics", "RHI");
     }
 }

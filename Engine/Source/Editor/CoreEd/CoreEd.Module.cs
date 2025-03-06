@@ -5,17 +5,10 @@ using AylaEngine;
 
 public class CoreEd : ModuleRules
 {
-    public CoreEd(TargetInfo targetInfo) : base(targetInfo)
+    public CoreEd()
     {
-        PublicIncludePaths.Add("Public");
-        PrivateIncludePaths.Add("Private");
-
-        PublicDependencyModuleNames.AddRange(new[]
-        {
-            "Core",
-            "SlateCore",
-            "MainFrame",
-            "Engine"
-        });
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        AddPublicDependencyModuleNames("Core", "SlateCore", "MainFrame", "Engine");
     }
 }
