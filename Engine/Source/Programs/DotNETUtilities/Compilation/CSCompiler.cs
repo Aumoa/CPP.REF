@@ -82,6 +82,21 @@ public static class CSCompiler
         return compiledAssembly;
     }
 
+    public static async Task CompileToAsync(string assemblyName, string saveTo, string sourceFile, IEnumerable<string> referencedAssemblies, bool includeBaseAssemblies = true, CancellationToken cancellationToken = default)
+    {
+        if (includeBaseAssemblies)
+        {
+            referencedAssemblies = referencedAssemblies.Concat(new string[]
+            {
+                typeof(object).Assembly.Location,
+                Assembly.Load("System.Runtime").Location,
+                Assembly.Load("System.Collections").Location
+            });
+        }
+
+        await CompileToAsync(assemblyName, saveTo, new string[] { sourceFile }, referencedAssemblies, cancellationToken);
+    }
+
     public static async Task<Type> LoadClassAsync<TBaseClass>(string sourceFile, CancellationToken cancellationToken = default)
     {
         Type basedType = typeof(TBaseClass);

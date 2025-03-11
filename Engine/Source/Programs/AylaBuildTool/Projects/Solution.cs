@@ -1,4 +1,7 @@
-﻿namespace AylaEngine;
+﻿using System.Reflection;
+using System.Threading.Tasks;
+
+namespace AylaEngine;
 
 internal class Solution
 {
@@ -57,9 +60,15 @@ internal class Solution
             var ruleFileName = Path.Combine(currentDir, directoryName + ".Module.cs");
             if (File.Exists(ruleFileName))
             {
-                var ruleAssembly = await CSCompiler.CompileAsync(directoryName, ruleFileName, [typeof(ModuleRules).Assembly.Location], cancellationToken: cancellationToken);
-                var ruleType = ruleAssembly.GetTypes().First(p => p.Name == directoryName);
+                var assembly = FindCachedAssembly(ruleFileName, out var dllFileName, out var cacheFileName);
+                if (assembly == null)
+                {
+                    await CSCompiler.CompileToAsync(directoryName, dllFileName, ruleFileName, [typeof(ModuleRules).Assembly.Location], cancellationToken: cancellationToken);
+                    File.Copy(ruleFileName, cacheFileName, true);
+                    assembly = await Task.Run(() => Assembly.LoadFile(dllFileName), cancellationToken);
+                }
 
+                var ruleType = assembly.GetTypes().First(p => p.Name == directoryName);
                 Project.Declaration declaration = await ConfigureDeclarationAsync(ruleFileName);
 
                 lock (results)
@@ -76,6 +85,37 @@ internal class Solution
             }
 
             await Task.WhenAll(innerTasks);
+
+            return;
+
+            Assembly? FindCachedAssembly(string ruleFileName, out string dllFileName, out string cacheFileName)
+            {
+                var fileName = Path.GetFileName(ruleFileName);
+                var dirName = Path.Combine(descriptor.IntermediateDirectory, "Rules");
+                Directory.CreateDirectory(dirName);
+
+                dllFileName = Path.Combine(dirName, fileName + ".dll");
+                cacheFileName = Path.Combine(dirName, fileName + ".cache");
+
+                if (File.Exists(cacheFileName) == false)
+                {
+                    return null;
+                }
+
+                if (File.Exists(dllFileName) == false)
+                {
+                    return null;
+                }
+
+                var ruleText = File.ReadAllText(ruleFileName);
+                var cacheText = File.ReadAllText(cacheFileName);
+                if (ruleText != cacheText)
+                {
+                    return null;
+                }
+
+                return Assembly.LoadFile(dllFileName);
+            }
         }
 
         async Task<Project.Declaration> ConfigureDeclarationAsync(string fileName)
