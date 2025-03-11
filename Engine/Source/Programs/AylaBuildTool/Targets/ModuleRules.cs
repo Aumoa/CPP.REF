@@ -21,8 +21,8 @@ public class ModuleRules
     public IReadOnlySet<int> PublicDisableWarnings { get; private set; } = new HashSet<int>();
     public IReadOnlySet<int> PrivateDisableWarnings { get; private set; } = new HashSet<int>();
 
-    public IReadOnlySet<string> PublicAdditionalMacros { get; private set; } = new HashSet<string>();
-    public IReadOnlySet<string> PrivateAdditionalMacros { get; private set; } = new HashSet<string>();
+    public IReadOnlySet<MacroSet> PublicAdditionalMacros { get; private set; } = new HashSet<MacroSet>();
+    public IReadOnlySet<MacroSet> PrivateAdditionalMacros { get; private set; } = new HashSet<MacroSet>();
 
     public IReadOnlySet<string> PublicDependencyModuleNames { get; private set; } = new HashSet<string>();
     public IReadOnlySet<string> PrivateDependencyModuleNames { get; private set; } = new HashSet<string>();
@@ -78,24 +78,24 @@ public class ModuleRules
         ((HashSet<int>)PrivateDisableWarnings).AddRange(items);
     }
 
-    public void AddPublicAdditionalMacros(params string[] items)
+    public void AddPublicAdditionalMacros(params MacroSet[] items)
     {
         if (m_FreezeCollections)
         {
             throw new InvalidOperationException();
         }
 
-        ((HashSet<string>)PublicAdditionalMacros).AddRange(items);
+        ((HashSet<MacroSet>)PublicAdditionalMacros).AddRange(items);
     }
 
-    public void AddPrivateAdditionalMacros(params string[] items)
+    public void AddPrivateAdditionalMacros(params MacroSet[] items)
     {
         if (m_FreezeCollections)
         {
             throw new InvalidOperationException();
         }
 
-        ((HashSet<string>)PrivateAdditionalMacros).AddRange(items);
+        ((HashSet<MacroSet>)PrivateAdditionalMacros).AddRange(items);
     }
 
     public void AddPublicDependencyModuleNames(params string[] items)
@@ -145,8 +145,8 @@ public class ModuleRules
         PrivateIncludePaths = ((HashSet<string>)PrivateIncludePaths).ToFrozenSet();
         PublicDisableWarnings = ((HashSet<int>)PublicDisableWarnings).ToFrozenSet();
         PrivateDisableWarnings = ((HashSet<int>)PrivateDisableWarnings).ToFrozenSet();
-        PublicAdditionalMacros = ((HashSet<string>)PublicAdditionalMacros).ToFrozenSet();
-        PrivateAdditionalMacros = ((HashSet<string>)PrivateAdditionalMacros).ToFrozenSet();
+        PublicAdditionalMacros = ((HashSet<MacroSet>)PublicAdditionalMacros).ToFrozenSet();
+        PrivateAdditionalMacros = ((HashSet<MacroSet>)PrivateAdditionalMacros).ToFrozenSet();
         PublicDependencyModuleNames = ((HashSet<string>)PublicDependencyModuleNames).ToFrozenSet();
         PrivateDependencyModuleNames = ((HashSet<string>)PrivateDependencyModuleNames).ToFrozenSet();
         PublicAdditionalLibraries = ((HashSet<string>)PublicAdditionalLibraries).ToFrozenSet();

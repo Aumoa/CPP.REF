@@ -1,4 +1,4 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "System/Console.h"
 #include "System/Action.h"

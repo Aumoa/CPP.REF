@@ -1,4 +1,4 @@
-﻿// Copyright 2020-2024 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 using System.Text;
 

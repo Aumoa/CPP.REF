@@ -1,4 +1,4 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #ifdef __D3D12_RESOURCE_HELPERS_ASSERT
 #error Do NOT include D3D12ResourceHelpers manually. Include D3D12Common.h instead.

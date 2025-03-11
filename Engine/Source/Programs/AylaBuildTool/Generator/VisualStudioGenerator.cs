@@ -554,7 +554,7 @@ internal class VisualStudioGenerator : Generator
                 string GenerateIncludePaths(ModuleRulesResolver resolver)
                 {
                     List<string> includes = new();
-                    foreach (var includePath in resolver.PublicIncludePaths.Concat(resolver.PrivateIncludePaths).Distinct())
+                    foreach (var includePath in resolver.IncludePaths)
                     {
                         var fullPath = Path.Combine(project.SourceDirectory, includePath);
                         includes.Add(fullPath);
@@ -576,9 +576,19 @@ internal class VisualStudioGenerator : Generator
 
                 static string GenerateProjectPreprocessorDefs(ModuleRulesResolver resolver)
                 {
-                    List<string> defs = new();
-                    defs.Add(resolver.Name.ToUpper() + "_API=__declspec(dllexport)");
-                    return string.Join(';', defs);
+                    return string.Join(';', resolver.AdditionalMacros.Select(FormatDef));
+
+                    static string FormatDef(MacroSet value)
+                    {
+                        if (value.Value == null)
+                        {
+                            return value.VarName;
+                        }
+                        else
+                        {
+                            return $"{value.VarName}={value.Value}";
+                        }
+                    }
                 }
             }
 

@@ -1,4 +1,4 @@
-// Copyright 2020-2023 Aumoa.lib. All right reserved.
+// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "EditorSlate/SEditorGameViewport.h"
 #include "Widgets/Layout/SOverlay.h"

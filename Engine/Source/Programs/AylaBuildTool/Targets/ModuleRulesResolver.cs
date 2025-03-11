@@ -9,16 +9,19 @@ internal class ModuleRulesResolver
         Name = rules.Name;
         PrivateDependencyModuleNames = rules.PrivateDependencyModuleNames.Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().ToArray();
+        PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Distinct().ToArray();
 
         HashSet<string> route = new();
         List<string> dependencyModuleNames = [];
         List<string> includePaths = [];
-        Resolve(solution, rules, route, true, dependencyModuleNames, includePaths);
+        List<MacroSet> additionalMacros = [];
+        Resolve(solution, rules, route, true, dependencyModuleNames, includePaths, additionalMacros);
         PublicDependencyModuleNames = dependencyModuleNames.Distinct().ToArray();
         PublicIncludePaths = includePaths.Distinct().ToArray();
+        PublicAdditionalMacros = additionalMacros.Distinct().ToArray();
     }
 
-    private void Resolve(Solution solution, ModuleRules rules, HashSet<string> route, bool addPrivate, List<string> dependencyModuleNames, List<string> includePaths)
+    private void Resolve(Solution solution, ModuleRules rules, HashSet<string> route, bool isPrimay, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros)
     {
         if (route.Add(rules.Name) == false)
         {
@@ -29,11 +32,17 @@ internal class ModuleRulesResolver
 
         dependencyModuleNames.AddRange(rules.PublicDependencyModuleNames);
         includePaths.AddRange(rules.PublicIncludePaths.Select(AbsoluteIncludePath));
+        additionalMacros.AddRange(rules.PublicAdditionalMacros);
 
         IEnumerable<string> deps = rules.PublicDependencyModuleNames;
-        if (addPrivate)
+        if (isPrimay)
         {
             deps = deps.Concat(rules.PrivateDependencyModuleNames);
+            additionalMacros.Add(rules.Name.ToUpper() + "_API=PLATFORM_SHARED_EXPORT");
+        }
+        else
+        {
+            additionalMacros.Add(rules.Name.ToUpper() + "_API=PLATFORM_SHARED_IMPORT");
         }
 
         foreach (var dep in deps)
@@ -52,7 +61,7 @@ internal class ModuleRulesResolver
             }
 
             var dependTargetRule = mp.GetRule(rules.TargetInfo);
-            Resolve(solution, dependTargetRule, route, false, dependencyModuleNames, includePaths);
+            Resolve(solution, dependTargetRule, route, false, dependencyModuleNames, includePaths, additionalMacros);
         }
 
         return;
@@ -65,9 +74,18 @@ internal class ModuleRulesResolver
 
     public readonly string Name;
 
-    public readonly string[] PrivateDependencyModuleNames;
-    public readonly string[] PublicDependencyModuleNames;
+    private readonly string[] PrivateDependencyModuleNames;
+    private readonly string[] PublicDependencyModuleNames;
 
-    public readonly string[] PrivateIncludePaths;
-    public readonly string[] PublicIncludePaths;
+    public IEnumerable<string> DependencyModuleNames => PrivateDependencyModuleNames.Concat(PublicDependencyModuleNames).Distinct();
+
+    private readonly string[] PrivateIncludePaths;
+    private readonly string[] PublicIncludePaths;
+
+    public IEnumerable<string> IncludePaths => PrivateIncludePaths.Concat(PublicIncludePaths).Distinct();
+
+    private readonly MacroSet[] PrivateAdditionalMacros;
+    private readonly MacroSet[] PublicAdditionalMacros;
+
+    public IEnumerable<MacroSet> AdditionalMacros => PrivateAdditionalMacros.Concat(PublicAdditionalMacros).Distinct();
 }

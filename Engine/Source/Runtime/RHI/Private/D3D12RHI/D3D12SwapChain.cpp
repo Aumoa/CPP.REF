@@ -1,4 +1,4 @@
-// Copyright 2020-2022 Aumoa.lib. All right reserved.
+// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "D3D12RHI/D3D12SwapChain.h"
 
