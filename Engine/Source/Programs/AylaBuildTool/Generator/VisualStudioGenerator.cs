@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AylaEngine;
 
@@ -280,46 +281,30 @@ internal class VisualStudioGenerator : Generator
                     AppendFormatLine("""<ItemGroup>""");
 
                     Dictionary<string, Guid> filters = new();
-                    Dictionary<string, string> sourceFileToFilter = new();
-                    foreach (var source in Directory.GetFiles(project.SourceDirectory, "*", SearchOption.AllDirectories))
+                    Dictionary<string, SourceCodeDescriptor> sourceFileToFilter = new();
+                    foreach (var descriptor in project.GetSourceCodes())
                     {
-                        var compilerType = GetCompilerType(source);
-                        if (compilerType != null)
+                        var relativePath = descriptor.RelativeDirectory;
+                        var guid = StringToGuid(relativePath);
+                        filters.TryAdd(relativePath, guid);
+                        sourceFileToFilter.TryAdd(descriptor.FilePath, descriptor);
+
+                        while (true)
                         {
-                            var directoryName = Path.GetDirectoryName(source);
-                            if (directoryName == null)
+                            var lastIndexOf = relativePath.LastIndexOf('\\');
+                            if (lastIndexOf == -1)
                             {
-                                throw new InvalidOperationException();
+                                break;
                             }
 
-                            var relativePath = Path.GetRelativePath(project.SourceDirectory, directoryName);
+                            relativePath = relativePath[..lastIndexOf];
                             if (relativePath == ".")
                             {
-                                continue;
+                                break;
                             }
 
-                            relativePath = Path.Combine("Source", relativePath);
-                            var guid = StringToGuid(relativePath);
+                            guid = StringToGuid(relativePath);
                             filters.TryAdd(relativePath, guid);
-                            sourceFileToFilter.TryAdd(source, relativePath);
-
-                            while (true)
-                            {
-                                var lastIndexOf = relativePath.LastIndexOf('\\');
-                                if (lastIndexOf == -1)
-                                {
-                                    break;
-                                }
-
-                                relativePath = relativePath[..lastIndexOf];
-                                if (relativePath == ".")
-                                {
-                                    break;
-                                }
-
-                                guid = StringToGuid(relativePath);
-                                filters.TryAdd(relativePath, guid);
-                            }
                         }
                     }
 
@@ -327,6 +312,11 @@ internal class VisualStudioGenerator : Generator
                     {
                         foreach (var (name, guid) in filters)
                         {
+                            if (string.IsNullOrEmpty(name))
+                            {
+                                continue;
+                            }
+
                             AppendFormatLine("""<Filter Include="{0}">""", name);
                             Indent(() =>
                             {
@@ -342,22 +332,17 @@ internal class VisualStudioGenerator : Generator
 
                     Indent(() =>
                     {
-                        foreach (var (source, filterName) in sourceFileToFilter)
+                        foreach (var (source, descriptor) in sourceFileToFilter)
                         {
-                            var compilerType = GetCompilerType(source);
-                            if (compilerType == null)
-                            {
-                                continue;
-                            }
-
                             Indent(() =>
                             {
-                                AppendFormatLine("""<{0} Include="{1}">""", compilerType, source);
+                                var cl = GetCompilerType(descriptor);
+                                AppendFormatLine("""<{0} Include="{1}">""", cl, source);
                                 Indent(() =>
                                 {
-                                    AppendFormatLine("""<Filter>{0}</Filter>""", filterName);
+                                    AppendFormatLine("""<Filter>{0}</Filter>""", descriptor.RelativeDirectory);
                                 });
-                                AppendFormatLine("""</{0}>""", compilerType);
+                                AppendFormatLine("""</{0}>""", cl);
                             });
                         }
                     });
@@ -507,13 +492,10 @@ internal class VisualStudioGenerator : Generator
                     AppendFormatLine("""<ItemGroup>""");
                     Indent(() =>
                     {
-                        foreach (var source in Directory.GetFiles(project.SourceDirectory, "*", SearchOption.AllDirectories))
+                        foreach (var descriptor in project.GetSourceCodes())
                         {
-                            var compilerType = GetCompilerType(source);
-                            if (compilerType != null)
-                            {
-                                AppendFormatLine("""<{0} Include="{1}" />""", compilerType, source);
-                            }
+                            var cl = GetCompilerType(descriptor);
+                            AppendFormatLine("""<{0} Include="{1}" />""", cl, descriptor.FilePath);
                         }
                     });
                     AppendFormatLine("""</ItemGroup>""");
@@ -591,21 +573,16 @@ internal class VisualStudioGenerator : Generator
                     }
                 }
             }
+        }
 
-            static string? GetCompilerType(string sourceCodeFileName)
+        static string GetCompilerType(SourceCodeDescriptor descriptor)
+        {
+            return descriptor.Type switch
             {
-                var extensions = Path.GetExtension(sourceCodeFileName).ToLower();
-                switch (extensions)
-                {
-                    case ".cpp":
-                        return "ClCompile";
-                    case ".h":
-                    case ".cs":
-                        return "ClInclude";
-                }
-
-                return null;
-            }
+                SourceCodeType.SourceCode => "ClCompile",
+                SourceCodeType.Header or SourceCodeType.Declaration => "ClInclude",
+                _ => throw new NotSupportedException()
+            };
         }
 
         static string GetConfigName(BuildConfiguration value)

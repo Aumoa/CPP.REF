@@ -32,4 +32,15 @@ internal class ModuleProject(string name, GroupDescriptor descriptor, string sou
 
         return rules;
     }
+
+    public IEnumerable<SourceCodeDescriptor> GetSourceCodes()
+    {
+        foreach (var source in Directory.GetFiles(SourceDirectory, "*", SearchOption.AllDirectories))
+        {
+            if (SourceCodeDescriptor.TryGet(source, SourceDirectory, out var descriptor))
+            {
+                yield return descriptor;
+            }
+        }
+    }
 }
