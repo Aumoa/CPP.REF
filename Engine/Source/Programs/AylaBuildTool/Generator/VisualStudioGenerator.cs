@@ -58,9 +58,9 @@ internal class VisualStudioGenerator : Generator
         PartOfGlobal();
 
         var solutionText = builder.ToString();
-        if (previousSolutionText != solutionText)
+        if (previousSolutionText?.Replace("\r\n", "\n") != solutionText)
         {
-            await File.WriteAllTextAsync(solutionFileName, solutionText, cancellationToken);
+            await File.WriteAllTextAsync(solutionFileName, solutionText.Replace("/", Environment.NewLine), cancellationToken);
         }
 
         return;
@@ -141,6 +141,10 @@ internal class VisualStudioGenerator : Generator
 
                     switch (project)
                     {
+                        case ModuleProject:
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                            break;
                         case ProgramProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
                             builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
@@ -246,6 +250,354 @@ internal class VisualStudioGenerator : Generator
             builder.AppendFormat("EndProject\n");
         }
 
+        static string GetArchitectureName(BuildConfiguration value) => value.Platform.Architecture switch
+        {
+            Architecture.X64 => "x64",
+            _ => throw new InvalidOperationException()
+        };
+
+        async Task GenerateCppProjectAsync(Dictionary<ModuleProject, string> vcxprojPaths, GroupDescriptor primaryGroup, ModuleProject project, CancellationToken cancellationToken)
+        {
+            var group = project.Descriptor;
+            var projectFilesDirectory = Path.Combine(primaryGroup.IntermediateDirectory, "ProjectFiles");
+            await Task.WhenAll(
+                GenerateVcxprojAsync(),
+                GenerateVcxprojFiltersAsync()
+            );
+
+            return;
+
+            async Task GenerateVcxprojFiltersAsync()
+            {
+                var fileName = Path.Combine(projectFilesDirectory, project.Name + ".vcxproj.filters");
+                var builder = new StringBuilder();
+                int indent = 0;
+
+                AppendFormatLine("""<?xml version="1.0" encoding="utf-8"?>""");
+                AppendFormatLine("""<Project ToolVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">""");
+                Indent(() =>
+                {
+                    AppendFormatLine("""<ItemGroup>""");
+
+                    Dictionary<string, Guid> filters = new();
+                    Dictionary<string, string> sourceFileToFilter = new();
+                    foreach (var source in Directory.GetFiles(project.SourceDirectory, "*", SearchOption.AllDirectories))
+                    {
+                        var compilerType = GetCompilerType(source);
+                        if (compilerType != null)
+                        {
+                            var directoryName = Path.GetDirectoryName(source);
+                            if (directoryName == null)
+                            {
+                                throw new InvalidOperationException();
+                            }
+
+                            var relativePath = Path.GetRelativePath(project.SourceDirectory, directoryName);
+                            if (relativePath == ".")
+                            {
+                                continue;
+                            }
+
+                            relativePath = Path.Combine("Source", relativePath);
+                            var guid = StringToGuid(relativePath);
+                            filters.TryAdd(relativePath, guid);
+                            sourceFileToFilter.TryAdd(source, relativePath);
+
+                            while (true)
+                            {
+                                var lastIndexOf = relativePath.LastIndexOf('\\');
+                                if (lastIndexOf == -1)
+                                {
+                                    break;
+                                }
+
+                                relativePath = relativePath[..lastIndexOf];
+                                if (relativePath == ".")
+                                {
+                                    break;
+                                }
+
+                                guid = StringToGuid(relativePath);
+                                filters.TryAdd(relativePath, guid);
+                            }
+                        }
+                    }
+
+                    Indent(() =>
+                    {
+                        foreach (var (name, guid) in filters)
+                        {
+                            AppendFormatLine("""<Filter Include="{0}">""", name);
+                            Indent(() =>
+                            {
+                                AppendFormatLine("""<UniqueIdentifier>{0}</UniqueIdentifier>""", guid.ToString("B").ToUpper());
+                            });
+                            AppendFormatLine("""</Filter>""");
+                        }
+                    });
+
+                    AppendFormatLine("""</ItemGroup>""");
+
+                    AppendFormatLine("""<ItemGroup>""");
+
+                    Indent(() =>
+                    {
+                        foreach (var (source, filterName) in sourceFileToFilter)
+                        {
+                            var compilerType = GetCompilerType(source);
+                            if (compilerType == null)
+                            {
+                                continue;
+                            }
+
+                            Indent(() =>
+                            {
+                                AppendFormatLine("""<{0} Include="{1}">""", compilerType, source);
+                                Indent(() =>
+                                {
+                                    AppendFormatLine("""<Filter>{0}</Filter>""", filterName);
+                                });
+                                AppendFormatLine("""</{0}>""", compilerType);
+                            });
+                        }
+                    });
+
+                    AppendFormatLine("""</ItemGroup>""");
+                });
+
+                AppendFormatLine("""</Project>""");
+
+                string? previousXml = null;
+                if (File.Exists(fileName))
+                {
+                    previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
+                }
+
+                var currentXml = builder.ToString();
+                if (previousXml != currentXml)
+                {
+                    await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
+                }
+
+                return;
+
+                void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
+                {
+                    var indentStr = new string(' ', indent * 2);
+                    builder.AppendFormat(indentStr + format + '\n', args);
+                }
+
+                void Indent(Action inner)
+                {
+                    ++indent;
+                    inner();
+                    --indent;
+                }
+
+                static Guid StringToGuid(string value)
+                {
+                    ulong c64 = CRC64.Generate64(value);
+                    var bytes = BitConverter.GetBytes(c64);
+                    return new Guid(bytes.Concat(bytes).ToArray());
+                }
+            }
+
+            async Task GenerateVcxprojAsync()
+            {
+                var fileName = Path.Combine(projectFilesDirectory, project.Name + ".vcxproj");
+                var builder = new StringBuilder();
+                int indent = 0;
+
+                lock (vcxprojPaths)
+                {
+                    vcxprojPaths.Add(project, fileName);
+                }
+
+                AppendFormatLine("""<?xml version="1.0" encoding="utf-8"?>""");
+                AppendFormatLine("""<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">""");
+                Indent(() =>
+                {
+                    AppendFormatLine("""<ItemGroup Label="ProjectConfigurations">""");
+                    Indent(() =>
+                    {
+                        foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+                        {
+                            // Visual Studio only support Windows platform.
+                            if (buildConfig.Platform.Group != PlatformGroup.Windows)
+                            {
+                                continue;
+                            }
+
+                            var configName = GetConfigName(buildConfig);
+                            var archName = GetArchitectureName(buildConfig);
+
+                            AppendFormatLine("""<ProjectConfiguration Include="{0}|{1}">""", configName, archName);
+                            Indent(() =>
+                            {
+                                AppendFormatLine("""<Configuration>{0}</Configuration>""", configName);
+                                AppendFormatLine("""<Platform>{0}</Platform>""", archName);
+                            });
+                            AppendFormatLine("""</ProjectConfiguration>""");
+                        }
+                    });
+                    AppendFormatLine("""</ItemGroup>""");
+
+                    AppendFormatLine("""<PropertyGroup Label="Globals">""");
+                    Indent(() =>
+                    {
+                        AppendFormatLine("""<VCProjectVersion>{0}</VCProjectVersion>""", VCProjectVersion);
+                        AppendFormatLine("""<Keyword>Win32Proj</Keyword>""");
+                        AppendFormatLine("""<ProjectGuid>{0}</ProjectGuid>""", project.Decl.Guid.ToString("B").ToUpper());
+                        AppendFormatLine("""<WindowsTargetPlatformVersion>{0}</WindowsTargetPlatformVersion>""", WindowsTargetPlatformVersion);
+                    });
+                    AppendFormatLine("""</PropertyGroup>""");
+
+                    AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />""");
+
+                    foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+                    {
+                        // Visual Studio only support Windows platform.
+                        if (buildConfig.Platform.Group != PlatformGroup.Windows)
+                        {
+                            continue;
+                        }
+
+                        var configName = GetConfigName(buildConfig);
+                        var archName = GetArchitectureName(buildConfig);
+
+                        AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'" Label="Configuration">""", configName, archName);
+                        Indent(() =>
+                        {
+                            AppendFormatLine("""<ConfigurationType>Makefile</ConfigurationType>""");
+                            AppendFormatLine("""<PlatformToolset>{0}</PlatformToolset>""", PlatformToolset);
+                            AppendFormatLine("""<CharacterSet>Unicode</CharacterSet>""");
+                            AppendFormatLine("""<UseDebugLibraries>{0}</UseDebugLibraries>""", LibraryDebugLevel(buildConfig).ToString().ToLower());
+                        });
+                        AppendFormatLine("""</PropertyGroup>""");
+                    }
+
+                    AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />""");
+
+                    foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+                    {
+                        // Visual Studio only support Windows platform.
+                        if (buildConfig.Platform.Group != PlatformGroup.Windows)
+                        {
+                            continue;
+                        }
+
+                        var configName = GetConfigName(buildConfig);
+                        var archName = GetArchitectureName(buildConfig);
+                        var outDir = Path.Combine(group.BinariesDirectory, buildConfig.Platform.Name, buildConfig.Config.ToString());
+                        var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
+                        var resolver = new ModuleRulesResolver(solution, ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildConfig.Platform }));
+                        var pps = GenerateProjectPreprocessorDefs(resolver);
+                        var includes = GenerateIncludePaths(resolver);
+
+                        AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
+                        Indent(() =>
+                        {
+                            AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
+                            AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
+                            AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
+                        });
+                        AppendFormatLine("""</PropertyGroup>""");
+                    }
+
+                    AppendFormatLine("""<ItemGroup>""");
+                    Indent(() =>
+                    {
+                        foreach (var source in Directory.GetFiles(project.SourceDirectory, "*", SearchOption.AllDirectories))
+                        {
+                            var compilerType = GetCompilerType(source);
+                            if (compilerType != null)
+                            {
+                                AppendFormatLine("""<{0} Include="{1}" />""", compilerType, source);
+                            }
+                        }
+                    });
+                    AppendFormatLine("""</ItemGroup>""");
+
+                    AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />""");
+                    AppendFormatLine("""<ImportGroup Label="ExtensionTargets">""");
+                    AppendFormatLine("""</ImportGroup>""");
+                });
+                AppendFormatLine("""</Project>""");
+
+                string? previousXml = null;
+                if (File.Exists(fileName))
+                {
+                    previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
+                }
+
+                var currentXml = builder.ToString();
+                if (previousXml != currentXml)
+                {
+                    await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
+                }
+
+                return;
+
+                void Indent(Action inner)
+                {
+                    ++indent;
+                    inner();
+                    --indent;
+                }
+
+                void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
+                {
+                    var indentStr = new string(' ', indent * 2);
+                    builder.AppendFormat(indentStr + format + '\n', args);
+                }
+
+                string GenerateIncludePaths(ModuleRulesResolver resolver)
+                {
+                    List<string> includes = new();
+                    foreach (var includePath in resolver.PublicIncludePaths.Concat(resolver.PrivateIncludePaths).Distinct())
+                    {
+                        var fullPath = Path.Combine(project.SourceDirectory, includePath);
+                        includes.Add(fullPath);
+                    }
+
+                    return string.Join(';', includes);
+                }
+
+                static string GetConfigName(BuildConfiguration value) => value.Config + (value.Editor ? "_Editor" : string.Empty);
+
+                static bool LibraryDebugLevel(BuildConfiguration value) => value.Config switch
+                {
+                    Configuration.Debug => true,
+                    Configuration.DebugGame => true,
+                    Configuration.Development => false,
+                    Configuration.Shipping => false,
+                    _ => throw new InvalidOperationException()
+                };
+
+                static string GenerateProjectPreprocessorDefs(ModuleRulesResolver resolver)
+                {
+                    List<string> defs = new();
+                    defs.Add(resolver.Name.ToUpper() + "_API=__declspec(dllexport)");
+                    return string.Join(';', defs);
+                }
+            }
+
+            static string? GetCompilerType(string sourceCodeFileName)
+            {
+                var extensions = Path.GetExtension(sourceCodeFileName).ToLower();
+                switch (extensions)
+                {
+                    case ".cpp":
+                        return "ClCompile";
+                    case ".h":
+                    case ".cs":
+                        return "ClInclude";
+                }
+
+                return null;
+            }
+        }
+
         static string GetConfigName(BuildConfiguration value)
         {
             return value.Config.ToString() + (value.Editor ? " Editor" : string.Empty);
@@ -263,357 +615,14 @@ internal class VisualStudioGenerator : Generator
             }
         }
 
+        static string GetCppConfigName(BuildConfiguration value)
+        {
+            return value.Config.ToString() + (value.Editor ? "_Editor" : string.Empty);
+        }
+
         static string GetCSharpConfigName(Configuration value)
         {
             return value == Configuration.Debug ? "Debug" : "Release";
-        }
-    }
-
-    private async Task GenerateCppProjectAsync(Dictionary<ModuleProject, string> vcxprojPaths, GroupDescriptor primaryGroup, ModuleProject project, CancellationToken cancellationToken)
-    {
-        var group = project.Descriptor;
-        var projectFilesDirectory = Path.Combine(primaryGroup.IntermediateDirectory, "ProjectFiles");
-        await Task.WhenAll(
-            GenerateVcxprojAsync(),
-            GenerateVcxprojFiltersAsync()
-        );
-
-        return;
-
-        async Task GenerateVcxprojFiltersAsync()
-        {
-            var fileName = Path.Combine(projectFilesDirectory, project.Name + ".vcxproj.filters");
-            var builder = new StringBuilder();
-            int indent = 0;
-
-            AppendFormatLine("""<?xml version="1.0" encoding="utf-8"?>""");
-            AppendFormatLine("""<Project ToolVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">""");
-            Indent(() =>
-            {
-                AppendFormatLine("""<ItemGroup>""");
-
-                Dictionary<string, Guid> filters = new();
-                Dictionary<string, string> sourceFileToFilter = new();
-                foreach (var source in Directory.GetFiles(project.SourceDirectory, "*", SearchOption.AllDirectories))
-                {
-                    var compilerType = GetCompilerType(source);
-                    if (compilerType != null)
-                    {
-                        var directoryName = Path.GetDirectoryName(source);
-                        if (directoryName == null)
-                        {
-                            throw new InvalidOperationException();
-                        }
-
-                        var relativePath = Path.GetRelativePath(project.SourceDirectory, directoryName);
-                        if (relativePath == ".")
-                        {
-                            continue;
-                        }
-
-                        relativePath = Path.Combine("Source", relativePath);
-                        var guid = StringToGuid(relativePath);
-                        filters.TryAdd(relativePath, guid);
-                        sourceFileToFilter.TryAdd(source, relativePath);
-
-                        while (true)
-                        {
-                            var lastIndexOf = relativePath.LastIndexOf('\\');
-                            if (lastIndexOf == -1)
-                            {
-                                break;
-                            }
-
-                            relativePath = relativePath[..lastIndexOf];
-                            if (relativePath == ".")
-                            {
-                                break;
-                            }
-
-                            guid = StringToGuid(relativePath);
-                            filters.TryAdd(relativePath, guid);
-                        }
-                    }
-                }
-
-                Indent(() =>
-                {
-                    foreach (var (name, guid) in filters)
-                    {
-                        AppendFormatLine("""<Filter Include="{0}">""", name);
-                        Indent(() =>
-                        {
-                            AppendFormatLine("""<UniqueIdentifier>{0}</UniqueIdentifier>""", guid.ToString("B").ToUpper());
-                        });
-                        AppendFormatLine("""</Filter>""");
-                    }
-                });
-
-                AppendFormatLine("""</ItemGroup>""");
-
-                AppendFormatLine("""<ItemGroup>""");
-
-                Indent(() =>
-                {
-                    foreach (var (source, filterName) in sourceFileToFilter)
-                    {
-                        var compilerType = GetCompilerType(source);
-                        if (compilerType == null)
-                        {
-                            continue;
-                        }
-
-                        Indent(() =>
-                        {
-                            AppendFormatLine("""<{0} Include="{1}">""", compilerType, source);
-                            Indent(() =>
-                            {
-                                AppendFormatLine("""<Filter>{0}</Filter>""", filterName);
-                            });
-                            AppendFormatLine("""</{0}>""", compilerType);
-                        });
-                    }
-                });
-
-                AppendFormatLine("""</ItemGroup>""");
-            });
-
-            AppendFormatLine("""</Project>""");
-
-            string? previousXml = null;
-            if (File.Exists(fileName))
-            {
-                previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
-            }
-
-            var currentXml = builder.ToString();
-            if (previousXml != currentXml)
-            {
-                await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
-            }
-
-            return;
-
-            void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
-            {
-                var indentStr = new string(' ', indent * 2);
-                builder.AppendFormat(indentStr + format + '\n', args);
-            }
-
-            void Indent(Action inner)
-            {
-                ++indent;
-                inner();
-                --indent;
-            }
-
-            static Guid StringToGuid(string value)
-            {
-                ulong c64 = CRC64.Generate64(value);
-                var bytes = BitConverter.GetBytes(c64);
-                return new Guid(bytes.Concat(bytes).ToArray());
-            }
-        }
-
-        async Task GenerateVcxprojAsync()
-        {
-            var fileName = Path.Combine(projectFilesDirectory, project.Name + ".vcxproj");
-            var builder = new StringBuilder();
-            int indent = 0;
-
-            lock (vcxprojPaths)
-            {
-                vcxprojPaths.Add(project, fileName);
-            }
-
-            AppendFormatLine("""<?xml version="1.0" encoding="utf-8"?>""");
-            AppendFormatLine("""<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">""");
-            Indent(() =>
-            {
-                AppendFormatLine("""<ItemGroup Label="ProjectConfigurations">""");
-                Indent(() =>
-                {
-                    foreach (var buildConfig in BuildConfiguration.GetConfigurations())
-                    {
-                        // Visual Studio only support Windows platform.
-                        if (buildConfig.Platform.Group != PlatformGroup.Windows)
-                        {
-                            continue;
-                        }
-
-                        var configName = GetConfigName(buildConfig);
-                        var archName = GetArchitectureName(buildConfig);
-
-                        AppendFormatLine("""<ProjectConfiguration Include="{0}|{1}">""", configName, archName);
-                        Indent(() =>
-                        {
-                            AppendFormatLine("""<Configuration>{0}</Configuration>""", configName);
-                            AppendFormatLine("""<Platform>{0}</Platform>""", archName);
-                        });
-                        AppendFormatLine("""</ProjectConfiguration>""");
-                    }
-                });
-                AppendFormatLine("""</ItemGroup>""");
-
-                AppendFormatLine("""<PropertyGroup Label="Globals">""");
-                Indent(() =>
-                {
-                    AppendFormatLine("""<VCProjectVersion>{0}</VCProjectVersion>""", VCProjectVersion);
-                    AppendFormatLine("""<Keyword>Win32Proj</Keyword>""");
-                    AppendFormatLine("""<ProjectGuid>{0}</ProjectGuid>""", project.Decl.Guid.ToString("B").ToUpper());
-                    AppendFormatLine("""<WindowsTargetPlatformVersion>{0}</WindowsTargetPlatformVersion>""", WindowsTargetPlatformVersion);
-                });
-                AppendFormatLine("""</PropertyGroup>""");
-
-                AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />""");
-
-                foreach (var buildConfig in BuildConfiguration.GetConfigurations())
-                {
-                    // Visual Studio only support Windows platform.
-                    if (buildConfig.Platform.Group != PlatformGroup.Windows)
-                    {
-                        continue;
-                    }
-
-                    var configName = GetConfigName(buildConfig);
-                    var archName = GetArchitectureName(buildConfig);
-
-                    AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'" Label="Configuration">""", configName, archName);
-                    Indent(() =>
-                    {
-                        AppendFormatLine("""<ConfigurationType>Makefile</ConfigurationType>""");
-                        AppendFormatLine("""<PlatformToolset>{0}</PlatformToolset>""", PlatformToolset);
-                        AppendFormatLine("""<CharacterSet>Unicode</CharacterSet>""");
-                        AppendFormatLine("""<UseDebugLibraries>{0}</UseDebugLibraries>""", LibraryDebugLevel(buildConfig).ToString().ToLower());
-                    });
-                    AppendFormatLine("""</PropertyGroup>""");
-                }
-
-                AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />""");
-
-                foreach (var buildConfig in BuildConfiguration.GetConfigurations())
-                {
-                    // Visual Studio only support Windows platform.
-                    if (buildConfig.Platform.Group != PlatformGroup.Windows)
-                    {
-                        continue;
-                    }
-
-                    var configName = GetConfigName(buildConfig);
-                    var archName = GetArchitectureName(buildConfig);
-                    var outDir = Path.Combine(group.BinariesDirectory, buildConfig.Platform.Name, buildConfig.Config.ToString());
-                    var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
-                    var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildConfig.Platform });
-                    var pps = GenerateProjectPreprocessorDefs(rules);
-                    var includes = GenerateIncludePaths(rules);
-
-                    AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
-                    Indent(() =>
-                    {
-                        AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
-                        AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
-                        AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
-                    });
-                    AppendFormatLine("""</PropertyGroup>""");
-                }
-
-                AppendFormatLine("""<ItemGroup>""");
-                Indent(() =>
-                {
-                    foreach (var source in Directory.GetFiles(project.SourceDirectory, "*", SearchOption.AllDirectories))
-                    {
-                        var compilerType = GetCompilerType(source);
-                        if (compilerType != null)
-                        {
-                            AppendFormatLine("""<{0} Include="{1}" />""", compilerType, source);
-                        }
-                    }
-                });
-                AppendFormatLine("""</ItemGroup>""");
-
-                AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />""");
-                AppendFormatLine("""<ImportGroup Label="ExtensionTargets">""");
-                AppendFormatLine("""</ImportGroup>""");
-            });
-            AppendFormatLine("""</Project>""");
-
-            string? previousXml = null;
-            if (File.Exists(fileName))
-            {
-                previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
-            }
-
-            var currentXml = builder.ToString();
-            if (previousXml != currentXml)
-            {
-                await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
-            }
-
-            return;
-
-            void Indent(Action inner)
-            {
-                ++indent;
-                inner();
-                --indent;
-            }
-
-            void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
-            {
-                var indentStr = new string(' ', indent * 2);
-                builder.AppendFormat(indentStr + format + '\n', args);
-            }
-
-            string GenerateIncludePaths(ModuleRules targetRule)
-            {
-                List<string> includes = new();
-                foreach (var includePath in targetRule.PublicIncludePaths.Concat(targetRule.PrivateIncludePaths).Distinct())
-                {
-                    var fullPath = Path.Combine(project.SourceDirectory, includePath);
-                    includes.Add(fullPath);
-                }
-
-                return string.Join(';', includes);
-            }
-
-            static string GetConfigName(BuildConfiguration value) => value.Config + (value.Editor ? "_Editor" : string.Empty);
-
-            static string GetArchitectureName(BuildConfiguration value) => value.Platform.Architecture switch
-            {
-                Architecture.X64 => "x64",
-                _ => throw new InvalidOperationException()
-            };
-
-            static bool LibraryDebugLevel(BuildConfiguration value) => value.Config switch
-            {
-                Configuration.Debug => true,
-                Configuration.DebugGame => true,
-                Configuration.Development => false,
-                Configuration.Shipping => false,
-                _ => throw new InvalidOperationException()
-            };
-
-            static string GenerateProjectPreprocessorDefs(ModuleRules targetRule)
-            {
-                List<string> defs = new();
-                defs.Add(targetRule.Name.ToUpper() + "_API=__declspec(dllexport)");
-                return string.Join(';', defs);
-            }
-        }
-
-        static string? GetCompilerType(string sourceCodeFileName)
-        {
-            var extensions = Path.GetExtension(sourceCodeFileName).ToLower();
-            switch (extensions)
-            {
-                case ".cpp":
-                    return "ClCompile";
-                case ".h":
-                case ".cs":
-                    return "ClInclude";
-            }
-
-            return null;
         }
     }
 }

@@ -15,6 +15,11 @@ internal class Solution
         PrimaryGroup = primaryGroup;
     }
 
+    public Project? FindProject(string name)
+    {
+        return AllProjects.FirstOrDefault(p => p.Name == name);
+    }
+
     public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? gameFolder, CancellationToken cancellationToken = default)
     {
         List<Task> tasks = new();
@@ -30,6 +35,8 @@ internal class Solution
         }
 
         await Task.WhenAll(tasks);
+        engineProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
+        gameProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
         return new Solution(engineProjects, gameProjects, primaryGroup);
 
         async Task ScanDirectoryRecursive(IList<Project> results, GroupDescriptor descriptor, string currentDir)

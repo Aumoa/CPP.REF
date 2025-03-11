@@ -17,8 +17,8 @@ public record BuildConfiguration
 
     public static IEnumerable<BuildConfiguration> GetConfigurations()
     {
-        return InnerGet(PlatformInfo.Win64, false)
-            .Concat(InnerGet(PlatformInfo.Win64, true));
+        return InnerGet(PlatformInfo.Win64, true)
+            .Concat(InnerGet(PlatformInfo.Win64, false));
 
         IEnumerable<BuildConfiguration> InnerGet(PlatformInfo platform, bool editor)
         {

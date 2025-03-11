@@ -4,4 +4,32 @@ internal class ModuleProject(string name, GroupDescriptor descriptor, string sou
 {
     public readonly Type RuleType = ruleType;
     public readonly string SourceDirectory = sourceDirectory;
+
+    private readonly Dictionary<ITargetInfo, ModuleRules> m_CachedRules = new();
+
+    public ModuleRules GetRule(ITargetInfo targetInfo)
+    {
+        ModuleRules? rules;
+
+        lock (m_CachedRules)
+        {
+            if (m_CachedRules.TryGetValue(targetInfo, out rules))
+            {
+                return rules;
+            }
+        }
+
+        rules = ModuleRules.New(RuleType, targetInfo);
+        lock (m_CachedRules)
+        {
+            if (m_CachedRules.TryGetValue(targetInfo, out var @int))
+            {
+                return @int;
+            }
+
+            m_CachedRules.Add(targetInfo, rules);
+        }
+
+        return rules;
+    }
 }

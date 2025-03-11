@@ -2,7 +2,7 @@
   "profiles": {
     "AylaBuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "ProjectFiles -ProjectFile \"F:\\SampleGame\\SampleGame.aproject\" -Target RHI -Config Debug"
+      "commandLineArgs": "generate --project \"F:\\\\SampleGame\\\\SampleGame.aproj\""
     }
   }
 }
