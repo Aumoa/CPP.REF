@@ -7,7 +7,13 @@ Console.CancelKeyPress += OnCancelKeyPress;
 var pass = await Parser.Default.ParseArguments<GenerateOptions>(args)
     .WithParsedAsync<GenerateOptions>(async options =>
     {
-        var solution = await Solution.ScanProjectsAsync("F:\\CPP.REF\\Engine", "F:\\SampleGame", cts.Token);
+        string? projectPath = null;
+        if (options.ProjectFile != null)
+        {
+            projectPath = Path.GetDirectoryName(options.ProjectFile);
+        }
+
+        var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cts.Token);
         foreach (var project in solution.AllProjects)
         {
             Console.WriteLine(project);
