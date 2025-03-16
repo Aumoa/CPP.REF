@@ -20,13 +20,21 @@ internal class VisualStudioInstallation : Installation
         public required VSVersion VisualStudioVersion { get; init; }
         public required Version CompilerVersion { get; init; }
         public required string Directory { get; init; }
+        
+        public string GetClCompiler(Architecture arch)
+        {
+            return Path.Combine(Directory, "bin", "Hostx64", arch.ToString().ToLower(), "cl.exe");
+        }
+
+        public string GetIncludeDirectory()
+        {
+            return Path.Combine(Directory, "include");
+        }
 
         public override string ToString() => Directory;
     }
 
     private const string Root = "C:\\Program Files\\Microsoft Visual Studio";
-
-    public static IEnumerable<Product> FindProducts2() => FindProducts();
 
     private static IEnumerable<Product> FindProducts()
     {

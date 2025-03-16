@@ -9,6 +9,7 @@ internal class MainCommands : Commands
     {
         m_Builder = new MenuBuilder("Main");
         m_Builder.Add("Generate", OnGenerateAsync);
+        m_Builder.Add("Build", OnBuildAsync);
     }
 
     public override async ValueTask RenderPromptAsync(CancellationToken cancellationToken)
@@ -19,6 +20,11 @@ internal class MainCommands : Commands
     private static ValueTask OnGenerateAsync(CancellationToken cancellationToken)
     {
         Commands.Push<GenerateCommands>();
+        return ValueTask.CompletedTask;
+    }
+
+    private static ValueTask OnBuildAsync(CancellationToken cancellationToken)
+    {
         return ValueTask.CompletedTask;
     }
 }
