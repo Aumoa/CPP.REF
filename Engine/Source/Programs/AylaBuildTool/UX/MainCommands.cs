@@ -25,6 +25,7 @@ internal class MainCommands : Commands
 
     private static ValueTask OnBuildAsync(CancellationToken cancellationToken)
     {
+        Commands.Push<BuildCommands>();
         return ValueTask.CompletedTask;
     }
 }
