@@ -59,6 +59,17 @@ public static class Terminal
         Critical,
     }
 
+    private static readonly HashSet<char> MarkupSeparator =
+    [
+        '[', ']', '{', '}', '(', ')',
+        '-', '.', ',',
+        '/', '\\', '|',
+        '~', '!', '@', '#', '$', '%', '^', '&', '*',
+        '+', '=',
+        '`', '"', '\'',
+        '\t', ' ', '\0'
+    ];
+
     public static async ValueTask<Output> ExecuteCommandAsync(string command, Options options, CancellationToken cancellationToken = default)
     {
         var process = StartProcess(options.Executable, command, options.WorkingDirectory);
@@ -83,7 +94,7 @@ public static class Terminal
 
                     if ((options.Logging | Logging.StdOut) != 0)
                     {
-                        AnsiConsole.WriteLine(e.Data.EscapeMarkup());
+                        AnsiConsole.MarkupLine(GetMarkupText(e.Data));
                     }
                 }
             }
@@ -128,6 +139,45 @@ public static class Terminal
             StdOut = stdout.ToArray(),
             StdErr = stderr.ToArray()
         };
+
+        string GetMarkupText(string value)
+        {
+            if (WholeContent("warning") || WholeContent("warn"))
+            {
+                return $"[yellow]{value.EscapeMarkup()}[/]";
+            }
+            else if (WholeContent("success") || WholeContent("successfully"))
+            {
+                return $"[green]{value.EscapeMarkup()}[/]";
+            }
+            else if (WholeContent("error") || WholeContent("err"))
+            {
+                return $"[red]{value.EscapeMarkup()}[/]";
+            }
+            else if (WholeContent("crit") || WholeContent("critical"))
+            {
+                return $"[red][b]{value.EscapeMarkup()}[/][/]";
+            }
+
+                return value;
+
+            bool WholeContent(string content)
+            {
+                int indexOf = content.IndexOf(content, StringComparison.OrdinalIgnoreCase);
+                if (indexOf == -1)
+                {
+                    return false;
+                }
+
+                if ((indexOf != 0 && MarkupSeparator.Contains(content[indexOf - 1])) ||
+                    (indexOf != content.Length - 1) && MarkupSeparator.Contains(content[indexOf + 1]))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
     }
 
     private static Process StartProcess(string? executable, string command, string workingDirectory = ".")
