@@ -1,8 +1,7 @@
 {
   "profiles": {
     "AylaBuildTool": {
-      "commandName": "Project",
-      "commandLineArgs": "generate --project \"F:\\\\SampleGame\\\\SampleGame.aproj\""
+      "commandName": "Project"
     }
   }
 }

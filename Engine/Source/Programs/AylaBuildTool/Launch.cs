@@ -1,27 +1,30 @@
-﻿using AylaEngine;
+﻿using System.Text;
+using AylaEngine;
 using CommandLine;
+using Spectre.Console;
+
+Console.OutputEncoding = Encoding.UTF8;
 
 CancellationTokenSource cts = new();
 Console.CancelKeyPress += OnCancelKeyPress;
 
-var pass = await Parser.Default.ParseArguments<GenerateOptions>(args)
-    .WithParsedAsync<GenerateOptions>(async options =>
+if (args.Length > 0)
+{
+    var pass = Parser.Default.ParseArguments<GenerateOptions>(args);
+    pass = await pass.WithParsedAsync(options => GenerateRunner.RunAsync(options, cts.Token).AsTask());
+}
+else
+{
+    var figlet = new FigletText("AylaBuildTool")
+        .Justify(Justify.Left);
+    AnsiConsole.Write(figlet);
+
+    Commands.Push<MainCommands>();
+    while (Commands.TryGetCurrent(out var commands))
     {
-        string? projectPath = null;
-        if (options.ProjectFile != null)
-        {
-            projectPath = Path.GetDirectoryName(options.ProjectFile);
-        }
-
-        var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cts.Token);
-        foreach (var project in solution.AllProjects)
-        {
-            Console.WriteLine(project);
-        }
-
-        var generator = new VisualStudioGenerator();
-        await generator.GenerateAsync(solution, cts.Token);
-    });
+        await commands.RenderPromptAsync(cts.Token);
+    }
+}
 
 return;
 

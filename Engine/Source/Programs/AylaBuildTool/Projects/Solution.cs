@@ -31,7 +31,7 @@ internal class Solution
         List<Project> engineProjects = new();;
         tasks.Add(ScanDirectoryRecursive(engineProjects, primaryGroup, Path.Combine(engineFolder, "Source")));
         List<Project> gameProjects = new();
-        if (gameFolder != null)
+        if (string.IsNullOrEmpty(gameFolder) == false)
         {
             primaryGroup = GroupDescriptor.FromRoot(gameFolder);
             tasks.Add(ScanDirectoryRecursive(gameProjects, primaryGroup, Path.Combine(gameFolder, "Source")));
