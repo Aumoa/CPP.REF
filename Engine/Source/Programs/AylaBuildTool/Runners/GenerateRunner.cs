@@ -11,11 +11,6 @@ internal class GenerateRunner
         }
 
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
-        foreach (var project in solution.AllProjects)
-        {
-            Console.WriteLine(project);
-        }
-
         var generator = new VisualStudioGenerator();
         await generator.GenerateAsync(solution, cancellationToken);
     }

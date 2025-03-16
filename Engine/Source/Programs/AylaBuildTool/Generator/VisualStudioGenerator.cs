@@ -515,6 +515,12 @@ internal class VisualStudioGenerator : Generator
                 var currentXml = builder.ToString();
                 if (previousXml != currentXml)
                 {
+                    var dirName = Path.GetDirectoryName(fileName);
+                    if (Directory.Exists(dirName) == false)
+                    {
+                        Directory.CreateDirectory(dirName!);
+                    }
+
                     await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
                 }
 
