@@ -2,4 +2,14 @@
 
 internal abstract class Compiler
 {
+    public readonly struct CompileItem
+    {
+        public ModuleRulesResolver Resolver { get; init; }
+
+        public SourceCodeDescriptor SourceCode { get; init; }
+
+        public GroupDescriptor Descriptor { get; init; }
+    }
+
+    public abstract ValueTask CompileAsync(CompileItem item, CancellationToken cancellationToken);
 }

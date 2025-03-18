@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using AylaEngine;
 using CommandLine;
 using Spectre.Console;
@@ -29,7 +30,8 @@ else
 
 return;
 
-void OnCancelKeyPress(object? sender, EventArgs? args)
+void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs args)
 {
+    args.Cancel = true;
     cts.Cancel();
 }

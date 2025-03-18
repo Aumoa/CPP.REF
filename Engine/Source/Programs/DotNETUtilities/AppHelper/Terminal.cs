@@ -11,14 +11,13 @@ public static class Terminal
     {
         None,
         StdOut = 0x01,
-        StdErr = 0x02
+        StdErr = 0x02,
+        All = StdOut | StdErr
     }
 
     public record Options
     {
         public required string Executable { get; init; }
-
-        public string Arguments { get; init; } = string.Empty;
 
         public string WorkingDirectory { get; init; } = string.Empty;
 
@@ -94,7 +93,7 @@ public static class Terminal
 
                     if ((options.Logging | Logging.StdOut) != 0)
                     {
-                        AnsiConsole.MarkupLine(GetMarkupText(e.Data));
+                        AnsiConsole.MarkupLine(GetMarkupText(e.Data.EscapeMarkup()));
                     }
                 }
             }
@@ -154,7 +153,7 @@ public static class Terminal
             {
                 return $"[red]{value.EscapeMarkup()}[/]";
             }
-            else if (WholeContent("crit") || WholeContent("critical"))
+            else if (WholeContent("crit") || WholeContent("critical") || WholeContent("fatal"))
             {
                 return $"[red][b]{value.EscapeMarkup()}[/][/]";
             }
@@ -163,19 +162,19 @@ public static class Terminal
 
             bool WholeContent(string content)
             {
-                int indexOf = content.IndexOf(content, StringComparison.OrdinalIgnoreCase);
+                int indexOf = value.IndexOf(content, StringComparison.OrdinalIgnoreCase);
                 if (indexOf == -1)
                 {
                     return false;
                 }
 
-                if ((indexOf != 0 && MarkupSeparator.Contains(content[indexOf - 1])) ||
-                    (indexOf != content.Length - 1) && MarkupSeparator.Contains(content[indexOf + 1]))
+                if ((indexOf != 0 && MarkupSeparator.Contains(value[indexOf - 1])) ||
+                    (indexOf != value.Length - 1) && MarkupSeparator.Contains(value[indexOf + 1]))
                 {
-                    return false;
+                    return true;
                 }
 
-                return true;
+                return false;
             }
         }
     }
@@ -210,5 +209,11 @@ public static class Terminal
         }
 
         return process;
+    }
+
+    public static async ValueTask<int> ExitCode(this ValueTask<Output> result)
+    {
+        var output = await result;
+        return output.ExitCode;
     }
 }

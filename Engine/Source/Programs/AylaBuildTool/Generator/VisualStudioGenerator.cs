@@ -114,7 +114,7 @@ internal class VisualStudioGenerator : Generator
         void PartOfGlobalSectionSolutionConfigurationPlatforms()
         {
             builder.AppendFormat("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n");
-            foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+            foreach (var buildConfig in TargetInfo.GetAllTargets())
             {
                 // Visual Studio only support Windows platform.
                 if (buildConfig.Platform.Group != PlatformGroup.Windows)
@@ -132,7 +132,7 @@ internal class VisualStudioGenerator : Generator
             builder.AppendFormat("\tGlobalSection(ProjectConfigurationPlatforms) = preSolution\n");
             foreach (var project in solution.AllProjects)
             {
-                foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+                foreach (var buildConfig in TargetInfo.GetAllTargets())
                 {
                     // Visual Studio only support Windows platform.
                     if (buildConfig.Platform.Group != PlatformGroup.Windows)
@@ -251,7 +251,7 @@ internal class VisualStudioGenerator : Generator
             builder.AppendFormat("EndProject\n");
         }
 
-        static string GetArchitectureName(BuildConfiguration value) => value.Platform.Architecture switch
+        static string GetArchitectureName(TargetInfo value) => value.Platform.Architecture switch
         {
             Architecture.X64 => "x64",
             _ => throw new InvalidOperationException()
@@ -405,7 +405,7 @@ internal class VisualStudioGenerator : Generator
                     AppendFormatLine("""<ItemGroup Label="ProjectConfigurations">""");
                     Indent(() =>
                     {
-                        foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+                        foreach (var buildConfig in TargetInfo.GetAllTargets())
                         {
                             // Visual Studio only support Windows platform.
                             if (buildConfig.Platform.Group != PlatformGroup.Windows)
@@ -439,7 +439,7 @@ internal class VisualStudioGenerator : Generator
 
                     AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />""");
 
-                    foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+                    foreach (var buildConfig in TargetInfo.GetAllTargets())
                     {
                         // Visual Studio only support Windows platform.
                         if (buildConfig.Platform.Group != PlatformGroup.Windows)
@@ -463,19 +463,19 @@ internal class VisualStudioGenerator : Generator
 
                     AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />""");
 
-                    foreach (var buildConfig in BuildConfiguration.GetConfigurations())
+                    foreach (var buildTarget in TargetInfo.GetAllTargets())
                     {
                         // Visual Studio only support Windows platform.
-                        if (buildConfig.Platform.Group != PlatformGroup.Windows)
+                        if (buildTarget.Platform.Group != PlatformGroup.Windows)
                         {
                             continue;
                         }
 
-                        var configName = GetConfigName(buildConfig);
-                        var archName = GetArchitectureName(buildConfig);
-                        var outDir = Path.Combine(group.BinariesDirectory, buildConfig.Platform.Name, buildConfig.Config.ToString());
+                        var configName = GetConfigName(buildTarget);
+                        var archName = GetArchitectureName(buildTarget);
+                        var outDir = Path.Combine(group.BinariesDirectory, buildTarget.Platform.Name, buildTarget.Config.ToString());
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
-                        var resolver = new ModuleRulesResolver(solution, ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildConfig.Platform }));
+                        var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform }));
                         var pps = GenerateProjectPreprocessorDefs(resolver);
                         var includes = GenerateIncludePaths(resolver);
 
@@ -551,9 +551,9 @@ internal class VisualStudioGenerator : Generator
                     return string.Join(';', includes);
                 }
 
-                static string GetConfigName(BuildConfiguration value) => value.Config + (value.Editor ? "_Editor" : string.Empty);
+                static string GetConfigName(TargetInfo value) => value.Config + (value.Editor ? "_Editor" : string.Empty);
 
-                static bool LibraryDebugLevel(BuildConfiguration value) => value.Config switch
+                static bool LibraryDebugLevel(TargetInfo value) => value.Config switch
                 {
                     Configuration.Debug => true,
                     Configuration.DebugGame => true,
@@ -591,7 +591,7 @@ internal class VisualStudioGenerator : Generator
             };
         }
 
-        static string GetConfigName(BuildConfiguration value)
+        static string GetConfigName(TargetInfo value)
         {
             return value.Config.ToString() + (value.Editor ? " Editor" : string.Empty);
         }
@@ -608,7 +608,7 @@ internal class VisualStudioGenerator : Generator
             }
         }
 
-        static string GetCppConfigName(BuildConfiguration value)
+        static string GetCppConfigName(TargetInfo value)
         {
             return value.Config.ToString() + (value.Editor ? "_Editor" : string.Empty);
         }

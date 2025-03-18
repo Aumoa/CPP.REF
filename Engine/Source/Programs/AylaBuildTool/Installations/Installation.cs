@@ -1,5 +1,6 @@
 ﻿namespace AylaEngine;
 
-internal class Installation
+internal abstract class Installation
 {
+    public abstract ValueTask<Compiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken);
 }

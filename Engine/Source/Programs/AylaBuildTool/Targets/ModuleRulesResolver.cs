@@ -4,38 +4,42 @@ namespace AylaEngine;
 
 internal class ModuleRulesResolver
 {
-    public ModuleRulesResolver(Solution solution, ModuleRules rules)
+    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules)
     {
         Name = rules.Name;
+
+        var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         PrivateDependencyModuleNames = rules.PrivateDependencyModuleNames.Distinct().ToArray();
-        PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().ToArray();
-        PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Distinct().ToArray();
+        PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
+        PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Append($"PLATFORM_STRING=TEXT(\"{targetInfo.Platform}\")").Append($"CONFIG_STRING=TEXT(\"{targetInfo.Config}\")").Distinct().ToArray();
+        PrivateDisableWarnings = rules.PrivateDisableWarnings.Distinct().ToArray();
 
         HashSet<string> route = new();
         List<string> dependencyModuleNames = [];
         List<string> includePaths = [];
         List<MacroSet> additionalMacros = [];
-        Resolve(solution, rules, route, true, dependencyModuleNames, includePaths, additionalMacros);
+        List<int> disableWarnings = [];
+        Resolve(solution, targetProject, rules, route, true, dependencyModuleNames, includePaths, additionalMacros, disableWarnings);
         PublicDependencyModuleNames = dependencyModuleNames.Distinct().ToArray();
         PublicIncludePaths = includePaths.Distinct().ToArray();
         PublicAdditionalMacros = additionalMacros.Distinct().ToArray();
+        PublicDisableWarnings = disableWarnings.Distinct().ToArray();
     }
 
-    private void Resolve(Solution solution, ModuleRules rules, HashSet<string> route, bool isPrimay, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros)
+    private void Resolve(Solution solution, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings)
     {
         if (route.Add(rules.Name) == false)
         {
             return;
         }
 
-        var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
-
         dependencyModuleNames.AddRange(rules.PublicDependencyModuleNames);
-        includePaths.AddRange(rules.PublicIncludePaths.Select(AbsoluteIncludePath));
+        includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)));
         additionalMacros.AddRange(rules.PublicAdditionalMacros);
+        disableWarnings.AddRange(rules.PublicDisableWarnings);
 
         IEnumerable<string> deps = rules.PublicDependencyModuleNames;
-        if (isPrimay)
+        if (isPrimary)
         {
             deps = deps.Concat(rules.PrivateDependencyModuleNames);
             additionalMacros.Add(rules.Name.ToUpper() + "_API=PLATFORM_SHARED_EXPORT");
@@ -61,15 +65,15 @@ internal class ModuleRulesResolver
             }
 
             var dependTargetRule = mp.GetRule(rules.TargetInfo);
-            Resolve(solution, dependTargetRule, route, false, dependencyModuleNames, includePaths, additionalMacros);
+            Resolve(solution, mp, dependTargetRule, route, false, dependencyModuleNames, includePaths, additionalMacros, disableWarnings);
         }
 
         return;
+    }
 
-        string AbsoluteIncludePath(string relativeIncludePath)
-        {
-            return Path.Combine(targetProject.SourceDirectory, relativeIncludePath);
-        }
+    private static string AbsoluteIncludePath(ModuleProject targetProject, string relativeIncludePath)
+    {
+        return Path.Combine(targetProject.SourceDirectory, relativeIncludePath);
     }
 
     public readonly string Name;
@@ -88,4 +92,9 @@ internal class ModuleRulesResolver
     private readonly MacroSet[] PublicAdditionalMacros;
 
     public IEnumerable<MacroSet> AdditionalMacros => PrivateAdditionalMacros.Concat(PublicAdditionalMacros).Distinct();
+
+    private readonly int[] PrivateDisableWarnings;
+    private readonly int[] PublicDisableWarnings;
+
+    public IEnumerable<int> DisableWarnings => PrivateDisableWarnings.Concat(PublicDisableWarnings).Distinct();
 }

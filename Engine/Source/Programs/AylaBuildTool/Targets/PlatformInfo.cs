@@ -12,6 +12,8 @@ public record PlatformInfo
 
     public Architecture Architecture { get; init; }
 
+    public override string ToString() => Name;
+
     public static readonly PlatformInfo Win64 = new()
     {
         Name = "Win64",

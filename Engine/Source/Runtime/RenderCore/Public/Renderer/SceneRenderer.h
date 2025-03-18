@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
+
 class NRHIViewport;
 
 class RENDERCORE_API NSceneRenderer
