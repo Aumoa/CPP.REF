@@ -15,7 +15,7 @@ internal class ClCompiler : Compiler
         m_Product = product;
     }
 
-    public override async ValueTask CompileAsync(CompileItem item, CancellationToken cancellationToken)
+    public override async ValueTask<Terminal.Output> CompileAsync(CompileItem item, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {
@@ -150,17 +150,6 @@ internal class ClCompiler : Compiler
         );
 
         m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
-        var result = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
-
-        for (int i = 0; i < result.Logs.Length; ++i)
-        {
-            var log = result.Logs[i];
-            AnsiConsole.WriteLine(log.Value);
-        }
-
-        if (result.ExitCode != 0)
-        {
-            throw TerminateException.User();
-        }
+        return await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
     }
 }

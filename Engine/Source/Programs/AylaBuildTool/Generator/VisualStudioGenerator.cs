@@ -463,6 +463,12 @@ internal class VisualStudioGenerator : Generator
 
                     AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />""");
 
+                    string projectPath = string.Empty;
+                    if (project.Descriptor.IsEngine == false)
+                    {
+                        projectPath = $"--project \"{primaryGroup.RootDirectory}\\{primaryGroup.Name}.aproject\" ";
+                    }
+
                     foreach (var buildTarget in TargetInfo.GetAllTargets())
                     {
                         // Visual Studio only support Windows platform.
@@ -484,6 +490,7 @@ internal class VisualStudioGenerator : Generator
                         {
                             AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
                             AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
+                            AppendFormatLine("""<NMakeBuildCommandLine>dotnet F:\CPP.REF\Engine\Binaries\DotNET\AylaBuildTool.dll build {0}--target "{1}"</NMakeBuildCommandLine>""", projectPath, project.Name);
                             AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
                         });
                         AppendFormatLine("""</PropertyGroup>""");

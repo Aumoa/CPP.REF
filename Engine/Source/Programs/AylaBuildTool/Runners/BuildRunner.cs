@@ -95,6 +95,16 @@ internal static class BuildRunner
                     compilationTasks.Add(descriptor, task);
                 }
 
+                int compiled = 0;
+                int log = compileItems.Count switch
+                {
+                    >= 0 and < 10 => 1,
+                    >= 10 and < 100 => 2,
+                    >= 100 and < 1000 => 3,
+                    >= 1000 and < 10000 => 4,
+                    >= 10000 and < 100000 => 5,
+                    _ => 6
+                };
                 foreach (var item in compileItems)
                 {
                     tasks.Add(SingleTask());
@@ -107,7 +117,12 @@ internal static class BuildRunner
                         try
                         {
                             var compiler = await installation.SpawnCompilerAsync(buildTarget, cancellationToken);
-                            await compiler.CompileAsync(item, cancellationToken);
+                            var output = await compiler.CompileAsync(item, cancellationToken);
+                            AnsiConsole.WriteLine($"[{{0,{log}}}/{{1,{log}}}] {{2}}", Interlocked.Increment(ref compiled), compileItems.Count, item.SourceCode.FilePath);
+                            foreach (var log in output.Logs.Skip(1))
+                            {
+                                AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
+                            }
                         }
                         finally
                         {

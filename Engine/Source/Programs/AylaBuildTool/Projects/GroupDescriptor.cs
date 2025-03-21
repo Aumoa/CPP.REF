@@ -6,6 +6,8 @@ internal record GroupDescriptor
 
     public string Name { get; init; } = string.Empty;
 
+    public bool IsEngine { get; init; }
+
     public string SourceDirectory { get; init; } = string.Empty;
 
     public string IntermediateDirectory { get; init; } = string.Empty;
@@ -14,12 +16,13 @@ internal record GroupDescriptor
 
     public string ContentDirectory { get; init; } = string.Empty;
 
-    public static GroupDescriptor FromRoot(string rootPath)
+    public static GroupDescriptor FromRoot(string rootPath, bool isEngine)
     {
         return new GroupDescriptor
         {
             RootDirectory = rootPath,
             Name = Path.GetFileName(rootPath),
+            IsEngine = isEngine,
             SourceDirectory = Path.Combine(rootPath, "Source"),
             IntermediateDirectory = Path.Combine(rootPath, "Intermediate"),
             BinariesDirectory = Path.Combine(rootPath, "Binaries"),

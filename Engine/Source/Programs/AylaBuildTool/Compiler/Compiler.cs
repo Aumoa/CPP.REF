@@ -11,5 +11,5 @@ internal abstract class Compiler
         public GroupDescriptor Descriptor { get; init; }
     }
 
-    public abstract ValueTask CompileAsync(CompileItem item, CancellationToken cancellationToken);
+    public abstract ValueTask<Terminal.Output> CompileAsync(CompileItem item, CancellationToken cancellationToken);
 }

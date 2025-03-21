@@ -46,14 +46,14 @@ internal class Solution
     public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? gameFolder, CancellationToken cancellationToken = default)
     {
         List<Task> tasks = new();
-        GroupDescriptor primaryGroup = GroupDescriptor.FromRoot(engineFolder);
+        GroupDescriptor primaryGroup = GroupDescriptor.FromRoot(engineFolder, true);
 
         List<Project> engineProjects = new();;
         tasks.Add(ScanDirectoryRecursive(engineProjects, primaryGroup, Path.Combine(engineFolder, "Source")));
         List<Project> gameProjects = new();
         if (string.IsNullOrEmpty(gameFolder) == false)
         {
-            primaryGroup = GroupDescriptor.FromRoot(gameFolder);
+            primaryGroup = GroupDescriptor.FromRoot(gameFolder, false);
             tasks.Add(ScanDirectoryRecursive(gameProjects, primaryGroup, Path.Combine(gameFolder, "Source")));
         }
 

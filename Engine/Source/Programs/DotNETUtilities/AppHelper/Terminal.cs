@@ -93,7 +93,7 @@ public static class Terminal
 
                     if ((options.Logging & Logging.StdOut) != 0)
                     {
-                        AnsiConsole.MarkupLine(GetMarkupText(e.Data.EscapeMarkup()));
+                        AnsiConsole.MarkupLine(SimpleMarkupOutputLine(e.Data.EscapeMarkup()));
                     }
                 }
             }
@@ -138,44 +138,44 @@ public static class Terminal
             StdOut = stdout.ToArray(),
             StdErr = stderr.ToArray()
         };
+    }
 
-        string GetMarkupText(string value)
+    public static string SimpleMarkupOutputLine(string line)
+    {
+        if (WholeContent("warning") || WholeContent("warn"))
         {
-            if (WholeContent("warning") || WholeContent("warn"))
-            {
-                return $"[yellow]{value.EscapeMarkup()}[/]";
-            }
-            else if (WholeContent("success") || WholeContent("successfully"))
-            {
-                return $"[green]{value.EscapeMarkup()}[/]";
-            }
-            else if (WholeContent("error") || WholeContent("err"))
-            {
-                return $"[red]{value.EscapeMarkup()}[/]";
-            }
-            else if (WholeContent("crit") || WholeContent("critical") || WholeContent("fatal"))
-            {
-                return $"[red][b]{value.EscapeMarkup()}[/][/]";
-            }
+            return $"[yellow]{line.EscapeMarkup()}[/]";
+        }
+        else if (WholeContent("success") || WholeContent("successfully"))
+        {
+            return $"[green]{line.EscapeMarkup()}[/]";
+        }
+        else if (WholeContent("error") || WholeContent("err"))
+        {
+            return $"[red]{line.EscapeMarkup()}[/]";
+        }
+        else if (WholeContent("crit") || WholeContent("critical") || WholeContent("fatal"))
+        {
+            return $"[red][b]{line.EscapeMarkup()}[/][/]";
+        }
 
-                return value;
+        return line.EscapeMarkup();
 
-            bool WholeContent(string content)
+        bool WholeContent(string content)
+        {
+            int indexOf = line.IndexOf(content, StringComparison.OrdinalIgnoreCase);
+            if (indexOf == -1)
             {
-                int indexOf = value.IndexOf(content, StringComparison.OrdinalIgnoreCase);
-                if (indexOf == -1)
-                {
-                    return false;
-                }
-
-                if ((indexOf != 0 && MarkupSeparator.Contains(value[indexOf - 1])) ||
-                    (indexOf != value.Length - 1) && MarkupSeparator.Contains(value[indexOf + 1]))
-                {
-                    return true;
-                }
-
                 return false;
             }
+
+            if ((indexOf != 0 && MarkupSeparator.Contains(line[indexOf - 1])) ||
+                (indexOf != line.Length - 1) && MarkupSeparator.Contains(line[indexOf + 1]))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 
