@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Threading.Tasks;
+using Spectre.Console;
 
 namespace AylaEngine;
 
@@ -21,6 +22,25 @@ internal class Solution
     public Project? FindProject(string name)
     {
         return AllProjects.FirstOrDefault(p => p.Name == name);
+    }
+
+    public Project[] FindDepends(params IEnumerable<string> names)
+    {
+        var namesArr = names.ToArray();
+        var results = new Project[namesArr.Length];
+        for (int i = 0; i < namesArr.Length; ++i)
+        {
+            var p = FindProject(namesArr[i]);
+            if (p == null)
+            {
+                AnsiConsole.MarkupLine("[red]Solution not contains depend project '{0}'.[/]", namesArr[i]);
+                throw TerminateException.User();
+            }
+
+            results[i] = p;
+        }
+
+        return results;
     }
 
     public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? gameFolder, CancellationToken cancellationToken = default)

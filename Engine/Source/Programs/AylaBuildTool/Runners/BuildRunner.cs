@@ -24,11 +24,36 @@ internal static class BuildRunner
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
         List<Compiler.CompileItem> compileItems = [];
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
-        foreach (var project in solution.AllProjects)
+        IEnumerable<Project> targetProjects;
+        if (string.IsNullOrEmpty(options.Target))
+        {
+            targetProjects = solution.AllProjects;
+        }
+        else
+        {
+            var targetProject = solution.FindProject(options.Target);
+            if (targetProject == null)
+            {
+                AnsiConsole.MarkupLine("[red]Target '{0}' is not found in solution.[/]", options.Target);
+                throw TerminateException.User();
+            }
+
+            if (targetProject is not ModuleProject mp)
+            {
+                AnsiConsole.MarkupLine("[red]Target '{0}' is not module project. Non module project must be build with specified build program.[/]", options.Target);
+                throw TerminateException.User();
+            }
+
+            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget));
+            var depends = solution.FindDepends(resolver.DependencyModuleNames);
+            targetProjects = depends.Append(targetProject);
+        }
+
+        foreach (var project in targetProjects)
         {
             if (project is ModuleProject mp)
             {
-                var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, new TargetInfo { Platform = PlatformInfo.Win64 }));
+                var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget));
 
                 foreach (var sourceCode in mp.GetSourceCodes())
                 {

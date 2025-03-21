@@ -6,24 +6,29 @@ internal class BuildCommands : Commands
 {
     public override async ValueTask RenderPromptAsync(CancellationToken cancellationToken)
     {
-        var prompt = await new TextPrompt<string>("Project Path:")
+        var projectFile = await new TextPrompt<string>("Project Path:")
             .Validate(OnValidateTextPrompt)
             .AllowEmpty()
             .ValidationErrorMessage("The path is not valid project path.")
             .ShowAsync(AnsiConsole.Console, cancellationToken);
-        TryConvertProjectPath(prompt, out prompt);
-        if (string.IsNullOrEmpty(prompt))
+        TryConvertProjectPath(projectFile, out projectFile);
+        if (string.IsNullOrEmpty(projectFile))
         {
-            AnsiConsole.MarkupLine("The [b]engine[/] project selected.", prompt);
+            AnsiConsole.MarkupLine("The [b]engine[/] project selected.", projectFile);
         }
         else
         {
-            AnsiConsole.MarkupLine("[b]{0}[/] project selected.", prompt);
+            AnsiConsole.MarkupLine("[b]{0}[/] project selected.", projectFile);
         }
+
+        var target = await new TextPrompt<string?>("Target:")
+            .AllowEmpty()
+            .ShowAsync(AnsiConsole.Console, cancellationToken);
 
         var options = new BuildOptions
         {
-            ProjectFile = prompt
+            ProjectFile = projectFile,
+            Target = target
         };
 
         await BuildRunner.RunAsync(options, cancellationToken);
