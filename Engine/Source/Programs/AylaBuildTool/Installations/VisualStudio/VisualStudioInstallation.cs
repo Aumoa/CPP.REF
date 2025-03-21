@@ -6,7 +6,8 @@ internal class VisualStudioInstallation : Installation
 {
     public enum License
     {
-        Community
+        Community,
+        Professional
     }
 
     public enum VSVersion
