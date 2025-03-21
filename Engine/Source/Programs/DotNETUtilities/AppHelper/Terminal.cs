@@ -91,7 +91,7 @@ public static class Terminal
                     logs.Add(l);
                     stdout.Add(l);
 
-                    if ((options.Logging | Logging.StdOut) != 0)
+                    if ((options.Logging & Logging.StdOut) != 0)
                     {
                         AnsiConsole.MarkupLine(GetMarkupText(e.Data.EscapeMarkup()));
                     }

@@ -20,7 +20,7 @@ internal class ClCompiler : Compiler
         var options = new Terminal.Options
         {
             Executable = Path.Combine(m_Product.Directory, "bin", "Hostx64", m_TargetInfo.Platform.Architecture == Architecture.X64 ? "x64" : "x86", "cl.exe"),
-            Logging = Terminal.Logging.All
+            Logging = Terminal.Logging.None
         };
 
         m_CommandBuilder.Clear();
@@ -53,7 +53,9 @@ internal class ClCompiler : Compiler
             // Diagnostics format: prints column information.
             "/diagnostics:column " +
             // Use standard preprocessor.
-            "/Zc:preprocessor "
+            "/Zc:preprocessor " +
+            // Causes the compiler to display the full path of source code files passed to the compiler in diagnostics.
+            "/FC "
         );
 
         switch (m_TargetInfo.Config)
@@ -148,8 +150,15 @@ internal class ClCompiler : Compiler
         );
 
         m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
-        int exitCode = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken).ExitCode();
-        if (exitCode != 0)
+        var result = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+
+        for (int i = 0; i < result.Logs.Length; ++i)
+        {
+            var log = result.Logs[i];
+            AnsiConsole.WriteLine(log.Value);
+        }
+
+        if (result.ExitCode != 0)
         {
             throw TerminateException.User();
         }
