@@ -481,7 +481,7 @@ internal class VisualStudioGenerator : Generator
                         var archName = GetArchitectureName(buildTarget);
                         var outDir = Path.Combine(group.BinariesDirectory, buildTarget.Platform.Name, buildTarget.Config.ToString());
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
-                        var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform }));
+                        var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform }), group);
                         var pps = GenerateProjectPreprocessorDefs(resolver);
                         var includes = GenerateIncludePaths(resolver);
 

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Platform/PlatformMacros.h"
+
 class NSceneRenderer;
 
 class RENDERCORE_API NSceneView

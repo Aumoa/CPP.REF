@@ -7,10 +7,12 @@ namespace Ayla
 {
 	struct Object::CreationHack
 	{
+		static thread_local CreationHack s_Hack;
 		bool AllowConstruct = false;
 	};
 
-	thread_local Object::CreationHack Object::s_Hack;
+	thread_local Object::CreationHack Object::CreationHack::s_Hack;
+	Object::RootCollection Object::s_RootCollection;
 
 	int64 Object::RootCollection::AddObject(Object* object)
 	{
@@ -42,7 +44,6 @@ namespace Ayla
 		check(mark.Refs == 0);
 
 		auto lock = std::unique_lock(m_Mutex);
-		auto& mark = m_Roots[object->m_InstanceID - 1];
 		mark.Ptr = nullptr;
 		m_InstanceIDPool.emplace_back(object->m_InstanceID);
 	}
@@ -52,10 +53,14 @@ namespace Ayla
 		return m_Roots[object->m_InstanceID - 1];
 	}
 
+	void Object::RootCollection::Collect()
+	{
+	}
+
 	Object::Object()
 		: m_PPtrCollection(this)
 	{
-		if (s_Hack.AllowConstruct == false)
+		if (CreationHack::s_Hack.AllowConstruct == false)
 		{
 			throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
 		}
@@ -65,9 +70,9 @@ namespace Ayla
 
 	void Object::ConfigureNew(std::function<Object*()> action)
 	{
-		s_Hack.AllowConstruct = true;
+		CreationHack::s_Hack.AllowConstruct = true;
 		auto object = action();
 		PlatformAtomics::InterlockedDecrement(&s_RootCollection.GetMark(object).Refs);
-		s_Hack.AllowConstruct = false;
+		CreationHack::s_Hack.AllowConstruct = false;
 	}
 }

@@ -24,7 +24,6 @@ namespace Ayla
 
 	private:
 		struct CreationHack;
-		static thread_local CreationHack s_Hack;
 
 	protected:
 		class PPtrCollection
@@ -78,6 +77,7 @@ namespace Ayla
 
 		virtual void GatherProperties(PPtrCollection& collection)
 		{
+			PLATFORM_UNREFERENCED_PARAMETER(collection);
 		}
 
 		virtual void Finalize()

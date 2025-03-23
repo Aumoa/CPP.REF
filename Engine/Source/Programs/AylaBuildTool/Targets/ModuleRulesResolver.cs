@@ -4,29 +4,34 @@ namespace AylaEngine;
 
 internal class ModuleRulesResolver
 {
-    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules)
+    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
     {
+        Rules = rules;
         Name = rules.Name;
+        Group = group;
 
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         PrivateDependencyModuleNames = rules.PrivateDependencyModuleNames.Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
         PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Append($"PLATFORM_STRING=TEXT(\"{targetInfo.Platform}\")").Append($"CONFIG_STRING=TEXT(\"{targetInfo.Config}\")").Distinct().ToArray();
         PrivateDisableWarnings = rules.PrivateDisableWarnings.Distinct().ToArray();
+        PrivateAdditionalLibraries = rules.PrivateAdditionalLibraries.Distinct().ToArray();
 
         HashSet<string> route = new();
         List<string> dependencyModuleNames = [];
         List<string> includePaths = [];
         List<MacroSet> additionalMacros = [];
         List<int> disableWarnings = [];
-        Resolve(solution, targetProject, rules, route, true, dependencyModuleNames, includePaths, additionalMacros, disableWarnings);
+        List<string> additionalLibraries = [];
+        Resolve(solution, targetProject, rules, route, true, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
         PublicDependencyModuleNames = dependencyModuleNames.Distinct().ToArray();
         PublicIncludePaths = includePaths.Distinct().ToArray();
         PublicAdditionalMacros = additionalMacros.Distinct().ToArray();
         PublicDisableWarnings = disableWarnings.Distinct().ToArray();
+        PublicAdditionalLibraries = additionalLibraries.Distinct().ToArray();
     }
 
-    private void Resolve(Solution solution, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings)
+    private void Resolve(Solution solution, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings, List<string> additionalLibraries)
     {
         if (route.Add(rules.Name) == false)
         {
@@ -37,6 +42,7 @@ internal class ModuleRulesResolver
         includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)));
         additionalMacros.AddRange(rules.PublicAdditionalMacros);
         disableWarnings.AddRange(rules.PublicDisableWarnings);
+        additionalLibraries.AddRange(rules.PublicAdditionalLibraries);
 
         IEnumerable<string> deps = rules.PublicDependencyModuleNames;
         if (isPrimary)
@@ -65,7 +71,7 @@ internal class ModuleRulesResolver
             }
 
             var dependTargetRule = mp.GetRule(rules.TargetInfo);
-            Resolve(solution, mp, dependTargetRule, route, false, dependencyModuleNames, includePaths, additionalMacros, disableWarnings);
+            Resolve(solution, mp, dependTargetRule, route, false, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
         }
 
         return;
@@ -76,7 +82,9 @@ internal class ModuleRulesResolver
         return Path.Combine(targetProject.SourceDirectory, relativeIncludePath);
     }
 
+    public readonly ModuleRules Rules;
     public readonly string Name;
+    public readonly GroupDescriptor Group;
 
     private readonly string[] PrivateDependencyModuleNames;
     private readonly string[] PublicDependencyModuleNames;
@@ -97,4 +105,9 @@ internal class ModuleRulesResolver
     private readonly int[] PublicDisableWarnings;
 
     public IEnumerable<int> DisableWarnings => PrivateDisableWarnings.Concat(PublicDisableWarnings).Distinct();
+
+    private readonly string[] PublicAdditionalLibraries;
+    private readonly string[] PrivateAdditionalLibraries;
+
+    public IEnumerable<string> AdditionalLibraries => PrivateAdditionalLibraries.Concat(PublicAdditionalLibraries).Distinct();
 }

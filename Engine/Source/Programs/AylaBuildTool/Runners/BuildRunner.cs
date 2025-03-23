@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Runtime.Loader;
 using Spectre.Console;
+using static AylaEngine.Compiler;
 
 namespace AylaEngine;
 
@@ -44,27 +44,34 @@ internal static class BuildRunner
                 throw TerminateException.User();
             }
 
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget));
+            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor);
             var depends = solution.FindDepends(resolver.DependencyModuleNames);
             targetProjects = depends.Append(targetProject);
         }
+
+        var installation = new VisualStudioInstallation();
+        List<Func<ValueTask>> queuedLinkerTasks = [];
+        int compiled = 0;
 
         foreach (var project in targetProjects)
         {
             if (project is ModuleProject mp)
             {
-                var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget));
+                var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor);
+                List<CompileItem> moduleItems = [];
 
                 foreach (var sourceCode in mp.GetSourceCodes())
                 {
                     if (sourceCode.Type == SourceCodeType.SourceCode)
                     {
-                        compileItems.Add(new Compiler.CompileItem
+                        var item = new Compiler.CompileItem
                         {
                             Resolver = resolver,
                             SourceCode = sourceCode,
                             Descriptor = project.Descriptor
-                        });
+                        };
+                        compileItems.Add(item);
+                        moduleItems.Add(item);
 
                         if (compilationTaskCounts.TryGetValue(mp.Descriptor, out int count))
                         {
@@ -76,67 +83,124 @@ internal static class BuildRunner
                         }
                     }
                 }
-            }
-        }
 
-        List<Task> tasks = new();
-        var installation = new VisualStudioInstallation();
-        int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
-        SemaphoreSlim semaphore = new(hardwareConcurrency);
-
-        await AnsiConsole.Progress()
-            .Columns([new SpinnerColumn(), new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn()])
-            .StartAsync(async ctx =>
-            {
-                Dictionary<GroupDescriptor, ProgressTask> compilationTasks = [];
-                foreach (var (descriptor, count) in compilationTaskCounts)
+                queuedLinkerTasks.Add(async () =>
                 {
-                    var task = ctx.AddTask($"Compile {descriptor.Name}", maxValue: compileItems.Count);
-                    compilationTasks.Add(descriptor, task);
-                }
-
-                int compiled = 0;
-                int log = compileItems.Count switch
-                {
-                    >= 0 and < 10 => 1,
-                    >= 10 and < 100 => 2,
-                    >= 100 and < 1000 => 3,
-                    >= 1000 and < 10000 => 4,
-                    >= 10000 and < 100000 => 5,
-                    _ => 6
-                };
-                foreach (var item in compileItems)
-                {
-                    tasks.Add(SingleTask());
-
-                    continue;
-
-                    async Task SingleTask()
+                    var linker = await installation.SpawnLinkerAsync(buildTarget, cancellationToken);
+                    var output = await linker.LinkAsync(resolver, moduleItems.ToArray(), cancellationToken);
+                    if (ConsoleEnvironment.IsDynamic)
                     {
-                        await semaphore.WaitAsync(cancellationToken);
-                        try
+                        lock (compileItems)
                         {
-                            var compiler = await installation.SpawnCompilerAsync(buildTarget, cancellationToken);
-                            var output = await compiler.CompileAsync(item, cancellationToken);
-                            AnsiConsole.WriteLine($"[{{0,{log}}}/{{1,{log}}}] {{2}}", Interlocked.Increment(ref compiled), compileItems.Count, item.SourceCode.FilePath);
-                            foreach (var log in output.Logs.Skip(1))
+                            foreach (var log in output.Logs)
                             {
                                 AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
                             }
                         }
-                        finally
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
+                    }
+                });
+            }
+        }
+
+        if (ConsoleEnvironment.IsDynamic)
+        {
+            await AnsiConsole.Progress()
+                .Columns([new SpinnerColumn(), new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn()])
+                .StartAsync(async ctx =>
+                {
+                    Dictionary<GroupDescriptor, ProgressTask> compilationTasks = [];
+                    foreach (var (descriptor, count) in compilationTaskCounts)
+                    {
+                        var task = ctx.AddTask($"Compile {descriptor.Name}", maxValue: compileItems.Count);
+                        compilationTasks.Add(descriptor, task);
+                    }
+
+                    await CompileAsync(item =>
+                    {
+                        lock (compilationTasks)
                         {
-                            lock (compilationTasks)
+                            compilationTasks[item.Descriptor].Increment(1);
+                            ctx.Refresh();
+                        }
+                    });
+                });
+        }
+        else
+        {
+            await CompileAsync(null);
+        }
+
+        foreach (var queuedLinkerTask in queuedLinkerTasks)
+        {
+            await queuedLinkerTask();
+        }
+
+        return;
+
+        async ValueTask CompileAsync(Action<CompileItem>? pulse)
+        {
+            int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
+            SemaphoreSlim semaphore = new(hardwareConcurrency);
+            List<Task> tasks = new();
+
+            int log = compileItems.Count switch
+            {
+                >= 0 and < 10 => 1,
+                >= 10 and < 100 => 2,
+                >= 100 and < 1000 => 3,
+                >= 1000 and < 10000 => 4,
+                >= 10000 and < 100000 => 5,
+                _ => 6
+            };
+            foreach (var item in compileItems)
+            {
+                tasks.Add(SingleTask());
+
+                continue;
+
+                async Task SingleTask()
+                {
+                    await semaphore.WaitAsync(cancellationToken);
+                    try
+                    {
+                        var compiler = await installation.SpawnCompilerAsync(buildTarget, cancellationToken);
+                        var output = await compiler.CompileAsync(item, cancellationToken);
+                        string fileText = string.Format($"[{{0,{log}}}/{{1,{log}}}] {{2}}", Interlocked.Increment(ref compiled), compileItems.Count + queuedLinkerTasks.Count, item.SourceCode.FilePath);
+                        if (ConsoleEnvironment.IsDynamic)
+                        {
+                            lock (compileItems)
                             {
-                                compilationTasks[item.Descriptor].Value += 1;
-                                ctx.Refresh();
+                                AnsiConsole.WriteLine(fileText);
+                                foreach (var log in output.Logs.Skip(1))
+                                {
+                                    AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
+                                }
                             }
-                            semaphore.Release();
+                        }
+                        else
+                        {
+                            string[] outputs = new string[output.Logs.Length];
+                            outputs[0] = fileText;
+                            for (int i = 1; i < output.Logs.Length; ++i)
+                            {
+                                outputs[i] = output.Logs[i].Value;
+                            }
+                            Console.WriteLine(string.Join('\n', outputs));
                         }
                     }
+                    finally
+                    {
+                        pulse?.Invoke(item);
+                        semaphore.Release();
+                    }
                 }
+            }
 
-                await Task.WhenAll(tasks);
-            });
+            await Task.WhenAll(tasks);
+        }
     }
 }

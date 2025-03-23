@@ -145,6 +145,18 @@ internal class VisualStudioInstallation : Installation
         return ValueTask.FromResult<Compiler>(new ClCompiler(targetInfo, product));
     }
 
+    public override ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
+    {
+        if (targetInfo.Platform.Group != PlatformGroup.Windows)
+        {
+            AnsiConsole.MarkupLine("[red]Non-windows build target not supported.[/]");
+            throw TerminateException.User();
+        }
+
+        var product = s_Products[0];
+        return ValueTask.FromResult<Linker>(new MSLinker(targetInfo, product));
+    }
+
     public static IEnumerable<string> GatherWindowsKitInclude()
     {
         if (s_WindowsKitVersion == null)
@@ -153,9 +165,31 @@ internal class VisualStudioInstallation : Installation
             throw TerminateException.User();
         }
 
-        yield return Path.Combine(KitRoot, "Include", s_WindowsKitVersion.ToString(4), "ucrt");
-        yield return Path.Combine(KitRoot, "Include", s_WindowsKitVersion.ToString(4), "um");
-        yield return Path.Combine(KitRoot, "Include", s_WindowsKitVersion.ToString(4), "shared");
-        yield return Path.Combine(KitRoot, "Include", s_WindowsKitVersion.ToString(4), "winrt");
+        string versionString = s_WindowsKitVersion.ToString(4);
+        string @base = Path.Combine(KitRoot, "Include", versionString);
+        yield return Path.Combine(@base, "ucrt");
+        yield return Path.Combine(@base, "um");
+        yield return Path.Combine(@base, "shared");
+        yield return Path.Combine(@base, "winrt");
+    }
+
+    public static IEnumerable<string> GatherWindowsKitSharedLibrary(Architecture arch)
+    {
+        if (s_WindowsKitVersion == null)
+        {
+            AnsiConsole.MarkupLine("[red]Non-windows build target not supported.[/]");
+            throw TerminateException.User();
+        }
+
+        string versionString = s_WindowsKitVersion.ToString(4);
+        string architectureString = arch switch
+        {
+            Architecture.X64 => "x64",
+            _ => throw TerminateException.Internal()
+        };
+
+        string @base = Path.Combine(KitRoot, "Lib", versionString);
+        yield return Path.Combine(@base, "um", architectureString);
+        yield return Path.Combine(@base, "ucrt", architectureString);
     }
 }
