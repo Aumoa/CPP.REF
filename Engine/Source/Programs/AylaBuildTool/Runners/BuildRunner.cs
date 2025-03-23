@@ -52,6 +52,8 @@ internal static class BuildRunner
         var installation = new VisualStudioInstallation();
         List<Func<ValueTask>> queuedLinkerTasks = [];
         int compiled = 0;
+        int totalActions = 0;
+        int log = 1;
 
         foreach (var project in targetProjects)
         {
@@ -70,7 +72,18 @@ internal static class BuildRunner
                             SourceCode = sourceCode,
                             Descriptor = project.Descriptor
                         };
-                        compileItems.Add(item);
+
+                        var intDir = item.Descriptor.GetIntermediateFolder(item.Resolver, buildTarget);
+                        var fileName = Path.GetFileName(item.SourceCode.FilePath);
+                        var cacheFileName = Path.Combine(intDir, fileName + ".cache");
+                        var depsFileName = Path.Combine(intDir, fileName + ".deps.json");
+                        var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, depsFileName, cancellationToken);
+                        if (File.Exists(cacheFileName) == false ||
+                            SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
+                        {
+                            compileItems.Add(item);
+                        }
+
                         moduleItems.Add(item);
 
                         if (compilationTaskCounts.TryGetValue(mp.Descriptor, out int count))
@@ -92,19 +105,38 @@ internal static class BuildRunner
                     {
                         lock (compileItems)
                         {
-                            foreach (var log in output.Logs)
+                            for (int i = 0; i < output.Logs.Length; i++)
                             {
-                                AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
+                                Terminal.Log log = output.Logs[i];
+                                if (i == 0)
+                                {
+                                    AnsiConsole.MarkupLine("{0} {1}", MakeOutputPrefix().EscapeMarkup(), Terminal.SimpleMarkupOutputLine(log.Value));
+                                }
+                                else
+                                {
+                                    AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
+                                }
                             }
                         }
                     }
                     else
                     {
-                        Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
+                        Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
                     }
                 });
             }
         }
+
+        totalActions = compileItems.Count + queuedLinkerTasks.Count;
+        log = compileItems.Count switch
+        {
+            >= 0 and < 10 => 1,
+            >= 10 and < 100 => 2,
+            >= 100 and < 1000 => 3,
+            >= 1000 and < 10000 => 4,
+            >= 10000 and < 100000 => 5,
+            _ => 6
+        };
 
         if (ConsoleEnvironment.IsDynamic)
         {
@@ -141,21 +173,16 @@ internal static class BuildRunner
 
         return;
 
+        string MakeOutputPrefix()
+        {
+            return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
+        }
+
         async ValueTask CompileAsync(Action<CompileItem>? pulse)
         {
             int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
             SemaphoreSlim semaphore = new(hardwareConcurrency);
             List<Task> tasks = new();
-
-            int log = compileItems.Count switch
-            {
-                >= 0 and < 10 => 1,
-                >= 10 and < 100 => 2,
-                >= 100 and < 1000 => 3,
-                >= 1000 and < 10000 => 4,
-                >= 10000 and < 100000 => 5,
-                _ => 6
-            };
             foreach (var item in compileItems)
             {
                 tasks.Add(SingleTask());
@@ -169,7 +196,7 @@ internal static class BuildRunner
                     {
                         var compiler = await installation.SpawnCompilerAsync(buildTarget, cancellationToken);
                         var output = await compiler.CompileAsync(item, cancellationToken);
-                        string fileText = string.Format($"[{{0,{log}}}/{{1,{log}}}] {{2}}", Interlocked.Increment(ref compiled), compileItems.Count + queuedLinkerTasks.Count, item.SourceCode.FilePath);
+                        string fileText = string.Format("{0} {1}", MakeOutputPrefix(), item.SourceCode.FilePath);
                         if (ConsoleEnvironment.IsDynamic)
                         {
                             lock (compileItems)

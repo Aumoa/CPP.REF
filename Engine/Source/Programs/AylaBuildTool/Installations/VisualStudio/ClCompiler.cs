@@ -137,6 +137,7 @@ internal class ClCompiler : Compiler
         var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
         var pdbFileName = Path.Combine(intermediateDirectory, fileName + ".pdb");
         var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps.json");
+        var cacheFileName = Path.Combine(intermediateDirectory, fileName + ".cache");
 
         Directory.CreateDirectory(intermediateDirectory);
 
@@ -150,6 +151,13 @@ internal class ClCompiler : Compiler
         );
 
         m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
-        return await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+        var output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+        if (output.ExitCode == 0)
+        {
+            var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, depsFileName, cancellationToken);
+            cached.SaveCached(cacheFileName);
+        }
+
+        return output;
     }
 }
