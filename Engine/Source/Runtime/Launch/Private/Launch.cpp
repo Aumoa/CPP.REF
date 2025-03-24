@@ -59,3 +59,14 @@ NLaunch& NLaunch::Get() noexcept
 {
     return *CurrentLaunch;
 }
+
+extern "C" LAUNCH_API int32 Ayla__Launch__StartApplication(const char_t* const* args, int32 length)
+{
+	std::vector<String> Args;
+	for (int i = 0; i < length; ++i)
+	{
+		Args.emplace_back(String::FromLiteral(args[i]));
+	}
+
+	return NLaunch::GeneratePlatformLaunch(String::Join(TEXT(" "), Args))->GuardedMain();
+}

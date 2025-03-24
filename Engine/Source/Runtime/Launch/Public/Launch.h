@@ -39,3 +39,5 @@ public:
 		return GeneratePlatformLaunch(String::Join(TEXT(" "), Args));
 	}
 };
+
+extern "C" LAUNCH_API int32 Ayla__Launch__StartApplication(const char_t* const* args, int32 length);
