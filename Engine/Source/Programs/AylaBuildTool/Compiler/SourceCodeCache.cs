@@ -6,12 +6,14 @@ internal readonly struct SourceCodeCache
 {
     private readonly bool m_IsValid;
     private readonly DateTime m_SourceCodeWriteTime;
+    private readonly DateTime m_RuleFileWriteTime;
     private readonly DateTime[] m_DependsWriteTime;
 
-    private SourceCodeCache(DateTime sourceCodeWriteTime, DateTime[] dependsWriteTime)
+    private SourceCodeCache(DateTime sourceCodeWriteTime, DateTime ruleFileWriteTime, DateTime[] dependsWriteTime)
     {
         m_IsValid = true;
         m_SourceCodeWriteTime = sourceCodeWriteTime;
+        m_RuleFileWriteTime = ruleFileWriteTime;
         m_DependsWriteTime = dependsWriteTime;
     }
 
@@ -23,6 +25,7 @@ internal readonly struct SourceCodeCache
         }
 
         return m_SourceCodeWriteTime != other.m_SourceCodeWriteTime
+            || m_RuleFileWriteTime != other.m_RuleFileWriteTime
             || m_DependsWriteTime.SequenceEqual(other.m_DependsWriteTime) == false;
     }
 
@@ -35,6 +38,7 @@ internal readonly struct SourceCodeCache
 
         using var writer = new BinaryWriter(File.OpenWrite(cacheFileName));
         writer.Write(m_SourceCodeWriteTime.ToBinary());
+        writer.Write(m_RuleFileWriteTime.ToBinary());
         writer.Write(m_DependsWriteTime.Length);
         foreach (var w in m_DependsWriteTime)
         {
@@ -50,13 +54,14 @@ internal readonly struct SourceCodeCache
         {
             using var reader = new BinaryReader(File.OpenRead(cacheFileName));
             DateTime sourceCodeWriteTime = DateTime.FromBinary(reader.ReadInt64());
+            DateTime ruleFileWriteTime = DateTime.FromBinary(reader.ReadInt64());
             int dependsCount = reader.ReadInt32();
             DateTime[] dependsWriteTime = new DateTime[dependsCount];
             for (int i = 0; i < dependsCount; i++)
             {
                 dependsWriteTime[i] = DateTime.FromBinary(reader.ReadInt64());
             }
-            return new SourceCodeCache(sourceCodeWriteTime, dependsWriteTime);
+            return new SourceCodeCache(sourceCodeWriteTime, ruleFileWriteTime, dependsWriteTime);
         }
         catch
         {
@@ -64,7 +69,7 @@ internal readonly struct SourceCodeCache
         }
     }
 
-    public static async ValueTask<SourceCodeCache> MakeCachedAsync(string sourceCode, string dependsFileName, CancellationToken cancellationToken)
+    public static async ValueTask<SourceCodeCache> MakeCachedAsync(string sourceCode, string ruleFilePath, string dependsFileName, CancellationToken cancellationToken)
     {
         if (File.Exists(dependsFileName) == false)
         {
@@ -72,6 +77,7 @@ internal readonly struct SourceCodeCache
         }
 
         var sourceCodeWriteTime = File.GetLastWriteTimeUtc(sourceCode);
+        var ruleFileWriteTime = File.GetLastWriteTimeUtc(ruleFilePath);
         string depsJson = await File.ReadAllTextAsync(dependsFileName, cancellationToken);
         var includes = JsonNode.Parse(depsJson)?["Data"]?["Includes"]?.AsArray();
         DateTime[] depsWriteTimes = [];
@@ -83,6 +89,6 @@ internal readonly struct SourceCodeCache
                 depsWriteTimes[i] = File.GetLastWriteTimeUtc(includes[i]!.GetValue<string>());
             }
         }
-        return new SourceCodeCache(sourceCodeWriteTime, depsWriteTimes);
+        return new SourceCodeCache(sourceCodeWriteTime, ruleFileWriteTime, depsWriteTimes);
     }
 }

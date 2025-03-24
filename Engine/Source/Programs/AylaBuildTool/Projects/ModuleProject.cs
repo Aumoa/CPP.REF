@@ -1,8 +1,9 @@
 ﻿namespace AylaEngine;
 
-internal class ModuleProject(string name, GroupDescriptor descriptor, string sourceDirectory, Type ruleType, Project.Declaration declaration) : Project(name, descriptor, declaration)
+internal class ModuleProject(string name, GroupDescriptor descriptor, string sourceDirectory, Type ruleType, string ruleFilePath, Project.Declaration declaration) : Project(name, descriptor, declaration)
 {
     public readonly Type RuleType = ruleType;
+    public readonly string RuleFilePath = ruleFilePath;
     public readonly string SourceDirectory = sourceDirectory;
 
     private readonly Dictionary<ITargetInfo, ModuleRules> m_CachedRules = new();

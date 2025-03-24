@@ -12,12 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="SourceTree\**" />
-    <EmbeddedResource Remove="SourceTree\**" />
-    <None Remove="SourceTree\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\..\..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 

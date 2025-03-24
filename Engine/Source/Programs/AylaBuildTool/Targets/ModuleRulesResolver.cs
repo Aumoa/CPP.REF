@@ -6,11 +6,12 @@ internal class ModuleRulesResolver
 {
     public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
     {
+        var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         Rules = rules;
+        RuleFilePath = targetProject.RuleFilePath;
         Name = rules.Name;
         Group = group;
 
-        var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         PrivateDependencyModuleNames = rules.PrivateDependencyModuleNames.Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
         PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Append($"PLATFORM_STRING=TEXT(\"{targetInfo.Platform}\")").Append($"CONFIG_STRING=TEXT(\"{targetInfo.Config}\")").Distinct().ToArray();
@@ -83,6 +84,7 @@ internal class ModuleRulesResolver
     }
 
     public readonly ModuleRules Rules;
+    public readonly string RuleFilePath;
     public readonly string Name;
     public readonly GroupDescriptor Group;
 

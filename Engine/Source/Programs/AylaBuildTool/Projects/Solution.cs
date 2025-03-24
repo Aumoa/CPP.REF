@@ -93,7 +93,7 @@ internal class Solution
 
                 lock (results)
                 {
-                    results.Add(new ModuleProject(directoryName, descriptor, currentDir, ruleType, declaration));
+                    results.Add(new ModuleProject(directoryName, descriptor, currentDir, ruleType, ruleFileName, declaration));
                 }
                 return;
             }

@@ -154,7 +154,7 @@ internal class ClCompiler : Compiler
         var output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, depsFileName, cancellationToken);
+            var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, cancellationToken);
             cached.SaveCached(cacheFileName);
         }
 
