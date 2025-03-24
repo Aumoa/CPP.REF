@@ -38,7 +38,9 @@ internal class MSLinker : Linker
                     // Create a DLL.
                     "/DLL " +
                     // Set output file name.
-                    $"/OUT:{outputFileName} "
+                    $"/OUT:{outputFileName} " +
+                    // Create debug symbols.
+                    "/DEBUG "
                 );
                 break;
             case ModuleType.Application:
@@ -47,7 +49,9 @@ internal class MSLinker : Linker
                     // Suppresses display of sign-on banner.
                     "/nologo " +
                     // Set output file name.
-                    $"/OUT:{outputFileName} "
+                    $"/OUT:{outputFileName} " +
+                    // Create debug symbols.
+                    "/DEBUG "
                 );
                 break;
             default:
