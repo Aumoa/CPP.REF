@@ -9,11 +9,14 @@
 #define __ALLOW_PLATFORM_COMMON_H__
 #include "Platform/PlatformCommon.h"
 
-struct NWindowsCoStatics : public StaticClass
+namespace Ayla
 {
-	static void TryCoInitialize();
-	static ComPtr<IWICImagingFactory2> GetImagingFactory();
-};
+	struct NWindowsCoStatics : public StaticClass
+	{
+		static void TryCoInitialize();
+		static ComPtr<IWICImagingFactory2> GetImagingFactory();
+	};
+}
 
 #undef __ALLOW_PLATFORM_COMMON_H__
 

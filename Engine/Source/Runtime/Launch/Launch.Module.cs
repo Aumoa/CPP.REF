@@ -9,6 +9,6 @@ public class Launch : ModuleRules
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
-        AddPublicDependencyModuleNames("Core", "RHI", "SlateCore", "SlateRHIRenderer", "Engine", "Slate", "CoreEd", "MainFrame");
+        AddPublicDependencyModuleNames("Core", "ApplicationCore");
     }
 }

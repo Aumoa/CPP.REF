@@ -10,24 +10,27 @@
 #define __ALLOW_PLATFORM_COMMON_H__
 #include "Platform/PlatformCommon.h"
 
-class NWindowsWindow : public NGenericWindow
+namespace Ayla
 {
-    static std::map<uint64, String> RegisteredClasses;
+    class NWindowsWindow : public NGenericWindow
+    {
+        static std::map<uint64, String> RegisteredClasses;
 
-private:
-    NGenericWindowDefinition CachedDefinition;
-    HWND hWnd = NULL;
+    private:
+        NGenericWindowDefinition CachedDefinition;
+        HWND hWnd = NULL;
 
-public:
-    NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefinition& InDefinition);
-    virtual ~NWindowsWindow() noexcept override;
+    public:
+        NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefinition& InDefinition);
+        virtual ~NWindowsWindow() noexcept override;
 
-    virtual NGenericWindowDefinition GetDefinition() const override;
-    virtual void* GetOSWindowHandle() const override;
-    virtual void Show() override;
-    virtual void Hide() override;
-    virtual Vector2N GetSize() const override;
-};
+        virtual NGenericWindowDefinition GetDefinition() const override;
+        virtual void* GetOSWindowHandle() const override;
+        virtual void Show() override;
+        virtual void Hide() override;
+        virtual Vector2N GetSize() const override;
+    };
+}
 
 #undef __ALLOW_PLATFORM_COMMON_H__
 

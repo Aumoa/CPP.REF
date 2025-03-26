@@ -4,40 +4,32 @@
 
 #include "CoreMinimal.h"
 
-class NEngineLoop;
-class NGenericApplication;
-
-class LAUNCH_API NLaunch
+namespace Ayla
 {
-private:
-	static NLaunch* CurrentLaunch;
+	class NGenericApplication;
 
-	String CmdArgs;
-	std::unique_ptr<NGenericApplication> GenericApp;
-    std::unique_ptr<NEngineLoop> Loop;
-
-protected:
-	NLaunch(String CmdArgs);
-
-public:
-	virtual ~NLaunch() noexcept;
-
-public:
-	int32 GuardedMain();
-
-	virtual void* GetApplicationPointer() = 0;
-
-	static NLaunch& Get() noexcept;
-	static std::unique_ptr<NLaunch> GeneratePlatformLaunch(String CmdArgs);
-	static std::unique_ptr<NLaunch> GeneratePlatformLaunch(int Argc, char** Argv)
+	class LAUNCH_API NLaunch
 	{
-		std::vector<String> Args;
-		for (int i = 0; i < Argc; ++i)
-		{
-			Args.emplace_back(String::FromLiteral(Argv[i]));
-		}
-		return GeneratePlatformLaunch(String::Join(TEXT(" "), Args));
-	}
-};
+	private:
+		static NLaunch* CurrentLaunch;
 
-extern "C" LAUNCH_API int32 Ayla__Launch__StartApplication(const char_t* const* args, int32 length);
+		String CmdArgs;
+		std::unique_ptr<NGenericApplication> GenericApp;
+
+	protected:
+		NLaunch(String CmdArgs);
+
+	public:
+		virtual ~NLaunch() noexcept;
+
+	public:
+		int32 GuardedMain();
+
+		virtual void* GetApplicationPointer() = 0;
+
+		static NLaunch& Get() noexcept;
+		static std::unique_ptr<NLaunch> GeneratePlatformLaunch(String CmdArgs);
+	};
+}
+
+extern "C" LAUNCH_API ::Ayla::int32 Ayla__Launch__StartApplication(const ::Ayla::char_t* const* args, ::Ayla::int32 length);

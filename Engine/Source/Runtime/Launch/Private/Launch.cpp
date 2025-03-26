@@ -1,72 +1,83 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Launch.h"
-#include "EngineLoop.h"
-#include "GameEngine.h"
-#include "Global.h"
 #include "GenericPlatform/GenericSplash.h"
 #include "GenericPlatform/GenericApplication.h"
+#include "GenericPlatform/GenericWIndow.h"
 #include "Localizational/Name.h"
 
 #if WITH_EDITOR
 #include "CoreEd.h"
 #endif
 
-NLaunch* NLaunch::CurrentLaunch;
-
-NLaunch::NLaunch(String CmdArgs)
-	: CmdArgs(CmdArgs)
+namespace Ayla
 {
-    check(CurrentLaunch == nullptr);
-    CurrentLaunch = this;
+    NLaunch* NLaunch::CurrentLaunch;
 
-    GenericApp = NGenericApplication::CreateApplication();
-    Loop = std::make_unique<NEngineLoop>();
-}
-
-NLaunch::~NLaunch() noexcept
-{
-    check(CurrentLaunch);
-    CurrentLaunch = nullptr;
-}
-
-int32 NLaunch::GuardedMain()
-{
-    GenericApp->SetApplicationPointer(GetApplicationPointer());
-    Global::SetEngineDirectory(GenericApp->GetEngineDirectory());
-    Global::SetGameDirectory(Environment::GetCurrentDirectory());
-
-    Loop->PreInit(CmdArgs);
-#if WITH_EDITOR
-    NCoreEd::EditorInit(*Loop);
-#else
-    Loop->Init(std::make_shared<GameEngine>());
-#endif
-    Loop->PostInit();
-
-    std::vector<NGenericPlatformInputEvent> InputEvents;
-    while (!GenericApp->IsQuitRequested())
+    NLaunch::NLaunch(String CmdArgs)
+        : CmdArgs(CmdArgs)
     {
-        GenericApp->PumpMessages(InputEvents);
-        Loop->Tick(InputEvents);
+        check(CurrentLaunch == nullptr);
+        CurrentLaunch = this;
+
+        GenericApp = NGenericApplication::CreateApplication();
     }
 
-    Loop->Shutdown();
-    return GenericApp->GetExitCode();
+    NLaunch::~NLaunch() noexcept
+    {
+        check(CurrentLaunch);
+        CurrentLaunch = nullptr;
+    }
+
+    int32 NLaunch::GuardedMain()
+    {
+        GenericApp->SetApplicationPointer(GetApplicationPointer());
+
+        NGenericWindowDefinition wDef =
+        {
+            .bPrimaryWindow = true,
+            .bSystemMenu = true,
+            .bThickframe = true,
+            .bSizebox = true,
+            .bCaption = true
+        };
+
+        NGenericSplash::Show();
+        NGenericSplash::SetSplashText(TEXT("Initialize... (0/100)"));
+        for (int i = 0; i < 100; ++i)
+        {
+            NGenericSplash::SetSplashText(String::Format(TEXT("Initialize... ({0}/100)"), i + 1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        NGenericSplash::Hide();
+
+        std::shared_ptr window = GenericApp->MakeWindow(wDef);
+        window->Show();
+
+        std::vector<NGenericPlatformInputEvent> InputEvents;
+        while (!GenericApp->IsQuitRequested())
+        {
+            GenericApp->PumpMessages(InputEvents);
+        }
+
+        return GenericApp->GetExitCode();
+    }
+
+    NLaunch& NLaunch::Get() noexcept
+    {
+        return *CurrentLaunch;
+    }
 }
 
-NLaunch& NLaunch::Get() noexcept
+extern "C" LAUNCH_API ::Ayla::int32 Ayla__Launch__StartApplication(const ::Ayla::char_t* const* args, ::Ayla::int32 length)
 {
-    return *CurrentLaunch;
-}
+    using namespace ::Ayla;
 
-extern "C" LAUNCH_API int32 Ayla__Launch__StartApplication(const char_t* const* args, int32 length)
-{
-	std::vector<String> Args;
-	for (int i = 0; i < length; ++i)
-	{
-		Args.emplace_back(String::FromLiteral(args[i]));
-	}
+    std::vector<String> Args;
+    for (int i = 0; i < length; ++i)
+    {
+        Args.emplace_back(String::FromLiteral(args[i]));
+    }
 
-	return NLaunch::GeneratePlatformLaunch(String::Join(TEXT(" "), Args))->GuardedMain();
+    return NLaunch::GeneratePlatformLaunch(String::Join(TEXT(" "), Args))->GuardedMain();
 }

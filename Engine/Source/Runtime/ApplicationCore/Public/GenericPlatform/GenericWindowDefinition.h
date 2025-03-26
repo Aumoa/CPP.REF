@@ -5,14 +5,17 @@
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Rect.h"
 
-struct NGenericWindowDefinition
+namespace Ayla
 {
-    uint8 bPopup : 1 = false;
-    uint8 bPrimaryWindow : 1 = false;
-    uint8 bSystemMenu : 1 = false;
-    uint8 bThickframe : 1 = false;
-    uint8 bSizebox : 1 = false;
-    uint8 bCaption : 1 = false;
-    Vector2N DesiredScreenPosition = Vector2N(-1, -1);
-    Vector2N DesiredScreenSize = Vector2N(-1, -1);
-};
+    struct NGenericWindowDefinition
+    {
+        uint8 bPopup : 1 = false;
+        uint8 bPrimaryWindow : 1 = false;
+        uint8 bSystemMenu : 1 = false;
+        uint8 bThickframe : 1 = false;
+        uint8 bSizebox : 1 = false;
+        uint8 bCaption : 1 = false;
+        Vector2N DesiredScreenPosition = Vector2N(-1, -1);
+        Vector2N DesiredScreenSize = Vector2N(-1, -1);
+    };
+}

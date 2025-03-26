@@ -5,23 +5,26 @@
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Rect.h"
 
-class APPLICATIONCORE_API NGenericImage : public std::enable_shared_from_this<NGenericImage>
+namespace Ayla
 {
-private:
-	void* pImpl = nullptr;
+	class APPLICATIONCORE_API NGenericImage : public std::enable_shared_from_this<NGenericImage>
+	{
+	private:
+		void* pImpl = nullptr;
 
-private:
-	NGenericImage();
+	private:
+		NGenericImage();
 
-public:
-	~NGenericImage() noexcept;
+	public:
+		~NGenericImage() noexcept;
 
-	void CopyPixels(int32 Stride, int32 BufferSize, void* DestBuf);
-	Task<> CopyPixelsAsync(int32 Stride, int32 BufferSize, void* DestBuf);
-	void CopyPixels(const RectN& InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf);
-	Task<> CopyPixelsAsync(RectN InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf);
+		void CopyPixels(int32 Stride, int32 BufferSize, void* DestBuf);
+		Task<> CopyPixelsAsync(int32 Stride, int32 BufferSize, void* DestBuf);
+		void CopyPixels(const RectN& InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf);
+		Task<> CopyPixelsAsync(RectN InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf);
 
-	Vector2N GetSize() const;
+		Vector2N GetSize() const;
 
-	static Task<std::shared_ptr<NGenericImage>> LoadFromFileAsync(String InFilename);
-};
+		static Task<std::shared_ptr<NGenericImage>> LoadFromFileAsync(String InFilename);
+	};
+}

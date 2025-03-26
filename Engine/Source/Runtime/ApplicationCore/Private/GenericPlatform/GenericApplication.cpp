@@ -3,80 +3,83 @@
 #include "GenericPlatform/GenericApplication.h"
 #include "GenericPlatform/GenericWIndow.h"
 
-NGenericApplication* NGenericApplication::sApp;
-
-NGenericApplication::NGenericApplication()
+namespace Ayla
 {
-    check(!sApp);
-    sApp = this;
-}
+    NGenericApplication* NGenericApplication::sApp;
 
-NGenericApplication::~NGenericApplication() noexcept
-{
-    check(sApp);
-    sApp = nullptr;
-}
+    NGenericApplication::NGenericApplication()
+    {
+        check(!sApp);
+        sApp = this;
+    }
 
-String NGenericApplication::GetApplicationName()
-{
-    return TEXT("");
-}
+    NGenericApplication::~NGenericApplication() noexcept
+    {
+        check(sApp);
+        sApp = nullptr;
+    }
 
-void NGenericApplication::SetApplicationPointer(void* InAppPointer)
-{
-    check(!bFreezed);
-    ApplicationPointer = InAppPointer;
-}
+    String NGenericApplication::GetApplicationName()
+    {
+        return TEXT("");
+    }
 
-void* NGenericApplication::GetApplicationPointer()
-{
-    return ApplicationPointer;
-}
+    void NGenericApplication::SetApplicationPointer(void* InAppPointer)
+    {
+        check(!bFreezed);
+        ApplicationPointer = InAppPointer;
+    }
 
-void NGenericApplication::Freeze()
-{
-    bFreezed = true;
-}
+    void* NGenericApplication::GetApplicationPointer()
+    {
+        return ApplicationPointer;
+    }
 
-bool NGenericApplication::IsFreezed() noexcept
-{
-    return bFreezed;
-}
+    void NGenericApplication::Freeze()
+    {
+        bFreezed = true;
+    }
 
-void NGenericApplication::QuitApplication(int32 InCode)
-{
-    check(!ExitCode);
-    ExitCode = InCode;
-}
+    bool NGenericApplication::IsFreezed() noexcept
+    {
+        return bFreezed;
+    }
 
-int32 NGenericApplication::GetExitCode()
-{
-    check(ExitCode);
-    return ExitCode.value();
-}
+    void NGenericApplication::QuitApplication(int32 InCode)
+    {
+        check(!ExitCode);
+        ExitCode = InCode;
+    }
 
-bool NGenericApplication::IsQuitRequested()
-{
-    return (bool)ExitCode;
-}
+    int32 NGenericApplication::GetExitCode()
+    {
+        check(ExitCode);
+        return ExitCode.value();
+    }
 
-extern "C" void* GenericApplication_Interop_CreateApplication()
-{
-    return NGenericApplication::CreateApplication().release();
-}
+    bool NGenericApplication::IsQuitRequested()
+    {
+        return (bool)ExitCode;
+    }
 
-extern "C" void GenericApplication_Interop_Dispose(void* instancePtr)
-{
-    delete (NGenericApplication*)instancePtr;
-}
+    extern "C" void* GenericApplication_Interop_CreateApplication()
+    {
+        return NGenericApplication::CreateApplication().release();
+    }
 
-extern "C" void* GenericApplication_Interop_MakeWindow(void* instancePtr)
-{
-    NGenericWindowDefinition defaultOptions;
-    defaultOptions.bPrimaryWindow = true;
-    defaultOptions.bSystemMenu = true;
-    defaultOptions.bThickframe = true;
-    defaultOptions.bSizebox = true;
-    defaultOptions.bCaption = true;
-    return ((NGenericApplication*)instancePtr)->MakeWindow(defaultOptions).release();
+    extern "C" void GenericApplication_Interop_Dispose(void* instancePtr)
+    {
+        delete (NGenericApplication*)instancePtr;
+    }
+
+    extern "C" void* GenericApplication_Interop_MakeWindow(void* instancePtr)
+    {
+        NGenericWindowDefinition defaultOptions;
+        defaultOptions.bPrimaryWindow = true;
+        defaultOptions.bSystemMenu = true;
+        defaultOptions.bThickframe = true;
+        defaultOptions.bSizebox = true;
+        defaultOptions.bCaption = true;
+        return ((NGenericApplication*)instancePtr)->MakeWindow(defaultOptions).release();
+    }
 }

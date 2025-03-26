@@ -4,13 +4,16 @@
 
 #include "CoreMinimal.h"
 
-class APPLICATIONCORE_API NGenericSplash
+namespace Ayla
 {
-	NGenericSplash() = delete;
+	class APPLICATIONCORE_API NGenericSplash
+	{
+		NGenericSplash() = delete;
 
-public:
-	static void Show();
-	static void Hide();
+	public:
+		static void Show();
+		static void Hide();
 
-	static void SetSplashText(String InText);
-};
+		static void SetSplashText(String InText);
+	};
+}

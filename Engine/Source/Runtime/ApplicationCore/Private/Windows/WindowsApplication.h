@@ -10,25 +10,28 @@
 #define __ALLOW_PLATFORM_COMMON_H__
 #include "Platform/PlatformCommon.h"
 
-class NWindowsApplication : public NGenericApplication
+namespace Ayla
 {
-private:
-    DirectoryReference EngineDirectory;
+    class NWindowsApplication : public NGenericApplication
+    {
+    private:
+        DirectoryReference EngineDirectory;
 
-public:
-    NWindowsApplication();
+    public:
+        NWindowsApplication();
 
-    virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) override;
-    virtual Vector2N GetScreenResolution() override;
-    virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) override;
-    virtual DirectoryReference GetEngineDirectory() const override;
+        virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) override;
+        virtual Vector2N GetScreenResolution() override;
+        virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) override;
+        virtual DirectoryReference GetEngineDirectory() const override;
 
-public:
-    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    public:
+        static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-private:
-    static std::vector<NGenericPlatformInputEvent> InputEvents;
-};
+    private:
+        static std::vector<NGenericPlatformInputEvent> InputEvents;
+    };
+}
 
 #undef __ALLOW_PLATFORM_COMMON_H__
 
