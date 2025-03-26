@@ -4,6 +4,7 @@
 
 #include <concepts>
 #include <ranges>
+#include <set>
 
 namespace Ayla::inline Linq
 {

@@ -39,7 +39,7 @@ namespace Ayla
 
 		static bool TryParse(String FormattedString, Guid& OutResult)
 		{
-			std::vector<String> Datas = FormattedString.Split(TEXT("-"), EStringSplitOptions::TrimEntries | EStringSplitOptions::RemoveEmptyEntries);
+			std::vector<String> Datas = FormattedString.Split(TEXT("-"), StringSplitOptions::TrimEntries | StringSplitOptions::RemoveEmptyEntries);
 			if (Datas.size() != 4)
 			{
 				OutResult = {};

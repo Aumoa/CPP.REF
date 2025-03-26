@@ -21,7 +21,7 @@ namespace Ayla::inline Linq::Adaptors
 		template<std::ranges::input_range U>
 		constexpr auto operator ()(U&& r1) noexcept
 		{
-			return ranges::concat_view(std::forward<U>(r1), std::forward<R>(r2));
+			return Ranges::concat_view(std::forward<U>(r1), std::forward<R>(r2));
 		}
 
 		template<std::ranges::input_range R1, std::ranges::input_range R2>

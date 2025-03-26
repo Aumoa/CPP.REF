@@ -5,132 +5,135 @@
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Vector.h"
 
-struct Translate2D
+namespace Ayla
 {
-	float X;
-	float Y;
-
-	constexpr Translate2D(float X, float Y) : X(X), Y(Y)
+	struct Translate2D
 	{
-	}
+		float X;
+		float Y;
 
-	constexpr Translate2D(const Translate2D& T) : X(T.X), Y(T.Y)
-	{
-	}
+		constexpr Translate2D(float X, float Y) : X(X), Y(Y)
+		{
+		}
 
-	template<TIsVector<float, 2> IVector>
-	constexpr Translate2D(const IVector& V) : X(V[0]), Y(V[1])
-	{
-	}
+		constexpr Translate2D(const Translate2D& T) : X(T.X), Y(T.Y)
+		{
+		}
 
-	constexpr Translate2D& operator =(const Translate2D& T)
-	{
-		X = T.X;
-		Y = T.Y;
-		return *this;
-	}
+		template<TIsVector<float, 2> IVector>
+		constexpr Translate2D(const IVector& V) : X(V[0]), Y(V[1])
+		{
+		}
 
-public:
-	using Type = float;
+		constexpr Translate2D& operator =(const Translate2D& T)
+		{
+			X = T.X;
+			Y = T.Y;
+			return *this;
+		}
 
-	constexpr Translate2D(float Uniform = 0) : X(Uniform), Y(Uniform)
-	{
-	}
+	public:
+		using Type = float;
 
-	static constexpr size_t Size()
-	{
-		return 2;
-	}
+		constexpr Translate2D(float Uniform = 0) : X(Uniform), Y(Uniform)
+		{
+		}
 
-	constexpr Translate2D operator -() const
-	{
-		return Translate2D(-X, -Y);
-	}
+		static constexpr size_t Size()
+		{
+			return 2;
+		}
 
-	constexpr const float& operator [](size_t N) const
-	{
-		return N == 0 ? X : Y;
-	}
+		constexpr Translate2D operator -() const
+		{
+			return Translate2D(-X, -Y);
+		}
 
-	constexpr float& operator [](size_t N)
-	{
-		return N == 0 ? X : Y;
-	}
+		constexpr const float& operator [](size_t N) const
+		{
+			return N == 0 ? X : Y;
+		}
 
-	template<TIsVector<float, 2> IVector>
-	constexpr Translate2D& operator =(const IVector& V)
-	{
-		X = V[0];
-		Y = V[1];
-		return *this;
-	}
+		constexpr float& operator [](size_t N)
+		{
+			return N == 0 ? X : Y;
+		}
 
-public:
-	template<TIsVector<float, 2> ITranslate>
-	static constexpr Translate2D Inverse(const ITranslate& T)
-	{
-		return -T;
-	}
+		template<TIsVector<float, 2> IVector>
+		constexpr Translate2D& operator =(const IVector& V)
+		{
+			X = V[0];
+			Y = V[1];
+			return *this;
+		}
 
-	constexpr Translate2D Inverse() const
-	{
-		return Inverse(*this);
-	}
+	public:
+		template<TIsVector<float, 2> ITranslate>
+		static constexpr Translate2D Inverse(const ITranslate& T)
+		{
+			return -T;
+		}
 
-	template<TIsVector<float, 2> ITranslateL, TIsVector<float, 2> ITranslateR>
-	static constexpr Translate2D Concatenate(const ITranslateL& TL, const ITranslateR& TR)
-	{
-		return TL + TR;
-	}
+		constexpr Translate2D Inverse() const
+		{
+			return Inverse(*this);
+		}
 
-	template<TIsVector<float, 2> ITranslate>
-	constexpr Translate2D Concatenate(const ITranslate& T) const
-	{
-		return Concatenate(*this, T);
-	}
+		template<TIsVector<float, 2> ITranslateL, TIsVector<float, 2> ITranslateR>
+		static constexpr Translate2D Concatenate(const ITranslateL& TL, const ITranslateR& TR)
+		{
+			return TL + TR;
+		}
 
-	static constexpr Translate2D Identity()
-	{
-		return Translate2D(0);
-	}
+		template<TIsVector<float, 2> ITranslate>
+		constexpr Translate2D Concatenate(const ITranslate& T) const
+		{
+			return Concatenate(*this, T);
+		}
 
-	template<TIsVector<float, 2> ITranslate, TIsVector<float, 2> IVector>
-	constexpr static IVector TransformPoint(const ITranslate& T, const IVector& P)
-	{
-		return P + T;
-	}
+		static constexpr Translate2D Identity()
+		{
+			return Translate2D(0);
+		}
 
-	template<TIsVector<float, 2> IVector>
-	constexpr IVector TransformPoint(const IVector& P) const
-	{
-		return TransformPoint(*this, P);
-	}
+		template<TIsVector<float, 2> ITranslate, TIsVector<float, 2> IVector>
+		constexpr static IVector TransformPoint(const ITranslate& T, const IVector& P)
+		{
+			return P + T;
+		}
 
-	template<TIsVector<float, 2> ITranslate, TIsVector<float, 2> IVector>
-	constexpr static IVector TransformVector([[maybe_unused]] const ITranslate& T, const IVector& V)
-	{
-		return V;
-	}
+		template<TIsVector<float, 2> IVector>
+		constexpr IVector TransformPoint(const IVector& P) const
+		{
+			return TransformPoint(*this, P);
+		}
 
-	template<TIsVector<float, 2> IVector>
-	constexpr IVector TransformVector(const IVector& V) const
-	{
-		return TransformVector(*this, V);
-	}
+		template<TIsVector<float, 2> ITranslate, TIsVector<float, 2> IVector>
+		constexpr static IVector TransformVector([[maybe_unused]] const ITranslate& T, const IVector& V)
+		{
+			return V;
+		}
 
-public:
-	String ToString() const
-	{
-		return Vector<>::ToString(*this);
-	}
+		template<TIsVector<float, 2> IVector>
+		constexpr IVector TransformVector(const IVector& V) const
+		{
+			return TransformVector(*this, V);
+		}
 
-	constexpr bool NearlyEquals(const Translate2D& T, float Epsilon) const
-	{
-		return Vector<>::NearlyEquals(*this, T, Epsilon);
-	}
+	public:
+		String ToString() const
+		{
+			return Vector<>::ToString(*this);
+		}
 
-	constexpr Translate2D Round() const
-	{
-		return { Math::Round(X), Math::Round(Y) };
-	}
-};
+		constexpr bool NearlyEquals(const Translate2D& T, float Epsilon) const
+		{
+			return Vector<>::NearlyEquals(*this, T, Epsilon);
+		}
+
+		constexpr Translate2D Round() const
+		{
+			return { Math::Round(X), Math::Round(Y) };
+		}
+	};
+}

@@ -5,92 +5,95 @@
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Vector.h"
 
-template<size_t N = 0>
-struct Sphere
+namespace Ayla
 {
-	Vector<float, N> Center;
-	float Radius;
-
-	constexpr Sphere(const Vector<float, N>& Center, float Radius = 0) : Center(Center), Radius(Radius)
+	template<size_t N = 0>
+	struct Sphere
 	{
-	}
+		Vector<float, N> Center;
+		float Radius;
 
-	constexpr Sphere(const Sphere& Rhs) : Center(Rhs.Center), Radius(Rhs.Radius)
-	{
-	}
-
-	template<TIsVector<float, N + 1> IVector>
-	constexpr Sphere(const IVector& Rhs) : Center(Rhs), Radius(Rhs[N])
-	{
-	}
-
-public:
-	using Type = float;
-
-	constexpr Sphere(float S = 0) : Center(S), Radius(S)
-	{
-	}
-
-	static constexpr size_t Size()
-	{
-		return N + 1;
-	}
-
-	constexpr Sphere operator -() const
-	{
-		return Sphere(-Center, -Radius);
-	}
-
-	constexpr const float& operator [](size_t Index) const
-	{
-		if (Index < N)
+		constexpr Sphere(const Vector<float, N>& Center, float Radius = 0) : Center(Center), Radius(Radius)
 		{
-			return Center[Index];
 		}
-		else
+
+		constexpr Sphere(const Sphere& Rhs) : Center(Rhs.Center), Radius(Rhs.Radius)
 		{
-			return Radius;
 		}
-	}
 
-	constexpr float& operator [](size_t Index)
-	{
-		if (Index < N)
+		template<TIsVector<float, N + 1> IVector>
+		constexpr Sphere(const IVector& Rhs) : Center(Rhs), Radius(Rhs[N])
 		{
-			return Center[Index];
 		}
-		else
+
+	public:
+		using Type = float;
+
+		constexpr Sphere(float S = 0) : Center(S), Radius(S)
 		{
-			return Radius;
 		}
-	}
 
-	template<TIsVector<float, N + 1> IVector>
-	constexpr Sphere& operator =(const IVector& V)
+		static constexpr size_t Size()
+		{
+			return N + 1;
+		}
+
+		constexpr Sphere operator -() const
+		{
+			return Sphere(-Center, -Radius);
+		}
+
+		constexpr const float& operator [](size_t Index) const
+		{
+			if (Index < N)
+			{
+				return Center[Index];
+			}
+			else
+			{
+				return Radius;
+			}
+		}
+
+		constexpr float& operator [](size_t Index)
+		{
+			if (Index < N)
+			{
+				return Center[Index];
+			}
+			else
+			{
+				return Radius;
+			}
+		}
+
+		template<TIsVector<float, N + 1> IVector>
+		constexpr Sphere& operator =(const IVector& V)
+		{
+			Center = V;
+			Radius = V[N];
+			return *this;
+		}
+
+	public:
+		String ToString() const;
+	};
+
+	template<>
+	struct Sphere<0>
 	{
-		Center = V;
-		Radius = V[N];
-		return *this;
-	}
+		template<TIsVectorTyped<float> IVector>
+		static String ToString(const IVector& S)
+		{
+			auto Center = Vector<>::Minor(S, S.Size() - 1);
+			auto Radius = S[S.Size() - 1];
+			return String::Format(TEXT("Center: {}, Radius: {}"), Center, Radius);
+		}
+	};
 
-public:
-	String ToString() const;
-};
-
-template<>
-struct Sphere<0>
-{
-	template<TIsVectorTyped<float> IVector>
-	static String ToString(const IVector& S)
+	template<size_t N>
+	String Sphere<N>::ToString() const
 	{
-		auto Center = Vector<>::Minor(S, S.Size() - 1);
-		auto Radius = S[S.Size() - 1];
-		return String::Format(TEXT("Center: {}, Radius: {}"), Center, Radius);
+		return Sphere<>::ToString(*this);
 	}
-};
-
-template<size_t N>
-String Sphere<N>::ToString() const
-{
-	return Sphere<>::ToString(*this);
 }

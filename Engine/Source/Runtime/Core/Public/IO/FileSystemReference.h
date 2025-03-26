@@ -120,13 +120,13 @@ namespace Ayla
 		{
 			InPath = TrimPath(InPath);
 
-			size_t IndexOf = InPath.LastIndexOf(Path::DirectorySeparatorChar);
-			if (IndexOf == -1)
+			size_t indexOf = InPath.LastIndexOf(Path::DirectorySeparatorChar);
+			if (indexOf == -1)
 			{
 				return InPath;
 			}
 
-			size_t NextPos = IndexOf + 1;
+			size_t NextPos = indexOf + 1;
 			if (InPath.IsValidIndex(NextPos) == false)
 			{
 				return String::GetEmpty();
@@ -137,17 +137,17 @@ namespace Ayla
 
 		static bool ExtractExtensions(String InFileName, String* OutNamePart, String* OutExtensionsPart)
 		{
-			size_t IndexOf = InFileName.IndexOf('.');
-			if (IndexOf == -1)
+			size_t indexOf = InFileName.IndexOf('.');
+			if (indexOf == -1)
 			{
 				*OutNamePart = InFileName;
 				*OutExtensionsPart = String::GetEmpty();
 				return false;
 			}
 
-			*OutNamePart = InFileName.Substring(0, IndexOf);
-			++IndexOf;
-			*OutExtensionsPart = InFileName.IsValidIndex(IndexOf) ? InFileName.Substring(IndexOf) : String::GetEmpty();
+			*OutNamePart = InFileName.Substring(0, indexOf);
+			++indexOf;
+			*OutExtensionsPart = InFileName.IsValidIndex(indexOf) ? InFileName.Substring(indexOf) : String::GetEmpty();
 			return true;
 		}
 

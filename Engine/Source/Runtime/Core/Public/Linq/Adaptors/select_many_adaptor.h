@@ -25,7 +25,7 @@ namespace Ayla::inline Linq::Adaptors
 		>
 		constexpr auto operator ()(R&& view) const noexcept
 		{
-			return ranges::select_many_view(std::forward<R>(view), value);
+			return Ranges::select_many_view(std::forward<R>(view), value);
 		}
 
 		template<std::ranges::input_range R, class T> requires requires { std::declval<Ayla::Linq::Adaptors::select_many_adaptor_closure<T>&>(); }

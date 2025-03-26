@@ -8,7 +8,7 @@
 namespace Ayla::inline Linq::inline Ranges
 {
 	template<std::ranges::input_range R1, std::ranges::input_range R2> requires std::constructible_from<
-		details::linked_iterator<
+		linked_iterator<
 			std::ranges::iterator_t<R1>,
 			std::ranges::iterator_t<R2>
 		>,
@@ -20,7 +20,7 @@ namespace Ayla::inline Linq::inline Ranges
 	struct concat_view : public std::ranges::view_interface<concat_view<R1, R2>>
 	{
 	public:
-		using iterator = details::linked_iterator<std::ranges::iterator_t<R1>, std::ranges::iterator_t<R2>>;
+		using iterator = linked_iterator<std::ranges::iterator_t<R1>, std::ranges::iterator_t<R2>>;
 
 	private:
 		R1 r1;
@@ -68,7 +68,7 @@ namespace Ayla::inline Linq::inline Ranges
 	};
 
 	template<std::ranges::input_range R1, std::ranges::input_range R2> requires std::constructible_from<
-		details::linked_iterator<
+		linked_iterator<
 			std::ranges::iterator_t<R1>,
 			std::ranges::iterator_t<R2>
 		>,
