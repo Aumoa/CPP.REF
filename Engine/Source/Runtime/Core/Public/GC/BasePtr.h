@@ -5,10 +5,7 @@
 namespace Ayla
 {
 	class Object;
-}
 
-namespace Ayla::GC
-{
 	class BasePtr
 	{
 	protected:

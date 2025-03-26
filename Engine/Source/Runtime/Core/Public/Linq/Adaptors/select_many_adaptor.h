@@ -4,7 +4,7 @@
 
 #include "Linq/Ranges/select_many_view.h"
 
-namespace Linq::adaptors
+namespace Ayla::inline Linq::Adaptors
 {
 	template<class T>
 	struct select_many_adaptor_closure
@@ -27,6 +27,12 @@ namespace Linq::adaptors
 		{
 			return ranges::select_many_view(std::forward<R>(view), value);
 		}
+
+		template<std::ranges::input_range R, class T> requires requires { std::declval<Ayla::Linq::Adaptors::select_many_adaptor_closure<T>&>(); }
+		friend constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::select_many_adaptor_closure<T>&& adaptor) noexcept
+		{
+			return adaptor(std::forward<R>(view));
+		}
 	};
 
 	template<class T>
@@ -40,10 +46,4 @@ namespace Linq::adaptors
 			return select_many_adaptor_closure(std::forward<T>(value));
 		}
 	};
-
-	template<std::ranges::input_range R, class T> requires requires { std::declval<select_many_adaptor_closure<T>&>(); }
-	constexpr auto operator |(R&& view, select_many_adaptor_closure<T>&& adaptor) noexcept
-	{
-		return adaptor(std::forward<R>(view));
-	}
 }

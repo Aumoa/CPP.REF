@@ -4,11 +4,10 @@
 
 #include <concepts>
 #include <ranges>
-#include <vector>
 
-namespace Linq
+namespace Ayla::inline Linq
 {
-	namespace details
+	namespace Adaptors
 	{
 		struct to_vector_adaptor_closure
 		{
@@ -29,6 +28,12 @@ namespace Linq
 				}
 				return Output;
 			}
+
+			template<std::ranges::input_range R>
+			friend inline constexpr auto operator |(R&& InRange, const Ayla::Linq::Adaptors::to_vector_adaptor_closure& Adaptor)
+			{
+				return Adaptor(std::forward<R>(InRange));
+			}
 		};
 
 		struct to_vector_adaptor
@@ -44,16 +49,10 @@ namespace Linq
 				return operator ()()(std::forward<R>(InRange));
 			}
 		};
-
-		template<std::ranges::input_range R>
-		inline constexpr auto operator |(R&& InRange, const to_vector_adaptor_closure& Adaptor)
-		{
-			return Adaptor(std::forward<R>(InRange));
-		}
 	}
 
-	inline namespace views
+	inline namespace Views
 	{
-		constexpr details::to_vector_adaptor ToVector;
+		constexpr Adaptors::to_vector_adaptor ToVector;
 	}
 }

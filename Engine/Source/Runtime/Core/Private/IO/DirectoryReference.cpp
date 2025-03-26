@@ -3,20 +3,23 @@
 #include "IO/DirectoryReference.h"
 #include "IO/FileReference.h"
 
-[[nodiscard]] std::vector<FileReference> DirectoryReference::GetFiles(bool bRecursive) const
+namespace Ayla
 {
-	if (IsExists() == false)
+	[[nodiscard]] std::vector<FileReference> DirectoryReference::GetFiles(bool bRecursive) const
 	{
-		return {};
+		if (IsExists() == false)
+		{
+			return {};
+		}
+
+		SearchOption Option = bRecursive ? SearchOption::AllDirectories : SearchOption::TopDirectoryOnly;
+		return Directory::GetFiles(GetValue(), Option)
+			| Linq::Select([](auto p) { return FileReference(p); })
+			| Linq::ToVector();
 	}
 
-	ESearchOption Option = bRecursive ? ESearchOption::AllDirectories : ESearchOption::TopDirectoryOnly;
-	return Directory::GetFiles(GetValue(), Option)
-		| Linq::Select([](auto p) { return FileReference(p); })
-		| Linq::ToVector();
-}
-
-[[nodiscard]] FileReference DirectoryReference::GetFile(String InName) const
-{
-	return Path::Combine(TrimPath(GetValue()), InName);
+	[[nodiscard]] FileReference DirectoryReference::GetFile(String InName) const
+	{
+		return Path::Combine(TrimPath(GetValue()), InName);
+	}
 }

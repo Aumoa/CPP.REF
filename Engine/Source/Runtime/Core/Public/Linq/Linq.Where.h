@@ -4,7 +4,7 @@
 
 #include <ranges>
 
-namespace Linq
+namespace Ayla::inline Linq
 {
 	inline constexpr auto Where = std::views::filter;
 }

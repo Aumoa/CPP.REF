@@ -2,8 +2,11 @@
 
 #pragma once
 
-class co_cancel_t
+namespace Ayla
 {
-};
+	class co_cancel_t
+	{
+	};
 
-constexpr co_cancel_t co_cancel;
+	constexpr co_cancel_t co_cancel;
+}

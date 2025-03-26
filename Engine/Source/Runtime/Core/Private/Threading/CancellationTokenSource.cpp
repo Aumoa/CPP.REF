@@ -1,24 +1,27 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Threading/CancellationTokenSource.h"
-#include "System/InvalidOperationException.h"
+#include "InvalidOperationException.h"
 #include "Threading/Tasks/Task.h"
 
-void CancellationTokenSource::CancelAfter(const TimeSpan& delay)
+namespace Ayla
 {
-	if (hasValue == false)
+	void CancellationTokenSource::CancelAfter(const TimeSpan& delay)
 	{
-		ThrowInvalidOperationException();
+		if (hasValue == false)
+		{
+			ThrowInvalidOperationException();
+		}
+
+		std::ignore = Task<>::Delay(delay, GetToken()).ContinueWith([source = get_source()](Task<>) mutable
+		{
+			source.request_stop();
+		});
 	}
 
-	std::ignore = Task<>::Delay(delay, GetToken()).ContinueWith([source = get_source()](Task<>) mutable
+	[[noreturn]]
+	void CancellationTokenSource::ThrowInvalidOperationException()
 	{
-		source.request_stop();
-	});
-}
-
-[[noreturn]]
-void CancellationTokenSource::ThrowInvalidOperationException()
-{
-	throw InvalidOperationException();
+		throw InvalidOperationException();
+	}
 }

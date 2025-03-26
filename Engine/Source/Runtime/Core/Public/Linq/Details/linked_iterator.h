@@ -4,9 +4,9 @@
 
 #include <ranges>
 #include "Linq/Details/linked_iterator_traits.h"
-#include "System/AssertionMacros.h"
+#include "AssertionMacros.h"
 
-namespace Linq
+namespace Ayla::inline Linq
 {
 	namespace details
 	{

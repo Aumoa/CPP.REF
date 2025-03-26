@@ -2,20 +2,23 @@
 
 #pragma once
 
-#include "System/String.h"
+#include "String_.h"
 #include "Threading/Tasks/Task.h"
 #include <stop_token>
 
-class TextReader
+namespace Ayla
 {
-protected:
-	TextReader() = default;
+	class TextReader
+	{
+	protected:
+		TextReader() = default;
 
-public:
-	virtual ~TextReader() noexcept = default;
+	public:
+		virtual ~TextReader() noexcept = default;
 
-	virtual String ReadLine() = 0;
-	virtual Task<String> ReadLineAsync(CancellationToken InCancellationToken = {}) = 0;
-	virtual Task<String> ReadToEndAsync(CancellationToken InCancellationToken = {}) = 0;
-	virtual bool IsEOF() const = 0;
-};
+		virtual String ReadLine() = 0;
+		virtual Task<String> ReadLineAsync(CancellationToken InCancellationToken = {}) = 0;
+		virtual Task<String> ReadToEndAsync(CancellationToken InCancellationToken = {}) = 0;
+		virtual bool IsEOF() const = 0;
+	};
+}

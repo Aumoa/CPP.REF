@@ -3,11 +3,11 @@
 #pragma once
 
 #include <ranges>
-#include "System/IntegralTypes.h"
+#include "IntegralTypes.h"
 
 #define VALUE_TYPE_TRAITS(T) typename std::iterator_traits<T>::value_type
 
-namespace Linq::details
+namespace Ayla::inline Linq::details
 {
 	template<std::input_iterator T1, std::input_iterator T2>
 	struct linked_iterator_traits

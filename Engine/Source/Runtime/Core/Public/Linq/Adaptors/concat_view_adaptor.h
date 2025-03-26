@@ -5,7 +5,7 @@
 #include <ranges>
 #include "Linq/Ranges/concat_view.h"
 
-namespace Linq::adaptors
+namespace Ayla::inline Linq::Adaptors
 {
 	template<std::ranges::input_range R>
 	struct concat_view_adaptor_closure
@@ -23,6 +23,12 @@ namespace Linq::adaptors
 		{
 			return ranges::concat_view(std::forward<U>(r1), std::forward<R>(r2));
 		}
+
+		template<std::ranges::input_range R1, std::ranges::input_range R2>
+		friend constexpr auto operator |(R1&& r1, Ayla::Linq::Adaptors::concat_view_adaptor_closure<R2>&& adaptor) noexcept
+		{
+			return adaptor(std::forward<R1>(r1));
+		}
 	};
 
 	template<std::ranges::input_range R>
@@ -36,10 +42,4 @@ namespace Linq::adaptors
 			return concat_view_adaptor_closure(std::forward<R>(r2));
 		}
 	};
-
-	template<std::ranges::input_range R1, std::ranges::input_range R2>
-	constexpr auto operator |(R1&& r1, concat_view_adaptor_closure<R2>&& adaptor) noexcept
-	{
-		return adaptor(std::forward<R1>(r1));
-	}
 }

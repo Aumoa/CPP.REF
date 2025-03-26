@@ -2,26 +2,29 @@
 
 #pragma once
 
-#include "System/Exception.h"
+#include "Exception.h"
 
-class CORE_API FileNotFoundException : public Exception
+namespace Ayla
 {
-public:
-	FileNotFoundException(String InFilename, std::exception_ptr InInnerException = nullptr)
-		: Exception(FormatMessage(InFilename), InInnerException)
+	class CORE_API FileNotFoundException : public Exception
 	{
-	}
+	public:
+		FileNotFoundException(String InFilename, std::exception_ptr InInnerException = nullptr)
+			: Exception(FormatMessage(InFilename), InInnerException)
+		{
+		}
 
-private:
-	static String FormatMessage(String InFilename)
-	{
-		if (InFilename.IsEmpty())
+	private:
+		static String FormatMessage(String InFilename)
 		{
-			return TEXT("File not found.");
+			if (InFilename.IsEmpty())
+			{
+				return TEXT("File not found.");
+			}
+			else
+			{
+				return String::Format(TEXT("Desired file '{}' is not found."), InFilename);
+			}
 		}
-		else
-		{
-			return String::Format(TEXT("Desired file '{}' is not found."), InFilename);
-		}
-	}
-};
+	};
+}

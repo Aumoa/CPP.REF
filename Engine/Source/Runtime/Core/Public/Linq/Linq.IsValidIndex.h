@@ -5,9 +5,9 @@
 #include <concepts>
 #include <ranges>
 
-namespace Linq
+namespace Ayla::inline Linq
 {
-	namespace details
+	namespace Adaptors
 	{
 		struct is_valid_index_adaptor_closure
 		{
@@ -22,6 +22,12 @@ namespace Linq
 			inline constexpr auto operator ()(const R& InRange) const noexcept
 			{
 				return std::ranges::size(InRange) > Index;
+			}
+
+			template<std::ranges::sized_range R>
+			friend inline constexpr auto operator |(const R& InRange, const Ayla::Linq::Adaptors::is_valid_index_adaptor_closure& Adaptor) noexcept
+			{
+				return Adaptor(InRange);
 			}
 		};
 
@@ -38,16 +44,10 @@ namespace Linq
 				return operator ()(Index)(InRange);
 			}
 		};
-
-		template<std::ranges::sized_range R>
-		inline constexpr auto operator |(const R& InRange, const is_valid_index_adaptor_closure& Adaptor) noexcept
-		{
-			return Adaptor(InRange);
-		}
 	}
 
-	inline namespace views
+	inline namespace Views
 	{
-		constexpr details::is_valid_index_adaptor IsValidIndex;
+		constexpr Adaptors::is_valid_index_adaptor IsValidIndex;
 	}
 }

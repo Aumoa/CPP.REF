@@ -2,15 +2,18 @@
 
 #pragma once
 
-#include "System/IntegralTypes.h"
-#include "System/LanguageSupportMacros.h"
+#include "IntegralTypes.h"
+#include "LanguageSupportMacros.h"
 
-enum class EFileAccessMode : uint32
+namespace Ayla
 {
-	Read = 0x80000000L,
-	Write = 0x40000000L,
-	Append = 0x00000004L,
-	All = 0x10000000L
-};
+	enum class FileAccessMode : uint32
+	{
+		Read = 0x80000000L,
+		Write = 0x40000000L,
+		Append = 0x00000004L,
+		All = 0x10000000L
+	};
+}
 
-GENERATE_BITMASK_ENUM_OPERATORS(EFileAccessMode);
+GENERATE_BITMASK_ENUM_OPERATORS(::Ayla::FileAccessMode);

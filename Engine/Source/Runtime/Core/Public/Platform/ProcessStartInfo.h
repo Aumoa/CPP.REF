@@ -2,10 +2,13 @@
 
 #pragma once
 
-#include "System/String.h"
+#include "String_.h"
 
-struct ProcessStartInfo
+namespace Ayla
 {
-	String FileName;
-	String Arguments;
-};
+	struct ProcessStartInfo
+	{
+		String FileName;
+		String Arguments;
+	};
+}

@@ -4,7 +4,7 @@
 
 #include <ranges>
 
-namespace Linq
+namespace Ayla::inline Linq
 {
 	constexpr auto Join = std::views::join;
 }

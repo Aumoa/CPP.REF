@@ -3,28 +3,31 @@
 #include "Platform/Process.h"
 #include "Platform/PlatformProcess.h"
 
-Process::Process()
+namespace Ayla
 {
-}
-
-Process::~Process() noexcept
-{
-	if (ProcessHandle)
+	Process::Process()
 	{
-		PlatformProcess::CloseProcessHandle(ProcessHandle);
-		ProcessHandle = nullptr;
 	}
-}
 
-std::shared_ptr<Process> Process::Start(const ProcessStartInfo& InStartInfo)
-{
-	std::shared_ptr<Process> Ptr{ new Process() };
-	Ptr->StartInfo = InStartInfo;
-	Ptr->StartApplication();
-	return Ptr;
-}
+	Process::~Process() noexcept
+	{
+		if (ProcessHandle)
+		{
+			PlatformProcess::CloseProcessHandle(ProcessHandle);
+			ProcessHandle = nullptr;
+		}
+	}
 
-void Process::StartApplication()
-{
-	ProcessHandle = PlatformProcess::CreateProcess(StartInfo);
+	std::shared_ptr<Process> Process::Start(const ProcessStartInfo& InStartInfo)
+	{
+		std::shared_ptr<Process> Ptr{ new Process() };
+		Ptr->StartInfo = InStartInfo;
+		Ptr->StartApplication();
+		return Ptr;
+	}
+
+	void Process::StartApplication()
+	{
+		ProcessHandle = PlatformProcess::CreateProcess(StartInfo);
+	}
 }

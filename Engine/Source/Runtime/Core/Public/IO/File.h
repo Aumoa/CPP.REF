@@ -2,16 +2,19 @@
 
 #pragma once
 
-#include "System/StaticClass.h"
+#include "StaticClass.h"
 #include "Threading/Tasks/Task.h"
 
-class CORE_API File : public StaticClass
+namespace Ayla
 {
-public:
-	static Task<String> ReadAllTextAsync(String InPath, CancellationToken InCancellationToken = {});
-	static String ReadAllText(String InPath);
-	static Task<> WriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken = {});
-	static Task<bool> CompareAndWriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken = {});
-	static bool Exists(String InPath);
-	static void Delete(String InPath);
-};
+	class CORE_API File : public StaticClass
+	{
+	public:
+		static Task<String> ReadAllTextAsync(String InPath, CancellationToken InCancellationToken = {});
+		static String ReadAllText(String InPath);
+		static Task<> WriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken = {});
+		static Task<bool> CompareAndWriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken = {});
+		static bool Exists(String InPath);
+		static void Delete(String InPath);
+	};
+}

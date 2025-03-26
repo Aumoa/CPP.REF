@@ -3,16 +3,20 @@
 #pragma once
 
 #include "Diagnostics/PerformanceTimer.h"
+#include "TimeSpan.h"
 
-class CORE_API TickTimer
+namespace Ayla
 {
-private:
-	PerformanceTimer Timer;
-	TimeSpan LastDur;
+	class CORE_API TickTimer
+	{
+	private:
+		PerformanceTimer Timer;
+		TimeSpan LastDur;
 
-public:
-	TickTimer();
-	~TickTimer() noexcept;
+	public:
+		TickTimer();
+		~TickTimer() noexcept;
 
-	TimeSpan Tick() noexcept;
-};
+		TimeSpan Tick() noexcept;
+	};
+}

@@ -2,60 +2,63 @@
 
 #pragma once
 
-#include "System/Action.h"
-#include "System/IntegralTypes.h"
-#include "System/AssertionMacros.h"
+#include "Action.h"
+#include "IntegralTypes.h"
+#include "AssertionMacros.h"
 #include "Platform/PlatformIO.h"
 
-class IOCompletionOverlapped
+namespace Ayla
 {
-	uint8 OverlappedBuffer[PlatformIO::OVERLAPPED_SIZE + sizeof(void*)];
-	Action<IOCompletionOverlapped*, size_t, int32> Work;
-
-private:
-	static IOCompletionOverlapped*& SelfPtr(uint8* Memory)
+	class IOCompletionOverlapped
 	{
-		return reinterpret_cast<IOCompletionOverlapped*&>(Memory[PlatformIO::OVERLAPPED_SIZE]);
-	}
+		uint8 OverlappedBuffer[PlatformIO::OVERLAPPED_SIZE + sizeof(void*)];
+		Action<IOCompletionOverlapped*, size_t, int32> Work;
 
-public:
-	IOCompletionOverlapped(Action<IOCompletionOverlapped*, size_t, int32> InWork)
-		: OverlappedBuffer{}
-		, Work(std::move(InWork))
-	{
-		SelfPtr(OverlappedBuffer) = this;
-	}
+	private:
+		static IOCompletionOverlapped*& SelfPtr(uint8* Memory)
+		{
+			return reinterpret_cast<IOCompletionOverlapped*&>(Memory[PlatformIO::OVERLAPPED_SIZE]);
+		}
 
-	~IOCompletionOverlapped() noexcept
-	{
-	}
+	public:
+		IOCompletionOverlapped(Action<IOCompletionOverlapped*, size_t, int32> InWork)
+			: OverlappedBuffer{}
+			, Work(std::move(InWork))
+		{
+			SelfPtr(OverlappedBuffer) = this;
+		}
 
-	inline void Complete(size_t Resolved)
-	{
-		Work(this, Resolved, 0);
-	}
+		~IOCompletionOverlapped() noexcept
+		{
+		}
 
-	inline void Failed(int32 SystemCode)
-	{
-		Work(this, 0, SystemCode);
-	}
+		inline void Complete(size_t Resolved)
+		{
+			Work(this, Resolved, 0);
+		}
 
-public:
-	inline void* ToOverlapped() noexcept
-	{
-		return OverlappedBuffer;
-	}
+		inline void Failed(int32 SystemCode)
+		{
+			Work(this, 0, SystemCode);
+		}
 
-	inline const void* ToOverlapped() const noexcept
-	{
-		return OverlappedBuffer;
-	}
+	public:
+		inline void* ToOverlapped() noexcept
+		{
+			return OverlappedBuffer;
+		}
 
-	static IOCompletionOverlapped* FromOverlapped(void* Overlapped) noexcept
-	{
-		uint8* Memory = reinterpret_cast<uint8*>(Overlapped);
-		auto* Self = SelfPtr(Memory);
-		check(Self && SelfPtr(Self->OverlappedBuffer) == Self);
-		return Self;
-	}
-};
+		inline const void* ToOverlapped() const noexcept
+		{
+			return OverlappedBuffer;
+		}
+
+		static IOCompletionOverlapped* FromOverlapped(void* Overlapped) noexcept
+		{
+			uint8* Memory = reinterpret_cast<uint8*>(Overlapped);
+			auto* Self = SelfPtr(Memory);
+			check(Self && SelfPtr(Self->OverlappedBuffer) == Self);
+			return Self;
+		}
+	};
+}

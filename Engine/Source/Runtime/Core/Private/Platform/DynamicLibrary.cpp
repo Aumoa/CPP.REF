@@ -3,31 +3,34 @@
 #include "Platform/DynamicLibrary.h"
 #include "Platform/Windows/DynamicLibrary.Implementation.h"
 
-DynamicLibrary::DynamicLibrary()
+namespace Ayla
 {
-}
-
-DynamicLibrary::DynamicLibrary(String InLibraryName)
-	: LibraryName(InLibraryName)
-	, Impl(new Implementation(InLibraryName))
-{
-}
-
-DynamicLibrary::~DynamicLibrary() noexcept
-{
-	if (Impl)
+	DynamicLibrary::DynamicLibrary()
 	{
-		delete Impl;
-		Impl = nullptr;
 	}
-}
 
-bool DynamicLibrary::IsValid() const
-{
-	return !LibraryName.IsEmpty() && Impl != nullptr && Impl->IsValid();
-}
+	DynamicLibrary::DynamicLibrary(String InLibraryName)
+		: LibraryName(InLibraryName)
+		, Impl(new Implementation(InLibraryName))
+	{
+	}
 
-void (*DynamicLibrary::InternalLoadFunction(String Signature))()
-{
-	return Impl->LoadFunction(Signature);
+	DynamicLibrary::~DynamicLibrary() noexcept
+	{
+		if (Impl)
+		{
+			delete Impl;
+			Impl = nullptr;
+		}
+	}
+
+	bool DynamicLibrary::IsValid() const
+	{
+		return !LibraryName.IsEmpty() && Impl != nullptr && Impl->IsValid();
+	}
+
+	void (*DynamicLibrary::InternalLoadFunction(String Signature))()
+	{
+		return Impl->LoadFunction(Signature);
+	}
 }

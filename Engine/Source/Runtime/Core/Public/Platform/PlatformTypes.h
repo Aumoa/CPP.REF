@@ -3,4 +3,3 @@
 #pragma once
 
 #include "Windows/WindowsPlatformTypes.h"
-#include "Linux/LinuxPlatformTypes.h"

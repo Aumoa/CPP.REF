@@ -2,5 +2,4 @@
 
 #pragma once
 
-#include "Platform/Linux/LinuxPlatformProcess.h"
 #include "Platform/Windows/WindowsPlatformProcess.h"

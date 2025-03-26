@@ -9,17 +9,20 @@
 #include "Platform/PlatformCommon.h"
 #include "IO/TextWriter.h"
 
-class WindowsStandardStreamTextWriter : public TextWriter
+namespace Ayla
 {
-	HANDLE hStd = NULL;
+	class WindowsStandardStreamTextWriter : public TextWriter
+	{
+		HANDLE hStd = NULL;
 
-public:
-	WindowsStandardStreamTextWriter(DWORD StdHandleId);
+	public:
+		WindowsStandardStreamTextWriter(DWORD StdHandleId);
 
-	virtual void Write(String Val) override;
+		virtual void Write(String Val) override;
 
-	HANDLE GetNativeHandle() const { return hStd; }
-};
+		HANDLE GetNativeHandle() const { return hStd; }
+	};
+}
 
 #undef __ALLOW_PLATFORM_COMMON_H__
 

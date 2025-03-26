@@ -4,35 +4,38 @@
 
 #include <coroutine>
 
-class suspend_and_destroy_if
+namespace Ayla
 {
-	const bool bSuspendAndDestroy;
-
-public:
-	inline constexpr suspend_and_destroy_if(bool bSuspendAndDestroy) noexcept
-		: bSuspendAndDestroy(bSuspendAndDestroy)
+	class suspend_and_destroy_if
 	{
-	}
+		const bool bSuspendAndDestroy;
 
-	inline constexpr bool await_ready() const noexcept
-	{
-		return !bSuspendAndDestroy;
-	}
-
-	void await_suspend(std::coroutine_handle<> Coro) const noexcept
-	{
-		if (bSuspendAndDestroy)
+	public:
+		inline constexpr suspend_and_destroy_if(bool bSuspendAndDestroy) noexcept
+			: bSuspendAndDestroy(bSuspendAndDestroy)
 		{
-			Coro.destroy();
 		}
-	}
 
-	inline constexpr void await_resume() const noexcept
-	{
-	}
+		inline constexpr bool await_ready() const noexcept
+		{
+			return !bSuspendAndDestroy;
+		}
 
-	inline explicit constexpr operator bool() const noexcept
-	{
-		return bSuspendAndDestroy;
-	}
-};
+		void await_suspend(std::coroutine_handle<> Coro) const noexcept
+		{
+			if (bSuspendAndDestroy)
+			{
+				Coro.destroy();
+			}
+		}
+
+		inline constexpr void await_resume() const noexcept
+		{
+		}
+
+		inline explicit constexpr operator bool() const noexcept
+		{
+			return bSuspendAndDestroy;
+		}
+	};
+}

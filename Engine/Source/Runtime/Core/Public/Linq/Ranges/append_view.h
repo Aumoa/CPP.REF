@@ -6,7 +6,7 @@
 #include "Linq/Ranges/concat_view.h"
 #include "Linq/Ranges/single_view.h"
 
-namespace Linq::ranges
+namespace Ayla::inline Linq::inline Ranges
 {
 	template<std::ranges::input_range R, class T> requires
 		std::constructible_from<concat_view<R, single_view<T>>, R, single_view<T>>

@@ -8,10 +8,7 @@
 namespace Ayla
 {
 	class Object;
-}
 
-namespace Ayla::GC
-{
 	template<std::derived_from<Object> T>
 	class PPtr : public BasePtr
 	{

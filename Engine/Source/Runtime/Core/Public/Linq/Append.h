@@ -4,7 +4,7 @@
 
 #include "Linq/Adaptors/append_view_adaptor.h"
 
-namespace Linq::inline views
+namespace Ayla::inline Linq::inline Views
 {
-	constexpr adaptors::append_view_adaptor Append;
+	constexpr Adaptors::append_view_adaptor Append;
 }

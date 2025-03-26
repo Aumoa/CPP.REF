@@ -2,11 +2,14 @@
 
 #pragma once
 
-enum class EFileMode
+namespace Ayla
 {
-	CreateNew = 1,
-	Create = 2,
-	Open = 3,
-	OpenOrCreate = 4,
-	Truncate = 5
-};
+	enum class FileMode
+	{
+		CreateNew = 1,
+		Create = 2,
+		Open = 3,
+		OpenOrCreate = 4,
+		Truncate = 5
+	};
+}

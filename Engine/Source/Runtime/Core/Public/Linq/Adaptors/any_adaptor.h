@@ -4,7 +4,7 @@
 
 #include <ranges>
 
-namespace Linq::adaptors
+namespace Ayla::inline Linq::Adaptors
 {
 	struct any_adaptor_closure
 	{
@@ -19,6 +19,12 @@ namespace Linq::adaptors
 			{
 				return std::ranges::empty(std::forward<R>(view)) == false;
 			}
+		}
+
+		template<std::ranges::input_range R>
+		friend constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::any_adaptor_closure&& adaptor) noexcept
+		{
+			return adaptor(std::forward<R>(view));
 		}
 	};
 
@@ -45,6 +51,12 @@ namespace Linq::adaptors
 
 			return false;
 		}
+
+		template<std::ranges::input_range R, std::invocable<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type> T>
+		friend constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::any_adaptor_closure_lambda<T>&& adaptor) noexcept
+		{
+			return adaptor(std::forward<R>(view));
+		}
 	};
 
 	template<class T>
@@ -63,16 +75,4 @@ namespace Linq::adaptors
 			return any_adaptor_closure_lambda(std::forward<T>(predicate));
 		}
 	};
-
-	template<std::ranges::input_range R>
-	constexpr auto operator |(R&& view, any_adaptor_closure&& adaptor) noexcept
-	{
-		return adaptor(std::forward<R>(view));
-	}
-
-	template<std::ranges::input_range R, std::invocable<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type> T>
-	constexpr auto operator |(R&& view, any_adaptor_closure_lambda<T>&& adaptor) noexcept
-	{
-		return adaptor(std::forward<R>(view));
-	}
 }

@@ -2,13 +2,16 @@
 
 #pragma once
 
-#include "System/StaticClass.h"
+#include "StaticClass.h"
 #include "Platform/PlatformMacros.h"
 
-struct CORE_API GenericPlatformProcess : public StaticClass
+namespace Ayla
 {
-	static FORCEINLINE bool IsDebuggerPresent() noexcept
+	struct CORE_API GenericPlatformProcess : public StaticClass
 	{
-		return false;
-	}
-};
+		static FORCEINLINE bool IsDebuggerPresent() noexcept
+		{
+			return false;
+		}
+	};
+}

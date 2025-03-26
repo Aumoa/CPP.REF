@@ -2,10 +2,13 @@
 
 #pragma once
 
-#include "System/StaticClass.h"
+#include "StaticClass.h"
 #include "Platform/PlatformMacros.h"
 
-struct CORE_API GenericPlatformIO : public StaticClass
+namespace Ayla
 {
-	static constexpr size_t OVERLAPPED_SIZE = 1;
-};
+	struct CORE_API GenericPlatformIO : public StaticClass
+	{
+		static constexpr size_t OVERLAPPED_SIZE = 1;
+	};
+}

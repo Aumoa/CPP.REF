@@ -4,7 +4,7 @@
 
 #include "Linq/Adaptors/concat_view_adaptor.h"
 
-namespace Linq::inline views
+namespace Ayla::inline Linq::inline Views
 {
-	constexpr adaptors::concat_view_adaptor Concat;
+	constexpr Adaptors::concat_view_adaptor Concat;
 }

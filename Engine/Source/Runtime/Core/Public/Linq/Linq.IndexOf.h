@@ -5,9 +5,9 @@
 #include <concepts>
 #include <ranges>
 
-namespace Linq
+namespace Ayla::inline Linq
 {
-	namespace details
+	namespace Adaptors
 	{
 		template<class T>
 		struct index_of_adaptor_closure
@@ -33,6 +33,12 @@ namespace Linq
 				}
 				return static_cast<size_t>(-1);
 			}
+
+			template<std::ranges::input_range R, class T>
+			friend constexpr auto operator |(const R& InRange, const Ayla::Linq::Adaptors::index_of_adaptor_closure<T>& Adaptor) noexcept(noexcept(Adaptor(InRange)))
+			{
+				return Adaptor(InRange);
+			}
 		};
 
 		template<class T>
@@ -52,16 +58,10 @@ namespace Linq
 				return operator ()(InComparand)(InRange);
 			}
 		};
-
-		template<std::ranges::input_range R, class T>
-		constexpr auto operator |(const R& InRange, const index_of_adaptor_closure<T>& Adaptor) noexcept(noexcept(Adaptor(InRange)))
-		{
-			return Adaptor(InRange);
-		}
 	}
 
-	inline namespace views
+	inline namespace Views
 	{
-		constexpr details::index_of_adaptor IndexOf;
+		constexpr Adaptors::index_of_adaptor IndexOf;
 	}
 }

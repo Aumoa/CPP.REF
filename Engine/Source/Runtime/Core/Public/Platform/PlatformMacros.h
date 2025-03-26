@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Windows/WindowsPlatformMacros.h"
-#include "Linux/LinuxPlatformMacros.h"
 
 #ifndef PLATFORM_YIELD
 #error PLATFORM_YIELD is not defined.

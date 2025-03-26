@@ -2,8 +2,11 @@
 
 #pragma once
 
-#include "System/StaticClass.h"
+#include "StaticClass.h"
 
-struct CORE_API GenericPlatformLocalization : public StaticClass
+namespace Ayla
 {
-};
+	struct CORE_API GenericPlatformLocalization : public StaticClass
+	{
+	};
+}

@@ -4,7 +4,7 @@
 
 #include <ranges>
 
-namespace Linq::adaptors
+namespace Ayla::inline Linq::Adaptors
 {
 	template<class T>
 	struct contains_adaptor_closure_element_or_predicate
@@ -61,20 +61,20 @@ namespace Linq::adaptors
 			return contains_adaptor_closure_element_or_predicate(std::forward<T>(value));
 		}
 	};
+}
 
-	template<std::ranges::input_range R, class T> requires
-		requires
-	{
-		{ std::declval<T>() == std::declval<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type>() } -> std::convertible_to<bool>;
-	}
-	constexpr auto operator |(R&& view, contains_adaptor_closure_element_or_predicate<T>&& adaptor) noexcept
-	{
-		return adaptor(std::forward<R>(view));
-	}
+template<std::ranges::input_range R, class T> requires
+	requires
+{
+	{ std::declval<T>() == std::declval<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type>() } -> std::convertible_to<bool>;
+}
+constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::contains_adaptor_closure_element_or_predicate<T>&& adaptor) noexcept
+{
+	return adaptor(std::forward<R>(view));
+}
 
-	template<std::ranges::input_range R, std::invocable<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type> T>
-	constexpr auto operator |(R&& view, contains_adaptor_closure_element_or_predicate<T>&& adaptor) noexcept
-	{
-		return adaptor(std::forward<R>(view));
-	}
+template<std::ranges::input_range R, std::invocable<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type> T>
+constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::contains_adaptor_closure_element_or_predicate<T>&& adaptor) noexcept
+{
+	return adaptor(std::forward<R>(view));
 }

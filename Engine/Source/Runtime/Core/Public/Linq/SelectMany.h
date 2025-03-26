@@ -4,7 +4,7 @@
 
 #include "Linq/Adaptors/select_many_adaptor.h"
 
-namespace Linq::inline views
+namespace Ayla::inline Linq::inline Views
 {
-	constexpr adaptors::select_many_adaptor SelectMany;
+	constexpr Adaptors::select_many_adaptor SelectMany;
 }

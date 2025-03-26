@@ -5,19 +5,15 @@
 #include "Platform/PlatformMacros.h"
 #include "GC/PPtr.h"
 #include "GC/RPtr.h"
-#include "System/InvalidOperationException.h"
-#include "System/AssertionMacros.h"
+#include "GC/GC.h"
+#include "InvalidOperationException.h"
+#include "AssertionMacros.h"
 #include <mutex>
 #include <vector>
 #include <functional>
 
 namespace Ayla
 {
-	namespace GC
-	{
-		void Collect();
-	}
-
 	class CORE_API Object
 	{
 		friend void GC::Collect();
@@ -30,7 +26,7 @@ namespace Ayla
 		{
 		private:
 			Object* const m_This;
-			std::vector<GC::BasePtr*> m_PPtrMembers;
+			std::vector<BasePtr*> m_PPtrMembers;
 
 		public:
 			inline PPtrCollection(Object* this_) : m_This(this_)
@@ -38,7 +34,7 @@ namespace Ayla
 			}
 
 			template<std::derived_from<Object> T>
-			inline void Add(GC::PPtr<T>& pptr)
+			inline void Add(PPtr<T>& pptr)
 			{
 				m_PPtrMembers.emplace_back(&static_cast<GC::BasePtr&>(pptr));
 			}
@@ -91,9 +87,9 @@ namespace Ayla
 
 	public:
 		template<std::derived_from<Object> T, class... TArgs>
-		static GC::RPtr<T> New(TArgs&&... args) requires std::constructible_from<T, TArgs...>
+		static RPtr<T> New(TArgs&&... args) requires std::constructible_from<T, TArgs...>
 		{
-			GC::RPtr<T> ptr;
+			RPtr<T> ptr;
 			ConfigureNew([&ptr]()
 			{
 				ptr = new T(std::forward<TArgs>(args)...);

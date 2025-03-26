@@ -7,14 +7,17 @@
 #if PLATFORM_WINDOWS
 
 #include "Platform/Generic/GenericPlatformMisc.h"
-#include "System/String.h"
+#include "String_.h"
 
-struct CORE_API WindowsPlatformMisc : public GenericPlatformMisc
+namespace Ayla
 {
-	static int32 GetLastError() noexcept;
-	static String FormatSystemCode(int32 ErrorCode) noexcept;
-};
+	struct CORE_API WindowsPlatformMisc : public GenericPlatformMisc
+	{
+		static int32 GetLastError() noexcept;
+		static String FormatSystemCode(int32 ErrorCode) noexcept;
+	};
 
-using PlatformMisc = WindowsPlatformMisc;
+	using PlatformMisc = WindowsPlatformMisc;
+}
 
 #endif

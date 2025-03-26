@@ -3,4 +3,3 @@
 #pragma once
 
 #include "Platform/Windows/WindowsPlatformLocalization.h"
-#include "Platform/Linux/LinuxPlatformLocalization.h"

@@ -2,14 +2,17 @@
 
 #pragma once
 
-#include "System/LanguageSupportMacros.h"
+#include "LanguageSupportMacros.h"
 
-enum class EFileSharedMode
+namespace Ayla
 {
-	None = 0,
-	Read = 0x1,
-	Write = 0x2,
-	Delete = 0x4
-};
+	enum class FileSharedMode
+	{
+		None = 0,
+		Read = 0x1,
+		Write = 0x2,
+		Delete = 0x4
+	};
+}
 
-GENERATE_BITMASK_ENUM_OPERATORS(EFileSharedMode);
+GENERATE_BITMASK_ENUM_OPERATORS(::Ayla::FileSharedMode);

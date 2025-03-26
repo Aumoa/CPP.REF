@@ -6,8 +6,8 @@
 
 #if PLATFORM_WINDOWS
 
-#include "System/String.h"
-#include "System/AssertionMacros.h"
+#include "String_.h"
+#include "AssertionMacros.h"
 
 #pragma push_macro("TEXT")
 
@@ -48,7 +48,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-namespace WindowsPlatformCommon
+namespace Ayla::WindowsPlatformCommon
 {
 	inline String GetErrorText(DWORD dwError)
 	{
@@ -74,6 +74,6 @@ namespace WindowsPlatformCommon
 	}
 }
 
-#define HR(X) if (HRESULT Result = (X); FAILED(Result)) { WindowsPlatformCommon::ReportHResult(Result); }
+#define HR(X) if (HRESULT Result = (X); FAILED(Result)) { ::Ayla::WindowsPlatformCommon::ReportHResult(Result); }
 
 #endif

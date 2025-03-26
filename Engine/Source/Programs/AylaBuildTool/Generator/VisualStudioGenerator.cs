@@ -571,7 +571,9 @@ internal class VisualStudioGenerator : Generator
 
                 static string GenerateProjectPreprocessorDefs(ModuleRulesResolver resolver)
                 {
-                    return string.Join(';', resolver.AdditionalMacros.Select(FormatDef));
+                    return string.Join(';', resolver.AdditionalMacros
+                        .Concat(["UNICODE", "_UNICODE"])
+                        .Select(FormatDef));
 
                     static string FormatDef(MacroSet value)
                     {

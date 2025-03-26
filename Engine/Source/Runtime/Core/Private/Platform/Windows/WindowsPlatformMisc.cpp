@@ -9,21 +9,24 @@
 #include "Platform/PlatformLocalization.h"
 #include "Platform/PlatformCommon.h"
 
-int32 PlatformMisc::GetLastError() noexcept
+namespace Ayla
 {
-	return (int32)::GetLastError();
-}
-
-String PlatformMisc::FormatSystemCode(int32 InSystemCode) noexcept
-{
-	static thread_local WCHAR Buf[1024] = {};
-	DWORD Len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)InSystemCode, 0, Buf, 1024, NULL);
-	if (Len == 0)
+	int32 PlatformMisc::GetLastError() noexcept
 	{
-		return TEXT("Unknown error.");
+		return (int32)::GetLastError();
 	}
 
-	return String(Buf, Len);
+	String PlatformMisc::FormatSystemCode(int32 InSystemCode) noexcept
+	{
+		static thread_local WCHAR Buf[1024] = {};
+		DWORD Len = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, (DWORD)InSystemCode, 0, Buf, 1024, NULL);
+		if (Len == 0)
+		{
+			return TEXT("Unknown error.");
+		}
+
+		return String(Buf, Len);
+	}
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__

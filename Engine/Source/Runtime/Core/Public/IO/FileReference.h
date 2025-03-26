@@ -4,74 +4,77 @@
 
 #include "IO/FileSystemReference.h"
 #include "IO/File.h"
-#include "System/Path.h"
-#include "System/Environment.h"
-#include "System/InvalidOperationException.h"
+#include "Path.h"
+#include "Environment.h"
+#include "InvalidOperationException.h"
 
-class DirectoryReference;
-
-class CORE_API FileReference : public FileSystemReference
+namespace Ayla
 {
-public:
-	FileReference() noexcept
-	{
-	}
+	class DirectoryReference;
 
-	FileReference(String InPath) : FileSystemReference(InPath)
+	class CORE_API FileReference : public FileSystemReference
 	{
-	}
-
-	FileReference(const FileReference&) = default;
-	FileReference(FileReference&&) noexcept = default;
-
-	virtual bool IsExists() const override
-	{
-		return File::Exists(GetValue());
-	}
-
-	[[nodiscard]] FileReference GetAbsolute() const
-	{
-		if (IsPathFullQualified())
+	public:
+		FileReference() noexcept
 		{
-			return FileReference(GetValue());
-		}
-		else
-		{
-			return FileReference(GetAbsolutePath());
-		}
-	}
-
-	[[nodiscard]] FileReference ToCurrentDirectoryBased() const
-	{
-		if (IsPathFullQualified())
-		{
-			throw InvalidOperationException();
 		}
 
-		return Path::Combine(Environment::GetCurrentDirectory(), GetValue());
-	}
-
-	void Delete() const
-	{
-		if (IsExists())
+		FileReference(String InPath) : FileSystemReference(InPath)
 		{
-			File::Delete(GetValue());
 		}
-	}
 
-	[[nodiscard]] String ReadAllText() const
-	{
-		return File::ReadAllText(GetValue());
-	}
+		FileReference(const FileReference&) = default;
+		FileReference(FileReference&&) noexcept = default;
 
-	[[nodiscard]] Task<String> ReadAllTextAsync(CancellationToken InCancellationToken = {}) const
-	{
-		return File::ReadAllTextAsync(GetValue(), InCancellationToken);
-	}
+		virtual bool IsExists() const override
+		{
+			return File::Exists(GetValue());
+		}
 
-	[[nodiscard]] FileReference WithExtensions(String InExtensions) const;
-	[[nodiscard]] DirectoryReference GetDirectory() const;
+		[[nodiscard]] FileReference GetAbsolute() const
+		{
+			if (IsPathFullQualified())
+			{
+				return FileReference(GetValue());
+			}
+			else
+			{
+				return FileReference(GetAbsolutePath());
+			}
+		}
 
-	FileReference& operator =(const FileReference& Rhs) noexcept = default;
-	FileReference& operator =(FileReference&& Rhs) noexcept = default;
-};
+		[[nodiscard]] FileReference ToCurrentDirectoryBased() const
+		{
+			if (IsPathFullQualified())
+			{
+				throw InvalidOperationException();
+			}
+
+			return Path::Combine(Environment::GetCurrentDirectory(), GetValue());
+		}
+
+		void Delete() const
+		{
+			if (IsExists())
+			{
+				File::Delete(GetValue());
+			}
+		}
+
+		[[nodiscard]] String ReadAllText() const
+		{
+			return File::ReadAllText(GetValue());
+		}
+
+		[[nodiscard]] Task<String> ReadAllTextAsync(CancellationToken InCancellationToken = {}) const
+		{
+			return File::ReadAllTextAsync(GetValue(), InCancellationToken);
+		}
+
+		[[nodiscard]] FileReference WithExtensions(String InExtensions) const;
+		[[nodiscard]] DirectoryReference GetDirectory() const;
+
+		FileReference& operator =(const FileReference& Rhs) noexcept = default;
+		FileReference& operator =(FileReference&& Rhs) noexcept = default;
+	};
+}

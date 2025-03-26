@@ -7,20 +7,23 @@
 #include <span>
 #include <vector>
 
-class CORE_API StackTrace
+namespace Ayla
 {
-private:
-	std::vector<StackFrame> Frames;
+	class CORE_API StackTrace
+	{
+	private:
+		std::vector<StackFrame> Frames;
 
-public:
-	StackTrace() noexcept;
+	public:
+		StackTrace() noexcept;
 
-	std::span<const StackFrame> GetFrames() const noexcept { return Frames; }
-	size_t GetFrameCount() const noexcept { return Frames.size(); }
-	String ToString() const;
+		std::span<const StackFrame> GetFrames() const noexcept { return Frames; }
+		size_t GetFrameCount() const noexcept { return Frames.size(); }
+		String ToString() const;
 
-public:
-	static StackTrace Current() noexcept;
-	static StackTrace FromThread(const Thread& Thrd) noexcept;
-	static StackTrace FromException(void* lpExceptionPointers) noexcept;
-};
+	public:
+		static StackTrace Current() noexcept;
+		static StackTrace FromThread(const Thread& Thrd) noexcept;
+		static StackTrace FromException(void* lpExceptionPointers) noexcept;
+	};
+}

@@ -74,7 +74,7 @@
 #endif
 
 
-namespace GenericPlatformMacros
+namespace Ayla::GenericPlatformMacros
 {
 	template<class T, size_t N>
 	constexpr size_t NativeArraySize(const T(&)[N])
@@ -83,6 +83,6 @@ namespace GenericPlatformMacros
 	}
 }
 
-#define AE_ARRAYSIZE(NativeArray) (GenericPlatformMacros::NativeArraySize(NativeArray))
+#define AE_ARRAYSIZE(NativeArray) (::Ayla::GenericPlatformMacros::NativeArraySize(NativeArray))
 #define LP1V(V1, Body) [&](auto& V1) { Body; }
 #define LP1R(V1, Body) [&](auto& V1) { return Body; }

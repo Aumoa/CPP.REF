@@ -5,7 +5,7 @@
 #include <ranges>
 #include "Linq/Details/linked_iterator.h"
 
-namespace Linq::ranges
+namespace Ayla::inline Linq::inline Ranges
 {
 	template<std::ranges::input_range R1, std::ranges::input_range R2> requires std::constructible_from<
 		details::linked_iterator<

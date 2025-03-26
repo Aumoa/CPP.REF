@@ -2,13 +2,16 @@
 
 #pragma once
 
-struct co_push_adaptor
+namespace Ayla
 {
-};
+	struct co_push_adaptor
+	{
+	};
 
-template<class T>
-struct co_push_t
-{
-};
+	template<class T>
+	struct co_push_t
+	{
+	};
+}
 
-#define co_push co_push_adaptor() << 
+#define co_push ::Ayla::Threading::Tasks::co_push_adaptor() << 

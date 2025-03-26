@@ -3,4 +3,3 @@
 #pragma once
 
 #include "Platform/Windows/WindowsPlatformAtomics.h"
-#include "Platform/Linux/LinuxPlatformAtomics.h"

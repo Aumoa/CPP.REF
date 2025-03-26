@@ -4,7 +4,7 @@
 
 #include "Linq/Adaptors/contains_adaptor.h"
 
-namespace Linq::inline views
+namespace Ayla::inline Linq::inline Views
 {
-	constexpr adaptors::contains_adaptor Contains;
+	constexpr Adaptors::contains_adaptor Contains;
 }

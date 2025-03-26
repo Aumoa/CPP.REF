@@ -2,80 +2,83 @@
 
 #include "IO/Directory.h"
 
-std::vector<String> Directory::GetFiles(String InPath, ESearchOption InSearchOption)
+namespace Ayla
 {
-	std::vector<String> Files;
-
-	if (InSearchOption == ESearchOption::TopDirectoryOnly)
+	std::vector<String> Directory::GetFiles(String InPath, SearchOption InSearchOption)
 	{
-		for (auto It : std::filesystem::directory_iterator(InPath.path()))
+		std::vector<String> Files;
+
+		if (InSearchOption == SearchOption::TopDirectoryOnly)
 		{
-			if (std::filesystem::is_regular_file(It.status()))
+			for (auto It : std::filesystem::directory_iterator(InPath.path()))
 			{
-				Files.emplace_back(It.path().wstring());
+				if (std::filesystem::is_regular_file(It.status()))
+				{
+					Files.emplace_back(It.path().wstring());
+				}
 			}
 		}
-	}
-	else
-	{
-		for (auto It : std::filesystem::recursive_directory_iterator(InPath.path()))
+		else
 		{
-			if (std::filesystem::is_regular_file(It.status()))
+			for (auto It : std::filesystem::recursive_directory_iterator(InPath.path()))
 			{
-				Files.emplace_back(It.path().wstring());
+				if (std::filesystem::is_regular_file(It.status()))
+				{
+					Files.emplace_back(It.path().wstring());
+				}
 			}
 		}
+
+		return Files;
 	}
 
-	return Files;
-}
-
-std::vector<String> Directory::GetDirectories(String InPath, ESearchOption InSearchOption)
-{
-	std::vector<String> Files;
-
-	if (InSearchOption == ESearchOption::TopDirectoryOnly)
+	std::vector<String> Directory::GetDirectories(String InPath, SearchOption InSearchOption)
 	{
-		for (auto It : std::filesystem::directory_iterator(InPath.path()))
+		std::vector<String> Files;
+
+		if (InSearchOption == SearchOption::TopDirectoryOnly)
 		{
-			if (std::filesystem::is_directory(It.status()))
+			for (auto It : std::filesystem::directory_iterator(InPath.path()))
 			{
-				Files.emplace_back(It.path().wstring());
+				if (std::filesystem::is_directory(It.status()))
+				{
+					Files.emplace_back(It.path().wstring());
+				}
 			}
 		}
-	}
-	else
-	{
-		for (auto It : std::filesystem::recursive_directory_iterator(InPath.path()))
+		else
 		{
-			if (std::filesystem::is_directory(It.status()))
+			for (auto It : std::filesystem::recursive_directory_iterator(InPath.path()))
 			{
-				Files.emplace_back(It.path().wstring());
+				if (std::filesystem::is_directory(It.status()))
+				{
+					Files.emplace_back(It.path().wstring());
+				}
 			}
 		}
+
+		return Files;
 	}
 
-	return Files;
-}
-
-bool Directory::Exists(String InPath)
-{
-	return std::filesystem::is_directory(InPath.path());
-}
-
-bool Directory::CreateDirectory(String InPath)
-{
-	return std::filesystem::create_directories(InPath.path());
-}
-
-void Directory::Delete(String InPath, bool bRecursive)
-{
-	if (bRecursive)
+	bool Directory::Exists(String InPath)
 	{
-		std::filesystem::remove_all(InPath.path());
+		return std::filesystem::is_directory(InPath.path());
 	}
-	else
+
+	bool Directory::CreateDirectory(String InPath)
 	{
-		std::filesystem::remove(InPath.path());
+		return std::filesystem::create_directories(InPath.path());
+	}
+
+	void Directory::Delete(String InPath, bool bRecursive)
+	{
+		if (bRecursive)
+		{
+			std::filesystem::remove_all(InPath.path());
+		}
+		else
+		{
+			std::filesystem::remove(InPath.path());
+		}
 	}
 }

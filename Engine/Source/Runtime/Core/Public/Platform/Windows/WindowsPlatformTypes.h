@@ -8,10 +8,13 @@
 
 #include "Platform/Generic/GenericPlatformTypes.h"
 
-struct WindowsPlatformTypes : public GenericPlatformTypes
+namespace Ayla
 {
-};
+	struct WindowsPlatformTypes : public GenericPlatformTypes
+	{
+	};
 
-using PlatformTypes = WindowsPlatformTypes;
+	using PlatformTypes = WindowsPlatformTypes;
+}
 
 #endif

@@ -4,7 +4,7 @@
 
 #include <ranges>
 
-namespace Linq::ranges
+namespace Ayla::inline Linq::inline Ranges
 {
 	template<
 		std::ranges::input_range R,

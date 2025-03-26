@@ -4,7 +4,7 @@
 
 #include "Linq/Adaptors/any_adaptor.h"
 
-namespace Linq::inline views
+namespace Ayla::inline Linq::inline Views
 {
-	constexpr adaptors::any_adaptor Any;
+	constexpr Adaptors::any_adaptor Any;
 }

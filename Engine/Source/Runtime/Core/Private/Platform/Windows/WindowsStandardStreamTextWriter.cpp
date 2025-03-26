@@ -3,20 +3,23 @@
 #if PLATFORM_WINDOWS
 
 #include "WindowsStandardStreamTextWriter.h"
-#include "System/AssertionMacros.h"
+#include "AssertionMacros.h"
 
-WindowsStandardStreamTextWriter::WindowsStandardStreamTextWriter(DWORD StdHandleId)
-	: hStd(GetStdHandle(StdHandleId))
+namespace Ayla
 {
-}
-
-void WindowsStandardStreamTextWriter::Write(String Val)
-{
-	if (hStd)
+	WindowsStandardStreamTextWriter::WindowsStandardStreamTextWriter(DWORD StdHandleId)
+		: hStd(GetStdHandle(StdHandleId))
 	{
-		DWORD Written = 0;
-		auto Wide = Val.AsCodepage();
-		WriteFile(hStd, Wide.c_str(), (DWORD)Wide.size(), &Written, NULL);
+	}
+
+	void WindowsStandardStreamTextWriter::Write(String Val)
+	{
+		if (hStd)
+		{
+			DWORD Written = 0;
+			auto Wide = Val.AsCodepage();
+			WriteFile(hStd, Wide.c_str(), (DWORD)Wide.size(), &Written, NULL);
+		}
 	}
 }
 

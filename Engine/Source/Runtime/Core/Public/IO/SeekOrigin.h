@@ -2,9 +2,12 @@
 
 #pragma once
 
-enum class ESeekOrigin
+namespace Ayla
 {
-	Begin = 0,
-	Current = 1,
-	End = 2
-};
+	enum class SeekOrigin
+	{
+		Begin = 0,
+		Current = 1,
+		End = 2
+	};
+}

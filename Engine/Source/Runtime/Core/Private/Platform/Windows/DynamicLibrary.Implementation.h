@@ -7,35 +7,38 @@
 #include "Platform/DynamicLibrary.h"
 #include "Platform/PlatformCommon.h"
 
-class DynamicLibrary::Implementation
+namespace Ayla
 {
-	HMODULE hModule = NULL;
-
-public:
-	inline Implementation(String InLibraryName)
+	class DynamicLibrary::Implementation
 	{
-		InLibraryName += TEXT(".dll");
-		hModule = LoadLibraryW(InLibraryName.c_str());
-	}
+		HMODULE hModule = NULL;
 
-	inline ~Implementation() noexcept
-	{
-		if (hModule != NULL)
+	public:
+		inline Implementation(String InLibraryName)
 		{
-			FreeLibrary(hModule);
-			hModule = NULL;
+			InLibraryName += TEXT(".dll");
+			hModule = LoadLibraryW(InLibraryName.c_str());
 		}
-	}
 
-	inline bool IsValid() const noexcept
-	{
-		return hModule != NULL;
-	}
+		inline ~Implementation() noexcept
+		{
+			if (hModule != NULL)
+			{
+				FreeLibrary(hModule);
+				hModule = NULL;
+			}
+		}
 
-	inline void (*LoadFunction(String Signature))()
-	{
-		return reinterpret_cast<void(*)()>(GetProcAddress(hModule, Signature.AsCodepage().c_str()));
-	}
-};
+		inline bool IsValid() const noexcept
+		{
+			return hModule != NULL;
+		}
+
+		inline void (*LoadFunction(String Signature))()
+		{
+			return reinterpret_cast<void(*)()>(GetProcAddress(hModule, Signature.AsCodepage().c_str()));
+		}
+	};
+}
 
 #endif

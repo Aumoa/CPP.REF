@@ -5,16 +5,19 @@
 #include "IO/TextWriter.h"
 #include "IO/Stream.h"
 
-class CORE_API StreamWriter : public TextWriter
+namespace Ayla
 {
-private:
-	std::shared_ptr<Stream> CurrentStream_Capture;
-	Stream* CurrentStream = nullptr;
+	class CORE_API StreamWriter : public TextWriter
+	{
+	private:
+		std::shared_ptr<Stream> CurrentStream_Capture;
+		Stream* CurrentStream = nullptr;
 
-public:
-	StreamWriter(std::shared_ptr<Stream> InStream);
-	StreamWriter(Stream* InStreamPtr);
+	public:
+		StreamWriter(std::shared_ptr<Stream> InStream);
+		StreamWriter(Stream* InStreamPtr);
 
-	virtual void Write(String Val) override;
-	virtual Task<> WriteAsync(String Val) override;
-};
+		virtual void Write(String Val) override;
+		virtual Task<> WriteAsync(String Val) override;
+	};
+}

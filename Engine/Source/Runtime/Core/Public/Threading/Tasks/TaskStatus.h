@@ -2,11 +2,14 @@
 
 #pragma once
 
-enum class ETaskStatus
+namespace Ayla
 {
-	Created,
-	Running,
-	RanToCompletion,
-	Faulted,
-	Canceled,
-};
+	enum class TaskStatus
+	{
+		Created,
+		Running,
+		RanToCompletion,
+		Faulted,
+		Canceled,
+	};
+}

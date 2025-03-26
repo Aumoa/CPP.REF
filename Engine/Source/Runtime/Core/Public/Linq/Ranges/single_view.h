@@ -4,7 +4,7 @@
 
 #include <ranges>
 
-namespace Linq::ranges
+namespace Ayla::inline Linq::inline Ranges
 {
 	template<class T>
 	struct single_view : public std::ranges::view_interface<single_view<T>>

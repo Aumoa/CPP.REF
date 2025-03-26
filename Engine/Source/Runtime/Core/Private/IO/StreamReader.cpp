@@ -2,153 +2,156 @@
 
 #include "IO/StreamReader.h"
 
-StreamReader::StreamReader(std::shared_ptr<Stream> InStream)
-	: CurrentStream_Capture(std::move(InStream))
-	, CurrentStream(CurrentStream_Capture.get())
+namespace Ayla
 {
-}
-
-StreamReader::StreamReader(Stream* InStreamRaw)
-	: CurrentStream(InStreamRaw)
-{
-}
-
-String StreamReader::ReadLine()
-{
-	return ReadLineAsync().GetResult();
-}
-
-Task<String> StreamReader::ReadLineAsync(CancellationToken InCancellationToken)
-{
-	size_t EndPos = static_cast<size_t>(-1);
-
-	if (Buffer.size() == 0)
+	StreamReader::StreamReader(std::shared_ptr<Stream> InStream)
+		: CurrentStream_Capture(std::move(InStream))
+		, CurrentStream(CurrentStream_Capture.get())
 	{
-		bool bExpanded = co_await ExpandBufferAsync(InCancellationToken);
-		if (bExpanded == false)
-		{
-			co_return String::GetEmpty();
-		}
 	}
 
-	size_t StartPos = BufferPos;
-	while (bEOF == false)
+	StreamReader::StreamReader(Stream* InStreamRaw)
+		: CurrentStream(InStreamRaw)
 	{
-		for (size_t i = BufferPos; i < Buffer.size(); ++i)
+	}
+
+	String StreamReader::ReadLine()
+	{
+		return ReadLineAsync().GetResult();
+	}
+
+	Task<String> StreamReader::ReadLineAsync(CancellationToken InCancellationToken)
+	{
+		size_t EndPos = static_cast<size_t>(-1);
+
+		if (Buffer.size() == 0)
 		{
-			if (Buffer[i] == '\n')
+			bool bExpanded = co_await ExpandBufferAsync(InCancellationToken);
+			if (bExpanded == false)
 			{
-				EndPos = Buffer[i];
+				co_return String::GetEmpty();
+			}
+		}
+
+		size_t StartPos = BufferPos;
+		while (bEOF == false)
+		{
+			for (size_t i = BufferPos; i < Buffer.size(); ++i)
+			{
+				if (Buffer[i] == '\n')
+				{
+					EndPos = Buffer[i];
+					break;
+				}
+			}
+
+			if (EndPos != -1)
+			{
+				break;
+			}
+
+			BufferPos = Buffer.size();
+			if (co_await ExpandBufferAsync(InCancellationToken) == false)
+			{
+				EndPos = Buffer.size();
 				break;
 			}
 		}
 
-		if (EndPos != -1)
+		size_t Length = EndPos - StartPos;
+		if (Length == 0)
 		{
-			break;
+			co_return String::GetEmpty();
 		}
 
+		const char* StringPtr = reinterpret_cast<const char*>(Buffer.data()) + StartPos;
+		String Str = String::FromCodepage(std::string_view(StringPtr, Length));
+		BufferPos = EndPos;
+		co_await TryShrinkAndFillAsync(InCancellationToken);
+		co_return Str;
+	}
+
+	Task<String> StreamReader::ReadToEndAsync(CancellationToken InCancellationToken)
+	{
+		while (bEOF == false)
+		{
+			co_await ExpandBufferAsync(InCancellationToken);
+		}
+
+		size_t Length = Buffer.size() - BufferPos;
+		if (Length == 0)
+		{
+			co_return String::GetEmpty();
+		}
+
+		const char* StringPtr = reinterpret_cast<const char*>(Buffer.data() + BufferPos);
+		String Str = String::FromCodepage(std::string_view(StringPtr, Length));
 		BufferPos = Buffer.size();
-		if (co_await ExpandBufferAsync(InCancellationToken) == false)
+		co_await TryShrinkAndFillAsync(InCancellationToken);
+		co_return Str;
+	}
+
+	bool StreamReader::IsEOF() const
+	{
+		return bEOF;
+	}
+
+	Task<> StreamReader::TryShrinkAndFillAsync(CancellationToken InCancellationToken)
+	{
+		if (BufferPos == 0 || BufferPos < InitialBufferSize)
 		{
-			EndPos = Buffer.size();
-			break;
+			co_return;
 		}
+
+		size_t CopySize = Buffer.size() - BufferPos;
+		size_t ShrinkSize = std::exchange(BufferPos, 0);
+		memmove(Buffer.data() + ShrinkSize, Buffer.data(), CopySize);
+		if (bEOF)
+		{
+			Buffer.resize(Buffer.size() - ShrinkSize);
+			co_return;
+		}
+
+		size_t ActualRead = co_await CurrentStream->ReadAsync(std::span(Buffer.data() + CopySize, ShrinkSize), InCancellationToken);
+		if (ActualRead < ShrinkSize)
+		{
+			Buffer.resize(Buffer.size() - (ShrinkSize - ActualRead));
+		}
+
+		bEOF = ActualRead == 0;
 	}
 
-	size_t Length = EndPos - StartPos;
-	if (Length == 0)
+	Task<bool> StreamReader::ExpandBufferAsync(CancellationToken InCancellationToken)
 	{
-		co_return String::GetEmpty();
+		size_t SizeToRead;
+		uint8* BufferPtr;
+
+		if (bEOF)
+		{
+			co_return false;
+		}
+
+		if (Buffer.size() == 0)
+		{
+			SizeToRead = InitialBufferSize;
+		}
+		else
+		{
+			SizeToRead = Buffer.size();
+		}
+
+		size_t Offset = Buffer.size();
+		Buffer.resize(Buffer.size() + SizeToRead);
+		BufferPtr = Buffer.data() + Offset;
+
+		size_t ActualRead = co_await CurrentStream->ReadAsync(std::span(BufferPtr, SizeToRead), InCancellationToken);
+		if (ActualRead < SizeToRead)
+		{
+			size_t Diff = SizeToRead - ActualRead;
+			Buffer.resize(Buffer.size() - Diff);
+		}
+
+		bEOF = ActualRead == 0;
+		co_return !bEOF;
 	}
-
-	const char* StringPtr = reinterpret_cast<const char*>(Buffer.data()) + StartPos;
-	String Str = String::FromCodepage(std::string_view(StringPtr, Length));
-	BufferPos = EndPos;
-	co_await TryShrinkAndFillAsync(InCancellationToken);
-	co_return Str;
-}
-
-Task<String> StreamReader::ReadToEndAsync(CancellationToken InCancellationToken)
-{
-	while (bEOF == false)
-	{
-		co_await ExpandBufferAsync(InCancellationToken);
-	}
-
-	size_t Length = Buffer.size() - BufferPos;
-	if (Length == 0)
-	{
-		co_return String::GetEmpty();
-	}
-
-	const char* StringPtr = reinterpret_cast<const char*>(Buffer.data() + BufferPos);
-	String Str = String::FromCodepage(std::string_view(StringPtr, Length));
-	BufferPos = Buffer.size();
-	co_await TryShrinkAndFillAsync(InCancellationToken);
-	co_return Str;
-}
-
-bool StreamReader::IsEOF() const
-{
-	return bEOF;
-}
-
-Task<> StreamReader::TryShrinkAndFillAsync(CancellationToken InCancellationToken)
-{
-	if (BufferPos == 0 || BufferPos < InitialBufferSize)
-	{
-		co_return;
-	}
-
-	size_t CopySize = Buffer.size() - BufferPos;
-	size_t ShrinkSize = std::exchange(BufferPos, 0);
-	memmove(Buffer.data() + ShrinkSize, Buffer.data(), CopySize);
-	if (bEOF)
-	{
-		Buffer.resize(Buffer.size() - ShrinkSize);
-		co_return;
-	}
-
-	size_t ActualRead = co_await CurrentStream->ReadAsync(std::span(Buffer.data() + CopySize, ShrinkSize), InCancellationToken);
-	if (ActualRead < ShrinkSize)
-	{
-		Buffer.resize(Buffer.size() - (ShrinkSize - ActualRead));
-	}
-
-	bEOF = ActualRead == 0;
-}
-
-Task<bool> StreamReader::ExpandBufferAsync(CancellationToken InCancellationToken)
-{
-	size_t SizeToRead;
-	uint8* BufferPtr;
-
-	if (bEOF)
-	{
-		co_return false;
-	}
-
-	if (Buffer.size() == 0)
-	{
-		SizeToRead = InitialBufferSize;
-	}
-	else
-	{
-		SizeToRead = Buffer.size();
-	}
-
-	size_t Offset = Buffer.size();
-	Buffer.resize(Buffer.size() + SizeToRead);
-	BufferPtr = Buffer.data() + Offset;
-
-	size_t ActualRead = co_await CurrentStream->ReadAsync(std::span(BufferPtr, SizeToRead), InCancellationToken);
-	if (ActualRead < SizeToRead)
-	{
-		size_t Diff = SizeToRead - ActualRead;
-		Buffer.resize(Buffer.size() - Diff);
-	}
-
-	bEOF = ActualRead == 0;
-	co_return !bEOF;
 }

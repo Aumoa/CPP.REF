@@ -4,9 +4,9 @@
 
 #include <cstdint>
 #include <type_traits>
-#include "System/StaticClass.h"
+#include "StaticClass.h"
 
-namespace Platform::inline details
+namespace Ayla::details
 {
 	template<size_t>
 	constexpr bool always_false = false;
@@ -40,25 +40,28 @@ namespace Platform::inline details
 	using select_arch_t = typename select_arch<ByteSize, Types...>::Type;
 }
 
-struct GenericPlatformTypes : public StaticClass
+namespace Ayla
 {
-	using uint8 = uint8_t;
-	using uint16 = uint16_t;
-	using uint32 = uint32_t;
-	using uint64 = uint64_t;
+	struct GenericPlatformTypes : public StaticClass
+	{
+		using uint8 = uint8_t;
+		using uint16 = uint16_t;
+		using uint32 = uint32_t;
+		using uint64 = uint64_t;
 
-	using int8 = int8_t;
-	using int16 = int16_t;
-	using int32 = int32_t;
-	using int64 = int64_t;
+		using int8 = int8_t;
+		using int16 = int16_t;
+		using int32 = int32_t;
+		using int64 = int64_t;
 
-	using byte = uint8_t;
+		using byte = uint8_t;
 
-	using ANSICHAR = char;
-	using WIDECHAR = wchar_t;
+		using ANSICHAR = char;
+		using WIDECHAR = wchar_t;
 
-	using char_t = WIDECHAR;
-	using ptrdiff_t = Platform::select_arch_t<sizeof(void*), int16, int32, int64>;
-	using size_t = Platform::select_arch_t<sizeof(void*), uint16, uint32, uint64>;
-	using ssize_t = Platform::select_arch_t<sizeof(void*), int16, int32, int64>;
-};
+		using char_t = WIDECHAR;
+		using ptrdiff_t = details::select_arch_t<sizeof(void*), int16, int32, int64>;
+		using size_t = details::select_arch_t<sizeof(void*), uint16, uint32, uint64>;
+		using ssize_t = details::select_arch_t<sizeof(void*), int16, int32, int64>;
+	};
+}

@@ -2,8 +2,11 @@
 
 #pragma once
 
-enum class ESearchOption
+namespace Ayla
 {
-	TopDirectoryOnly,
-	AllDirectories,
-};
+	enum class SearchOption
+	{
+		TopDirectoryOnly,
+		AllDirectories,
+	};
+}

@@ -5,7 +5,7 @@
 #include <concepts>
 #include <ranges>
 
-namespace Linq::inline views
+namespace Ayla::inline Linq::inline Views
 {
 	constexpr auto Values = std::views::values;
 }

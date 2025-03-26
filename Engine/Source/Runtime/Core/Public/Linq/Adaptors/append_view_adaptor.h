@@ -5,7 +5,7 @@
 #include <ranges>
 #include "Linq/Ranges/append_view.h"
 
-namespace Linq::adaptors
+namespace Ayla::inline Linq::Adaptors
 {
 	template<class T>
 	struct append_view_adaptor_closure
@@ -23,6 +23,12 @@ namespace Linq::adaptors
 		{
 			return ranges::append_view(std::forward<R>(left_view), std::forward<T>(value));
 		}
+
+		template<std::ranges::input_range R, class T>
+		friend constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::append_view_adaptor_closure<T>&& adaptor) noexcept
+		{
+			return adaptor(std::forward<R>(view));
+		}
 	};
 
 	template<class T>
@@ -36,10 +42,4 @@ namespace Linq::adaptors
 			return append_view_adaptor_closure(std::forward<T>(value));
 		}
 	};
-
-	template<std::ranges::input_range R, class T>
-	constexpr auto operator |(R&& view, append_view_adaptor_closure<T>&& adaptor) noexcept
-	{
-		return adaptor(std::forward<R>(view));
-	}
 }
