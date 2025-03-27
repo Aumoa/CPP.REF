@@ -17,7 +17,7 @@ namespace Ayla
 		void* ApplicationPointer = nullptr;
 
 	public:
-		NWindowsLaunch(String CmdArgs) : Super(CmdArgs)
+		NWindowsLaunch(std::vector<String> CmdArgs) : Super(std::move(CmdArgs))
 		{
 			ApplicationPointer = GetModuleHandleW(nullptr);
 		}
@@ -29,10 +29,26 @@ namespace Ayla
 	};
 }
 
-extern "C" INT APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, INT)
+extern "C"
+{
+	__declspec(dllexport) int Ayla__WindowsLaunch__StartApplication(wchar_t** args, int length)
+	{
+		using namespace ::Ayla;
+		std::vector<String> cmdArgs((size_t)length);
+		for (size_t i = 0; i < length; ++i)
+		{
+			cmdArgs[i] = String::FromLiteral(args[i]);
+		}
+
+		auto Launch = std::make_shared<NWindowsLaunch>(std::move(cmdArgs));
+		return Launch->GuardedMain();
+	}
+}
+
+INT APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, INT)
 {
 	using namespace Ayla;
-	auto Launch = std::make_shared<NWindowsLaunch>(String::FromLiteral(lpCmdLine));
+	auto Launch = std::make_shared<NWindowsLaunch>(std::vector<String>{});
 	return Launch->GuardedMain();
 }
 

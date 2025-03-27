@@ -9,6 +9,7 @@
     <OutputPath>..\..\..\Binaries\DotNET\</OutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<RootNamespace>AylaEngine</RootNamespace>
+	<PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>

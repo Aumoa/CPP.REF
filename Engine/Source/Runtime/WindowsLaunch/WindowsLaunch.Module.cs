@@ -7,7 +7,6 @@ public class WindowsLaunch : ModuleRules
 {
     public WindowsLaunch()
     {
-        Type = ModuleType.Application;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Launch");

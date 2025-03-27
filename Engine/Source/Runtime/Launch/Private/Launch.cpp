@@ -14,8 +14,8 @@ namespace Ayla
 {
     NLaunch* NLaunch::CurrentLaunch;
 
-    NLaunch::NLaunch(String CmdArgs)
-        : CmdArgs(CmdArgs)
+    NLaunch::NLaunch(std::vector<String> CmdArgs)
+        : CmdArgs(std::move(CmdArgs))
     {
         check(CurrentLaunch == nullptr);
         CurrentLaunch = this;

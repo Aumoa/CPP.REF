@@ -13,11 +13,11 @@ namespace Ayla
 	private:
 		static NLaunch* CurrentLaunch;
 
-		String CmdArgs;
+		std::vector<String> CmdArgs;
 		std::unique_ptr<NGenericApplication> GenericApp;
 
 	protected:
-		NLaunch(String CmdArgs);
+		NLaunch(std::vector<String> CmdArgs);
 
 	public:
 		virtual ~NLaunch() noexcept;
