@@ -2,14 +2,10 @@
 
 #if PLATFORM_WINDOWS
 
+#define __ALLOW_PLATFORM_COMMON_H__
+
 #include "Launch.h"
-
-#pragma push_macro("TEXT")
-#undef TEXT
-
-#include <Windows.h>
-
-#pragma pop_macro("TEXT")
+#include "Platform/PlatformCommon.h"
 
 namespace Ayla
 {
@@ -31,11 +27,15 @@ namespace Ayla
 			return ApplicationPointer;
 		}
 	};
-
-	std::unique_ptr<NLaunch> NLaunch::GeneratePlatformLaunch(String CmdArgs)
-	{
-		return std::make_unique<NWindowsLaunch>(CmdArgs);
-	}
 }
+
+extern "C" INT APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, INT)
+{
+	using namespace Ayla;
+	auto Launch = std::make_shared<NWindowsLaunch>(String::FromLiteral(lpCmdLine));
+	return Launch->GuardedMain();
+}
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

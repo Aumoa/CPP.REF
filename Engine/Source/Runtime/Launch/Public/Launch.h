@@ -28,8 +28,5 @@ namespace Ayla
 		virtual void* GetApplicationPointer() = 0;
 
 		static NLaunch& Get() noexcept;
-		static std::unique_ptr<NLaunch> GeneratePlatformLaunch(String CmdArgs);
 	};
 }
-
-extern "C" LAUNCH_API ::Ayla::int32 Ayla__Launch__StartApplication(const ::Ayla::char_t* const* args, ::Ayla::int32 length);

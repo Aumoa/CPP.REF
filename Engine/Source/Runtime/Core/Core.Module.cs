@@ -15,7 +15,7 @@ public class Core : ModuleRules
 
         if (TargetInfo.Platform.Group == PlatformGroup.Windows)
         {
-            AddPublicAdditionalMacros("NOMINMAX", "WIN32_LEAN_AND_MEAN");
+            AddPublicAdditionalMacros("WIN32_LEAN_AND_MEAN");
             AddPrivateAdditionalLibraries("dbghelp.lib", "Rpcrt4.lib", "Kernel32.lib", "Ws2_32.lib");
         }
     }

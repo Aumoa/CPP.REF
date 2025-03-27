@@ -10,6 +10,8 @@
 #include "AssertionMacros.h"
 
 #pragma push_macro("TEXT")
+#pragma warning(push)
+#pragma warning(disable: 4458)
 
 #undef TEXT
 
@@ -44,6 +46,7 @@
 #undef SetEnvironmentVariable
 #undef GetEnvironmentVariable
 
+#pragma warning(pop)
 #pragma pop_macro("TEXT")
 
 using Microsoft::WRL::ComPtr;

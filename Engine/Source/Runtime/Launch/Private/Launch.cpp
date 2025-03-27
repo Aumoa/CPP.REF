@@ -68,16 +68,3 @@ namespace Ayla
         return *CurrentLaunch;
     }
 }
-
-extern "C" LAUNCH_API ::Ayla::int32 Ayla__Launch__StartApplication(const ::Ayla::char_t* const* args, ::Ayla::int32 length)
-{
-    using namespace ::Ayla;
-
-    std::vector<String> Args;
-    for (int i = 0; i < length; ++i)
-    {
-        Args.emplace_back(String::FromLiteral(args[i]));
-    }
-
-    return NLaunch::GeneratePlatformLaunch(String::Join(TEXT(" "), Args))->GuardedMain();
-}

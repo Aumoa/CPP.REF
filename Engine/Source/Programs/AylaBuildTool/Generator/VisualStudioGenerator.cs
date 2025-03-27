@@ -488,9 +488,10 @@ internal class VisualStudioGenerator : Generator
                         AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                         Indent(() =>
                         {
+                            var engineGroup = solution.EngineProjects.First().Descriptor;
                             AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
                             AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
-                            AppendFormatLine("""<NMakeBuildCommandLine>dotnet F:\CPP.REF\Engine\Binaries\DotNET\AylaBuildTool.dll build {0}--target "{1}"</NMakeBuildCommandLine>""", projectPath, project.Name);
+                            AppendFormatLine("""<NMakeBuildCommandLine>dotnet "{0}\DotNET\AylaBuildTool.dll" build {1}--target "{2}"</NMakeBuildCommandLine>""", engineGroup.BinariesDirectory, projectPath, project.Name);
                             AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
                         });
                         AppendFormatLine("""</PropertyGroup>""");
