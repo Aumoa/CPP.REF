@@ -24,6 +24,7 @@ internal static class BuildRunner
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
         List<Compiler.CompileItem> compileItems = [];
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
+        var primaryGroup = solution.EngineProjects.First().Descriptor;
         IEnumerable<Project> targetProjects;
         if (string.IsNullOrEmpty(options.Target))
         {
@@ -44,7 +45,7 @@ internal static class BuildRunner
                 throw TerminateException.User();
             }
 
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor);
+            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor, primaryGroup);
             var depends = solution.FindDepends(resolver.DependencyModuleNames);
             targetProjects = depends.Append(targetProject);
         }
@@ -59,7 +60,7 @@ internal static class BuildRunner
         {
             if (project is ModuleProject mp)
             {
-                var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor);
+                var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor, primaryGroup);
                 List<CompileItem> moduleItems = [];
 
                 foreach (var sourceCode in mp.GetSourceCodes())
@@ -73,7 +74,7 @@ internal static class BuildRunner
                             Descriptor = project.Descriptor
                         };
 
-                        var intDir = item.Descriptor.GetIntermediateFolder(item.Resolver, buildTarget);
+                        var intDir = item.Descriptor.Intermediate(item.Resolver.Name, buildTarget, FolderPolicy.PathType.Current);
                         var fileName = Path.GetFileName(item.SourceCode.FilePath);
                         var cacheFileName = Path.Combine(intDir, fileName + ".cache");
                         var depsFileName = Path.Combine(intDir, fileName + ".deps.json");

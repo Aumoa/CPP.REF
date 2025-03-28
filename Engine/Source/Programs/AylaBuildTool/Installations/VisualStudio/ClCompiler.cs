@@ -133,7 +133,7 @@ internal class ClCompiler : Compiler
         }
 
         var fileName = Path.GetFileName(item.SourceCode.FilePath);
-        var intermediateDirectory = item.Descriptor.GetIntermediateFolder(item.Resolver, m_TargetInfo);
+        var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
         var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
         var pdbFileName = Path.Combine(intermediateDirectory, fileName + ".pdb");
         var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps.json");

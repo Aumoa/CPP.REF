@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -259,14 +260,81 @@ internal class VisualStudioGenerator : Generator
 
         async Task GenerateCppProjectAsync(Dictionary<ModuleProject, string> vcxprojPaths, GroupDescriptor primaryGroup, ModuleProject project, CancellationToken cancellationToken)
         {
+            var engineGroup = solution.EngineProjects.First().Descriptor;
+
             var group = project.Descriptor;
             var projectFilesDirectory = Path.Combine(primaryGroup.IntermediateDirectory, "ProjectFiles");
             await Task.WhenAll(
                 GenerateVcxprojAsync(),
-                GenerateVcxprojFiltersAsync()
+                GenerateVcxprojFiltersAsync(),
+                GenerateVcxprojUserAsync()
             );
 
             return;
+
+            async Task GenerateVcxprojUserAsync()
+            {
+                var fileName = Path.Combine(projectFilesDirectory, project.Name + ".vcxproj.user");
+                var builder = new StringBuilder();
+                int indent = 0;
+
+                AppendFormatLine("""<?xml version="1.0" encoding="utf-8"?>""");
+                AppendFormatLine("""<Project ToolVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">""");
+                Indent(() =>
+                {
+                    foreach (var buildConfig in TargetInfo.GetAllTargets())
+                    {
+                        // Visual Studio only support Windows platform.
+                        if (buildConfig.Platform.Group != PlatformGroup.Windows)
+                        {
+                            continue;
+                        }
+
+                        AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                        Indent(() =>
+                        {
+                            var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildConfig.Platform });
+                            if (rules.Type == ModuleType.Game)
+                            {
+                                AppendFormatLine("""<LocalDebuggerCommand>{0}\DotNET\ScriptingLaunch.exe</LocalDebuggerCommand>""", engineGroup.BinariesDirectory);
+                            }
+                            AppendFormatLine("""<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>""");
+                            AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Current));
+                            AppendFormatLine("""<LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>""");
+                        });
+                        AppendFormatLine("""</PropertyGroup>""");
+                    }
+                });
+
+                AppendFormatLine("""</Project>""");
+
+                string? previousXml = null;
+                if (File.Exists(fileName))
+                {
+                    previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
+                }
+
+                var currentXml = builder.ToString();
+                if (previousXml != currentXml)
+                {
+                    await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
+                }
+
+                return;
+
+                void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
+                {
+                    var indentStr = new string(' ', indent * 2);
+                    builder.AppendFormat(indentStr + format + '\n', args);
+                }
+
+                void Indent(Action inner)
+                {
+                    ++indent;
+                    inner();
+                    --indent;
+                }
+            }
 
             async Task GenerateVcxprojFiltersAsync()
             {
@@ -481,17 +549,20 @@ internal class VisualStudioGenerator : Generator
                         var archName = GetArchitectureName(buildTarget);
                         var outDir = Path.Combine(group.BinariesDirectory, buildTarget.Platform.Name, buildTarget.Config.ToString());
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
-                        var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform }), group);
+                        var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform });
+                        var resolver = new ModuleRulesResolver(buildTarget, solution, rules, group, primaryGroup);
                         var pps = GenerateProjectPreprocessorDefs(resolver);
                         var includes = GenerateIncludePaths(resolver);
+                        var outputFileName = group.OutputFileName(project.Name, rules.Type, FolderPolicy.PathType.Current);
 
                         AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                         Indent(() =>
                         {
-                            var engineGroup = solution.EngineProjects.First().Descriptor;
                             AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
                             AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
                             AppendFormatLine("""<NMakeBuildCommandLine>dotnet "{0}\DotNET\AylaBuildTool.dll" build {1}--target "{2}"</NMakeBuildCommandLine>""", engineGroup.BinariesDirectory, projectPath, project.Name);
+                            AppendFormatLine("""<OutDir>{0}</OutDir>""", outDir);
+                            AppendFormatLine("""<NMakeOutput>{0}</NMakeOutput>""", outputFileName);
                             AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
                         });
                         AppendFormatLine("""</PropertyGroup>""");

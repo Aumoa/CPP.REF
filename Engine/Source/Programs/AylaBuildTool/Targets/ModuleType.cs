@@ -3,5 +3,6 @@
 public enum ModuleType
 {
     Library,
-    Application
+    Application,
+    Game
 }

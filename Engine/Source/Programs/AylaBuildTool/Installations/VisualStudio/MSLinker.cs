@@ -24,14 +24,14 @@ internal class MSLinker : Linker
 
         m_CommandBuilder.Clear();
 
-        var outputPath = Path.Combine(module.Group.BinariesDirectory, m_TargetInfo.Platform.Name, m_TargetInfo.Config.ToString());
-        var outputFileName = Path.Combine(outputPath, module.Rules.Name);
+        var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.OutputFileName(m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
         switch (module.Rules.Type)
         {
             case ModuleType.Library:
-                outputFileName += ".dll";
+            case ModuleType.Game:
                 m_CommandBuilder.Append(
                     // Suppresses display of sign-on banner.
                     "/nologo " +
@@ -44,7 +44,6 @@ internal class MSLinker : Linker
                 );
                 break;
             case ModuleType.Application:
-                outputFileName += ".exe";
                 m_CommandBuilder.Append(
                     // Suppresses display of sign-on banner.
                     "/nologo " +
@@ -60,7 +59,7 @@ internal class MSLinker : Linker
 
         for (int i = 0; i < sourceObjects.Length; ++i)
         {
-            var intermediateDirectory = sourceObjects[i].Descriptor.GetIntermediateFolder(module, m_TargetInfo);
+            var intermediateDirectory = sourceObjects[i].Descriptor.Intermediate(module.Name, m_TargetInfo, FolderPolicy.PathType.Current);
             var fileName = Path.GetFileName(sourceObjects[i].SourceCode.FilePath);
             var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
             m_CommandBuilder.AppendFormat("\"{0}\" ", objectFileName);
@@ -74,7 +73,9 @@ internal class MSLinker : Linker
 
         foreach (var libPath in VisualStudioInstallation.GatherWindowsKitSharedLibrary(m_TargetInfo.Platform.Architecture)
             .Append(libraryPath)
-            .Append(outputPath))
+            .Append(outputPath)
+            .Append(module.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
+            .Distinct())
         {
             m_CommandBuilder.Append($"/LIBPATH:\"{libPath}\" ");
         }

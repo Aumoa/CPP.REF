@@ -4,13 +4,14 @@ namespace AylaEngine;
 
 internal class ModuleRulesResolver
 {
-    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
+    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group, GroupDescriptor primaryGroup)
     {
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         Rules = rules;
         RuleFilePath = targetProject.RuleFilePath;
         Name = rules.Name;
         Group = group;
+        PrimaryGroup = primaryGroup;
 
         PrivateDependencyModuleNames = rules.PrivateDependencyModuleNames.Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
@@ -87,6 +88,7 @@ internal class ModuleRulesResolver
     public readonly string RuleFilePath;
     public readonly string Name;
     public readonly GroupDescriptor Group;
+    public readonly GroupDescriptor PrimaryGroup;
 
     private readonly string[] PrivateDependencyModuleNames;
     private readonly string[] PublicDependencyModuleNames;

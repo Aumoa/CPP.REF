@@ -29,9 +29,4 @@ internal record GroupDescriptor
             ContentDirectory = Path.Combine(rootPath, "Content")
         };
     }
-
-    public string GetIntermediateFolder(ModuleRulesResolver resolver, TargetInfo targetInfo)
-    {
-        return Path.Combine(IntermediateDirectory, resolver.Name, targetInfo.Platform.Name, targetInfo.Config.ToString());
-    }
 }
