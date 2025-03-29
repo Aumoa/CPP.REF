@@ -5,13 +5,15 @@ namespace AylaEngine;
 internal readonly struct SourceCodeCache
 {
     private readonly bool m_IsValid;
+    private readonly DateTime m_BuildToolWriteTime;
     private readonly DateTime m_SourceCodeWriteTime;
     private readonly DateTime m_RuleFileWriteTime;
     private readonly DateTime[] m_DependsWriteTime;
 
-    private SourceCodeCache(DateTime sourceCodeWriteTime, DateTime ruleFileWriteTime, DateTime[] dependsWriteTime)
+    private SourceCodeCache(DateTime sourceCodeWriteTime, DateTime buildToolWriteTime, DateTime ruleFileWriteTime, DateTime[] dependsWriteTime)
     {
         m_IsValid = true;
+        m_BuildToolWriteTime = buildToolWriteTime;
         m_SourceCodeWriteTime = sourceCodeWriteTime;
         m_RuleFileWriteTime = ruleFileWriteTime;
         m_DependsWriteTime = dependsWriteTime;
@@ -25,6 +27,7 @@ internal readonly struct SourceCodeCache
         }
 
         return m_SourceCodeWriteTime != other.m_SourceCodeWriteTime
+            || m_BuildToolWriteTime != other.m_BuildToolWriteTime
             || m_RuleFileWriteTime != other.m_RuleFileWriteTime
             || m_DependsWriteTime.SequenceEqual(other.m_DependsWriteTime) == false;
     }
@@ -38,6 +41,7 @@ internal readonly struct SourceCodeCache
 
         using var writer = new BinaryWriter(File.OpenWrite(cacheFileName));
         writer.Write(m_SourceCodeWriteTime.ToBinary());
+        writer.Write(m_BuildToolWriteTime.ToBinary());
         writer.Write(m_RuleFileWriteTime.ToBinary());
         writer.Write(m_DependsWriteTime.Length);
         foreach (var w in m_DependsWriteTime)
@@ -54,6 +58,7 @@ internal readonly struct SourceCodeCache
         {
             using var reader = new BinaryReader(File.OpenRead(cacheFileName));
             DateTime sourceCodeWriteTime = DateTime.FromBinary(reader.ReadInt64());
+            DateTime buildToolWriteTime = DateTime.FromBinary(reader.ReadInt64());
             DateTime ruleFileWriteTime = DateTime.FromBinary(reader.ReadInt64());
             int dependsCount = reader.ReadInt32();
             DateTime[] dependsWriteTime = new DateTime[dependsCount];
@@ -61,7 +66,7 @@ internal readonly struct SourceCodeCache
             {
                 dependsWriteTime[i] = DateTime.FromBinary(reader.ReadInt64());
             }
-            return new SourceCodeCache(sourceCodeWriteTime, ruleFileWriteTime, dependsWriteTime);
+            return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, dependsWriteTime);
         }
         catch
         {
@@ -77,6 +82,7 @@ internal readonly struct SourceCodeCache
         }
 
         var sourceCodeWriteTime = File.GetLastWriteTimeUtc(sourceCode);
+        var buildToolWriteTime = File.GetLastWriteTimeUtc(Global.AssemblyLocation);
         var ruleFileWriteTime = File.GetLastWriteTimeUtc(ruleFilePath);
         string depsJson = await File.ReadAllTextAsync(dependsFileName, cancellationToken);
         var includes = JsonNode.Parse(depsJson)?["Data"]?["Includes"]?.AsArray();
@@ -89,6 +95,6 @@ internal readonly struct SourceCodeCache
                 depsWriteTimes[i] = File.GetLastWriteTimeUtc(includes[i]!.GetValue<string>());
             }
         }
-        return new SourceCodeCache(sourceCodeWriteTime, ruleFileWriteTime, depsWriteTimes);
+        return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, depsWriteTimes);
     }
 }
