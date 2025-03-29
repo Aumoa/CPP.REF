@@ -20,12 +20,14 @@ internal class ModuleRulesResolver
         PrivateAdditionalLibraries = rules.PrivateAdditionalLibraries.Distinct().ToArray();
 
         HashSet<string> route = new();
+        List<string> dependRuleFilePaths = [];
         List<string> dependencyModuleNames = [];
         List<string> includePaths = [];
         List<MacroSet> additionalMacros = [];
         List<int> disableWarnings = [];
         List<string> additionalLibraries = [];
-        Resolve(solution, targetProject, rules, route, true, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
+        Resolve(solution, targetProject, rules, route, true, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
+        DependRuleFilePaths = dependRuleFilePaths.Distinct().ToArray();
         PublicDependencyModuleNames = dependencyModuleNames.Distinct().ToArray();
         PublicIncludePaths = includePaths.Distinct().ToArray();
         PublicAdditionalMacros = additionalMacros.Distinct().ToArray();
@@ -33,7 +35,7 @@ internal class ModuleRulesResolver
         PublicAdditionalLibraries = additionalLibraries.Distinct().ToArray();
     }
 
-    private void Resolve(Solution solution, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings, List<string> additionalLibraries)
+    private void Resolve(Solution solution, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependRuleFilePaths, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings, List<string> additionalLibraries)
     {
         if (route.Add(rules.Name) == false)
         {
@@ -73,7 +75,9 @@ internal class ModuleRulesResolver
             }
 
             var dependTargetRule = mp.GetRule(rules.TargetInfo);
-            Resolve(solution, mp, dependTargetRule, route, false, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
+            dependRuleFilePaths.Add(mp.RuleFilePath);
+
+            Resolve(solution, mp, dependTargetRule, route, false, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
         }
 
         return;
@@ -89,6 +93,7 @@ internal class ModuleRulesResolver
     public readonly string Name;
     public readonly GroupDescriptor Group;
     public readonly GroupDescriptor PrimaryGroup;
+    public readonly string[] DependRuleFilePaths;
 
     private readonly string[] PrivateDependencyModuleNames;
     private readonly string[] PublicDependencyModuleNames;

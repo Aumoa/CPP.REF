@@ -8,14 +8,16 @@ internal readonly struct SourceCodeCache
     private readonly DateTime m_BuildToolWriteTime;
     private readonly DateTime m_SourceCodeWriteTime;
     private readonly DateTime m_RuleFileWriteTime;
+    private readonly DateTime[] m_DependRuleFilesWriteTime;
     private readonly DateTime[] m_DependsWriteTime;
 
-    private SourceCodeCache(DateTime sourceCodeWriteTime, DateTime buildToolWriteTime, DateTime ruleFileWriteTime, DateTime[] dependsWriteTime)
+    private SourceCodeCache(DateTime sourceCodeWriteTime, DateTime buildToolWriteTime, DateTime ruleFileWriteTime, DateTime[] dependRuleFilesWriteTime, DateTime[] dependsWriteTime)
     {
         m_IsValid = true;
         m_BuildToolWriteTime = buildToolWriteTime;
         m_SourceCodeWriteTime = sourceCodeWriteTime;
         m_RuleFileWriteTime = ruleFileWriteTime;
+        m_DependRuleFilesWriteTime = dependRuleFilesWriteTime;
         m_DependsWriteTime = dependsWriteTime;
     }
 
@@ -29,6 +31,7 @@ internal readonly struct SourceCodeCache
         return m_SourceCodeWriteTime != other.m_SourceCodeWriteTime
             || m_BuildToolWriteTime != other.m_BuildToolWriteTime
             || m_RuleFileWriteTime != other.m_RuleFileWriteTime
+            || m_DependRuleFilesWriteTime.SequenceEqual(other.m_DependRuleFilesWriteTime) == false
             || m_DependsWriteTime.SequenceEqual(other.m_DependsWriteTime) == false;
     }
 
@@ -43,13 +46,20 @@ internal readonly struct SourceCodeCache
         writer.Write(m_SourceCodeWriteTime.ToBinary());
         writer.Write(m_BuildToolWriteTime.ToBinary());
         writer.Write(m_RuleFileWriteTime.ToBinary());
-        writer.Write(m_DependsWriteTime.Length);
-        foreach (var w in m_DependsWriteTime)
-        {
-            writer.Write(w.ToBinary());
-        }
-
+        Write(writer, m_DependRuleFilesWriteTime);
+        Write(writer, m_DependsWriteTime);
         writer.Close();
+
+        return;
+
+        void Write(BinaryWriter writer, ReadOnlySpan<DateTime> values)
+        {
+            writer.Write(values.Length);
+            foreach (var v in values)
+            {
+                writer.Write(v.ToBinary());
+            }
+        }
     }
 
     public static SourceCodeCache LoadCached(string cacheFileName)
@@ -60,13 +70,22 @@ internal readonly struct SourceCodeCache
             DateTime sourceCodeWriteTime = DateTime.FromBinary(reader.ReadInt64());
             DateTime buildToolWriteTime = DateTime.FromBinary(reader.ReadInt64());
             DateTime ruleFileWriteTime = DateTime.FromBinary(reader.ReadInt64());
-            int dependsCount = reader.ReadInt32();
-            DateTime[] dependsWriteTime = new DateTime[dependsCount];
-            for (int i = 0; i < dependsCount; i++)
+            DateTime[] dependRuleFilesWriteTime = ReadDateTimeArray(reader);
+            DateTime[] dependsWriteTime = ReadDateTimeArray(reader);
+            reader.Close();
+            return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, dependRuleFilesWriteTime, dependsWriteTime);
+
+            DateTime[] ReadDateTimeArray(BinaryReader reader)
             {
-                dependsWriteTime[i] = DateTime.FromBinary(reader.ReadInt64());
+                int count = reader.ReadInt32();
+                var result = new DateTime[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    result[i] = DateTime.FromBinary(reader.ReadInt64());
+                }
+
+                return result;
             }
-            return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, dependsWriteTime);
         }
         catch
         {
@@ -74,7 +93,7 @@ internal readonly struct SourceCodeCache
         }
     }
 
-    public static async ValueTask<SourceCodeCache> MakeCachedAsync(string sourceCode, string ruleFilePath, string dependsFileName, CancellationToken cancellationToken)
+    public static async ValueTask<SourceCodeCache> MakeCachedAsync(string sourceCode, string ruleFilePath, string dependsFileName, string[] dependRuleFileNames, CancellationToken cancellationToken)
     {
         if (File.Exists(dependsFileName) == false)
         {
@@ -95,6 +114,11 @@ internal readonly struct SourceCodeCache
                 depsWriteTimes[i] = File.GetLastWriteTimeUtc(includes[i]!.GetValue<string>());
             }
         }
-        return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, depsWriteTimes);
+        DateTime[] dependRuleFilesWriteTime = new DateTime[dependRuleFileNames.Length];
+        for (int i = 0; i < dependRuleFileNames.Length; ++i)
+        {
+            dependRuleFilesWriteTime[i] = File.GetLastWriteTimeUtc(dependRuleFileNames[i]);
+        }
+        return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, dependRuleFilesWriteTime, depsWriteTimes);
     }
 }

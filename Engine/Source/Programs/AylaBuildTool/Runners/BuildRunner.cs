@@ -78,7 +78,7 @@ internal static class BuildRunner
                         var fileName = Path.GetFileName(item.SourceCode.FilePath);
                         var cacheFileName = Path.Combine(intDir, fileName + ".cache");
                         var depsFileName = Path.Combine(intDir, fileName + ".deps.json");
-                        var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, mp.RuleFilePath, depsFileName, cancellationToken);
+                        var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, mp.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
                         if (File.Exists(cacheFileName) == false ||
                             SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
                         {
