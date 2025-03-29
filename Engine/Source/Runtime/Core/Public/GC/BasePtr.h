@@ -5,9 +5,12 @@
 namespace Ayla
 {
 	class Object;
+	struct GC;
 
 	class BasePtr
 	{
+		friend GC;
+
 	protected:
 		Object* m_Object = nullptr;
 

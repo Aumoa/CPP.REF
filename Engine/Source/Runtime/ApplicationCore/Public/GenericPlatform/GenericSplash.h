@@ -6,9 +6,9 @@
 
 namespace Ayla
 {
-	class APPLICATIONCORE_API NGenericSplash
+	class APPLICATIONCORE_API GenericSplash : virtual public Object
 	{
-		NGenericSplash() = delete;
+		GenericSplash() = delete;
 
 	public:
 		static void Show();

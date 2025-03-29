@@ -18,7 +18,7 @@ internal static class BuildRunner
         {
             Platform = PlatformInfo.Win64,
             Editor = true,
-            Config = Configuration.Debug
+            Config = options.Config
         };
 
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);

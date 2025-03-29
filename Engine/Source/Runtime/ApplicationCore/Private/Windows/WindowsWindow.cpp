@@ -7,16 +7,16 @@
 
 namespace Ayla
 {
-    std::map<uint64, String> NWindowsWindow::RegisteredClasses;
+    std::map<uint64, String> WindowsWindow::RegisteredClasses;
 
-    NWindowsWindow::NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefinition& InDefinition)
+    WindowsWindow::WindowsWindow(HINSTANCE hInstance, const GenericWindowDefinition& InDefinition)
     {
         char PackedBuffer[1] = { (char)InDefinition.bPopup };
         uint64 HashVal = CrcHash::Hash64(PackedBuffer, sizeof(PackedBuffer));
         auto It = RegisteredClasses.find(HashVal);
         if (It == RegisteredClasses.end())
         {
-            String ClassName = String::Format(TEXT("NWindowsWindow_${}"), HashVal);
+            String ClassName = String::Format(TEXT("WindowsWindow_${}"), HashVal);
 
             WNDCLASSEXW WndClass = {};
             WndClass.cbSize = sizeof(WndClass);
@@ -25,7 +25,7 @@ namespace Ayla
             {
                 WndClass.style |= CS_NOCLOSE;
             }
-            WndClass.lpfnWndProc = NWindowsApplication::WndProc;
+            WndClass.lpfnWndProc = WindowsApplication::WndProc;
             WndClass.cbWndExtra = sizeof(void*);
             WndClass.hInstance = hInstance;
             WndClass.lpszClassName = ClassName.c_str();
@@ -89,7 +89,7 @@ namespace Ayla
         hWnd = CreateWindowExW(WndStyleEx, It->second.c_str(), NULL, WndStyle, nX, nY, nWidth, nHeight, NULL, NULL, hInstance, this);
     }
 
-    NWindowsWindow::~NWindowsWindow() noexcept
+    WindowsWindow::~WindowsWindow() noexcept
     {
         if (hWnd != NULL)
         {
@@ -99,27 +99,27 @@ namespace Ayla
         }
     }
 
-    NGenericWindowDefinition NWindowsWindow::GetDefinition() const
+    GenericWindowDefinition WindowsWindow::GetDefinition() const
     {
         return CachedDefinition;
     }
 
-    void* NWindowsWindow::GetOSWindowHandle() const
+    void* WindowsWindow::GetOSWindowHandle() const
     {
         return hWnd;
     }
 
-    void NWindowsWindow::Show()
+    void WindowsWindow::Show()
     {
         ShowWindow(hWnd, SW_SHOW);
     }
 
-    void NWindowsWindow::Hide()
+    void WindowsWindow::Hide()
     {
         ShowWindow(hWnd, SW_HIDE);
     }
 
-    Vector2N NWindowsWindow::GetSize() const
+    Vector2N WindowsWindow::GetSize() const
     {
         RECT Rc;
         ::GetClientRect(hWnd, &Rc);

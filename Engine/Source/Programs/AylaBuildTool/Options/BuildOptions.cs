@@ -10,4 +10,7 @@ internal record BuildOptions
 
     [Option('t', "target", HelpText = "The target to build.")]
     public string? Target { get; init; }
+
+    [Option('c', "config", HelpText = "The configuration of build.", Default = Configuration.Shipping)]
+    public Configuration Config { get; init; } = Configuration.Shipping;
 }

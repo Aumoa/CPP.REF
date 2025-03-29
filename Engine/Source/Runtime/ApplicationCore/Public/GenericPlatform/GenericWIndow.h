@@ -7,18 +7,13 @@
 
 namespace Ayla
 {
-    class NRHIGraphics;
-    class NRHICommandQueue;
-
-    class APPLICATIONCORE_API NGenericWindow
+    class APPLICATIONCORE_API GenericWindow : virtual public Object
     {
     protected:
-        NGenericWindow();
+        GenericWindow();
 
     public:
-        virtual ~NGenericWindow() noexcept;
-
-        virtual NGenericWindowDefinition GetDefinition() const = 0;
+        virtual GenericWindowDefinition GetDefinition() const = 0;
         virtual void* GetOSWindowHandle() const = 0;
         virtual void Show() = 0;
         virtual void Hide() = 0;

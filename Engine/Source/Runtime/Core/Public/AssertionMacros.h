@@ -7,7 +7,7 @@
 
 #if DO_CHECK && !SHIPPING
 
-namespace Ayla::AssertionMacros::details
+namespace Ayla
 {
 	template<class TReturn, class TVerify>
 	TReturn FORCEINLINE DispatchCheckVerify(TVerify&& Verify) requires std::convertible_to<std::invoke_result_t<TVerify>, TReturn>
@@ -19,22 +19,22 @@ namespace Ayla::AssertionMacros::details
 #define AE_CHECK_IMPL(Capture, Expr, Msg) \
 	if (UNLIKELY(!(Expr))) \
 	{ \
-		Ayla::Platform::PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
+		::Ayla::PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
 		PLATFORM_BREAK(); \
 	}
 
 #define check(Expr)						AE_CHECK_IMPL( , Expr, TEXT(#Expr))
-#define checkf(Expr, Msgf, ...)			AE_CHECK_IMPL(&, Expr, String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
+#define checkf(Expr, Msgf, ...)			AE_CHECK_IMPL(&, Expr, ::Ayla::String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
 
 #define AE_ENSURE_IMPL(Capture, Expr, Msg) \
-	(LIKELY(!!(Expr)) || (Ayla::AssertionMacros::details::DispatchCheckVerify<bool>([Capture]() FORCEINLINE_LAMBDA \
+	(LIKELY(!!(Expr)) || (::Ayla::DispatchCheckVerify<bool>([Capture]() FORCEINLINE_LAMBDA \
 	{ \
 		static bool bExecuted = false; \
-		Ayla::Platform::PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
+		::Ayla::PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
 		if (UNLIKELY(!bExecuted)) \
 		{ \
 			bExecuted = true; \
-			return Ayla::Platform::PlatformProcess::IsDebuggerPresent(); \
+			return ::Ayla::PlatformProcess::IsDebuggerPresent(); \
 		} \
 		return false; \
 	}) && ([] () { PLATFORM_BREAK(); } (), false)))

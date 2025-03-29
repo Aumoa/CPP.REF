@@ -9,15 +9,15 @@
 
 namespace Ayla
 {
-	class NWindowsLaunch : public NLaunch
+	class WindowsLaunch : public Launch
 	{
-		using Super = NLaunch;
+		using Super = Launch;
 
 	private:
 		void* ApplicationPointer = nullptr;
 
 	public:
-		NWindowsLaunch(std::vector<String> CmdArgs) : Super(std::move(CmdArgs))
+		WindowsLaunch(std::vector<String> CmdArgs) : Super(std::move(CmdArgs))
 		{
 			ApplicationPointer = GetModuleHandleW(nullptr);
 		}
@@ -40,16 +40,9 @@ extern "C"
 			cmdArgs[i] = String::FromLiteral(args[i]);
 		}
 
-		auto Launch = std::make_shared<NWindowsLaunch>(std::move(cmdArgs));
-		return Launch->GuardedMain();
+		auto launch = Object::New<WindowsLaunch>(std::move(cmdArgs));
+		return launch->GuardedMain();
 	}
-}
-
-INT APIENTRY WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, INT)
-{
-	using namespace Ayla;
-	auto Launch = std::make_shared<NWindowsLaunch>(std::vector<String>{});
-	return Launch->GuardedMain();
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__

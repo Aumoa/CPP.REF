@@ -4,26 +4,22 @@
 
 namespace Ayla
 {
-	NGenericWindow::NGenericWindow()
-	{
-	}
-
-	NGenericWindow::~NGenericWindow() noexcept
+	GenericWindow::GenericWindow()
 	{
 	}
 
 	extern "C" void GenericWindow_Interop_Dispose(void* instancePtr)
 	{
-		delete (NGenericWindow*)instancePtr;
+		delete (GenericWindow*)instancePtr;
 	}
 
 	extern "C" void GenericWindow_Interop_Show(void* instancePtr)
 	{
-		((NGenericWindow*)instancePtr)->Show();
+		((GenericWindow*)instancePtr)->Show();
 	}
 
 	extern "C" void GenericWindow_Interop_Hide(void* instancePtr)
 	{
-		((NGenericWindow*)instancePtr)->Hide();
+		((GenericWindow*)instancePtr)->Hide();
 	}
 }

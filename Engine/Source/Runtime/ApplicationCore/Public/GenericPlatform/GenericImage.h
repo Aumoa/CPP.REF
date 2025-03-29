@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-	class APPLICATIONCORE_API NGenericImage : public std::enable_shared_from_this<NGenericImage>
+	class APPLICATIONCORE_API NGenericImage : virtual public Object
 	{
 	private:
 		void* pImpl = nullptr;

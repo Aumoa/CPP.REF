@@ -16,7 +16,10 @@ namespace Ayla
 {
 	class CORE_API Object
 	{
-		friend void GC::Collect();
+		friend ::Ayla::GC;
+
+	public:
+		using This = Object;
 
 	private:
 		struct CreationHack;
@@ -24,6 +27,8 @@ namespace Ayla
 	protected:
 		class PPtrCollection
 		{
+			friend ::Ayla::GC;
+
 		private:
 			Object* const m_This;
 			std::vector<BasePtr*> m_PPtrMembers;
@@ -33,10 +38,10 @@ namespace Ayla
 			{
 			}
 
-			template<std::derived_from<Object> T>
+			template<class T>
 			inline void Add(PPtr<T>& pptr)
 			{
-				m_PPtrMembers.emplace_back(&static_cast<GC::BasePtr&>(pptr));
+				m_PPtrMembers.emplace_back(&static_cast<BasePtr&>(pptr));
 			}
 		};
 
@@ -45,32 +50,32 @@ namespace Ayla
 		{
 			Object* Ptr;
 			int64 Refs;
-			bool SuppressFinalize;
+			int64 Version;
 		};
 
 		class RootCollection
 		{
+			friend ::Ayla::GC;
+
 			std::mutex m_Mutex;
 			std::vector<RootMark> m_Roots;
 			std::vector<int64> m_InstanceIDPool;
+			size_t m_InstanceIDPoolSize = 0;
 
 		public:
 			int64 AddObject(Object* object);
-			void FinalizeObject(Object* object);
+			Object* FinalizeObject(RootMark& mark);
 			RootMark& GetMark(Object* object);
-
-			void Collect();
 		};
 
 	private:
 		static RootCollection s_RootCollection;
 
 		PPtrCollection m_PPtrCollection;
-		int64 m_InstanceID;
+		int64 m_InstanceID = -1;
+		bool m_FinalizeSuppressed = false;
 
 	protected:
-		Object();
-
 		virtual void GatherProperties(PPtrCollection& collection)
 		{
 			PLATFORM_UNREFERENCED_PARAMETER(collection);
@@ -81,16 +86,15 @@ namespace Ayla
 		}
 
 	public:
-		virtual ~Object() noexcept
-		{
-		}
+		Object();
+		virtual ~Object() noexcept;
 
 	public:
 		template<std::derived_from<Object> T, class... TArgs>
 		static RPtr<T> New(TArgs&&... args) requires std::constructible_from<T, TArgs...>
 		{
 			RPtr<T> ptr;
-			ConfigureNew([&ptr]()
+			ConfigureNew([&]()
 			{
 				ptr = new T(std::forward<TArgs>(args)...);
 				return ptr.Get();

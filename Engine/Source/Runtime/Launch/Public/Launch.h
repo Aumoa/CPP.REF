@@ -6,27 +6,25 @@
 
 namespace Ayla
 {
-	class NGenericApplication;
+	class GenericApplication;
 
-	class LAUNCH_API NLaunch
+	class LAUNCH_API Launch : public virtual Object
 	{
-	private:
-		static NLaunch* CurrentLaunch;
+		using Super = This;
+		using This = Launch;
 
+	private:
 		std::vector<String> CmdArgs;
-		std::unique_ptr<NGenericApplication> GenericApp;
+		PPtr<GenericApplication> GenericApp;
 
 	protected:
-		NLaunch(std::vector<String> CmdArgs);
+		Launch(std::vector<String> CmdArgs);
 
-	public:
-		virtual ~NLaunch() noexcept;
+		virtual void GatherProperties(PPtrCollection& collection) override;
 
 	public:
 		int32 GuardedMain();
 
 		virtual void* GetApplicationPointer() = 0;
-
-		static NLaunch& Get() noexcept;
 	};
 }

@@ -5,28 +5,32 @@
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericWindowDefinition.h"
 #include "GenericPlatform/GenericPlatformInputEvent.h"
+#include "GenericPlatform/GenericWindow.h"
 
 namespace Ayla
 {
-    class NGenericWindow;
+    class GenericWindow;
 
-    class APPLICATIONCORE_API NGenericApplication
+    class APPLICATIONCORE_API GenericApplication : virtual public Object
     {
+    public:
+        using Super = This;
+        using This = GenericApplication;
+
     private:
-        static NGenericApplication* sApp;
+        static GenericApplication* sApp;
         void* ApplicationPointer = nullptr;
         bool bFreezed = false;
         std::optional<int32> ExitCode;
 
     protected:
-        NGenericApplication();
+        GenericApplication();
+        virtual void Finalize() override;
 
     public:
-        virtual ~NGenericApplication() noexcept;
-
-        virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) = 0;
+        virtual RPtr<GenericWindow> MakeWindow(const GenericWindowDefinition& InDefinition) = 0;
         virtual Vector2N GetScreenResolution() = 0;
-        virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) = 0;
+        virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& OutInputEvents) = 0;
 
         virtual String GetApplicationName();
         virtual DirectoryReference GetEngineDirectory() const = 0;
@@ -42,11 +46,7 @@ namespace Ayla
         int32 GetExitCode();
 
     public:
-        static std::unique_ptr<NGenericApplication> CreateApplication();
-        static NGenericApplication& Get() noexcept { return *sApp; }
+        static RPtr<GenericApplication> CreateApplication();
+        static GenericApplication& Get() noexcept { return *sApp; }
     };
-
-    extern "C" APPLICATIONCORE_API void* GenericApplication_Interop_CreateApplication();
-    extern "C" APPLICATIONCORE_API void GenericApplication_Interop_Dispose(void* instancePtr);
-    extern "C" APPLICATIONCORE_API void* GenericApplication_Interop_MakeWindow(void* instancePtr);
 }

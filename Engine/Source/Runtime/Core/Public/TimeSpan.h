@@ -51,7 +51,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::months>(Val - Years).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalMonths() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>
@@ -65,7 +65,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::days>(Val - Months).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalDays() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>
@@ -79,7 +79,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::hours>(Val - Days).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalHours() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>
@@ -93,7 +93,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::minutes>(Val - Hours).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalMinutes() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>
@@ -107,7 +107,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::seconds>(Val - Minutes).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalSeconds() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>
@@ -121,7 +121,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::milliseconds>(Val - Seconds).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalMilliseconds() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>
@@ -135,7 +135,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::microseconds>(Val - Milliseconds).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalMicroseconds() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>
@@ -149,7 +149,7 @@ namespace Ayla
 			return std::chrono::floor<std::chrono::nanoseconds>(Val - Microseconds).count();
 		}
 
-		template<class T = int64>
+		template<class T = double>
 		inline constexpr T GetTotalNanoseconds() const noexcept requires
 			std::integral<T> ||
 			std::floating_point<T>

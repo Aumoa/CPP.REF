@@ -257,7 +257,7 @@ namespace Ayla
 		}
 	}
 
-	void NGenericSplash::Show()
+	void GenericSplash::Show()
 	{
 		if (hWnd == NULL)
 		{
@@ -268,7 +268,7 @@ namespace Ayla
 		UpdateWindow(hWnd);
 	}
 
-	void NGenericSplash::Hide()
+	void GenericSplash::Hide()
 	{
 		if (hWnd != NULL)
 		{
@@ -285,7 +285,7 @@ namespace Ayla
 		}
 	}
 
-	void NGenericSplash::SetSplashText(String InText)
+	void GenericSplash::SetSplashText(String InText)
 	{
 		check(hWnd);
 		check(Drawing);

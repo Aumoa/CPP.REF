@@ -19,10 +19,10 @@ namespace Ayla
 		auto lock = std::unique_lock(m_Mutex);
 		int64 instanceID;
 		RootMark* mark;
-		if (m_InstanceIDPool.size() > 0)
+		if (m_InstanceIDPoolSize > 0)
 		{
-			instanceID = m_InstanceIDPool.back();
-			m_InstanceIDPool.erase(m_InstanceIDPool.end() - 1);
+			instanceID = m_InstanceIDPool[m_InstanceIDPoolSize - 1];
+			--m_InstanceIDPoolSize;
 			mark = &m_Roots[instanceID - 1];
 		}
 		else
@@ -32,20 +32,28 @@ namespace Ayla
 		}
 
 		mark->Ptr = object;
+		mark->Version = 0;
 		PlatformAtomics::InterlockedExchange(&mark->Refs, 1);
-		mark->SuppressFinalize = false;
 
 		return instanceID;
 	}
 
-	void Object::RootCollection::FinalizeObject(Object* object)
+	Object* Object::RootCollection::FinalizeObject(RootMark& mark)
 	{
-		auto& mark = m_Roots[object->m_InstanceID - 1];
 		check(mark.Refs == 0);
-
-		auto lock = std::unique_lock(m_Mutex);
+		auto* ptr = mark.Ptr;
+		if (m_InstanceIDPoolSize < m_InstanceIDPool.size())
+		{
+			m_InstanceIDPool[m_InstanceIDPoolSize++] = mark.Ptr->m_InstanceID;
+		}
+		else
+		{
+			m_InstanceIDPool.emplace_back(mark.Ptr->m_InstanceID);
+			++m_InstanceIDPoolSize;
+		}
 		mark.Ptr = nullptr;
-		m_InstanceIDPool.emplace_back(object->m_InstanceID);
+		mark.Version = 0;
+		return ptr;
 	}
 
 	Object::RootMark& Object::RootCollection::GetMark(Object* object)
@@ -53,13 +61,11 @@ namespace Ayla
 		return m_Roots[object->m_InstanceID - 1];
 	}
 
-	void Object::RootCollection::Collect()
-	{
-	}
-
 	Object::Object()
 		: m_PPtrCollection(this)
 	{
+		GC::TrapInitialize();
+
 		if (CreationHack::s_Hack.AllowConstruct == false)
 		{
 			throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
@@ -68,11 +74,16 @@ namespace Ayla
 		m_InstanceID = s_RootCollection.AddObject(this);
 	}
 
+	Object::~Object() noexcept
+	{
+		GC::EnsureFinalizerThread();
+	}
+
 	void Object::ConfigureNew(std::function<Object*()> action)
 	{
 		CreationHack::s_Hack.AllowConstruct = true;
 		auto object = action();
-		PlatformAtomics::InterlockedDecrement(&s_RootCollection.GetMark(object).Refs);
+		object->GatherProperties(object->m_PPtrCollection);
 		CreationHack::s_Hack.AllowConstruct = false;
 	}
 }

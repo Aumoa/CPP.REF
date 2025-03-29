@@ -551,7 +551,7 @@ internal class VisualStudioGenerator : Generator
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
                         var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform });
                         var resolver = new ModuleRulesResolver(buildTarget, solution, rules, group, primaryGroup);
-                        var pps = GenerateProjectPreprocessorDefs(resolver);
+                        var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                         var includes = GenerateIncludePaths(resolver);
                         var outputFileName = group.OutputFileName(project.Name, rules.Type, FolderPolicy.PathType.Current);
 
@@ -560,7 +560,7 @@ internal class VisualStudioGenerator : Generator
                         {
                             AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
                             AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
-                            AppendFormatLine("""<NMakeBuildCommandLine>dotnet "{0}\DotNET\AylaBuildTool.dll" build {1}--target "{2}"</NMakeBuildCommandLine>""", engineGroup.BinariesDirectory, projectPath, project.Name);
+                            AppendFormatLine("""<NMakeBuildCommandLine>dotnet "{0}\DotNET\AylaBuildTool.dll" build {1}--target "{2}" --config {3}</NMakeBuildCommandLine>""", engineGroup.BinariesDirectory, projectPath, project.Name, buildTarget.Config);
                             AppendFormatLine("""<OutDir>{0}</OutDir>""", outDir);
                             AppendFormatLine("""<NMakeOutput>{0}</NMakeOutput>""", outputFileName);
                             AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
@@ -641,11 +641,16 @@ internal class VisualStudioGenerator : Generator
                     _ => throw new InvalidOperationException()
                 };
 
-                static string GenerateProjectPreprocessorDefs(ModuleRulesResolver resolver)
+                static string GenerateProjectPreprocessorDefs(ModuleRulesResolver resolver, TargetInfo targetInfo)
                 {
-                    return string.Join(';', resolver.AdditionalMacros
-                        .Concat(["UNICODE", "_UNICODE"])
-                        .Select(FormatDef));
+                    var additionalMacros = resolver.AdditionalMacros
+                        .Concat(["UNICODE", "_UNICODE"]);
+                    if (targetInfo.Config != Configuration.Shipping)
+                    {
+                        additionalMacros = additionalMacros.Append("DO_CHECK=1");
+                    }
+
+                    return string.Join(';', additionalMacros.Select(FormatDef));
 
                     static string FormatDef(MacroSet value)
                     {

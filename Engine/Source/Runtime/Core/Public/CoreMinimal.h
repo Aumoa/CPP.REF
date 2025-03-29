@@ -79,6 +79,12 @@
 #include "Version.h"
 #include "OperationCanceledException.h"
 #include "ConstructorNotFoundException.h"
+#include "Object.h"
+
+#include "GC/GC.h"
+#include "GC/RPtr.h"
+#include "GC/PPtr.h"
+#include "GC/GCPtr.Impl.h"
 
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"

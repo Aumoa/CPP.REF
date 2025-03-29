@@ -102,12 +102,19 @@ internal class ClCompiler : Compiler
 
         m_CommandBuilder.Append(string.Join(' ', includes) + ' ');
 
-        List<string> macros = [];
-        foreach (var macro in item.Resolver.AdditionalMacros
+        var additionalMacros = item.Resolver.AdditionalMacros
             .Append("PLATFORM_WINDOWS=1")
             .Append("_UNICODE")
-            .Append("UNICODE")
-            )
+            .Append("UNICODE");
+
+        if (m_TargetInfo.Config != Configuration.Shipping)
+        {
+            additionalMacros = additionalMacros.Append("DO_CHECK=1");
+        }
+
+
+        List<string> macros = [];
+        foreach (var macro in additionalMacros)
         {
             if (macro.Value == null)
             {

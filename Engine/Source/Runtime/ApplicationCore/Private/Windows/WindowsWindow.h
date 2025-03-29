@@ -12,19 +12,19 @@
 
 namespace Ayla
 {
-    class NWindowsWindow : public NGenericWindow
+    class WindowsWindow : public GenericWindow
     {
         static std::map<uint64, String> RegisteredClasses;
 
     private:
-        NGenericWindowDefinition CachedDefinition;
+        GenericWindowDefinition CachedDefinition;
         HWND hWnd = NULL;
 
     public:
-        NWindowsWindow(HINSTANCE hInstance, const NGenericWindowDefinition& InDefinition);
-        virtual ~NWindowsWindow() noexcept override;
+        WindowsWindow(HINSTANCE hInstance, const GenericWindowDefinition& InDefinition);
+        virtual ~WindowsWindow() noexcept override;
 
-        virtual NGenericWindowDefinition GetDefinition() const override;
+        virtual GenericWindowDefinition GetDefinition() const override;
         virtual void* GetOSWindowHandle() const override;
         virtual void Show() override;
         virtual void Hide() override;

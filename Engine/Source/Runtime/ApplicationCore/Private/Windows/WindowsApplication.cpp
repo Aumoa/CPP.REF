@@ -7,25 +7,25 @@
 
 namespace Ayla
 {
-    std::vector<NGenericPlatformInputEvent> NWindowsApplication::InputEvents;
+    std::vector<GenericPlatformInputEvent> WindowsApplication::InputEvents;
 
-    NWindowsApplication::NWindowsApplication()
+    WindowsApplication::WindowsApplication()
     {
     }
 
-    std::unique_ptr<NGenericWindow> NWindowsApplication::MakeWindow(const NGenericWindowDefinition& InDefinition)
+    RPtr<GenericWindow> WindowsApplication::MakeWindow(const GenericWindowDefinition& InDefinition)
     {
-        return std::make_unique<NWindowsWindow>((HINSTANCE)GetApplicationPointer(), InDefinition);
+        return New<WindowsWindow>((HINSTANCE)GetApplicationPointer(), InDefinition);
     }
 
-    Vector2N NWindowsApplication::GetScreenResolution()
+    Vector2N WindowsApplication::GetScreenResolution()
     {
         int X = GetSystemMetrics(SM_CXSCREEN);
         int Y = GetSystemMetrics(SM_CYSCREEN);
         return Vector2N(X, Y);
     }
 
-    void NWindowsApplication::PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents)
+    void WindowsApplication::PumpMessages(std::vector<GenericPlatformInputEvent>& OutInputEvents)
     {
         static thread_local MSG M;
         while (PeekMessage(&M, NULL, 0, 0, PM_REMOVE))
@@ -46,7 +46,7 @@ namespace Ayla
         InputEvents.clear();
     }
 
-    DirectoryReference NWindowsApplication::GetEngineDirectory() const
+    DirectoryReference WindowsApplication::GetEngineDirectory() const
     {
         HMODULE hModule = GetModuleHandleW(L"ApplicationCore.dll");
         static WCHAR ModuleNameBuf[1024];
@@ -55,7 +55,7 @@ namespace Ayla
         return ModuleDll.GetDirectory().GetParent().GetParent().GetParent().GetAbsolute();
     }
 
-    LRESULT CALLBACK NWindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    LRESULT CALLBACK WindowsApplication::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         if (uMsg == WM_NCCREATE)
         {
@@ -73,23 +73,23 @@ namespace Ayla
             }
         }
 
-        NWindowsWindow* WindowPtr = (NWindowsWindow*)GetWindowLongPtrW(hWnd, 0);
+        WindowsWindow* WindowPtr = (WindowsWindow*)GetWindowLongPtrW(hWnd, 0);
 
         switch (uMsg)
         {
         case WM_MOUSEMOVE:
         {
-            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            GenericPlatformInputEvent& Input = InputEvents.emplace_back();
             Input.Idx = Input.IDX_MouseMove;
-            NGenericPlatformInputMouseMoveEvent& MouseMove = Input.MouseMove();
+            GenericPlatformInputMouseMoveEvent& MouseMove = Input.MouseMove();
             MouseMove.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
         }
         break;
         case WM_LBUTTONDOWN:
         {
-            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            GenericPlatformInputEvent& Input = InputEvents.emplace_back();
             Input.Idx = Input.IDX_MouseButton;
-            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            GenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
             MouseButton.ButtonType = GenericPlatformInputMouseButtonType::Left;
             MouseButton.bUp = false;
             MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
@@ -97,9 +97,9 @@ namespace Ayla
         break;
         case WM_RBUTTONDOWN:
         {
-            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            GenericPlatformInputEvent& Input = InputEvents.emplace_back();
             Input.Idx = Input.IDX_MouseButton;
-            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            GenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
             MouseButton.ButtonType = GenericPlatformInputMouseButtonType::Right;
             MouseButton.bUp = false;
             MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
@@ -107,9 +107,9 @@ namespace Ayla
         break;
         case WM_MBUTTONDOWN:
         {
-            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            GenericPlatformInputEvent& Input = InputEvents.emplace_back();
             Input.Idx = Input.IDX_MouseButton;
-            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            GenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
             MouseButton.ButtonType = GenericPlatformInputMouseButtonType::Middle;
             MouseButton.bUp = false;
             MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
@@ -117,9 +117,9 @@ namespace Ayla
         break;
         case WM_LBUTTONUP:
         {
-            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            GenericPlatformInputEvent& Input = InputEvents.emplace_back();
             Input.Idx = Input.IDX_MouseButton;
-            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            GenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
             MouseButton.ButtonType = GenericPlatformInputMouseButtonType::Left;
             MouseButton.bUp = true;
             MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
@@ -127,9 +127,9 @@ namespace Ayla
         break;
         case WM_RBUTTONUP:
         {
-            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            GenericPlatformInputEvent& Input = InputEvents.emplace_back();
             Input.Idx = Input.IDX_MouseButton;
-            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            GenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
             MouseButton.ButtonType = GenericPlatformInputMouseButtonType::Right;
             MouseButton.bUp = true;
             MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
@@ -137,9 +137,9 @@ namespace Ayla
         break;
         case WM_MBUTTONUP:
         {
-            NGenericPlatformInputEvent& Input = InputEvents.emplace_back();
+            GenericPlatformInputEvent& Input = InputEvents.emplace_back();
             Input.Idx = Input.IDX_MouseButton;
-            NGenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
+            GenericPlatformInputMouseButtonEvent& MouseButton = Input.MouseButton();
             MouseButton.ButtonType = GenericPlatformInputMouseButtonType::Middle;
             MouseButton.bUp = true;
             MouseButton.Location = Vector2N((int32)(int16)LOWORD(lParam), (int32)(int16)HIWORD(lParam));
@@ -158,9 +158,9 @@ namespace Ayla
     }
 
     // specialize for each platforms.
-    std::unique_ptr<NGenericApplication> NGenericApplication::CreateApplication()
+    RPtr<GenericApplication> GenericApplication::CreateApplication()
     {
-        return std::make_unique<NWindowsApplication>();
+        return New<WindowsApplication>();
     }
 }
 

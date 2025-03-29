@@ -5,81 +5,61 @@
 
 namespace Ayla
 {
-    NGenericApplication* NGenericApplication::sApp;
+    GenericApplication* GenericApplication::sApp;
 
-    NGenericApplication::NGenericApplication()
+    GenericApplication::GenericApplication()
     {
         check(!sApp);
         sApp = this;
     }
 
-    NGenericApplication::~NGenericApplication() noexcept
+    void GenericApplication::Finalize()
     {
+        Super::Finalize();
         check(sApp);
         sApp = nullptr;
     }
 
-    String NGenericApplication::GetApplicationName()
+    String GenericApplication::GetApplicationName()
     {
         return TEXT("");
     }
 
-    void NGenericApplication::SetApplicationPointer(void* InAppPointer)
+    void GenericApplication::SetApplicationPointer(void* InAppPointer)
     {
         check(!bFreezed);
         ApplicationPointer = InAppPointer;
     }
 
-    void* NGenericApplication::GetApplicationPointer()
+    void* GenericApplication::GetApplicationPointer()
     {
         return ApplicationPointer;
     }
 
-    void NGenericApplication::Freeze()
+    void GenericApplication::Freeze()
     {
         bFreezed = true;
     }
 
-    bool NGenericApplication::IsFreezed() noexcept
+    bool GenericApplication::IsFreezed() noexcept
     {
         return bFreezed;
     }
 
-    void NGenericApplication::QuitApplication(int32 InCode)
+    void GenericApplication::QuitApplication(int32 InCode)
     {
         check(!ExitCode);
         ExitCode = InCode;
     }
 
-    int32 NGenericApplication::GetExitCode()
+    int32 GenericApplication::GetExitCode()
     {
         check(ExitCode);
         return ExitCode.value();
     }
 
-    bool NGenericApplication::IsQuitRequested()
+    bool GenericApplication::IsQuitRequested()
     {
         return (bool)ExitCode;
-    }
-
-    extern "C" void* GenericApplication_Interop_CreateApplication()
-    {
-        return NGenericApplication::CreateApplication().release();
-    }
-
-    extern "C" void GenericApplication_Interop_Dispose(void* instancePtr)
-    {
-        delete (NGenericApplication*)instancePtr;
-    }
-
-    extern "C" void* GenericApplication_Interop_MakeWindow(void* instancePtr)
-    {
-        NGenericWindowDefinition defaultOptions;
-        defaultOptions.bPrimaryWindow = true;
-        defaultOptions.bSystemMenu = true;
-        defaultOptions.bThickframe = true;
-        defaultOptions.bSizebox = true;
-        defaultOptions.bCaption = true;
-        return ((NGenericApplication*)instancePtr)->MakeWindow(defaultOptions).release();
     }
 }

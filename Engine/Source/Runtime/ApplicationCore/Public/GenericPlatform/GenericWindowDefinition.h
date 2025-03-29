@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-    struct NGenericWindowDefinition
+    struct GenericWindowDefinition
     {
         uint8 bPopup : 1 = false;
         uint8 bPrimaryWindow : 1 = false;

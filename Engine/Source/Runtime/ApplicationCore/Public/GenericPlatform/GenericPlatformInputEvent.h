@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-	struct NGenericPlatformInputMouseMoveEvent
+	struct GenericPlatformInputMouseMoveEvent
 	{
 		Vector2N Location;
 	};
@@ -19,25 +19,25 @@ namespace Ayla
 		Middle
 	};
 
-	struct NGenericPlatformInputMouseButtonEvent
+	struct GenericPlatformInputMouseButtonEvent
 	{
 		GenericPlatformInputMouseButtonType ButtonType;
 		bool bUp;
 		Vector2N Location;
 	};
 
-	struct NGenericPlatformInputEvent
+	struct GenericPlatformInputEvent
 	{
-		static constexpr size_t BufSize = Math::Max(sizeof(NGenericPlatformInputMouseMoveEvent), sizeof(NGenericPlatformInputMouseButtonEvent));
+		static constexpr size_t BufSize = Math::Max(sizeof(GenericPlatformInputMouseMoveEvent), sizeof(GenericPlatformInputMouseButtonEvent));
 		byte Idx = 0;
 		byte Buf[BufSize] = {};
 
 		static constexpr size_t IDX_MouseMove = 0;
-		NGenericPlatformInputMouseMoveEvent& MouseMove() { return reinterpret_cast<NGenericPlatformInputMouseMoveEvent&>(*Buf); }
-		const NGenericPlatformInputMouseMoveEvent& MouseMove() const { return reinterpret_cast<const NGenericPlatformInputMouseMoveEvent&>(*Buf); }
+		GenericPlatformInputMouseMoveEvent& MouseMove() { return reinterpret_cast<GenericPlatformInputMouseMoveEvent&>(*Buf); }
+		const GenericPlatformInputMouseMoveEvent& MouseMove() const { return reinterpret_cast<const GenericPlatformInputMouseMoveEvent&>(*Buf); }
 
 		static constexpr size_t IDX_MouseButton = 1;
-		NGenericPlatformInputMouseButtonEvent& MouseButton() { return reinterpret_cast<NGenericPlatformInputMouseButtonEvent&>(*Buf); }
-		const NGenericPlatformInputMouseButtonEvent& MouseButton() const { return reinterpret_cast<const NGenericPlatformInputMouseButtonEvent&>(*Buf); }
+		GenericPlatformInputMouseButtonEvent& MouseButton() { return reinterpret_cast<GenericPlatformInputMouseButtonEvent&>(*Buf); }
+		const GenericPlatformInputMouseButtonEvent& MouseButton() const { return reinterpret_cast<const GenericPlatformInputMouseButtonEvent&>(*Buf); }
 	};
 }

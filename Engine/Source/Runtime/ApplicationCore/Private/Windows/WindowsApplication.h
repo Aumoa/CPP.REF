@@ -12,24 +12,24 @@
 
 namespace Ayla
 {
-    class NWindowsApplication : public NGenericApplication
+    class WindowsApplication : public GenericApplication
     {
     private:
         DirectoryReference EngineDirectory;
 
     public:
-        NWindowsApplication();
+        WindowsApplication();
 
-        virtual std::unique_ptr<NGenericWindow> MakeWindow(const NGenericWindowDefinition& InDefinition) override;
+        virtual RPtr<GenericWindow> MakeWindow(const GenericWindowDefinition& InDefinition) override;
         virtual Vector2N GetScreenResolution() override;
-        virtual void PumpMessages(std::vector<NGenericPlatformInputEvent>& OutInputEvents) override;
+        virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& OutInputEvents) override;
         virtual DirectoryReference GetEngineDirectory() const override;
 
     public:
         static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     private:
-        static std::vector<NGenericPlatformInputEvent> InputEvents;
+        static std::vector<GenericPlatformInputEvent> InputEvents;
     };
 }
 

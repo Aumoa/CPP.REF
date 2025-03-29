@@ -6,34 +6,25 @@
 #include "GenericPlatform/GenericWIndow.h"
 #include "Localizational/Name.h"
 
-#if WITH_EDITOR
-#include "CoreEd.h"
-#endif
-
 namespace Ayla
 {
-    NLaunch* NLaunch::CurrentLaunch;
-
-    NLaunch::NLaunch(std::vector<String> CmdArgs)
+    Launch::Launch(std::vector<String> CmdArgs)
         : CmdArgs(std::move(CmdArgs))
     {
-        check(CurrentLaunch == nullptr);
-        CurrentLaunch = this;
-
-        GenericApp = NGenericApplication::CreateApplication();
+        GenericApp = GenericApplication::CreateApplication();
     }
 
-    NLaunch::~NLaunch() noexcept
+    void Launch::GatherProperties(PPtrCollection& collection)
     {
-        check(CurrentLaunch);
-        CurrentLaunch = nullptr;
+        Super::GatherProperties(collection);
+        collection.Add(GenericApp);
     }
 
-    int32 NLaunch::GuardedMain()
+    int32 Launch::GuardedMain()
     {
         GenericApp->SetApplicationPointer(GetApplicationPointer());
 
-        NGenericWindowDefinition wDef =
+        GenericWindowDefinition wDef =
         {
             .bPrimaryWindow = true,
             .bSystemMenu = true,
@@ -41,30 +32,25 @@ namespace Ayla
             .bSizebox = true,
             .bCaption = true
         };
-
-        NGenericSplash::Show();
-        NGenericSplash::SetSplashText(TEXT("Initialize... (0/100)"));
+        
+        GenericSplash::Show();
+        GenericSplash::SetSplashText(TEXT("Initialize... (0/100)"));
         for (int i = 0; i < 100; ++i)
         {
-            NGenericSplash::SetSplashText(String::Format(TEXT("Initialize... ({0}/100)"), i + 1));
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            GenericSplash::SetSplashText(String::Format(TEXT("Initialize... ({0}/100)"), i + 1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
-        NGenericSplash::Hide();
+        GenericSplash::Hide();
 
-        std::shared_ptr window = GenericApp->MakeWindow(wDef);
+        auto window = GenericApp->MakeWindow(wDef);
         window->Show();
 
-        std::vector<NGenericPlatformInputEvent> InputEvents;
+        std::vector<GenericPlatformInputEvent> InputEvents;
         while (!GenericApp->IsQuitRequested())
         {
             GenericApp->PumpMessages(InputEvents);
         }
 
         return GenericApp->GetExitCode();
-    }
-
-    NLaunch& NLaunch::Get() noexcept
-    {
-        return *CurrentLaunch;
     }
 }
