@@ -26,6 +26,10 @@
 #include "Platform/ProcessStartInfo.h"
 #include "Platform/Process.h"
 #include "Platform/DynamicLibrary.h"
+// Do not include the PlatformCommon.h file.
+// This file must be used with strict certification when using special features limited to the platform.
+// Define the __ALLOW_PLATFORM_COMMON_H__ preprocessor in the source code you want to use.
+// #include "Platform/PlatformCommon.h"
 
 #include "Action.h"
 #include "Func.h"

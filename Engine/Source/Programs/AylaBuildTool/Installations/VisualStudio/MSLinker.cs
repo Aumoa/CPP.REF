@@ -85,6 +85,25 @@ internal class MSLinker : Linker
             m_CommandBuilder.AppendFormat("\"{0}\" ", additionalLibrary);
         }
 
-        return await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+        var result = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+        if (result.IsCompletedSuccessfully && ((result.StdOut.Length == 0 && result.Logs.Length == 0) || (result.StdOut.Length == 1 && result.Logs.Length == 1 && string.IsNullOrWhiteSpace(result.StdOut[0].Value))))
+        {
+            Terminal.Log[] outputs =
+            [
+                new Terminal.Log
+                {
+                    Value = outputFileName,
+                    Verbosity = Terminal.Verbose.Info
+                }
+            ];
+
+            result = result with
+            {
+                StdOut = outputs,
+                Logs = outputs
+            };
+        }
+
+        return result;
     }
 }
