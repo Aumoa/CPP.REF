@@ -25,13 +25,14 @@ namespace Ayla
 		static bool s_DuringFinalize;
 
 	public:
-		static void TrapInitialize();
 		static void SuppressFinalize(const RPtr<Object>& target);
 		static void AddRef(Object* target);
 		static void Release(Object* target);
+		static void Collect(int32 generation = 2);
 
 	private:
-		static void InternalCollect();
+		static void InternalCollect(int32 generation, bool nolock);
+		static void DoFinalize(int32 generation, std::vector<Object*> finalizedObjects, double criticalSectionSecs, double markObjectsSecs, double unmarkPropertyObjectsSecs, double finalizeQueueSecs);
 
 		static inline void EnsureFinalizerThread()
 		{

@@ -11,27 +11,29 @@
 
 namespace Ayla
 {
+	struct ScopedTimer
+	{
+		PerformanceTimer m_Timer;
+		double* m_Output;
+
+		ScopedTimer(double& output)
+		{
+			m_Timer.Start();
+			m_Output = &output;
+		}
+
+		~ScopedTimer() noexcept
+		{
+			m_Timer.Stop();
+			*m_Output = m_Timer.GetElapsed().GetTotalSeconds();
+		}
+	};
+
 	std::chrono::seconds GC::TimeSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(29950));
 	int32 GC::s_Interlocked;
 	int64 GC::s_Version;
 	std::thread::id GC::s_ThreadId;
 	bool GC::s_DuringFinalize;
-
-	void GC::TrapInitialize()
-	{
-		if (PlatformAtomics::InterlockedCompareExchange(&s_Interlocked, 1, 0) == 0)
-		{
-			std::thread([]()
-			{
-				s_ThreadId = std::this_thread::get_id();
-				while (true)
-				{
-					std::this_thread::sleep_for(GC::TimeSeconds);
-					InternalCollect();
-				}
-			}).detach();
-		}
-	}
 
 	void GC::SuppressFinalize(const RPtr<Object>& target)
 	{
@@ -57,48 +59,57 @@ namespace Ayla
 		PlatformAtomics::InterlockedDecrement(&mark.Refs);
 	}
 
-	void GC::InternalCollect()
+	void GC::Collect(int32 generation)
 	{
-		struct ScopedTimer
-		{
-			PerformanceTimer m_Timer;
-			double* m_Output;
+		InternalCollect(generation, false);
+	}
 
-			ScopedTimer(double& output)
-			{
-				m_Timer.Start();
-				m_Output = &output;
-			}
-
-			~ScopedTimer() noexcept
-			{
-				m_Timer.Stop();
-				*m_Output = m_Timer.GetElapsed().GetTotalSeconds();
-			}
-		};
-
-		check(s_ThreadId == std::this_thread::get_id());
+	void GC::InternalCollect(int32 generation, bool nolock)
+	{
+		std::vector<Object*> finalizedObjects;
 
 		// Since FinalizeObject is processed on a different thread,
 		// vector memory allocation is done individually for each call.
-		static std::vector<Object*> finalizedObjects;
 		static std::vector<Object*> gatherQueue;
 		static std::vector<Object*> gatherQueue_;
 
-		++s_Version;
-		finalizedObjects.clear();
 		gatherQueue.clear();
 		gatherQueue_.clear();
 
 		auto& self_ = Object::s_RootCollection;
-		auto lock = std::unique_lock(self_.m_Mutex);
+		if (nolock == false)
+		{
+			self_.m_Mutex.lock();
+		}
 
-		finalizedObjects.resize(self_.m_Roots.size());
+		if (generation == 0 && self_.m_InstanceIndexPool[1].size() < Object::RootCollection::G1Size)
+		{
+			InternalCollect(1, true);
+		}
 
 		double criticalSectionSecs;
 		double markObjectsSecs;
 		double unmarkPropertyObjectsSecs;
 		double finalizeQueueSecs;
+
+		size_t begin, end;
+		switch (generation)
+		{
+		case 0:
+			begin = 0;
+			end = Object::RootCollection::G1Size;
+			break;
+		case 1:
+			begin = Object::RootCollection::G1Size;
+			end = begin + Object::RootCollection::G2Size;
+			break;
+		default:
+			begin = Object::RootCollection::G1Size + Object::RootCollection::G2Size;
+			end = self_.m_Roots.size();
+			break;
+		}
+
+		++s_Version;
 
 		{
 			ScopedTimer criticalSection(criticalSectionSecs);
@@ -107,7 +118,7 @@ namespace Ayla
 				ScopedTimer markObjects(markObjectsSecs);
 
 				// STEP 1. Mark objects that are not roots.
-				for (size_t i = 0; i < self_.m_Roots.size(); ++i)
+				for (size_t i = begin; i < end; ++i)
 				{
 					auto& mark = self_.m_Roots[i];
 					if (mark.Refs == 0 && mark.Ptr != nullptr)
@@ -121,7 +132,7 @@ namespace Ayla
 				ScopedTimer unmarkPropertyObjects(unmarkPropertyObjectsSecs);
 
 				// STEP 2. Unmark objects that are not roots but are referenced by root objects.
-				for (size_t i = 0; i < self_.m_Roots.size(); ++i)
+				for (size_t i = begin; i < end; ++i)
 				{
 					auto& mark = self_.m_Roots[i];
 					if (mark.Ptr != nullptr && mark.Refs > 0)
@@ -158,56 +169,60 @@ namespace Ayla
 				ScopedTimer finalizeQueue(finalizeQueueSecs);
 
 				// STEP 3. Add marked objects to the Finalize Queue.
-				size_t index = 0;
-				for (size_t i = 0; i < self_.m_Roots.size(); ++i)
+				for (size_t i = begin; i < end; ++i)
 				{
 					auto& mark = self_.m_Roots[i];
 					if (mark.Refs == 0 && mark.Version == s_Version && mark.Ptr != nullptr)
 					{
-						finalizedObjects[index++] = self_.FinalizeObject(mark);
+						finalizedObjects.emplace_back(self_.FinalizeObject(mark));
+					}
+					else if (generation == 0 || generation == 1)
+					{
+						int32 ngen = generation + 1;
+						auto& pool = self_.m_InstanceIndexPool[generation];
+						pool.emplace_back(i);
+						auto& npool = self_.m_InstanceIndexPool[ngen];
+						auto rb = npool.rbegin();
+						int64 index = *rb;
+						npool.erase((rb + 1).base());
+						auto& nmark = self_.m_Roots[index] = mark;
+						mark = {};
+						nmark.Ptr->m_InstanceIndex = index;
 					}
 				}
-
-				finalizedObjects.resize(index);
 			}
 		}
 
-		lock.unlock();
+		DoFinalize(generation, std::move(finalizedObjects), criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs);
+
+		if (nolock == false)
+		{
+			self_.m_Mutex.unlock();
+		}
+	}
+
+	void GC::DoFinalize(int32 generation, std::vector<Object*> finalizedObjects, double criticalSectionSecs, double markObjectsSecs, double unmarkPropertyObjectsSecs, double finalizeQueueSecs)
+	{
+		co_await Task<>::Yield();
 
 		double finalizeSecs;
-
 		{
 			ScopedTimer finalize(finalizeSecs);
 			s_DuringFinalize = true;
 
-			size_t c = std::thread::hardware_concurrency();
-			size_t items = (finalizedObjects.size() - 1) / c + 1;
-			std::vector<Task<>> tasks(c);
-			for (size_t i = 0; i < c; ++i)
+			for (auto& object : finalizedObjects)
 			{
-				size_t s = items * i;
-				size_t e = std::min(s + items, finalizedObjects.size());
-				tasks[i] = Task<>::Run([&, s = s, e = e]()
+				if (object->m_FinalizeSuppressed == false)
 				{
-					for (size_t j = s; j < e; ++j)
-					{
-						auto* object = finalizedObjects[j];
-						if (object->m_FinalizeSuppressed == false)
-						{
-							object->m_FinalizeSuppressed = true;
-							object->Finalize();
-						}
-
-						delete object;
-					}
-				});
+					object->m_FinalizeSuppressed = true;
+					object->Finalize();
+				}
+				
+				delete object;
 			}
 
-			Task<>::WhenAll(tasks).GetResult();
 			s_DuringFinalize = false;
 		}
-
-		finalizedObjects.clear();
 
 		PlatformProcess::OutputDebugString(String::Format(TEXT("GC::InternalCollect() called. CriticalSection: {:.2f} secs (MarkObjects: {:.2f} secs, UnmarkPropertyObjects: {:.2f} secs, FinalizeQueue: {:.2f} secs), Finalize: {:.2f} secs\n"), criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs, finalizeSecs));
 	}

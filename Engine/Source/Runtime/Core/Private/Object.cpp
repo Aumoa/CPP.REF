@@ -14,43 +14,48 @@ namespace Ayla
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
 	Object::RootCollection Object::s_RootCollection;
 
+	Object::RootCollection::RootCollection()
+		: m_Roots(G1Size + G2Size)
+		, m_InstanceIndexPool{ std::vector<int64>(G1Size, (int64)0), std::vector<int64>(G2Size, (int64)0) }
+	{
+		for (size_t i = 0; i < G1Size; ++i)
+		{
+			m_InstanceIndexPool[0][i] = i;
+		}
+
+		for (size_t i = 0; i < G2Size; ++i)
+		{
+			m_InstanceIndexPool[1][i] = i + G1Size;
+		}
+	}
+
 	int64 Object::RootCollection::AddObject(Object* object)
 	{
 		auto lock = std::unique_lock(m_Mutex);
-		int64 instanceID;
-		RootMark* mark;
-		if (m_InstanceIDPoolSize > 0)
+		if (m_InstanceIndexPool[0].empty())
 		{
-			instanceID = m_InstanceIDPool[m_InstanceIDPoolSize - 1];
-			--m_InstanceIDPoolSize;
-			mark = &m_Roots[instanceID - 1];
-		}
-		else
-		{
-			instanceID = m_Roots.size() + 1;
-			mark = &m_Roots.emplace_back();
+			GC::InternalCollect(0, true);
 		}
 
-		mark->Ptr = object;
-		mark->Version = 0;
-		PlatformAtomics::InterlockedExchange(&mark->Refs, 1);
+		auto rb = m_InstanceIndexPool[0].rbegin();
+		int64 instanceIndex = *rb;
+		m_InstanceIndexPool[0].erase((rb + 1).base());
+		RootMark& mark = m_Roots[instanceIndex];
 
-		return instanceID;
+		mark.Ptr = object;
+		mark.Version = 0;
+		PlatformAtomics::InterlockedExchange(&mark.Refs, 1);
+
+		return instanceIndex;
 	}
 
 	Object* Object::RootCollection::FinalizeObject(RootMark& mark)
 	{
 		check(mark.Refs == 0);
 		auto* ptr = mark.Ptr;
-		if (m_InstanceIDPoolSize < m_InstanceIDPool.size())
-		{
-			m_InstanceIDPool[m_InstanceIDPoolSize++] = mark.Ptr->m_InstanceID;
-		}
-		else
-		{
-			m_InstanceIDPool.emplace_back(mark.Ptr->m_InstanceID);
-			++m_InstanceIDPoolSize;
-		}
+		size_t generation = mark.Ptr->m_InstanceIndex < G1Size ? 0 :
+			(mark.Ptr->m_InstanceIndex < G1Size + G2Size ? 1 : 2);
+		m_InstanceIndexPool[generation].emplace_back(mark.Ptr->m_InstanceIndex);
 		mark.Ptr = nullptr;
 		mark.Version = 0;
 		return ptr;
@@ -58,20 +63,18 @@ namespace Ayla
 
 	Object::RootMark& Object::RootCollection::GetMark(Object* object)
 	{
-		return m_Roots[object->m_InstanceID - 1];
+		return m_Roots[object->m_InstanceIndex];
 	}
 
 	Object::Object()
 		: m_PPtrCollection(this)
 	{
-		GC::TrapInitialize();
-
 		if (CreationHack::s_Hack.AllowConstruct == false)
 		{
 			throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
 		}
 
-		m_InstanceID = s_RootCollection.AddObject(this);
+		m_InstanceIndex = s_RootCollection.AddObject(this);
 	}
 
 	Object::~Object() noexcept

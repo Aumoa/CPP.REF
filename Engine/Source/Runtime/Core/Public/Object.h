@@ -57,12 +57,16 @@ namespace Ayla
 		{
 			friend ::Ayla::GC;
 
+			static constexpr size_t G1Size = 16384;
+			static constexpr size_t G2Size = 131072;
+
 			std::mutex m_Mutex;
 			std::vector<RootMark> m_Roots;
-			std::vector<int64> m_InstanceIDPool;
-			size_t m_InstanceIDPoolSize = 0;
+			std::vector<int64> m_InstanceIndexPool[3];
 
 		public:
+			RootCollection();
+
 			int64 AddObject(Object* object);
 			Object* FinalizeObject(RootMark& mark);
 			RootMark& GetMark(Object* object);
@@ -72,7 +76,7 @@ namespace Ayla
 		static RootCollection s_RootCollection;
 
 		PPtrCollection m_PPtrCollection;
-		int64 m_InstanceID = -1;
+		int64 m_InstanceIndex = -1;
 		bool m_FinalizeSuppressed = false;
 
 	protected:
