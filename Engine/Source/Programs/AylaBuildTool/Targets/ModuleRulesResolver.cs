@@ -13,7 +13,7 @@ internal class ModuleRulesResolver
         Group = group;
         PrimaryGroup = primaryGroup;
 
-        PrivateDependencyModuleNames = rules.PrivateDependencyModuleNames.Distinct().ToArray();
+        PrivateDependencyModuleNames = WithBuiltInDependencyModule(targetInfo, rules.PrivateDependencyModuleNames).Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
         PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Append($"PLATFORM_STRING=TEXT(\"{targetInfo.Platform}\")").Append($"CONFIG_STRING=TEXT(\"{targetInfo.Config}\")").Distinct().ToArray();
         PrivateDisableWarnings = rules.PrivateDisableWarnings.Distinct().ToArray();
@@ -26,16 +26,36 @@ internal class ModuleRulesResolver
         List<MacroSet> additionalMacros = [];
         List<int> disableWarnings = [];
         List<string> additionalLibraries = [];
-        Resolve(solution, targetProject, rules, route, true, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
+        Resolve(solution, targetInfo, targetProject, rules, route, true, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
         DependRuleFilePaths = dependRuleFilePaths.Distinct().ToArray();
         PublicDependencyModuleNames = dependencyModuleNames.Distinct().ToArray();
         PublicIncludePaths = includePaths.Distinct().ToArray();
         PublicAdditionalMacros = additionalMacros.Distinct().ToArray();
         PublicDisableWarnings = disableWarnings.Distinct().ToArray();
         PublicAdditionalLibraries = additionalLibraries.Distinct().ToArray();
+
+        return;
     }
 
-    private void Resolve(Solution solution, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependRuleFilePaths, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings, List<string> additionalLibraries)
+    private IEnumerable<string> WithBuiltInDependencyModule(TargetInfo targetInfo, IEnumerable<string> source)
+    {
+        if (Rules.Type == ModuleType.Game)
+        {
+            switch (targetInfo.Platform.Group)
+            {
+                case PlatformGroup.Windows:
+                    source = source.Append("WindowsLaunch");
+                    break;
+                default:
+                    AnsiConsole.MarkupLine("[red]Target platform not supported yet.[/]");
+                    throw TerminateException.Internal();
+            }
+        }
+
+        return source;
+    }
+
+    private void Resolve(Solution solution, TargetInfo targetInfo, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependRuleFilePaths, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings, List<string> additionalLibraries)
     {
         if (route.Add(rules.Name) == false)
         {
@@ -51,7 +71,7 @@ internal class ModuleRulesResolver
         IEnumerable<string> deps = rules.PublicDependencyModuleNames;
         if (isPrimary)
         {
-            deps = deps.Concat(rules.PrivateDependencyModuleNames);
+            deps = deps.Concat(WithBuiltInDependencyModule(targetInfo, rules.PrivateDependencyModuleNames));
             additionalMacros.Add(rules.Name.ToUpper() + "_API=PLATFORM_SHARED_EXPORT");
         }
         else
@@ -77,7 +97,7 @@ internal class ModuleRulesResolver
             var dependTargetRule = mp.GetRule(rules.TargetInfo);
             dependRuleFilePaths.Add(mp.RuleFilePath);
 
-            Resolve(solution, mp, dependTargetRule, route, false, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
+            Resolve(solution, targetInfo, mp, dependTargetRule, route, false, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
         }
 
         return;
