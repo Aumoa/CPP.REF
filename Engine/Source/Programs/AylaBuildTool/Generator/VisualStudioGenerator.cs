@@ -559,7 +559,7 @@ internal class VisualStudioGenerator : Generator
                         Indent(() =>
                         {
                             var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build {projectPath}--target \"{project.Name}\" --config {buildTarget.Config}";
-                            AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
+                            AppendFormatLine("""<AdditionalOptions>/std:c++20 /Zc:preprocessor</AdditionalOptions>""", outDir);
                             AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
                             AppendFormatLine("""<NMakeBuildCommandLine>dotnet {0}</NMakeBuildCommandLine>""", buildCommand);
                             AppendFormatLine("""<NMakeReBuildCommandLine>dotnet {0} --clean Rebuild</NMakeReBuildCommandLine>""", buildCommand);
