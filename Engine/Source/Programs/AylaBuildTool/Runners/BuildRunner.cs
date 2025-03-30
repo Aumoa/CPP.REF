@@ -1,11 +1,111 @@
 ﻿using System.Diagnostics;
 using Spectre.Console;
 using static AylaEngine.Compiler;
+using static AylaEngine.Terminal;
 
 namespace AylaEngine;
 
 internal static class BuildRunner
 {
+    private interface ITask
+    {
+        GroupDescriptor Group { get; }
+    }
+
+    private class CompileTask : ITask
+    {
+        public readonly CompileItem Item;
+        private readonly TaskCompletionSource m_CompletionSource = new();
+
+        public CompileTask(CompileItem item)
+        {
+            Item = item;
+        }
+
+        public async Task<Terminal.Output> CompileAsync(SemaphoreSlim access, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
+        {
+            await access.WaitAsync(cancellationToken);
+            try
+            {
+                var compiler = await installation.SpawnCompilerAsync(targetInfo, cancellationToken);
+                var output = await compiler.CompileAsync(Item, cancellationToken);
+                m_CompletionSource.SetResult();
+                return output;
+            }
+            catch (OperationCanceledException)
+            {
+                m_CompletionSource.SetCanceled();
+                throw;
+            }
+            catch (Exception e)
+            {
+                m_CompletionSource.SetException(e);
+                throw;
+            }
+            finally
+            {
+                access.Release();
+            }
+        }
+
+        public Task Task => m_CompletionSource.Task;
+
+        public GroupDescriptor Group => Item.Descriptor;
+    }
+
+    private class ModuleTask : ITask
+    {
+        public readonly ModuleRulesResolver Resolver;
+        public readonly CompileTask[] NeedCompileTasks;
+
+        private readonly CompileItem[] m_AllCompiles;
+        private readonly TaskCompletionSource m_CompletionSource = new();
+
+        public ModuleTask(ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles)
+        {
+            Resolver = resolver;
+            NeedCompileTasks = needCompiles;
+            m_AllCompiles = allCompiles;
+        }
+
+        public async Task<Terminal.Output> LinkAsync(SemaphoreSlim access, IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
+        {
+            await Task.WhenAll(NeedCompileTasks.Select(p => p.Task));
+
+            foreach (var name in Resolver.DependencyModuleNames)
+            {
+                await moduleTasks.Where(p => p.Resolver.Name == name).First().Task;
+            }
+
+            await access.WaitAsync(cancellationToken);
+            try
+            {
+                var linker = await installation.SpawnLinkerAsync(targetInfo, cancellationToken);
+                var output = await linker.LinkAsync(Resolver, m_AllCompiles, cancellationToken);
+                m_CompletionSource.SetResult();
+                return output;
+            }
+            catch (OperationCanceledException)
+            {
+                m_CompletionSource.SetCanceled();
+                throw;
+            }
+            catch (Exception e)
+            {
+                m_CompletionSource.SetException(e);
+                throw;
+            }
+            finally
+            {
+                access.Release();
+            }
+        }
+
+        public Task Task => m_CompletionSource.Task;
+
+        public GroupDescriptor Group => Resolver.Group;
+    }
+
     public static async ValueTask RunAsync(BuildOptions options, CancellationToken cancellationToken)
     {
         string? projectPath = null;
@@ -22,7 +122,6 @@ internal static class BuildRunner
         };
 
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
-        List<Compiler.CompileItem> compileItems = [];
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
         var primaryGroup = solution.EngineProjects.First().Descriptor;
         IEnumerable<Project> targetProjects;
@@ -51,17 +150,19 @@ internal static class BuildRunner
         }
 
         var installation = new VisualStudioInstallation();
-        List<Func<ValueTask>> queuedLinkerTasks = [];
         int compiled = 0;
         int totalActions = 0;
         int log = 1;
+
+        List<ModuleTask> moduleTasks = [];
 
         foreach (var project in targetProjects)
         {
             if (project is ModuleProject mp)
             {
                 var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor, primaryGroup);
-                List<CompileItem> moduleItems = [];
+                List<CompileItem> allCompiles = [];
+                List<CompileTask> needCompiles = [];
 
                 foreach (var sourceCode in mp.GetSourceCodes())
                 {
@@ -79,56 +180,22 @@ internal static class BuildRunner
                         var cacheFileName = Path.Combine(intDir, fileName + ".cache");
                         var depsFileName = Path.Combine(intDir, fileName + ".deps.json");
                         var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, mp.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
+                        allCompiles.Add(item);
                         if (File.Exists(cacheFileName) == false ||
                             SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
                         {
-                            compileItems.Add(item);
-                        }
-
-                        moduleItems.Add(item);
-
-                        if (compilationTaskCounts.TryGetValue(mp.Descriptor, out int count))
-                        {
-                            compilationTaskCounts[mp.Descriptor] = ++count;
-                        }
-                        else
-                        {
-                            compilationTaskCounts[mp.Descriptor] = 1;
+                            needCompiles.Add(new CompileTask(item));
                         }
                     }
                 }
 
-                queuedLinkerTasks.Add(async () =>
-                {
-                    var linker = await installation.SpawnLinkerAsync(buildTarget, cancellationToken);
-                    var output = await linker.LinkAsync(resolver, moduleItems.ToArray(), cancellationToken);
-                    if (ConsoleEnvironment.IsDynamic)
-                    {
-                        lock (compileItems)
-                        {
-                            for (int i = 0; i < output.Logs.Length; i++)
-                            {
-                                Terminal.Log log = output.Logs[i];
-                                if (i == 0)
-                                {
-                                    AnsiConsole.MarkupLine("{0} {1}", MakeOutputPrefix().EscapeMarkup(), Terminal.SimpleMarkupOutputLine(log.Value));
-                                }
-                                else
-                                {
-                                    AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
-                    }
-                });
+                moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray()));
             }
         }
 
-        totalActions = compileItems.Count + queuedLinkerTasks.Count;
+        int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
+        SemaphoreSlim semaphore = new(hardwareConcurrency);
+        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length + 1);
         log = totalActions switch
         {
             >= 0 and < 10 => 1,
@@ -146,30 +213,34 @@ internal static class BuildRunner
                 .StartAsync(async ctx =>
                 {
                     Dictionary<GroupDescriptor, ProgressTask> compilationTasks = [];
-                    foreach (var (descriptor, count) in compilationTaskCounts)
+
+                    foreach (var result in moduleTasks.GroupBy(p => p.Group))
                     {
-                        var task = ctx.AddTask($"Compile {descriptor.Name}", maxValue: compileItems.Count);
-                        compilationTasks.Add(descriptor, task);
+                        var task = ctx.AddTask($"Compile {result.Key.Name}", maxValue: result.Sum(p => p.NeedCompileTasks.Length + 1));
+                        compilationTasks.Add(result.Key, task);
                     }
 
-                    await CompileAsync(item =>
+                    DispatchCompileWorkers(PulseCounter);
+                    DispatchLinkWorkers(PulseCounter);
+
+                    await Task.WhenAll(moduleTasks.Select(p => p.Task));
+                    return;
+
+                    void PulseCounter(ITask task)
                     {
                         lock (compilationTasks)
                         {
-                            compilationTasks[item.Descriptor].Increment(1);
+                            compilationTasks[task.Group].Increment(1);
                             ctx.Refresh();
                         }
-                    });
+                    }
                 });
         }
         else
         {
-            await CompileAsync(null);
-        }
-
-        foreach (var queuedLinkerTask in queuedLinkerTasks)
-        {
-            await queuedLinkerTask();
+            DispatchCompileWorkers(null);
+            DispatchLinkWorkers(null);
+            await Task.WhenAll(moduleTasks.Select(p => p.Task));
         }
 
         return;
@@ -179,28 +250,60 @@ internal static class BuildRunner
             return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
         }
 
-        async ValueTask CompileAsync(Action<CompileItem>? pulse)
+        void DispatchLinkWorkers(Action<ITask>? pulse)
         {
-            int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
-            SemaphoreSlim semaphore = new(hardwareConcurrency);
-            List<Task> tasks = new();
-            foreach (var item in compileItems)
+            foreach (var moduleTask in moduleTasks)
             {
-                tasks.Add(SingleTask());
-
-                continue;
-
-                async Task SingleTask()
+                moduleTask.LinkAsync(semaphore, moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
-                    await semaphore.WaitAsync(cancellationToken);
                     try
                     {
-                        var compiler = await installation.SpawnCompilerAsync(buildTarget, cancellationToken);
-                        var output = await compiler.CompileAsync(item, cancellationToken);
-                        string fileText = string.Format("{0} {1}", MakeOutputPrefix(), item.SourceCode.FilePath);
+                        var output = r.Result;
                         if (ConsoleEnvironment.IsDynamic)
                         {
-                            lock (compileItems)
+                            lock (moduleTasks)
+                            {
+                                for (int i = 0; i < output.Logs.Length; i++)
+                                {
+                                    Terminal.Log log = output.Logs[i];
+                                    if (i == 0)
+                                    {
+                                        AnsiConsole.MarkupLine("{0} {1}", MakeOutputPrefix().EscapeMarkup(), Terminal.SimpleMarkupOutputLine(log.Value));
+                                    }
+                                    else
+                                    {
+                                        AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                        }
+                    }
+                    finally
+                    {
+                        pulse?.Invoke(moduleTask);
+                    }
+                });
+            }
+        }
+
+        void DispatchCompileWorkers(Action<ITask>? pulse)
+        {
+            var allCompiles = moduleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
+            foreach (var compileTask in allCompiles)
+            {
+                compileTask.CompileAsync(semaphore, installation, buildTarget, cancellationToken).ContinueWith(r =>
+                {
+                    try
+                    {
+                        var output = r.Result;
+                        string fileText = string.Format("{0} {1}", MakeOutputPrefix(), compileTask.Item.SourceCode.FilePath);
+                        if (ConsoleEnvironment.IsDynamic)
+                        {
+                            lock (moduleTasks)
                             {
                                 AnsiConsole.WriteLine(fileText);
                                 foreach (var log in output.Logs.Skip(1))
@@ -222,13 +325,10 @@ internal static class BuildRunner
                     }
                     finally
                     {
-                        pulse?.Invoke(item);
-                        semaphore.Release();
+                        pulse?.Invoke(compileTask);
                     }
-                }
+                });
             }
-
-            await Task.WhenAll(tasks);
         }
     }
 }

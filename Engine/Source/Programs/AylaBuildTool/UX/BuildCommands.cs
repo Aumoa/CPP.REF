@@ -25,10 +25,15 @@ internal class BuildCommands : Commands
             .AllowEmpty()
             .ShowAsync(AnsiConsole.Console, cancellationToken);
 
+        var config = await new TextPrompt<Configuration>("Config:")
+            .DefaultValue(Configuration.Shipping)
+            .ShowAsync(AnsiConsole.Console, cancellationToken);
+
         var options = new BuildOptions
         {
             ProjectFile = projectFile,
-            Target = target
+            Target = target,
+            Config = config
         };
 
         await BuildRunner.RunAsync(options, cancellationToken);
