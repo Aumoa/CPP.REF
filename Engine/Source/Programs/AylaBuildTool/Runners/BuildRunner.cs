@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Spectre.Console;
 using static AylaEngine.Compiler;
 using static AylaEngine.Terminal;
@@ -154,43 +155,64 @@ internal static class BuildRunner
         int totalActions = 0;
         int log = 1;
 
+        if (options.Clean == CleanOptions.CleanOnly)
+        {
+            foreach (var project in targetProjects.OfType<ModuleProject>())
+            {
+                var intDir = project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
+                foreach (var sourceCode in project.GetSourceCodes())
+                {
+                    var fileName = Path.GetFileName(sourceCode.FilePath);
+                    var cacheFileName = Path.Combine(intDir, fileName + ".cache");
+                    File.Delete(cacheFileName);
+                }
+            }
+
+            return;
+        }
+
         List<ModuleTask> moduleTasks = [];
 
-        foreach (var project in targetProjects)
+        foreach (var project in targetProjects.OfType<ModuleProject>())
         {
-            if (project is ModuleProject mp)
+            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, buildTarget), project.Descriptor, primaryGroup);
+            List<CompileItem> allCompiles = [];
+            List<CompileTask> needCompiles = [];
+            var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
+
+            foreach (var sourceCode in project.GetSourceCodes())
             {
-                var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor, primaryGroup);
-                List<CompileItem> allCompiles = [];
-                List<CompileTask> needCompiles = [];
-
-                foreach (var sourceCode in mp.GetSourceCodes())
+                if (sourceCode.Type == SourceCodeType.SourceCode)
                 {
-                    if (sourceCode.Type == SourceCodeType.SourceCode)
+                    var item = new Compiler.CompileItem
                     {
-                        var item = new Compiler.CompileItem
-                        {
-                            Resolver = resolver,
-                            SourceCode = sourceCode,
-                            Descriptor = project.Descriptor
-                        };
+                        Resolver = resolver,
+                        SourceCode = sourceCode,
+                        Descriptor = project.Descriptor
+                    };
 
-                        var intDir = item.Descriptor.Intermediate(item.Resolver.Name, buildTarget, FolderPolicy.PathType.Current);
-                        var fileName = Path.GetFileName(item.SourceCode.FilePath);
-                        var cacheFileName = Path.Combine(intDir, fileName + ".cache");
-                        var depsFileName = Path.Combine(intDir, fileName + ".deps.json");
-                        var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, mp.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
-                        allCompiles.Add(item);
+                    var fileName = Path.GetFileName(item.SourceCode.FilePath);
+                    var cacheFileName = Path.Combine(intDir, fileName + ".cache");
+                    var depsFileName = Path.Combine(intDir, fileName + ".deps.json");
+                    allCompiles.Add(item);
+
+                    if (options.Clean != CleanOptions.Rebuild)
+                    {
+                        var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, project.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
                         if (File.Exists(cacheFileName) == false ||
                             SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
                         {
                             needCompiles.Add(new CompileTask(item));
                         }
                     }
+                    else
+                    {
+                        needCompiles.Add(new CompileTask(item));
+                    }
                 }
-
-                moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray()));
             }
+
+            moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray()));
         }
 
         int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;

@@ -29,11 +29,16 @@ internal class BuildCommands : Commands
             .DefaultValue(Configuration.Shipping)
             .ShowAsync(AnsiConsole.Console, cancellationToken);
 
+        var clean = await new TextPrompt<CleanOptions>("Clean:")
+            .DefaultValue(CleanOptions.None)
+            .ShowAsync(AnsiConsole.Console, cancellationToken);
+
         var options = new BuildOptions
         {
             ProjectFile = projectFile,
             Target = target,
-            Config = config
+            Config = config,
+            Clean = clean
         };
 
         await BuildRunner.RunAsync(options, cancellationToken);

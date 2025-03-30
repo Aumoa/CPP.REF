@@ -558,9 +558,12 @@ internal class VisualStudioGenerator : Generator
                         AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                         Indent(() =>
                         {
+                            var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build {projectPath}--target \"{project.Name}\" --config {buildTarget.Config}";
                             AppendFormatLine("""<AdditionalOptions>/std:c++20</AdditionalOptions>""", outDir);
                             AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
-                            AppendFormatLine("""<NMakeBuildCommandLine>dotnet "{0}\DotNET\AylaBuildTool.dll" build {1}--target "{2}" --config {3}</NMakeBuildCommandLine>""", engineGroup.BinariesDirectory, projectPath, project.Name, buildTarget.Config);
+                            AppendFormatLine("""<NMakeBuildCommandLine>dotnet {0}</NMakeBuildCommandLine>""", buildCommand);
+                            AppendFormatLine("""<NMakeReBuildCommandLine>dotnet {0} --clean Rebuild</NMakeReBuildCommandLine>""", buildCommand);
+                            AppendFormatLine("""<NMakeCleanCommandLine>dotnet {0} --clean CleanOnly</NMakeCleanCommandLine>""", buildCommand);
                             AppendFormatLine("""<OutDir>{0}</OutDir>""", outDir);
                             AppendFormatLine("""<NMakeOutput>{0}</NMakeOutput>""", outputFileName);
                             AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
