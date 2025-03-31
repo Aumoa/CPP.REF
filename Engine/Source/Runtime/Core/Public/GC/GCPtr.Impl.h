@@ -6,6 +6,7 @@
 #include "GC/PPtr.h"
 #include "GC/GC.h"
 #include "Object.h"
+#include "GC/PropertyGather.h"
 
 namespace Ayla
 {
@@ -115,6 +116,51 @@ namespace Ayla
 		m_Ptr = nullptr;
 		return *this;
 	}
+
+	template<class T>
+	struct PropertyGather<PPtr<T>> : public PropertyGather<>
+	{
+	private:
+		PPtr<T>* const m_Block;
+
+	public:
+		PropertyGather(PPtr<T>* block)
+			: m_Block(block)
+		{
+		}
+
+		virtual void PullPPtrs(std::vector<Object*>& output) override
+		{
+			if (auto* ptr = m_Block->Get(); ptr != nullptr)
+			{
+				output.emplace_back(ptr);
+			}
+		}
+	};
+
+	template<class T> requires std::ranges::sized_range<T> && std::derived_from<std::ranges::range_value_t<T>, BasePtr>
+	struct PropertyGather<T> : public PropertyGather<>
+	{
+	private:
+		T* const m_Block;
+
+	public:
+		PropertyGather(T* block)
+			: m_Block(block)
+		{
+		}
+
+		virtual void PullPPtrs(std::vector<Object*>& output) override
+		{
+			for (auto& pptr : *m_Block)
+			{
+				if (auto* ptr = pptr.Get(); ptr != nullptr)
+				{
+					output.emplace_back(ptr);
+				}
+			}
+		}
+	};
 
 	template<class T>
 	inline RPtr<T>::RPtr(T* ptr) noexcept requires std::derived_from<T, Object>

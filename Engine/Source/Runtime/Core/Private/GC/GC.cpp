@@ -3,6 +3,8 @@
 #include "Object.h"
 #include "Console.h"
 #include "GC/GC.h"
+#include "GC/PropertyGather.h"
+#include "GC/GCPtr.Impl.h"
 #include "Threading/Tasks/Task.h"
 #include "Diagnostics/PerformanceTimer.h"
 #include "Diagnostics/Debug.h"
@@ -103,10 +105,10 @@ namespace Ayla
 			InternalCollect(1, true);
 		}
 
-		double criticalSectionSecs;
-		double markObjectsSecs;
-		double unmarkPropertyObjectsSecs;
-		double finalizeQueueSecs;
+		double criticalSectionSecs = 0;
+		double markObjectsSecs = 0;
+		double unmarkPropertyObjectsSecs = 0;
+		double finalizeQueueSecs = 0;
 
 		gatherQueue.reserve(self_.m_Roots.size());
 		gatherQueue_.reserve(self_.m_Roots.size());
@@ -161,17 +163,24 @@ namespace Ayla
 						{
 							for (auto& object : gatherQueue)
 							{
-								for (auto& ptr : object->m_PPtrCollection.m_PPtrMembers)
+								for (auto& gather : object->m_PPtrCollection.m_PPtrMembers)
 								{
-									if (ptr->m_Object != nullptr)
+									size_t si = gatherQueue_.size();
+									gather->PullPPtrs(gatherQueue_);
+
+									for (size_t j = si; j < gatherQueue_.size(); ++j)
 									{
-										auto& innerMark = self_.GetMark(ptr->m_Object);
-										if (innerMark.Version != 0)
+										auto& innerMark = self_.GetMark(gatherQueue_[j]);
+										if (innerMark.Version == 0)
 										{
-											innerMark.Version = 0;
-											gatherQueue_.emplace_back(ptr->m_Object);
+											continue;
 										}
+
+										innerMark.Version = 0;
+										gatherQueue_[si++] = gatherQueue_[j];
 									}
+
+									gatherQueue_.resize(si);
 								}
 							}
 

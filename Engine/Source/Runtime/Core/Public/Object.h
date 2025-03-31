@@ -14,6 +14,9 @@
 
 namespace Ayla
 {
+	template<class T>
+	struct PropertyGather;
+
 	class CORE_API Object
 	{
 		friend ::Ayla::GC;
@@ -30,14 +33,19 @@ namespace Ayla
 			friend ::Ayla::GC;
 
 		private:
-			std::vector<BasePtr*> m_PPtrMembers;
+			std::vector<std::unique_ptr<PropertyGather<void>>> m_PPtrMembers;
 
 		public:
+			PPtrCollection() noexcept = default;
+			PPtrCollection(const PPtrCollection&) = delete;
+
 			template<class T>
-			inline void Add(PPtr<T>& pptr)
+			inline void Add(T& pptr) requires requires { std::declval<PropertyGather<T>>(); }
 			{
-				m_PPtrMembers.emplace_back(&static_cast<BasePtr&>(pptr));
+				m_PPtrMembers.emplace_back(std::make_unique<PropertyGather<T>>(&pptr));
 			}
+
+			PPtrCollection& operator =(const PPtrCollection&) = delete;
 		};
 
 	private:
@@ -51,6 +59,7 @@ namespace Ayla
 		class RootCollection
 		{
 			friend ::Ayla::GC;
+			friend Object;
 
 			static constexpr size_t G1Size = 8192;
 			static constexpr size_t G2Size = 65536;
@@ -88,9 +97,12 @@ namespace Ayla
 
 	public:
 		Object();
+		Object(const Object&) = delete;
 		virtual ~Object() noexcept;
 
 		String ToString();
+
+		Object& operator =(const Object&) = delete;
 
 	public:
 		template<std::derived_from<Object> T, class... TArgs>

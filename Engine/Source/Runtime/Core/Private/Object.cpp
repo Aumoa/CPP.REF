@@ -2,6 +2,7 @@
 
 #include "Object.h"
 #include "Platform/PlatformAtomics.h"
+#include "GC/GCPtr.Impl.h"
 
 namespace Ayla
 {
@@ -94,8 +95,10 @@ namespace Ayla
 	{
 		CreationHack::s_Hack.AllowConstruct = true;
 		auto object = action();
-		GC::Release(object);  // This corresponds to the AddRef called in the Object constructor.
+		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
 		object->GatherProperties(object->m_PPtrCollection);
+		lock.unlock();
+		GC::Release(object);  // This corresponds to the AddRef called in the Object constructor.
 		CreationHack::s_Hack.AllowConstruct = false;
 	}
 }
