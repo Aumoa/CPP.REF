@@ -16,11 +16,6 @@ namespace Ayla
 	private:
 		std::vector<String> CmdArgs;
 		PPtr<GenericApplication> GenericApp;
-		PPtr<Object> T1;
-		PPtr<Object> T2;
-		PPtr<Object> T3;
-		PPtr<Object> T4;
-		PPtr<Object> T5;
 
 	protected:
 		Launch(std::vector<String> CmdArgs);
