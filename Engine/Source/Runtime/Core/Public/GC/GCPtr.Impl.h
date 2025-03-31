@@ -14,7 +14,6 @@ namespace Ayla
 	{
 		if (ptr != nullptr)
 		{
-			auto lock = GC::GetLock();
 			m_Object = ptr;
 			m_Ptr = ptr;
 		}
@@ -31,7 +30,6 @@ namespace Ayla
 	{
 		if (rhs.m_Object != nullptr)
 		{
-			auto lock = GC::GetLock();
 			m_Object = rhs.m_Object;
 			m_Ptr = rhs.m_Ptr;
 		}
@@ -48,7 +46,6 @@ namespace Ayla
 	{
 		if (rhs.m_Object != nullptr)
 		{
-			auto lock = GC::GetLock();
 			std::swap(m_Object = nullptr, rhs.m_Object);
 			m_Ptr = rhs.m_Ptr;
 			rhs.m_Ptr = nullptr;
@@ -61,7 +58,6 @@ namespace Ayla
 	{
 		if (rhs.m_Object != nullptr)
 		{
-			auto lock = GC::GetLock();
 			m_Object = rhs.m_Object;
 			m_Ptr = rhs.m_Ptr;
 		}
@@ -73,11 +69,9 @@ namespace Ayla
 	{
 		if (rhs.m_Object != nullptr)
 		{
-			auto lock = GC::GetLock();
 			std::swap(m_Object = nullptr, rhs.m_Object);
 			m_Ptr = rhs.m_Ptr;
 			rhs.m_Ptr = nullptr;
-			lock.unlock();
 			// Since the target is an RPtr, the root reference of the target must be removed.
 			GC::Release(m_Ptr);
 		}
@@ -91,7 +85,6 @@ namespace Ayla
 			return *this;
 		}
 
-		auto lock = GC::GetLock();
 		m_Object = rhs.m_Object;
 		m_Ptr = rhs.m_Ptr;
 		return *this;
@@ -105,7 +98,6 @@ namespace Ayla
 			return *this;
 		}
 
-		auto lock = GC::GetLock();
 		std::swap(m_Object = nullptr, rhs.m_Object);
 		std::swap(m_Ptr = nullptr, rhs.m_Ptr);
 		return *this;
@@ -119,7 +111,6 @@ namespace Ayla
 			return *this;
 		}
 
-		auto lock = GC::GetLock();
 		m_Object = nullptr;
 		m_Ptr = nullptr;
 		return *this;

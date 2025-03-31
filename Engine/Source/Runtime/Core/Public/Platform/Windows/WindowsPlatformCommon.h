@@ -29,6 +29,7 @@
 #include <wrl/client.h>
 #include <wincodec.h>
 #include <dxcapi.h>
+#include <TlHelp32.h>
 
 #undef YieldProcessor
 #undef OutputDebugString

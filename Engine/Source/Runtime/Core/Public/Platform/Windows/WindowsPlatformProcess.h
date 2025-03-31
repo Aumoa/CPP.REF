@@ -16,6 +16,9 @@ namespace Ayla
 
 	struct CORE_API WindowsPlatformProcess : public GenericPlatformProcess
 	{
+		struct SnapshotRunner;
+		struct SuspendToken;
+
 		static bool IsDebuggerPresent() noexcept;
 		static void OutputDebugString(String InMessage) noexcept;
 
@@ -35,6 +38,9 @@ namespace Ayla
 
 		static bool SetEnvironmentVariable(String InName, String InValue) noexcept;
 		static String GetEnvironmentVariable(String InName) noexcept;
+
+		static SuspendToken* SuspendAllThreads() noexcept;
+		static void ResumeAllThreads(SuspendToken* token) noexcept;
 	};
 
 	using PlatformProcess = WindowsPlatformProcess;

@@ -44,7 +44,6 @@ namespace Ayla
 	private:
 		static void AddRef(Object* target);
 		static void Release(Object* target);
-		static std::unique_lock<std::mutex> GetLock();
 		static void InternalCollect(int32 generation, bool nolock);
 		static void DoFinalize(int32 generation, std::vector<Object*> finalizedObjects, double criticalSectionSecs, double markObjectsSecs, double unmarkPropertyObjectsSecs, double finalizeQueueSecs);
 	};

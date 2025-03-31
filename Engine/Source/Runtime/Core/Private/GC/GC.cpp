@@ -30,7 +30,7 @@ namespace Ayla
 		}
 	};
 
-	constexpr LogCategory LogGC = TEXT("LogGC");
+	constexpr LogCategory LogGC{ TEXT("LogGC") };
 
 	std::chrono::seconds GC::TimeSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(29950));
 	int32 GC::s_Interlocked;
@@ -78,11 +78,6 @@ namespace Ayla
 		PlatformAtomics::InterlockedDecrement(&mark.Refs);
 	}
 
-	std::unique_lock<std::mutex> GC::GetLock()
-	{
-		return std::unique_lock(Object::s_RootCollection.m_Mutex);
-	}
-
 	void GC::InternalCollect(int32 generation, bool nolock)
 	{
 		std::vector<Object*> finalizedObjects;
@@ -96,9 +91,11 @@ namespace Ayla
 		gatherQueue_.clear();
 
 		auto& self_ = Object::s_RootCollection;
+		PlatformProcess::SuspendToken* stoken = nullptr;
 		if (nolock == false)
 		{
 			self_.m_Mutex.lock();
+			stoken = PlatformProcess::SuspendAllThreads();
 		}
 
 		if (generation == 0 && self_.m_InstanceIndexPool[1].size() < Object::RootCollection::G1Size)
@@ -110,6 +107,9 @@ namespace Ayla
 		double markObjectsSecs;
 		double unmarkPropertyObjectsSecs;
 		double finalizeQueueSecs;
+
+		gatherQueue.reserve(self_.m_Roots.size());
+		gatherQueue_.reserve(self_.m_Roots.size());
 
 		size_t begin, end;
 		switch (generation)
@@ -182,6 +182,11 @@ namespace Ayla
 						gatherQueue.clear();
 					}
 				}
+			}
+
+			if (stoken != nullptr)
+			{
+				PlatformProcess::ResumeAllThreads(stoken);
 			}
 
 			{

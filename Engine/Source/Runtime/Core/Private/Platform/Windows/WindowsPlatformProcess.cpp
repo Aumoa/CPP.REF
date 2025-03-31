@@ -12,10 +12,121 @@
 #include "Path.h"
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"
+#include "Diagnostics/Debug.h"
 #include "WindowsStackTrace.h"
+#include <mutex>
+#include <map>
 
 namespace Ayla
 {
+	struct WindowsPlatformProcess::SnapshotRunner
+	{
+		static std::unique_ptr<SnapshotRunner> Run()
+		{
+			auto i = std::make_unique<SnapshotRunner>();
+			i->Start();
+			return i;
+		}
+
+		std::mutex m_Mtx;
+		std::map<DWORD, HANDLE> m_Handles;
+
+	private:
+		void Start()
+		{
+			using namespace std::chrono_literals;
+
+			std::mutex mtx;
+			std::condition_variable cv;
+			bool init = false;
+			std::thread([&]()
+			{
+				Capture();
+
+				auto lock = std::unique_lock(mtx);
+				cv.notify_one();
+				init = true;
+				lock.unlock();
+
+				while (true)
+				{
+					std::this_thread::sleep_for(10s);
+					Capture();
+				}
+			}).detach();
+
+			auto lock = std::unique_lock(mtx);
+			while (init == false)
+			{
+				cv.wait(lock);
+			}
+		}
+
+		void Capture()
+		{
+			HANDLE hThreadSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+			if (hThreadSnapshot == INVALID_HANDLE_VALUE)
+			{
+				Debug::LogCritical(LogPlatform, TEXT("Failed to create snapshot of threads."));
+				return;
+			}
+
+			DWORD currentProcessId = GetCurrentProcessId();
+			DWORD currentThreadId = GetCurrentThreadId();
+
+			THREADENTRY32 te32;
+			te32.dwSize = sizeof(THREADENTRY32);
+
+			std::vector<DWORD> query;
+			if (Thread32First(hThreadSnapshot, &te32))
+			{
+				do
+				{
+					if (te32.th32OwnerProcessID == currentProcessId && te32.th32ThreadID != currentThreadId)
+					{
+						query.emplace_back(te32.th32ThreadID);
+					}
+				} while (Thread32Next(hThreadSnapshot, &te32));
+			}
+			else
+			{
+				Debug::LogCritical(LogPlatform, TEXT("Failed to retrieve thread information."));
+			}
+
+			auto lock = std::unique_lock(m_Mtx);
+			std::map<DWORD, HANDLE> handlesCopy;
+			std::swap(handlesCopy, m_Handles);
+			for (auto& threadId : query)
+			{
+				auto it = handlesCopy.find(threadId);
+				if (it == handlesCopy.end())
+				{
+					HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, threadId);
+					m_Handles.emplace(threadId, hThread);
+				}
+				else
+				{
+					m_Handles.emplace(it->first, it->second);
+					handlesCopy.erase(it);
+				}
+			}
+			lock.unlock();
+
+			for (auto& [_1, handle] : handlesCopy)
+			{
+				CloseHandle(handle);
+			}
+
+			CloseHandle(hThreadSnapshot);
+			hThreadSnapshot = INVALID_HANDLE_VALUE;
+		}
+	};
+
+	struct WindowsPlatformProcess::SuspendToken
+	{
+		std::vector<HANDLE> m_SuspendThreads;
+	};
+
 	bool WindowsPlatformProcess::IsDebuggerPresent() noexcept
 	{
 		return ::IsDebuggerPresent() == TRUE;
@@ -165,6 +276,43 @@ namespace Ayla
 			return String::GetEmpty();
 		}
 		return String::FromLiteral(std::wstring_view(Buf, (size_t)Len));
+	}
+
+	auto WindowsPlatformProcess::SuspendAllThreads() noexcept -> SuspendToken*
+	{
+		static auto s_Snapshot = SnapshotRunner::Run();
+
+		auto token = new SuspendToken();
+		auto currentId = GetCurrentThreadId();
+		auto lock = std::unique_lock(s_Snapshot->m_Mtx);
+		for (auto& [id, handle] : s_Snapshot->m_Handles)
+		{
+			if (id != currentId)
+			{
+				token->m_SuspendThreads.emplace_back(handle);
+			}
+		}
+		lock.unlock();
+
+		for (auto& handle : token->m_SuspendThreads)
+		{
+			SuspendThread(handle);
+		}
+
+		return token;
+	}
+
+	void WindowsPlatformProcess::ResumeAllThreads(SuspendToken* token) noexcept
+	{
+		if (token != nullptr)
+		{
+			for (auto& hThread : token->m_SuspendThreads)
+			{
+				ResumeThread(hThread);
+			}
+
+			delete token;
+		}
 	}
 }
 
