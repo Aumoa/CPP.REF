@@ -33,11 +33,27 @@ namespace Ayla
 	int32 GC::s_Interlocked;
 	int64 GC::s_Version;
 	std::thread::id GC::s_ThreadId;
-	bool GC::s_DuringFinalize;
+	int32 GC::s_DuringFinalize;
+	std::mutex GC::s_NotifyMtx;
+	std::condition_variable GC::s_CompleteToFinalize;
 
 	void GC::SuppressFinalize(const RPtr<Object>& target)
 	{
 		target->m_FinalizeSuppressed = true;
+	}
+
+	void GC::Collect(int32 generation)
+	{
+		InternalCollect(generation, false);
+	}
+
+	void GC::WaitForCompleteToFinalize()
+	{
+		auto lock = std::unique_lock(s_NotifyMtx);
+		while (s_DuringFinalize > 0)
+		{
+			s_CompleteToFinalize.wait(lock);
+		}
 	}
 
 	void GC::AddRef(Object* target)
@@ -59,9 +75,9 @@ namespace Ayla
 		PlatformAtomics::InterlockedDecrement(&mark.Refs);
 	}
 
-	void GC::Collect(int32 generation)
+	std::unique_lock<std::mutex> GC::GetLock()
 	{
-		InternalCollect(generation, false);
+		return std::unique_lock(Object::s_RootCollection.m_Mutex);
 	}
 
 	void GC::InternalCollect(int32 generation, bool nolock)
@@ -104,7 +120,7 @@ namespace Ayla
 			end = begin + Object::RootCollection::G2Size;
 			break;
 		default:
-			begin = Object::RootCollection::G1Size + Object::RootCollection::G2Size;
+			begin = 0;
 			end = self_.m_Roots.size();
 			break;
 		}
@@ -132,7 +148,7 @@ namespace Ayla
 				ScopedTimer unmarkPropertyObjects(unmarkPropertyObjectsSecs);
 
 				// STEP 2. Unmark objects that are not roots but are referenced by root objects.
-				for (size_t i = begin; i < end; ++i)
+				for (size_t i = 0; i < self_.m_Roots.size(); ++i)
 				{
 					auto& mark = self_.m_Roots[i];
 					if (mark.Ptr != nullptr && mark.Refs > 0)
@@ -172,22 +188,39 @@ namespace Ayla
 				for (size_t i = begin; i < end; ++i)
 				{
 					auto& mark = self_.m_Roots[i];
-					if (mark.Refs == 0 && mark.Version == s_Version && mark.Ptr != nullptr)
+					if (mark.Ptr != nullptr)
 					{
-						finalizedObjects.emplace_back(self_.FinalizeObject(mark));
-					}
-					else if (generation == 0 || generation == 1)
-					{
-						int32 ngen = generation + 1;
-						auto& pool = self_.m_InstanceIndexPool[generation];
-						pool.emplace_back(i);
-						auto& npool = self_.m_InstanceIndexPool[ngen];
-						auto rb = npool.rbegin();
-						int64 index = *rb;
-						npool.erase((rb + 1).base());
-						auto& nmark = self_.m_Roots[index] = mark;
-						mark = {};
-						nmark.Ptr->m_InstanceIndex = index;
+						if (mark.Refs == 0 && mark.Version == s_Version)
+						{
+							finalizedObjects.emplace_back(self_.FinalizeObject(mark));
+						}
+						else if (generation == 0 || generation == 1)
+						{
+							int32 ngen = generation + 1;
+							auto& pool = self_.m_InstanceIndexPool[generation];
+							pool.emplace_back(i);
+							auto& npool = self_.m_InstanceIndexPool[ngen];
+							auto rb = npool.rbegin();
+							int64 index;
+							Object::RootMark* nmark;
+							if (rb == npool.rend())
+							{
+								check(ngen == 2);
+								index = self_.m_Roots.size();
+								nmark = &self_.m_Roots.emplace_back(Object::RootMark{});
+							}
+							else
+							{
+								index = *rb;
+								npool.erase((rb + 1).base());
+								nmark = &self_.m_Roots[index];
+							}
+
+							// Do NOT use 'mark' variable after this scope.
+
+							std::swap(*nmark, self_.m_Roots[i]);
+							nmark->Ptr->m_InstanceIndex = index;
+						}
 					}
 				}
 			}
@@ -203,13 +236,17 @@ namespace Ayla
 
 	void GC::DoFinalize(int32 generation, std::vector<Object*> finalizedObjects, double criticalSectionSecs, double markObjectsSecs, double unmarkPropertyObjectsSecs, double finalizeQueueSecs)
 	{
+		size_t lo = Object::s_LiveObjects - finalizedObjects.size();
+		auto& r = Object::s_RootCollection;
+		size_t g1 = r.G1Size - r.m_InstanceIndexPool[0].size();
+		size_t g2 = r.G2Size - r.m_InstanceIndexPool[1].size();
+		size_t g3 = r.m_Roots.size() - r.G1Size - r.G2Size - r.m_InstanceIndexPool[2].size();
+		PlatformAtomics::InterlockedIncrement(&s_DuringFinalize);
 		co_await Task<>::Yield();
 
 		double finalizeSecs;
 		{
 			ScopedTimer finalize(finalizeSecs);
-			s_DuringFinalize = true;
-
 			for (auto& object : finalizedObjects)
 			{
 				if (object->m_FinalizeSuppressed == false)
@@ -220,10 +257,12 @@ namespace Ayla
 				
 				delete object;
 			}
-
-			s_DuringFinalize = false;
 		}
 
-		PlatformProcess::OutputDebugString(String::Format(TEXT("GC::InternalCollect() called. CriticalSection: {:.2f} secs (MarkObjects: {:.2f} secs, UnmarkPropertyObjects: {:.2f} secs, FinalizeQueue: {:.2f} secs), Finalize: {:.2f} secs\n"), criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs, finalizeSecs));
+		PlatformProcess::OutputDebugString(String::Format(TEXT("GC::InternalCollect({})) called. NumCollect: {}, Live: {}(Gen: {}, {}, {}), CriticalSection: {:.2f} secs (Mark: {:.2f} secs, Unmark: {:.2f} secs, FinalizeQueue: {:.2f} secs), Finalize: {:.2f} secs\n"), generation, finalizedObjects.size(), lo, g1, g2, g3, criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs, finalizeSecs));
+
+		auto lock = std::unique_lock(s_NotifyMtx);
+		PlatformAtomics::InterlockedDecrement(&s_DuringFinalize);
+		s_CompleteToFinalize.notify_all();
 	}
 }

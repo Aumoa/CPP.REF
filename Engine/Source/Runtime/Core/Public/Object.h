@@ -30,14 +30,9 @@ namespace Ayla
 			friend ::Ayla::GC;
 
 		private:
-			Object* const m_This;
 			std::vector<BasePtr*> m_PPtrMembers;
 
 		public:
-			inline PPtrCollection(Object* this_) : m_This(this_)
-			{
-			}
-
 			template<class T>
 			inline void Add(PPtr<T>& pptr)
 			{
@@ -57,8 +52,9 @@ namespace Ayla
 		{
 			friend ::Ayla::GC;
 
-			static constexpr size_t G1Size = 16384;
-			static constexpr size_t G2Size = 131072;
+			static constexpr size_t G1Size = 8192;
+			static constexpr size_t G2Size = 65536;
+			static_assert(G2Size > G1Size);
 
 			std::mutex m_Mutex;
 			std::vector<RootMark> m_Roots;
@@ -73,6 +69,7 @@ namespace Ayla
 		};
 
 	private:
+		static size_t s_LiveObjects;
 		static RootCollection s_RootCollection;
 
 		PPtrCollection m_PPtrCollection;
@@ -93,17 +90,19 @@ namespace Ayla
 		Object();
 		virtual ~Object() noexcept;
 
+		String ToString();
+
 	public:
 		template<std::derived_from<Object> T, class... TArgs>
 		static RPtr<T> New(TArgs&&... args) requires std::constructible_from<T, TArgs...>
 		{
-			RPtr<T> ptr;
+			std::optional<RPtr<T>> ptr;
 			ConfigureNew([&]()
 			{
-				ptr = new T(std::forward<TArgs>(args)...);
-				return ptr.Get();
+				ptr.emplace(new T(std::forward<TArgs>(args)...));
+				return ptr->Get();
 			});
-			return ptr;
+			return std::move(ptr).value();
 		}
 
 	private:

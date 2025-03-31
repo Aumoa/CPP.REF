@@ -5,7 +5,6 @@
 #include <concepts>
 #include <algorithm>
 #include "GC/BasePtr.h"
-#include "GC/CommonPtrDeclaration.h"
 
 namespace Ayla
 {
@@ -32,7 +31,7 @@ namespace Ayla
 			m_Ptr = nullptr;
 		}
 
-		inline RPtr(T* ptr) noexcept requires std::derived_from<T, Object>;
+		inline explicit RPtr(T* ptr) noexcept requires std::derived_from<T, Object>;
 		template<class U>
 		inline RPtr(const RPtr<U>& rhs) noexcept requires std::derived_from<U, T>;
 
@@ -51,8 +50,18 @@ namespace Ayla
 
 		inline ~RPtr() noexcept;
 
-#define AYLA__COMMON_PTR_CLASS_NAME RPtr
-		AYLA__COMMON_PTR_DECLARATION;
-#undef AYLA__COMMON_PTR_CLASS_NAME
+		inline T* Get() const noexcept
+		{
+			return m_Ptr;
+		}
+
+		inline RPtr<T>& operator =(const RPtr<T>& rhs) noexcept;
+		inline RPtr<T>& operator =(RPtr<T>&& rhs) noexcept;
+		inline RPtr<T>& operator =(std::nullptr_t) noexcept;
+
+		inline T* operator ->() const noexcept
+		{
+			return m_Ptr;
+		}
 	};
 }

@@ -34,6 +34,7 @@ extern "C"
 	__declspec(dllexport) int Ayla__WindowsLaunch__StartApplication(wchar_t** args, int length)
 	{
 		using namespace ::Ayla;
+
 		std::vector<String> cmdArgs((size_t)length);
 		for (size_t i = 0; i < length; ++i)
 		{
@@ -41,7 +42,13 @@ extern "C"
 		}
 
 		auto launch = Object::New<WindowsLaunch>(std::move(cmdArgs));
-		return launch->GuardedMain();
+		int32 ec = launch->GuardedMain();
+
+		launch = nullptr;
+		GC::Collect();
+		GC::WaitForCompleteToFinalize();
+
+		return ec;
 	}
 }
 

@@ -18,6 +18,11 @@ namespace Ayla
     {
         Super::GatherProperties(collection);
         collection.Add(GenericApp);
+        collection.Add(T5);
+        collection.Add(T4);
+        collection.Add(T3);
+        collection.Add(T2);
+        collection.Add(T1);
     }
 
     int32 Launch::GuardedMain()
@@ -46,11 +51,27 @@ namespace Ayla
         window->Show();
 
         std::vector<GenericPlatformInputEvent> InputEvents;
+        bool exit = false;
+        auto thr = std::thread([this, &exit]()
+        {
+            while (exit == false)
+            {
+                T5 = std::move(T4);
+                T4 = std::move(T3);
+                T3 = std::move(T2);
+                T2 = std::move(T1);
+                std::this_thread::yield();
+            }
+        });
+
         while (!GenericApp->IsQuitRequested())
         {
             GenericApp->PumpMessages(InputEvents);
+            T1 = New<Object>();
         }
 
+        exit = true;
+        thr.join();
         return GenericApp->GetExitCode();
     }
 }

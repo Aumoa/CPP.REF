@@ -5,7 +5,6 @@
 #include <concepts>
 #include <algorithm>
 #include "GC/BasePtr.h"
-#include "GC/CommonPtrDeclaration.h"
 
 namespace Ayla
 {
@@ -32,27 +31,11 @@ namespace Ayla
 			m_Ptr = nullptr;
 		}
 
-		inline PPtr(T* ptr) noexcept requires std::derived_from<T, Object>
-		{
-			m_Object = ptr;
-			m_Ptr = ptr;
-		}
-
+		inline explicit PPtr(T* ptr) noexcept requires std::derived_from<T, Object>;
 		template<class U>
-		inline PPtr(const PPtr<U>& rhs) noexcept requires std::derived_from<U, T>
-		{
-			m_Object = rhs.m_Object;
-			m_Ptr = rhs.m_Ptr;
-		}
-
+		inline PPtr(const PPtr<U>& rhs) noexcept requires std::derived_from<U, T>;
 		template<class U>
-		inline PPtr(PPtr<U>&& rhs) noexcept requires std::derived_from<U, T>
-		{
-			std::swap(m_Object = nullptr, rhs.m_Object);
-			m_Ptr = rhs.m_Ptr;
-			rhs.m_Ptr = nullptr;
-		}
-
+		inline PPtr(PPtr<U>&& rhs) noexcept requires std::derived_from<U, T>;
 		template<class U>
 		inline PPtr(const RPtr<U>& rhs) noexcept requires std::derived_from<U, T>;
 		template<class U>
@@ -64,8 +47,18 @@ namespace Ayla
 			m_Ptr = nullptr;
 		}
 
-#define AYLA__COMMON_PTR_CLASS_NAME PPtr
-		AYLA__COMMON_PTR_DECLARATION;
-#undef AYLA__COMMON_PTR_CLASS_NAME
+		inline T* Get() const noexcept
+		{
+			return m_Ptr;
+		}
+
+		inline PPtr<T>& operator =(const PPtr<T>& rhs) noexcept;
+		inline PPtr<T>& operator =(PPtr<T>&& rhs) noexcept;
+		inline PPtr<T>& operator =(std::nullptr_t) noexcept;
+
+		inline T* operator ->() const noexcept
+		{
+			return m_Ptr;
+		}
 	};
 }
