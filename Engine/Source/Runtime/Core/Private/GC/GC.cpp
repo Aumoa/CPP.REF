@@ -5,6 +5,7 @@
 #include "GC/GC.h"
 #include "Threading/Tasks/Task.h"
 #include "Diagnostics/PerformanceTimer.h"
+#include "Diagnostics/Debug.h"
 #include "Platform/PlatformProcess.h"
 #include <set>
 #include <chrono>
@@ -28,6 +29,8 @@ namespace Ayla
 			*m_Output = m_Timer.GetElapsed().GetTotalSeconds();
 		}
 	};
+
+	constexpr LogCategory LogGC = TEXT("LogGC");
 
 	std::chrono::seconds GC::TimeSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(29950));
 	int32 GC::s_Interlocked;
@@ -259,7 +262,7 @@ namespace Ayla
 			}
 		}
 
-		PlatformProcess::OutputDebugString(String::Format(TEXT("GC::InternalCollect({})) called. NumCollect: {}, Live: {}(Gen: {}, {}, {}), CriticalSection: {:.2f} secs (Mark: {:.2f} secs, Unmark: {:.2f} secs, FinalizeQueue: {:.2f} secs), Finalize: {:.2f} secs\n"), generation, finalizedObjects.size(), lo, g1, g2, g3, criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs, finalizeSecs));
+		Debug::LogVerboseFormat(LogGC, TEXT("GC::InternalCollect({})) called. NumCollect: {}, Live: {}(Gen: {}, {}, {}), CriticalSection: {:.2f} secs (Mark: {:.2f} secs, Unmark: {:.2f} secs, FinalizeQueue: {:.2f} secs), Finalize: {:.2f} secs"), generation, finalizedObjects.size(), lo, g1, g2, g3, criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs, finalizeSecs);
 
 		auto lock = std::unique_lock(s_NotifyMtx);
 		PlatformAtomics::InterlockedDecrement(&s_DuringFinalize);

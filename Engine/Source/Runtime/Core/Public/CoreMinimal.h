@@ -94,6 +94,9 @@
 #include "Diagnostics/StackTrace.h"
 #include "Diagnostics/PerformanceTimer.h"
 #include "Diagnostics/TickTimer.h"
+#include "Diagnostics/LogCategory.h"
+#include "Diagnostics/Debug.h"
+#include "Diagnostics/LogVerbosity.h"
 
 #include "Threading/Spinlock.h"
 #include "Threading/Thread.h"
