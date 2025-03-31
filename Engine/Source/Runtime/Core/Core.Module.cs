@@ -10,7 +10,7 @@ public class Core : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
 
-        AddPublicDisableWarnings(4251, 4275, 5105, 4005);
+        AddPublicDisableWarnings(4005, 4100, 4251, 4275, 5105);
         AddPrivateDisableWarnings(5106);
 
         if (TargetInfo.Platform.Group == PlatformGroup.Windows)

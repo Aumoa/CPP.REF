@@ -3,6 +3,8 @@
 #pragma once
 
 #include <type_traits>
+#include <optional>
+#include <functional>
 
 #define GENERATE_BITMASK_ENUM_OPERATORS(ClassType) \
 inline constexpr ClassType operator |(ClassType Lhs, ClassType Rhs) noexcept \
@@ -117,3 +119,47 @@ inline constexpr auto operator <=>(ClassType Lhs, std::underlying_type_t<ClassTy
 #define MACRO_RECURSIVE_HELPER_FOR_EACH_RETRY_DOT() MACRO_RECURSIVE_HELPER_FOR_EACH_INVOKER_DOT
 
 #define MACRO_RECURSIVE_FOR_EACH_DOT(Body, ...) MACRO_RECURSIVE_HELPER_FOR_EACH_DOT(Body __VA_OPT__(, __VA_ARGS__))
+
+namespace Ayla::LaunguageSupportMacros
+{
+	template<class Mtx>
+	class lock_append
+	{
+		std::optional<Mtx> m_Mtx;
+		bool m_Dis;
+
+	public:
+		inline lock_append(Mtx&& mtx) noexcept
+			: m_Mtx(std::move(mtx))
+		{
+		}
+
+		inline ~lock_append() noexcept
+		{
+			m_Mtx.reset();
+		}
+
+		inline void operator <<(std::function<void(Mtx&)> body)
+		{
+			body(m_Mtx.value());
+			m_Mtx.reset();
+		}
+
+		template<class U>
+		inline U operator <<(std::function<U(Mtx&)> body)
+		{
+			U r = body(m_Mtx.value());
+			m_Mtx.reset();
+			return r;
+		}
+
+		template<class L>
+		inline auto operator <<(L&& body) -> std::invoke_result_t<L, Mtx>
+			requires std::invocable<L, Mtx&>
+		{
+			return *this * (std::function<std::invoke_result_t<L, Mtx>(Mtx&)>)body;
+		}
+	};
+}
+
+#define al_lock(Mtx) ::Ayla::LaunguageSupportMacros::lock_append(std::unique_lock(Mtx)) << [&](std::unique_lock<std::remove_reference_t<decltype(Mtx)>>& lock_)
