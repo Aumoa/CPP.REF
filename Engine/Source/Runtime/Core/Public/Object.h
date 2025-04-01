@@ -52,8 +52,8 @@ namespace Ayla
 		struct RootMark
 		{
 			Object* Ptr;
-			int64 Refs;
-			int64 Version;
+			int16 Refs;
+			int32 Version;
 		};
 
 		class RootCollection
@@ -67,12 +67,12 @@ namespace Ayla
 
 			std::mutex m_Mutex;
 			std::vector<RootMark> m_Roots;
-			std::vector<int64> m_InstanceIndexPool[3];
+			std::vector<int32> m_InstanceIndexPool[3];
 
 		public:
 			RootCollection();
 
-			int64 AddObject(Object* object);
+			int32 AddObject(Object* object);
 			Object* FinalizeObject(RootMark& mark);
 			RootMark& GetMark(Object* object);
 		};
@@ -82,7 +82,7 @@ namespace Ayla
 		static RootCollection s_RootCollection;
 
 		PPtrCollection m_PPtrCollection;
-		int64 m_InstanceIndex = -1;
+		int32 m_InstanceIndex = -1;
 		bool m_FinalizeSuppressed = false;
 
 	protected:

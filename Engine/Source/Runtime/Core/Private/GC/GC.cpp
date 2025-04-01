@@ -36,7 +36,7 @@ namespace Ayla
 
 	std::chrono::seconds GC::TimeSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(29950));
 	int32 GC::s_Interlocked;
-	int64 GC::s_Version;
+	int32 GC::s_Version;
 	std::thread::id GC::s_ThreadId;
 	int32 GC::s_DuringFinalize;
 	std::mutex GC::s_NotifyMtx;
@@ -215,15 +215,15 @@ namespace Ayla
 						{
 							int32 ngen = generation + 1;
 							auto& pool = self_.m_InstanceIndexPool[generation];
-							pool.emplace_back(i);
+							pool.emplace_back((int32)i);
 							auto& npool = self_.m_InstanceIndexPool[ngen];
 							auto rb = npool.rbegin();
-							int64 index;
+							int32 index;
 							Object::RootMark* nmark;
 							if (rb == npool.rend())
 							{
 								check(ngen == 2);
-								index = self_.m_Roots.size();
+								index = (int32)self_.m_Roots.size();
 								nmark = &self_.m_Roots.emplace_back(Object::RootMark{});
 							}
 							else

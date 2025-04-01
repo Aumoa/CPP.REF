@@ -30,7 +30,7 @@ namespace Ayla
 	private:
 		static std::chrono::seconds TimeSeconds;
 		static int32 s_Interlocked;
-		static int64 s_Version;
+		static int32 s_Version;
 		static std::thread::id s_ThreadId;
 		static int32 s_DuringFinalize;
 		static std::mutex s_NotifyMtx;

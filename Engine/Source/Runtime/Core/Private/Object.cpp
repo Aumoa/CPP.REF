@@ -18,20 +18,20 @@ namespace Ayla
 
 	Object::RootCollection::RootCollection()
 		: m_Roots(G1Size + G2Size)
-		, m_InstanceIndexPool{ std::vector<int64>(G1Size, (int64)0), std::vector<int64>(G2Size, (int64)0) }
+		, m_InstanceIndexPool{ std::vector<int32>(G1Size, (int32)0), std::vector<int32>(G2Size, (int32)0) }
 	{
 		for (size_t i = 0; i < G1Size; ++i)
 		{
-			m_InstanceIndexPool[0][i] = i;
+			m_InstanceIndexPool[0][i] = (int32)i;
 		}
 
 		for (size_t i = 0; i < G2Size; ++i)
 		{
-			m_InstanceIndexPool[1][i] = i + G1Size;
+			m_InstanceIndexPool[1][i] = (int32)(i + G1Size);
 		}
 	}
 
-	int64 Object::RootCollection::AddObject(Object* object)
+	int32 Object::RootCollection::AddObject(Object* object)
 	{
 		auto lock = std::unique_lock(m_Mutex);
 		if (m_InstanceIndexPool[0].empty())
@@ -40,7 +40,7 @@ namespace Ayla
 		}
 
 		auto rb = m_InstanceIndexPool[0].rbegin();
-		int64 instanceIndex = *rb;
+		int32 instanceIndex = *rb;
 		m_InstanceIndexPool[0].erase((rb + 1).base());
 		RootMark& mark = m_Roots[instanceIndex];
 
