@@ -2,7 +2,7 @@
   "profiles": {
     "ScriptingLaunch": {
       "commandName": "Project",
-      "workingDirectory": "F:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug",
+      "workingDirectory": "$(SolutionDir)Binaries\\Win64\\$(Configuration)",
       "nativeDebugging": true
     }
   }
