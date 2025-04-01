@@ -79,6 +79,11 @@ internal readonly struct SourceCodeCache
             {
                 int count = reader.ReadInt32();
                 var result = new DateTime[count];
+                if (count > 2048)
+                {
+                    throw new IOException();
+                }
+
                 for (int i = 0; i < count; ++i)
                 {
                     result[i] = DateTime.FromBinary(reader.ReadInt64());

@@ -7,11 +7,11 @@ internal class ModuleRulesResolver
     public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group, GroupDescriptor primaryGroup)
     {
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
+        Solution = solution;
         Rules = rules;
         RuleFilePath = targetProject.RuleFilePath;
         Name = rules.Name;
         Group = group;
-        PrimaryGroup = primaryGroup;
 
         PrivateDependencyModuleNames = WithBuiltInDependencyModule(targetInfo, rules.PrivateDependencyModuleNames).Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
@@ -108,11 +108,11 @@ internal class ModuleRulesResolver
         return Path.Combine(targetProject.SourceDirectory, relativeIncludePath);
     }
 
+    public readonly Solution Solution;
     public readonly ModuleRules Rules;
     public readonly string RuleFilePath;
     public readonly string Name;
     public readonly GroupDescriptor Group;
-    public readonly GroupDescriptor PrimaryGroup;
     public readonly string[] DependRuleFilePaths;
 
     private readonly string[] PrivateDependencyModuleNames;

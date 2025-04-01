@@ -1,5 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+#include "CoreMinimal.h"
+
 #if PLATFORM_WINDOWS
 
 #define __ALLOW_PLATFORM_COMMON_H__
