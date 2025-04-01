@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "InvalidOperationException.h"
+#include "AssertionMacros.h"
 #include "Platform/PlatformMacros.h"
 #include "GC/PPtr.h"
 #include "GC/RPtr.h"
 #include "GC/GC.h"
-#include "InvalidOperationException.h"
-#include "AssertionMacros.h"
+#include "Reflection/PropertyCollector.h"
 #include <mutex>
 #include <vector>
 #include <functional>
@@ -26,27 +27,6 @@ namespace Ayla
 
 	private:
 		struct CreationHack;
-
-	protected:
-		class PPtrCollection
-		{
-			friend ::Ayla::GC;
-
-		private:
-			std::vector<std::unique_ptr<PropertyGather<void>>> m_PPtrMembers;
-
-		public:
-			PPtrCollection() noexcept = default;
-			PPtrCollection(const PPtrCollection&) = delete;
-
-			template<class T>
-			inline void Add(T& pptr) requires requires { std::declval<PropertyGather<T>>(); }
-			{
-				m_PPtrMembers.emplace_back(std::make_unique<PropertyGather<T>>(&pptr));
-			}
-
-			PPtrCollection& operator =(const PPtrCollection&) = delete;
-		};
 
 	private:
 		struct RootMark
@@ -81,12 +61,12 @@ namespace Ayla
 		static size_t s_LiveObjects;
 		static RootCollection s_RootCollection;
 
-		PPtrCollection m_PPtrCollection;
+		PropertyCollector m_PropertyCollector;
 		int32 m_InstanceIndex = -1;
 		bool m_FinalizeSuppressed = false;
 
 	protected:
-		virtual void GatherProperties(PPtrCollection& collection)
+		virtual void GatherProperties(PropertyCollector& collection)
 		{
 			PLATFORM_UNREFERENCED_PARAMETER(collection);
 		}

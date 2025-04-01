@@ -6,7 +6,7 @@
 #include "GC/PPtr.h"
 #include "GC/GC.h"
 #include "Object.h"
-#include "GC/PropertyGather.h"
+#include "Reflection/PPtrGather.h"
 
 namespace Ayla
 {
@@ -118,13 +118,13 @@ namespace Ayla
 	}
 
 	template<class T>
-	struct PropertyGather<PPtr<T>> : public PropertyGather<>
+	struct PPtrGather<PPtr<T>> : public PPtrGather<>
 	{
 	private:
 		PPtr<T>* const m_Block;
 
 	public:
-		PropertyGather(PPtr<T>* block)
+		PPtrGather(PPtr<T>* block)
 			: m_Block(block)
 		{
 		}
@@ -139,13 +139,13 @@ namespace Ayla
 	};
 
 	template<class T> requires std::ranges::sized_range<T> && std::derived_from<std::ranges::range_value_t<T>, BasePtr>
-	struct PropertyGather<T> : public PropertyGather<>
+	struct PPtrGather<T> : public PPtrGather<>
 	{
 	private:
 		T* const m_Block;
 
 	public:
-		PropertyGather(T* block)
+		PPtrGather(T* block)
 			: m_Block(block)
 		{
 		}

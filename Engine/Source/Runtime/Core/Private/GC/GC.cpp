@@ -3,7 +3,6 @@
 #include "Object.h"
 #include "Console.h"
 #include "GC/GC.h"
-#include "GC/PropertyGather.h"
 #include "GC/GCPtr.Impl.h"
 #include "Threading/Tasks/Task.h"
 #include "Diagnostics/PerformanceTimer.h"
@@ -162,7 +161,7 @@ namespace Ayla
 						{
 							for (auto& object : gatherQueue)
 							{
-								for (auto& gather : object->m_PPtrCollection.m_PPtrMembers)
+								for (auto& gather : object->m_PropertyCollector.m_PPtrMembers)
 								{
 									size_t si = gatherQueue_.size();
 									gather->PullPPtrs(gatherQueue_);

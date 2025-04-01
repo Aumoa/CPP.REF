@@ -3,25 +3,28 @@
 #pragma once
 
 #include <concepts>
+#include <vector>
 
 namespace Ayla
 {
+	class Object;
+
 	template<class T = void>
-	struct PropertyGather
+	struct PPtrGather
 	{
 		static_assert(std::same_as<T, void>);
 	};
 
 	template<>
-	struct PropertyGather<void>
+	struct PPtrGather<void>
 	{
 	protected:
-		PropertyGather()
+		PPtrGather()
 		{
 		}
 
 	public:
-		virtual ~PropertyGather() noexcept
+		virtual ~PPtrGather() noexcept
 		{
 		}
 

@@ -96,7 +96,7 @@ namespace Ayla
 		CreationHack::s_Hack.AllowConstruct = true;
 		auto object = action();
 		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
-		object->GatherProperties(object->m_PPtrCollection);
+		object->GatherProperties(object->m_PropertyCollector);
 		lock.unlock();
 		GC::Release(object);  // This corresponds to the AddRef called in the Object constructor.
 		CreationHack::s_Hack.AllowConstruct = false;
