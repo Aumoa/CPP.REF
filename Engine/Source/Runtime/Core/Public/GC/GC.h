@@ -28,7 +28,6 @@ namespace Ayla
 		friend class PPtr;
 
 	private:
-		static std::chrono::seconds TimeSeconds;
 		static int32 s_Interlocked;
 		static int32 s_Version;
 		static std::thread::id s_ThreadId;

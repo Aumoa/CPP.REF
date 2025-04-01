@@ -321,4 +321,6 @@ namespace Ayla
 			return TimeSpan(std::chrono::nanoseconds(0));
 		}
 	};
+
+	using namespace std::chrono_literals;
 }

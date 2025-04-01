@@ -34,7 +34,6 @@ namespace Ayla
 
 	constexpr LogCategory LogGC{ TEXT("LogGC") };
 
-	std::chrono::seconds GC::TimeSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(29950));
 	int32 GC::s_Interlocked;
 	int32 GC::s_Version;
 	std::thread::id GC::s_ThreadId;

@@ -14,7 +14,7 @@ namespace Ayla
 		: StartTime(std::move(Rhs.StartTime))
 		, Elapsed(Rhs.Elapsed)
 	{
-		Rhs.Elapsed = std::chrono::seconds(0);
+		Rhs.Elapsed = 0s;
 	}
 
 	void PerformanceTimer::Start() noexcept
@@ -36,13 +36,13 @@ namespace Ayla
 
 	void PerformanceTimer::Reset() noexcept
 	{
-		Elapsed = TimeSpan::FromSeconds(0);
+		Elapsed = 0s;
 		StartTime.reset();
 	}
 
 	void PerformanceTimer::Restart() noexcept
 	{
-		Elapsed = TimeSpan::FromSeconds(0);
+		Elapsed = 0s;
 		StartTime = DateTime::Now();
 	}
 
@@ -80,7 +80,7 @@ namespace Ayla
 	{
 		StartTime = std::move(Rhs.StartTime);
 		Elapsed = Rhs.Elapsed;
-		Rhs.Elapsed = std::chrono::seconds(0);
+		Rhs.Elapsed = 0s;
 		return *this;
 	}
 }

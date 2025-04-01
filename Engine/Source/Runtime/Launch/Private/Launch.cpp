@@ -38,7 +38,7 @@ namespace Ayla
         for (int i = 0; i < 100; ++i)
         {
             GenericSplash::SetSplashText(String::Format(TEXT("Initialize... ({0}/100)"), i + 1));
-            std::this_thread::sleep_for(std::chrono::milliseconds(16));
+            std::this_thread::sleep_for(16ms);
         }
         GenericSplash::Hide();
 
