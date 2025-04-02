@@ -11,16 +11,9 @@ Console.CancelKeyPress += OnCancelKeyPress;
 
 if (args.Length > 0)
 {
-    try
-    {
-        var pass = Parser.Default.ParseArguments<GenerateOptions, BuildOptions>(args);
-        pass = await pass.WithParsedAsync<GenerateOptions>(options => GenerateRunner.RunAsync(options, cts.Token).AsTask());
-        pass = await pass.WithParsedAsync<BuildOptions>(options => BuildRunner.RunAsync(options, cts.Token).AsTask());
-    }
-    catch (TerminateException e)
-    {
-        return e.ReturnCode;
-    }
+    var pass = Parser.Default.ParseArguments<GenerateOptions, BuildOptions>(args);
+    pass = await pass.WithParsedAsync<GenerateOptions>(options => GenerateRunner.RunAsync(options, cts.Token).AsTask());
+    pass = await pass.WithParsedAsync<BuildOptions>(options => BuildRunner.RunAsync(options, cts.Token).AsTask());
 }
 else
 {
@@ -35,7 +28,7 @@ else
     }
 }
 
-return 0;
+return;
 
 void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs args)
 {

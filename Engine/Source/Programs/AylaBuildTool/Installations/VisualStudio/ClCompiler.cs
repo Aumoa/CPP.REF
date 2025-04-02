@@ -54,8 +54,8 @@ internal class ClCompiler : Compiler
             "/diagnostics:column " +
             // Use standard preprocessor.
             "/Zc:preprocessor " +
-            // Forces writes to the program database (PDB) file—created by /Zi or /ZI—to be serialized through MSPDBSRV.EXE.
-            "/FS "
+            // Causes the compiler to display the full path of source code files passed to the compiler in diagnostics.
+            "/FC "
         );
 
         switch (m_TargetInfo.Config)
@@ -142,7 +142,7 @@ internal class ClCompiler : Compiler
         var fileName = Path.GetFileName(item.SourceCode.FilePath);
         var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
         var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-        var pdbFileName = Path.Combine(intermediateDirectory, "Unused.pdb");
+        var pdbFileName = Path.Combine(intermediateDirectory, fileName + ".pdb");
         var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps.json");
         var cacheFileName = Path.Combine(intermediateDirectory, fileName + ".cache");
 
@@ -156,26 +156,6 @@ internal class ClCompiler : Compiler
             pdbFileName,
             depsFileName
         );
-
-        if (item.Resolver.Name == "Core")
-        {
-            if (Path.GetFileName(item.SourceCode.FilePath).Equals("CoreMinimal.pch.cpp"))
-            {
-                string pchFileName = Path.Combine(intermediateDirectory, "CoreMinimal.pch");
-                var pchPdbFileName = Path.Combine(intermediateDirectory, "CoreMinimal.pdb");
-                m_CommandBuilder.Replace("/DCORE_API=PLATFORM_SHARED_EXPORT", "/DCORE_API=PLATFORM_SHARED_IMPORT");
-                m_CommandBuilder.Replace($"/Fd\"{pdbFileName}\"", $"/Fd\"{pchPdbFileName}\"");
-                m_CommandBuilder.AppendFormat("/Yc\"CoreMinimal.h\" /Fp\"{0}\" ", pchFileName);
-            }
-        }
-        else if (item.Resolver.DependencyModuleNames.Contains("Core"))
-        {
-            var coreInt = item.Resolver.Solution.EngineGroup.Intermediate("Core", m_TargetInfo, FolderPolicy.PathType.Current);
-            var pchFileName = Path.Combine(coreInt, "CoreMinimal.pch");
-            var pchPdbFileName = Path.Combine(coreInt, "CoreMinimal.pdb");
-            m_CommandBuilder.Replace($"/Fd\"{pdbFileName}\"", $"/Fd\"{pchPdbFileName}\"");
-            m_CommandBuilder.AppendFormat("/Yu\"CoreMinimal.h\" /Fp\"{0}\" /FI\"CoreMinimal.h\" ", pchFileName);
-        }
 
         m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
         var output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);

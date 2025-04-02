@@ -9,15 +9,13 @@ internal class Solution
     public readonly IReadOnlyList<Project> EngineProjects;
     public readonly IReadOnlyList<Project> GameProjects;
     public readonly IReadOnlyList<Project> AllProjects;
-    public readonly GroupDescriptor EngineGroup;
     public readonly GroupDescriptor PrimaryGroup;
 
-    private Solution(List<Project> engineProjects, List<Project> gameProjects, GroupDescriptor engineGroup, GroupDescriptor primaryGroup)
+    private Solution(List<Project> engineProjects, List<Project> gameProjects, GroupDescriptor primaryGroup)
     {
         EngineProjects = engineProjects;
         GameProjects = gameProjects;
         AllProjects = gameProjects.Concat(engineProjects).ToArray();
-        EngineGroup = engineGroup;
         PrimaryGroup = primaryGroup;
     }
 
@@ -48,11 +46,10 @@ internal class Solution
     public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? gameFolder, CancellationToken cancellationToken = default)
     {
         List<Task> tasks = new();
-        GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
-        GroupDescriptor primaryGroup = engineGroup;
+        GroupDescriptor primaryGroup = GroupDescriptor.FromRoot(engineFolder, true);
 
         List<Project> engineProjects = new();;
-        tasks.Add(ScanDirectoryRecursive(engineProjects, engineGroup, Path.Combine(engineFolder, "Source")));
+        tasks.Add(ScanDirectoryRecursive(engineProjects, primaryGroup, Path.Combine(engineFolder, "Source")));
         List<Project> gameProjects = new();
         if (string.IsNullOrEmpty(gameFolder) == false)
         {
@@ -63,7 +60,7 @@ internal class Solution
         await Task.WhenAll(tasks);
         engineProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
         gameProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
-        return new Solution(engineProjects, gameProjects, engineGroup, primaryGroup);
+        return new Solution(engineProjects, gameProjects, primaryGroup);
 
         async Task ScanDirectoryRecursive(IList<Project> results, GroupDescriptor descriptor, string currentDir)
         {

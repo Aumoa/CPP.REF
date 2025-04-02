@@ -16,7 +16,7 @@ internal static class BuildRunner
     private class CompileTask : ITask
     {
         public readonly CompileItem Item;
-        private readonly TaskCompletionSource<int> m_CompletionSource = new();
+        private readonly TaskCompletionSource m_CompletionSource = new();
 
         public CompileTask(CompileItem item)
         {
@@ -30,7 +30,7 @@ internal static class BuildRunner
             {
                 var compiler = await installation.SpawnCompilerAsync(targetInfo, cancellationToken);
                 var output = await compiler.CompileAsync(Item, cancellationToken);
-                m_CompletionSource.SetResult(output.ExitCode);
+                m_CompletionSource.SetResult();
                 return output;
             }
             catch (OperationCanceledException)
@@ -49,7 +49,7 @@ internal static class BuildRunner
             }
         }
 
-        public Task<int> Task => m_CompletionSource.Task;
+        public Task Task => m_CompletionSource.Task;
 
         public GroupDescriptor Group => Item.Descriptor;
     }
@@ -60,82 +60,22 @@ internal static class BuildRunner
         public readonly CompileTask[] NeedCompileTasks;
 
         private readonly CompileItem[] m_AllCompiles;
-        private readonly TaskCompletionSource<int> m_CompletionSource = new();
-        private readonly CompileTask? m_PrecompileTask;
+        private readonly TaskCompletionSource m_CompletionSource = new();
 
         public ModuleTask(ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles)
         {
             Resolver = resolver;
             NeedCompileTasks = needCompiles;
             m_AllCompiles = allCompiles;
-            if (resolver.Name == "Core")
-            {
-                int indexOf = Array.FindIndex(needCompiles, p => Path.GetFileName(p.Item.SourceCode.FilePath).Equals("CoreMinimal.pch.cpp", StringComparison.CurrentCultureIgnoreCase));
-                if (indexOf != -1)
-                {
-                    m_PrecompileTask = needCompiles[indexOf];
-                    NeedCompileTasks = needCompiles
-                        .Where((_, index) => index != indexOf)
-                        .ToArray();
-                }
-            }
-        }
-
-        public Task<Terminal.Output?> TryPrecompileAsync(SemaphoreSlim access, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
-        {
-            if (m_PrecompileTask == null)
-            {
-                return System.Threading.Tasks.Task.FromResult<Terminal.Output?>(null);
-            }
-
-            return m_PrecompileTask.CompileAsync(access, installation, targetInfo, cancellationToken)!;
         }
 
         public async Task<Terminal.Output> LinkAsync(SemaphoreSlim access, IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
-            var compileResults = await System.Threading.Tasks.Task.WhenAll(NeedCompileTasks.Select(p => p.Task));
-            if (compileResults.Any(p => p != 0))
-            {
-                var err = new Terminal.Log
-                {
-                    Value = "Link error: One or more required source code compilations have failed.",
-                    Verbosity = Verbose.Error
-                };
-
-                m_CompletionSource.SetResult(-1);
-                return new Terminal.Output
-                {
-                    ExitCode = -1,
-                    Executable = string.Empty,
-                    Command = string.Empty,
-                    Logs = [err],
-                    StdOut = [],
-                    StdErr = [err]
-                };
-            }
+            await Task.WhenAll(NeedCompileTasks.Select(p => p.Task));
 
             foreach (var name in Resolver.DependencyModuleNames)
             {
-                var dependLinkResult = await moduleTasks.Where(p => p.Resolver.Name == name).First().Task;
-                if (dependLinkResult != 0)
-                {
-                    var err = new Terminal.Log
-                    {
-                        Value = "Link error: One or more required module linking have failed.",
-                        Verbosity = Verbose.Error
-                    };
-
-                    m_CompletionSource.SetResult(-1);
-                    return new Terminal.Output
-                    {
-                        ExitCode = -1,
-                        Executable = string.Empty,
-                        Command = string.Empty,
-                        Logs = [err],
-                        StdOut = [],
-                        StdErr = [err]
-                    };
-                }
+                await moduleTasks.Where(p => p.Resolver.Name == name).First().Task;
             }
 
             await access.WaitAsync(cancellationToken);
@@ -143,7 +83,7 @@ internal static class BuildRunner
             {
                 var linker = await installation.SpawnLinkerAsync(targetInfo, cancellationToken);
                 var output = await linker.LinkAsync(Resolver, m_AllCompiles, cancellationToken);
-                m_CompletionSource.SetResult(output.ExitCode);
+                m_CompletionSource.SetResult();
                 return output;
             }
             catch (OperationCanceledException)
@@ -162,7 +102,7 @@ internal static class BuildRunner
             }
         }
 
-        public Task<int> Task => m_CompletionSource.Task;
+        public Task Task => m_CompletionSource.Task;
 
         public GroupDescriptor Group => Resolver.Group;
     }
@@ -288,10 +228,9 @@ internal static class BuildRunner
             _ => 6
         };
 
-        int[] buildResults;
         if (ConsoleEnvironment.IsDynamic)
         {
-            buildResults = await AnsiConsole.Progress()
+            await AnsiConsole.Progress()
                 .Columns([new SpinnerColumn(), new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn()])
                 .StartAsync(async ctx =>
                 {
@@ -303,11 +242,11 @@ internal static class BuildRunner
                         compilationTasks.Add(result.Key, task);
                     }
 
-                    await PrecompileAsync(PulseCounter);
                     DispatchCompileWorkers(PulseCounter);
                     DispatchLinkWorkers(PulseCounter);
 
-                    return await Task.WhenAll(moduleTasks.Select(p => p.Task));
+                    await Task.WhenAll(moduleTasks.Select(p => p.Task));
+                    return;
 
                     void PulseCounter(ITask task)
                     {
@@ -321,16 +260,9 @@ internal static class BuildRunner
         }
         else
         {
-            await PrecompileAsync(null);
             DispatchCompileWorkers(null);
             DispatchLinkWorkers(null);
-            buildResults = await Task.WhenAll(moduleTasks.Select(p => p.Task));
-        }
-
-        if (buildResults.Any(p => p != 0))
-        {
-            AnsiConsole.MarkupLine("[red]Build failed.[/]");
-            throw TerminateException.User();
+            await Task.WhenAll(moduleTasks.Select(p => p.Task));
         }
 
         return;
@@ -378,57 +310,6 @@ internal static class BuildRunner
                     }
                 });
             }
-        }
-
-        async Task PrecompileAsync(Action<ITask>? pulse)
-        {
-            List<Task> tasks = [];
-
-            foreach (var moduleTask in moduleTasks)
-            {
-                var precompileTask = moduleTask.TryPrecompileAsync(semaphore, installation, buildTarget, cancellationToken);
-                tasks.Add(precompileTask);
-                _ = precompileTask.ContinueWith(r =>
-                {
-                    var output = r.Result;
-                    if (output == null)
-                    {
-                        return;
-                    }
-
-                    try
-                    {
-                        if (ConsoleEnvironment.IsDynamic)
-                        {
-                            lock (moduleTasks)
-                            {
-                                for (int i = 0; i < output.Logs.Length; i++)
-                                {
-                                    Terminal.Log log = output.Logs[i];
-                                    if (i == 0)
-                                    {
-                                        AnsiConsole.MarkupLine("{0} {1}", MakeOutputPrefix().EscapeMarkup(), Terminal.SimpleMarkupOutputLine(log.Value));
-                                    }
-                                    else
-                                    {
-                                        AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
-                        }
-                    }
-                    finally
-                    {
-                        pulse?.Invoke(moduleTask);
-                    }
-                });
-            }
-
-            await Task.WhenAll(tasks);
         }
 
         void DispatchCompileWorkers(Action<ITask>? pulse)

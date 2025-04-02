@@ -65,13 +65,6 @@ internal class MSLinker : Linker
             m_CommandBuilder.AppendFormat("\"{0}\" ", objectFileName);
         }
 
-        if (module.DependencyModuleNames.Contains("Core"))
-        {
-            var coreInt = module.Solution.EngineGroup.Intermediate("Core", m_TargetInfo, FolderPolicy.PathType.Current);
-            var pchObjectFileName = Path.Combine(coreInt, "CoreMinimal.pch.cpp.o");
-            m_CommandBuilder.AppendFormat("\"{0}\" ", pchObjectFileName);
-        }
-
         string libraryPath = Path.Combine(m_Product.Directory, "lib", m_TargetInfo.Platform.Architecture switch
         {
             Architecture.X64 => "x64",
@@ -81,8 +74,7 @@ internal class MSLinker : Linker
         foreach (var libPath in VisualStudioInstallation.GatherWindowsKitSharedLibrary(m_TargetInfo.Platform.Architecture)
             .Append(libraryPath)
             .Append(outputPath)
-            .Append(module.Solution.EngineGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
-            .Append(module.Solution.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
+            .Append(module.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
             .Distinct())
         {
             m_CommandBuilder.Append($"/LIBPATH:\"{libPath}\" ");

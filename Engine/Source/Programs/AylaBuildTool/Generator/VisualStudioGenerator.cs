@@ -1,5 +1,4 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -261,7 +260,7 @@ internal class VisualStudioGenerator : Generator
 
         async Task GenerateCppProjectAsync(Dictionary<ModuleProject, string> vcxprojPaths, GroupDescriptor primaryGroup, ModuleProject project, CancellationToken cancellationToken)
         {
-            var engineGroup = solution.EngineGroup;
+            var engineGroup = solution.EngineProjects.First().Descriptor;
 
             var group = project.Descriptor;
             var projectFilesDirectory = Path.Combine(primaryGroup.IntermediateDirectory, "ProjectFiles");

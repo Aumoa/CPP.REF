@@ -41,16 +41,8 @@ internal class BuildCommands : Commands
             Clean = clean
         };
 
-        try
-        {
-            await BuildRunner.RunAsync(options, cancellationToken);
-            AnsiConsole.MarkupLine("[green]Build completed.[/]");
-        }
-        catch (TerminateException)
-        {
-            // error print on BuildRunner.RunAsync().
-        }
-
+        await BuildRunner.RunAsync(options, cancellationToken);
+        AnsiConsole.MarkupLine("[green]Build completed.[/]");
         Pop();
         return;
 
