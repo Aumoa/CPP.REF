@@ -6,6 +6,47 @@
 #include <optional>
 #include <functional>
 
+#define GENERATE_BITMASK_ENUM_OPERATORS_FRIEND(ClassType) \
+friend inline constexpr ClassType operator |(ClassType Lhs, ClassType Rhs) noexcept \
+{ \
+	using T = std::underlying_type_t<ClassType>; \
+	return (ClassType)((T)Lhs | (T)Rhs); \
+} \
+\
+friend inline constexpr ClassType operator &(ClassType Lhs, ClassType Rhs) noexcept \
+{ \
+	using T = std::underlying_type_t<ClassType>; \
+	return (ClassType)((T)Lhs & (T)Rhs); \
+} \
+\
+friend inline constexpr ClassType& operator |=(ClassType& Lhs, ClassType Rhs) noexcept \
+{ \
+	Lhs = Lhs | Rhs; \
+	return Lhs; \
+} \
+\
+friend inline constexpr ClassType& operator &=(ClassType& Lhs, ClassType Rhs) noexcept \
+{ \
+	Lhs = Lhs & Rhs; \
+	return Lhs; \
+} \
+\
+friend inline constexpr ClassType operator ~(ClassType u) noexcept \
+{ \
+	using T = std::underlying_type_t<ClassType>; \
+	return (ClassType)~(T)u; \
+} \
+\
+friend inline constexpr bool operator ==(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
+{ \
+	return static_cast<std::underlying_type_t<ClassType>>(Lhs) == Rhs; \
+} \
+\
+friend inline constexpr auto operator <=>(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
+{ \
+	return static_cast<std::underlying_type_t<ClassType>>(Lhs) <=> Rhs; \
+}
+
 #define GENERATE_BITMASK_ENUM_OPERATORS(ClassType) \
 inline constexpr ClassType operator |(ClassType Lhs, ClassType Rhs) noexcept \
 { \
