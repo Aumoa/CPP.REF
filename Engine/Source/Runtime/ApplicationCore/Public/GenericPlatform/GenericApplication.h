@@ -6,6 +6,7 @@
 #include "GenericPlatform/GenericWindowDefinition.h"
 #include "GenericPlatform/GenericPlatformInputEvent.h"
 #include "GenericPlatform/GenericWindow.h"
+#include "IO/DirectoryReference.h"
 
 namespace Ayla
 {

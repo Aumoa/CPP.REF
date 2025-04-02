@@ -7,6 +7,7 @@
 #define __ALLOW_PLATFORM_COMMON_H__
 #include "Platform/PlatformCommon.h"
 #include "GenericPlatform/GenericApplication.h"
+#include "IO/File.h"
 #include <optional>
 
 namespace Ayla

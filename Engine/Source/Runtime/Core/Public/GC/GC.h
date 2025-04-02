@@ -6,10 +6,10 @@
 #include "StaticClass.h"
 #include "AssertionMacros.h"
 #include "GC/RPtr.h"
+#include "Threading/Spinlock.h"
+#include "Threading/SpinlockConditionVariable.h"
 #include <chrono>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 
 namespace Ayla
 {
@@ -32,8 +32,8 @@ namespace Ayla
 		static int32 s_Version;
 		static std::thread::id s_ThreadId;
 		static int32 s_DuringFinalize;
-		static std::mutex s_NotifyMtx;
-		static std::condition_variable s_CompleteToFinalize;
+		static Spinlock s_NotifyMtx;
+		static SpinlockConditionVariable s_CompleteToFinalize;
 
 	public:
 		static void SuppressFinalize(const RPtr<Object>& target);

@@ -4,6 +4,7 @@
 
 #include "Windows/WindowsApplication.h"
 #include "Windows/WindowsWindow.h"
+#include "IO/FileReference.h"
 
 namespace Ayla
 {

@@ -20,7 +20,7 @@ namespace Ayla
 	protected:
 		Launch(std::vector<String> CmdArgs);
 
-		virtual void GatherProperties(PPtrCollection& collection) override;
+		virtual void GatherProperties(PropertyCollector& collection) override;
 
 	public:
 		int32 GuardedMain();

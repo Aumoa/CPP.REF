@@ -14,10 +14,10 @@ namespace Ayla
         GenericApp = GenericApplication::CreateApplication();
     }
 
-    void Launch::GatherProperties(PPtrCollection& collection)
+    void Launch::GatherProperties(PropertyCollector& collection)
     {
         Super::GatherProperties(collection);
-        collection.Add(GenericApp);
+        collection.Add(TEXT("GenericApp"), GenericApp);
     }
 
     int32 Launch::GuardedMain()

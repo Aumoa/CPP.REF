@@ -28,7 +28,7 @@ namespace Ayla
 			return i;
 		}
 
-		std::mutex m_Mtx;
+		Spinlock m_Mtx;
 		std::map<DWORD, HANDLE> m_Handles;
 
 	private:
@@ -36,15 +36,15 @@ namespace Ayla
 		{
 			using namespace std::chrono_literals;
 
-			std::mutex mtx;
-			std::condition_variable cv;
+			Spinlock mtx;
+			SpinlockConditionVariable cv;
 			bool init = false;
 			std::thread([&]()
 			{
 				Capture();
 
 				auto lock = std::unique_lock(mtx);
-				cv.notify_one();
+				cv.NotifyOne();
 				init = true;
 				lock.unlock();
 
@@ -58,7 +58,7 @@ namespace Ayla
 			auto lock = std::unique_lock(mtx);
 			while (init == false)
 			{
-				cv.wait(lock);
+				cv.Wait(lock);
 			}
 		}
 

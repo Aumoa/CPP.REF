@@ -9,7 +9,7 @@
 #include "GC/RPtr.h"
 #include "GC/GC.h"
 #include "Reflection/PropertyCollector.h"
-#include <mutex>
+#include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>
 
@@ -45,7 +45,7 @@ namespace Ayla
 			static constexpr size_t G2Size = 65536;
 			static_assert(G2Size > G1Size);
 
-			std::mutex m_Mutex;
+			Spinlock m_Mutex;
 			std::vector<RootMark> m_Roots;
 			std::vector<int32> m_InstanceIndexPool[3];
 

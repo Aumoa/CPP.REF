@@ -37,8 +37,8 @@ namespace Ayla
 	int32 GC::s_Version;
 	std::thread::id GC::s_ThreadId;
 	int32 GC::s_DuringFinalize;
-	std::mutex GC::s_NotifyMtx;
-	std::condition_variable GC::s_CompleteToFinalize;
+	Spinlock GC::s_NotifyMtx;
+	SpinlockConditionVariable GC::s_CompleteToFinalize;
 
 	void GC::SuppressFinalize(const RPtr<Object>& target)
 	{
@@ -55,7 +55,7 @@ namespace Ayla
 		auto lock = std::unique_lock(s_NotifyMtx);
 		while (s_DuringFinalize > 0)
 		{
-			s_CompleteToFinalize.wait(lock);
+			s_CompleteToFinalize.Wait(lock);
 		}
 	}
 
@@ -278,6 +278,6 @@ namespace Ayla
 
 		auto lock = std::unique_lock(s_NotifyMtx);
 		PlatformAtomics::InterlockedDecrement(&s_DuringFinalize);
-		s_CompleteToFinalize.notify_all();
+		s_CompleteToFinalize.NotifyAll();
 	}
 }

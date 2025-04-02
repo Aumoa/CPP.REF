@@ -4,6 +4,7 @@
 
 #include "Windows/WindowsWindow.h"
 #include "Windows/WindowsApplication.h"
+#include "CrcHash.h"
 
 namespace Ayla
 {
