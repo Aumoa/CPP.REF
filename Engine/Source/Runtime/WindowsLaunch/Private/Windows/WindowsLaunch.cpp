@@ -4,29 +4,20 @@
 
 #define __ALLOW_PLATFORM_COMMON_H__
 
-#include "Launch.h"
+#include "Windows/WindowsLaunch.h"
 #include "Platform/PlatformCommon.h"
 
 namespace Ayla
 {
-	class WindowsLaunch : public Launch
+	WindowsLaunch::WindowsLaunch(std::vector<String> CmdArgs) : Super(std::move(CmdArgs))
 	{
-		using Super = Launch;
+		ApplicationPointer = GetModuleHandleW(nullptr);
+	}
 
-	private:
-		void* ApplicationPointer = nullptr;
-
-	public:
-		WindowsLaunch(std::vector<String> CmdArgs) : Super(std::move(CmdArgs))
-		{
-			ApplicationPointer = GetModuleHandleW(nullptr);
-		}
-
-		virtual void* GetApplicationPointer() override
-		{
-			return ApplicationPointer;
-		}
-	};
+	void* WindowsLaunch::GetApplicationPointer()
+	{
+		return ApplicationPointer;
+	}
 }
 
 extern "C"

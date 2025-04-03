@@ -3,24 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Launch.gen.h"
 
 namespace Ayla
 {
 	class GenericApplication;
 
+	ACLASS()
 	class LAUNCH_API Launch : public virtual Object
 	{
-		using Super = This;
-		using This = Launch;
+		GENERATED_BODY()
 
 	private:
 		std::vector<String> CmdArgs;
+		APROPERTY()
 		PPtr<GenericApplication> GenericApp;
 
 	protected:
 		Launch(std::vector<String> CmdArgs);
-
-		virtual void GatherProperties(PropertyCollector& collection) override;
 
 	public:
 		int32 GuardedMain();

@@ -48,6 +48,7 @@
 #include "OperationCanceledException.h"
 #include "ConstructorNotFoundException.h"
 #include "Object.h"
+#include "Type.h"
 
 #include "GC/GC.h"
 #include "GC/RPtr.h"
@@ -57,6 +58,7 @@
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/PPtrGather.h"
 #include "Reflection/ReflectionMacros.h"
+#include "Reflection/TypeRegister.h"
 
 #include "Diagnostics/Debug.h"
 

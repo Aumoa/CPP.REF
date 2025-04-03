@@ -120,18 +120,11 @@ namespace Ayla
 	template<class T>
 	struct PPtrGather<PPtr<T>> : public PPtrGather<>
 	{
-	private:
-		PPtr<T>* const m_Block;
-
 	public:
-		PPtrGather(PPtr<T>* block)
-			: m_Block(block)
+		virtual void PullPPtrs(Object* pointer, size_t offset, std::vector<Object*>& output) override
 		{
-		}
-
-		virtual void PullPPtrs(std::vector<Object*>& output) override
-		{
-			if (auto* ptr = m_Block->Get(); ptr != nullptr)
+			auto pptr = reinterpret_cast<PPtr<T>*>(reinterpret_cast<byte*>(pointer) + offset);
+			if (auto* ptr = pptr->Get(); ptr != nullptr)
 			{
 				output.emplace_back(ptr);
 			}
@@ -141,22 +134,15 @@ namespace Ayla
 	template<class T> requires std::ranges::sized_range<T> && std::derived_from<std::ranges::range_value_t<T>, BasePtr>
 	struct PPtrGather<T> : public PPtrGather<>
 	{
-	private:
-		T* const m_Block;
-
 	public:
-		PPtrGather(T* block)
-			: m_Block(block)
+		virtual void PullPPtrs(Object* pointer, size_t offset, std::vector<Object*>& output) override
 		{
-		}
-
-		virtual void PullPPtrs(std::vector<Object*>& output) override
-		{
-			for (auto& pptr : *m_Block)
+			auto ptr = reinterpret_cast<std::vector<T>*>(reinterpret_cast<byte*>(pointer) + offset);
+			for (auto& pptr : *ptr)
 			{
-				if (auto* ptr = pptr.Get(); ptr != nullptr)
+				if (pptr.Get() != nullptr)
 				{
-					output.emplace_back(ptr);
+					output.emplace_back(ptr.Get());
 				}
 			}
 		}

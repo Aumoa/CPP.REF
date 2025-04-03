@@ -7,16 +7,16 @@
 #include "GenericPlatform/GenericPlatformInputEvent.h"
 #include "GenericPlatform/GenericWindow.h"
 #include "IO/DirectoryReference.h"
+#include "GenericApplication.gen.h"
 
 namespace Ayla
 {
     class GenericWindow;
 
+    ACLASS()
     class APPLICATIONCORE_API GenericApplication : virtual public Object
     {
-    public:
-        using Super = This;
-        using This = GenericApplication;
+        GENERATED_BODY()
 
     private:
         static GenericApplication* sApp;

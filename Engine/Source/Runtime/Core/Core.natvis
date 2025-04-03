@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<Type Name="String">
-		<DisplayString Condition="Buf._Which==0">{Buf._Head,[Len]}</DisplayString>
-		<DisplayString Condition="Buf._Which==1">{Buf._Tail._Head._Ptr,[Len]}</DisplayString>
-		<StringView Condition="Buf._Which==0">Buf._Head,[Len]</StringView>
-		<StringView Condition="Buf._Which==1">Buf._Tail._Head._Ptr,[Len]</StringView>
+	<Type Name="Ayla::String">
+		<DisplayString Condition="Buf._Which==0">{Buf._Head,su}</DisplayString>
+		<DisplayString Condition="Buf._Which==1">{Buf._Tail._Head._Ptr,su}</DisplayString>
+		<StringView Condition="Buf._Which==0">Buf._Head</StringView>
+		<StringView Condition="Buf._Which==1">Buf._Tail._Head._Ptr</StringView>
 		<Expand>
-			<Item Condition="Buf._Which==0" Name="[Text]">Buf._Head,[Len]</Item>
-			<Item Condition="Buf._Which==1" Name="[Text]">Buf._Tail._Head._Ptr,[Len]</Item>
+			<Item Condition="Buf._Which==0" Name="[Text]">Buf._Head,su</Item>
+			<Item Condition="Buf._Which==1" Name="[Text]">Buf._Tail._Head._Ptr,sub</Item>
 			<Item Condition="Buf._Which==1" Name="[Refs]">Buf._Tail._Head._Rep->_Uses</Item>
 		</Expand>
+	</Type>
+	<Type Name="Ayla::Type">
+		<DisplayString>{((Ayla::RuntimeType*)this)->m_TR.Namespace,sb}.{((Ayla::RuntimeType*)this)->m_TR.Name,sb}</DisplayString>
 	</Type>
 	<Type Name="Version">
 		<DisplayString Condition="Revision != 0">{Major}.{Minor}.{Build}.{Revision}</DisplayString>
 		<DisplayString Condition="Build != 0">{Major}.{Minor}.{Build}</DisplayString>
 		<DisplayString>{Major}.{Minor}</DisplayString>
-	</Type>
-	<Type Name="ToolChainInstallation">
-		<DisplayString Condition="(WindowsToolkitInstallation*)this">WindowsToolkitInstallation {((WindowsToolkitInstallation*)this)->InstallVersion}</DisplayString>
-	</Type>
-	<Type Name="FileSystemReference">
-		<DisplayString>{Value}</DisplayString>
 	</Type>
 </AutoVisualizer>

@@ -1,8 +1,14 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Object.h"
+#include "TypeNotFoundException.h"
 #include "Platform/PlatformAtomics.h"
+#include "Reflection/TypeRegister.h"
+#include "Reflection/TypeCollector.h"
+#include "Reflection/ReflectionMacros.h"
 #include "GC/GCPtr.Impl.h"
+
+ACLASS__IMPL_CLASS_REGISTER_2(Ayla, Object);
 
 namespace Ayla
 {
@@ -10,6 +16,7 @@ namespace Ayla
 	{
 		static thread_local CreationHack s_Hack;
 		bool AllowConstruct = false;
+		Type* ObjectType;
 	};
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
@@ -68,15 +75,24 @@ namespace Ayla
 		return m_Roots[object->m_InstanceIndex];
 	}
 
-	Object::Object()
+	Object::Object(CreationFlags flags)
+		: m_Type(nullptr)
 	{
-		if (CreationHack::s_Hack.AllowConstruct == false)
+		if (flags != CreationFlags::Static)
 		{
-			throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
-		}
+			if (CreationHack::s_Hack.AllowConstruct == false)
+			{
+				throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
+			}
 
-		PlatformAtomics::InterlockedIncrement(&s_LiveObjects);
-		m_InstanceIndex = s_RootCollection.AddObject(this);
+			PlatformAtomics::InterlockedIncrement(&s_LiveObjects);
+			m_InstanceIndex = s_RootCollection.AddObject(this);
+			m_Type = CreationHack::s_Hack.ObjectType;
+		}
+	}
+
+	Object::Object() : Object(CreationFlags::None)
+	{
 	}
 
 	Object::~Object() noexcept
@@ -91,12 +107,16 @@ namespace Ayla
 		return String::Format(TEXT("{}"), String::FromLiteral(typeid(*this).name()));
 	}
 
-	void Object::ConfigureNew(std::function<Object*()> action)
+	void Object::ConfigureNew(const std::type_info& typeInfo, std::function<Object*()> action)
 	{
 		CreationHack::s_Hack.AllowConstruct = true;
+		CreationHack::s_Hack.ObjectType = TypeCollector::FindType(typeInfo);
+		if (CreationHack::s_Hack.ObjectType == nullptr)
+		{
+			throw new TypeNotFoundException(String::FromLiteral(typeInfo.name()));
+		}
 		auto object = action();
 		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
-		object->GatherProperties(object->m_PropertyCollector);
 		lock.unlock();
 		GC::Release(object);  // This corresponds to the AddRef called in the Object constructor.
 		CreationHack::s_Hack.AllowConstruct = false;

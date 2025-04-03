@@ -4,6 +4,7 @@
 
 #include "InvalidOperationException.h"
 #include "AssertionMacros.h"
+#include "LanguageSupportMacros.h"
 #include "Platform/PlatformMacros.h"
 #include "GC/PPtr.h"
 #include "GC/RPtr.h"
@@ -12,15 +13,24 @@
 #include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>
+#include <typeinfo>
 
 namespace Ayla
 {
 	template<class T>
 	struct PropertyGather;
 
+	struct GC;
+	struct TypeRegister;
+	class Type;
+	class RuntimeType;
+
 	class CORE_API Object
 	{
-		friend ::Ayla::GC;
+		friend GC;
+		friend TypeRegister;
+		friend Type;
+		friend RuntimeType;
 
 	public:
 		using This = Object;
@@ -58,15 +68,24 @@ namespace Ayla
 		};
 
 	private:
+		enum class CreationFlags
+		{
+			None,
+			Static
+		};
+
+		GENERATE_BITMASK_ENUM_OPERATORS_FRIEND(::Ayla::Object::CreationFlags);
+
+	private:
 		static size_t s_LiveObjects;
 		static RootCollection s_RootCollection;
 
-		PropertyCollector m_PropertyCollector;
 		int32 m_InstanceIndex = -1;
-		bool m_FinalizeSuppressed = false;
+		uint8 m_FinalizeSuppressed : 1 = false;
+		Type* m_Type;
 
 	protected:
-		virtual void GatherProperties(PropertyCollector& collection)
+		static void GatherProperties(PropertyCollector& collection)
 		{
 			PLATFORM_UNREFERENCED_PARAMETER(collection);
 		}
@@ -74,6 +93,9 @@ namespace Ayla
 		virtual void Finalize()
 		{
 		}
+
+	private:
+		Object(CreationFlags flags);
 
 	public:
 		Object();
@@ -89,7 +111,7 @@ namespace Ayla
 		static RPtr<T> New(TArgs&&... args) requires std::constructible_from<T, TArgs...>
 		{
 			std::optional<RPtr<T>> ptr;
-			ConfigureNew([&]()
+			ConfigureNew(typeid(T), [&]()
 			{
 				ptr.emplace(new T(std::forward<TArgs>(args)...));
 				return ptr->Get();
@@ -98,6 +120,6 @@ namespace Ayla
 		}
 
 	private:
-		static void ConfigureNew(std::function<Object*()> action);
+		static void ConfigureNew(const std::type_info& typeInfo, std::function<Object*()> action);
 	};
 }

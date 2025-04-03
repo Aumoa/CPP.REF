@@ -14,12 +14,6 @@ namespace Ayla
         GenericApp = GenericApplication::CreateApplication();
     }
 
-    void Launch::GatherProperties(PropertyCollector& collection)
-    {
-        Super::GatherProperties(collection);
-        collection.Add(TEXT("GenericApp"), GenericApp);
-    }
-
     int32 Launch::GuardedMain()
     {
         GenericApp->SetApplicationPointer(GetApplicationPointer());
@@ -50,6 +44,7 @@ namespace Ayla
         while (!GenericApp->IsQuitRequested())
         {
             GenericApp->PumpMessages(InputEvents);
+            New<Object>();
         }
 
         return GenericApp->GetExitCode();

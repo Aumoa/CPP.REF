@@ -8,6 +8,8 @@
 namespace Ayla
 {
 	class Object;
+	template<class T>
+	class PPtr;
 
 	template<class T = void>
 	struct PPtrGather
@@ -19,15 +21,21 @@ namespace Ayla
 	struct PPtrGather<void>
 	{
 	protected:
-		PPtrGather()
-		{
-		}
+		PPtrGather() = default;
 
 	public:
-		virtual ~PPtrGather() noexcept
-		{
-		}
+		PPtrGather(const PPtrGather&) = delete;
+		virtual ~PPtrGather() noexcept = default;
 
-		virtual void PullPPtrs(std::vector<Object*>& output) = 0;
+		virtual void PullPPtrs(Object* pointer, size_t offset, std::vector<Object*>& output) = 0;
+
+		PPtrGather& operator =(const PPtrGather&) = delete;
+
+		template<class U>
+		inline static PPtrGather<U>* Get()
+		{
+			static PPtrGather<U> s_Inst;
+			return &s_Inst;
+		}
 	};
 }

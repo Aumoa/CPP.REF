@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-    class APPLICATIONCORE_API GenericWindow : virtual public Object
+    class APPLICATIONCORE_API GenericWindow : public Object
     {
     protected:
         GenericWindow();

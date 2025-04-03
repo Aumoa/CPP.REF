@@ -9,25 +9,30 @@
 namespace Ayla
 {
 	struct GC;
+	class BasePtr;
 
 	class PropertyCollector
 	{
 		friend GC;
-		std::vector<std::unique_ptr<PPtrGather<void>>> m_PPtrMembers;
+		std::vector<std::pair<PPtrGather<>*, size_t>> m_PPtrMembers;
 
 	public:
 		PropertyCollector() noexcept = default;
 		PropertyCollector(const PropertyCollector&) = delete;
 
-		template<class T>
-		inline void Add(String name, T& pptr) requires requires
+		template<std::derived_from<BasePtr> T>
+		inline void Add(String name, T* offset)
 		{
-			std::declval<PPtrGather<T>>();
-		}
-		{
-			m_PPtrMembers.emplace_back(std::make_unique<PPtrGather<T>>(&pptr));
+			m_PPtrMembers.emplace_back(PPtrGather<>::template Get<T>(), (size_t)offset);
 		}
 
 		PropertyCollector& operator =(const PropertyCollector&) = delete;
+
+		template<class U, class T>
+		static T* Advance(T* pointer)
+		{
+			size_t advance = reinterpret_cast<size_t>(static_cast<Object*>(reinterpret_cast<U*>(0)));
+			return reinterpret_cast<T*>(reinterpret_cast<byte*>(pointer) + advance);
+		}
 	};
 }
