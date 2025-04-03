@@ -4,5 +4,6 @@ internal enum SourceCodeType
 {
     SourceCode,
     Declaration,
-    Header
+    Header,
+    NativeVisualizer
 }

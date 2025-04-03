@@ -11,20 +11,27 @@ internal readonly struct SourceCodeDescriptor(string FilePath, string RelativePa
     public static bool TryGet(string filePath, string sourceCodeRoot, out SourceCodeDescriptor outValue)
     {
         var extensions = Path.GetExtension(filePath).ToLower();
+        SourceCodeType type;
         switch (extensions)
         {
             case ".cpp":
-                outValue = new SourceCodeDescriptor(filePath, Path.GetRelativePath(sourceCodeRoot, filePath), SourceCodeType.SourceCode);
-                return true;
+                type = SourceCodeType.SourceCode;
+                break;
             case ".h":
-                outValue = new SourceCodeDescriptor(filePath, Path.GetRelativePath(sourceCodeRoot, filePath), SourceCodeType.Header);
-                return true;
+                type = SourceCodeType.Header;
+                break;
             case ".cs":
-                outValue = new SourceCodeDescriptor(filePath, Path.GetRelativePath(sourceCodeRoot, filePath), SourceCodeType.Declaration);
-                return true;
+                type = SourceCodeType.Declaration;
+                break;
+            case ".natvis":
+                type = SourceCodeType.NativeVisualizer;
+                break;
+            default:
+                outValue = default;
+                return false;
         }
 
-        outValue = default;
-        return false;
+        outValue = new SourceCodeDescriptor(filePath, Path.GetRelativePath(sourceCodeRoot, filePath), type);
+        return true;
     }
 }

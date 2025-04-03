@@ -676,6 +676,7 @@ internal class VisualStudioGenerator : Generator
             {
                 SourceCodeType.SourceCode => "ClCompile",
                 SourceCodeType.Header or SourceCodeType.Declaration => "ClInclude",
+                SourceCodeType.NativeVisualizer => "Natvis",
                 _ => throw new NotSupportedException()
             };
         }
