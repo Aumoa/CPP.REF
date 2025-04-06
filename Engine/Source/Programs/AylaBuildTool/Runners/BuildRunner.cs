@@ -27,14 +27,14 @@ internal static partial class BuildRunner
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
         var primaryGroup = solution.EngineProjects.First().Descriptor;
-        IEnumerable<Project> targetProjects;
+        IEnumerable<ModuleProject> targetProjects;
         if (string.IsNullOrEmpty(options.Target))
         {
-            targetProjects = solution.AllProjects;
+            targetProjects = solution.AllProjects.OfType<ModuleProject>();
         }
         else
         {
-            var targetProject = solution.FindProject(options.Target);
+            var targetProject = (ModuleProject?)solution.FindProject(options.Target);
             if (targetProject == null)
             {
                 AnsiConsole.MarkupLine("[red]Target '{0}' is not found in solution.[/]", options.Target);
@@ -48,7 +48,7 @@ internal static partial class BuildRunner
             }
 
             var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor, primaryGroup);
-            var depends = solution.FindDepends(resolver.DependencyModuleNames);
+            var depends = solution.FindDepends(resolver.DependencyModuleNames).OfType<ModuleProject>();
             targetProjects = depends.Append(targetProject);
         }
 
@@ -73,17 +73,18 @@ internal static partial class BuildRunner
             return;
         }
 
+        Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
+        await DispatchGenerateHeaderWorkers();
         List<ModuleTask> moduleTasks = [];
 
-        foreach (var project in targetProjects.OfType<ModuleProject>())
+        foreach (var project in targetProjects)
         {
             var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, buildTarget), project.Descriptor, primaryGroup);
             List<CompileItem> allCompiles = [];
             List<CompileTask> needCompiles = [];
-            List<GenerateReflectionHeaderTask> reflectionHeaderGenerates = [];
             var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
 
-            foreach (var sourceCode in project.GetSourceCodes())
+            foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
             {
                 if (sourceCode.Type == SourceCodeType.SourceCode)
                 {
@@ -113,20 +114,15 @@ internal static partial class BuildRunner
                         needCompiles.Add(new CompileTask(item));
                     }
                 }
-                else if (sourceCode.Type == SourceCodeType.Header)
-                {
-                    reflectionHeaderGenerates.Add(new GenerateReflectionHeaderTask(resolver, sourceCode));
-                }
             }
 
-            moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray(), reflectionHeaderGenerates.ToArray()));
+            moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray()));
         }
 
         int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
         SemaphoreSlim semaphore = new(hardwareConcurrency);
         const int LinkTasks = 1;
-        const int GenerateHeaderTasks = 1;
-        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length + LinkTasks) + GenerateHeaderTasks;
+        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length + LinkTasks);
         log = totalActions switch
         {
             >= 0 and < 10 => 1,
@@ -151,7 +147,6 @@ internal static partial class BuildRunner
                         compilationTasks.Add(result.Key, task);
                     }
 
-                    await DispatchGenerateHeaderWorkers(PulseCounter);
                     DispatchCompileWorkers(PulseCounter);
                     DispatchLinkWorkers(PulseCounter);
 
@@ -170,7 +165,6 @@ internal static partial class BuildRunner
         }
         else
         {
-            await DispatchGenerateHeaderWorkers(null);
             DispatchCompileWorkers(null);
             DispatchLinkWorkers(null);
             await Task.WhenAll(moduleTasks.Select(p => p.Task));
@@ -183,40 +177,61 @@ internal static partial class BuildRunner
             return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
         }
 
-        async Task DispatchGenerateHeaderWorkers(Action<ITask>? pulse)
+        async Task DispatchGenerateHeaderWorkers()
         {
-            List<Task<string>> tasks = [];
+            List<Task<GenerateReflectionHeaderTask>> tasks = [];
 
-            foreach (var moduleTask in moduleTasks)
+            foreach (var project in targetProjects)
             {
-                foreach (var task in moduleTask.GRHTasks)
+                foreach (var sourceCode in project.GetSourceCodes())
                 {
-                    tasks.Add(task.GenerateAsync(semaphore, buildTarget, cancellationToken));
+                    if (sourceCode.Type == SourceCodeType.Header)
+                    {
+                        var ght = new GenerateReflectionHeaderTask(project, sourceCode);
+                        tasks.Add(ght.GenerateAsync(buildTarget, cancellationToken));
+                    }
                 }
             }
 
-            string[] results = (await Task.WhenAll(tasks)).Where(r => string.IsNullOrEmpty(r) == false).ToArray();
-            if (results.Length > 0)
+            var results = await Task.WhenAll(tasks);
+            if (results.Any(p => p.ErrorText != null))
             {
+                var errorMessages = results.Where(p => p.ErrorText != null).Select(p => p.ErrorText);
+
                 if (ConsoleEnvironment.IsDynamic)
                 {
-                    AnsiConsole.MarkupLine("[red]{0}[/]", string.Join('\n', results).EscapeMarkup());
+                    AnsiConsole.MarkupLine("[red]{0}[/]", string.Join('\n', errorMessages).EscapeMarkup());
                 }
                 else
                 {
-                    Console.WriteLine(string.Join('\n', results));
+                    Console.WriteLine(string.Join('\n', errorMessages));
                 }
 
                 throw TerminateException.User();
             }
 
+            foreach (var result in results)
+            {
+                var gsc = result.GeneratedSourceCode;
+                if (gsc.HasValue)
+                {
+                    if (generatedSourceCodes.TryGetValue(result.Project, out var list) == false)
+                    {
+                        list = [];
+                        generatedSourceCodes.Add(result.Project, list);
+                    }
+
+                    list.Add(gsc.Value);
+                }
+            }
+
             if (ConsoleEnvironment.IsDynamic)
             {
-                AnsiConsole.MarkupLine("{0} Reflection header files has been generated.", MakeOutputPrefix().EscapeMarkup());
+                AnsiConsole.MarkupLine("Reflection header files has been generated.");
             }
             else
             {
-                Console.WriteLine("{0} Reflection header files has been generated.", MakeOutputPrefix());
+                Console.WriteLine("Reflection header files has been generated.");
             }
         }
 

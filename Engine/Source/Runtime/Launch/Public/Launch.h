@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericPlatform/GenericApplication.h"
 #include "Launch.gen.h"
 
 namespace Ayla
 {
-	class GenericApplication;
-
 	ACLASS()
 	class LAUNCH_API Launch : public Object
 	{

@@ -35,4 +35,14 @@ internal readonly struct SourceCodeDescriptor(GroupDescriptor Group, string File
         outValue = new SourceCodeDescriptor(group, filePath, Path.GetRelativePath(sourceCodeRoot, filePath), type);
         return true;
     }
+
+    public static SourceCodeDescriptor Get(GroupDescriptor group, string filePath, string sourceCodeRoot)
+    {
+        if (TryGet(group, filePath, sourceCodeRoot, out var result) == false)
+        {
+            throw TerminateException.Internal();
+        }
+
+        return result;
+    }
 }

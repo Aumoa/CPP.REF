@@ -4,40 +4,45 @@ internal static partial class BuildRunner
 {
     private class GenerateReflectionHeaderTask
     {
-        private readonly ModuleRulesResolver m_Resolver;
+        public readonly ModuleProject Project;
         private readonly SourceCodeDescriptor m_SourceCode;
 
-        public GenerateReflectionHeaderTask(ModuleRulesResolver resolver, SourceCodeDescriptor sourceCode)
+        public GenerateReflectionHeaderTask(ModuleProject project, SourceCodeDescriptor sourceCode)
         {
-            m_Resolver = resolver;
+            Project = project;
             m_SourceCode = sourceCode;
         }
 
-        public async Task<string> GenerateAsync(SemaphoreSlim access, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public SourceCodeDescriptor? GeneratedSourceCode { get; private set; }
+
+        public string? ErrorText { get; private set; }
+
+        public async Task<GenerateReflectionHeaderTask> GenerateAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
         {
-            await access.WaitAsync(cancellationToken);
             try
             {
                 var fileName = Path.GetFileNameWithoutExtension(m_SourceCode.FilePath);
-                var intDir = m_Resolver.Group.Intermediate(m_Resolver.Name, targetInfo, FolderPolicy.PathType.Current);
+                var intDir = Project.Descriptor.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
                 var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
                 var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
                 var generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
                 if (generator != null)
                 {
-                    var headerText = generator.GenerateHeader().Trim();
+                    var headerText = generator.GenerateHeader().Replace("\r\n", "\n").Trim();
                     await CompareExchangeContentAsync(generatedHeader, headerText, cancellationToken);
+
+                    var sourceCodeText = generator.GenerateSourceCode().Replace("\r\n", "\n").Trim();
+                    await CompareExchangeContentAsync(generatedSourceCode, sourceCodeText, cancellationToken);
+
+                    GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
                 }
-                return string.Empty;
             }
             catch (Exception e)
             {
-                return e.Message;
+                ErrorText = e.Message;
             }
-            finally
-            {
-                access.Release();
-            }
+
+            return this;
         }
 
         private static async Task CompareExchangeContentAsync(string filePath, string content, CancellationToken cancellationToken)
@@ -51,7 +56,8 @@ internal static partial class BuildRunner
                 }
             }
 
-            await File.WriteAllTextAsync(filePath, content.Replace("\r\n", "\n").Trim(), cancellationToken);
+            Console.WriteLine("{0} is newer.", filePath);
+            await File.WriteAllTextAsync(filePath, content.Replace("\n", Environment.NewLine), cancellationToken);
         }
     }
 }

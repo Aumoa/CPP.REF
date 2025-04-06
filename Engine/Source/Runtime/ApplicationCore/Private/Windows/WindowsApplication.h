@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericApplication.h"
-#include "Windows/WindowsApplication.gen.h"
+#include "WindowsApplication.gen.h"
 
 #if PLATFORM_WINDOWS
 

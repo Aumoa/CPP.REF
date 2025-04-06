@@ -8,17 +8,15 @@ internal static partial class BuildRunner
     {
         public readonly ModuleRulesResolver Resolver;
         public readonly CompileTask[] NeedCompileTasks;
-        public readonly GenerateReflectionHeaderTask[] GRHTasks;
 
         private readonly CompileItem[] m_AllCompiles;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public ModuleTask(ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles, GenerateReflectionHeaderTask[] grhTasks)
+        public ModuleTask(ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles)
         {
             Resolver = resolver;
             NeedCompileTasks = needCompiles;
             m_AllCompiles = allCompiles;
-            GRHTasks = grhTasks;
         }
 
         public async Task<Terminal.Output> LinkAsync(SemaphoreSlim access, IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)

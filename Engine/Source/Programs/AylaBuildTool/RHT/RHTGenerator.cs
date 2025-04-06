@@ -402,6 +402,7 @@ internal class RHTGenerator
     {
         public readonly Class Class;
         private GeneratedBody? m_GeneratedBody;
+        private List<AProperty> m_Properties = [];
 
         private AClass(Context context, Class @class) : base(context)
         {
@@ -427,6 +428,13 @@ internal class RHTGenerator
 
                 m_GeneratedBody = value;
             }
+        }
+
+        public IReadOnlyList<AProperty> Properties => m_Properties;
+
+        public void AddProperty(AProperty property)
+        {
+            m_Properties.Add(property);
         }
 
         public static bool TryAccept(Context context, List<Syntax> bracketStack, [NotNullWhen(true)] out AClass? aclass)
@@ -482,8 +490,11 @@ internal class RHTGenerator
 
     internal class AProperty : Syntax
     {
-        private AProperty(Context context) : base(context)
+        public readonly string Name;
+
+        private AProperty(Context context, string name) : base(context)
         {
+            Name = name;
         }
 
         public override string ToString()
@@ -503,7 +514,17 @@ internal class RHTGenerator
 
             var capture = context.Capture();
             context.Advance("APROPERTY()".Length);
-            aproperty = new AProperty(capture);
+
+            context.SkipWhiteSpace(true);
+            var nextLine = context.Export(0, "\n").Trim(';').ToString();
+            var items = nextLine.Split('=');
+            var declare = items[0].Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (declare.Length != 2)
+            {
+                throw capture.ParsingError("Syntax Error: Expected 'Type Name[ = DefaultValue];' but found an unexpected character.");
+            }
+
+            aproperty = new AProperty(capture, declare[1]);
             return true;
         }
     }
@@ -553,22 +574,22 @@ internal class RHTGenerator
 
     private readonly SourceCodeDescriptor m_SourceCode;
     private readonly Syntax[] m_Syntaxes;
+    private readonly string m_FileId;
 
     private RHTGenerator(SourceCodeDescriptor sourceCode, Syntax[] syntaxes)
     {
         m_SourceCode = sourceCode;
         m_Syntaxes = syntaxes;
-    }
-
-    public string GenerateHeader()
-    {
         var sourceRelativePath = Path.GetRelativePath(m_SourceCode.Group.SourceDirectory, m_SourceCode.FilePath);
-        var fileId = sourceRelativePath
+        m_FileId = sourceRelativePath
             .Replace('/', '_')
             .Replace('\\', '_')
             .Replace('.', '_')
             .ToUpper();
+    }
 
+    public string GenerateHeader()
+    {
         string headerText = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.
@@ -578,7 +599,7 @@ internal class RHTGenerator
 #include "Reflection/ReflectionMacros.h"
 
 #undef GENERATED_BODY__FILE_ID__
-#define GENERATED_BODY__FILE_ID__ {fileId}
+#define GENERATED_BODY__FILE_ID__ {m_FileId}
 
 
 """;
@@ -589,16 +610,58 @@ internal class RHTGenerator
             {
                 var lineNumber = aclass.Body.LineNumber;
 
-                headerText += $"#define GENERATED_BODY__IMPL__{fileId}__{lineNumber}__NAMESPACE {aclass.Class.Namespace}\n";
-                headerText += $"#define GENERATED_BODY__IMPL__{fileId}__{lineNumber}__CLASSNAME {aclass.Class.Name}\n\n";
+                headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__NAMESPACE {aclass.Class.Namespace}\n";
+                headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__CLASSNAME {aclass.Class.Name}\n\n";
 
-                headerText += $"#define GENERATED_BODY__IMPL__{fileId}__{lineNumber} \\\n";
-                headerText += $"\tGENERATED_BODY__DEFAULT_BODY(GENERATED_BODY__IMPL__{fileId}__{lineNumber}__CLASSNAME) \\\n";
+                headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber} \\\n";
+                headerText += $"\tGENERATED_BODY__DEFAULT_BODY(GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__CLASSNAME) \\\n";
                 headerText += $"\tGENERATED_BODY__DECLARE_GATHER_PROPERTIES()\n\n";
             }
         }
 
         return headerText;
+    }
+
+    public string GenerateSourceCode()
+    {
+        string sourceCodeText = $"""
+// Copyright 2020-2025 AylaEngine. All Rights Reserved.
+// This file is auto-generated. Do not edit it manually.
+
+#include "CoreMinimal.h"
+#include "{m_SourceCode.FilePath.Replace('\\', '/')}"
+
+
+""";
+
+        foreach (var syntax in m_Syntaxes)
+        {
+            if (syntax is AClass aclass)
+            {
+                var lineNumber = aclass.Body.LineNumber;
+                string namespaceDefine = $"GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__NAMESPACE";
+                string classNameDefine = $"GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__CLASSNAME";
+
+                sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER_2(\n";
+                sourceCodeText += $"\t{namespaceDefine},\n";
+                sourceCodeText += $"\t{classNameDefine}\n";
+                sourceCodeText += $");\n\n";
+
+                sourceCodeText += $"namespace {namespaceDefine}\n";
+                sourceCodeText += "{\n";
+                sourceCodeText += $"\tvoid {classNameDefine}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
+                sourceCodeText +=  "\t{\n";
+                sourceCodeText +=  "\t\tSuper::GatherProperties(collector);\n";
+                foreach (var property in aclass.Properties)
+                {
+                    sourceCodeText += $"\t\tGENERATED_BODY__GATHER_PROPERTIES_PROP({property.Name});\n";
+                }
+                sourceCodeText +=  "\t}\n";
+                sourceCodeText +=  "}\n\n";
+            }
+        }
+
+        return sourceCodeText;
     }
 
     public static async Task<RHTGenerator?> ParseAsync(SourceCodeDescriptor sourceCode, CancellationToken cancellationToken = default)
@@ -653,12 +716,23 @@ internal class RHTGenerator
             }
             else if (GeneratedBody.TryAccept(context, out var generatedBody))
             {
-                syntaxes.OfType<AClass>().Last().Body = generatedBody;
+                aclass = syntaxes.OfType<AClass>().LastOrDefault();
+                if (aclass == null)
+                {
+                    throw generatedBody.Context.ParsingError("Syntax Error: A class definition is required before GENERATED_BODY().");
+                }
+                aclass.Body = generatedBody;
                 continue;
             }
             else if (AProperty.TryAccept(context, out var aproperty))
             {
-                syntaxes.Add(aproperty);
+                aclass = syntaxes.OfType<AClass>().LastOrDefault();
+                if (aclass == null)
+                {
+                    throw aproperty.Context.ParsingError("Syntax Error: A class definition is required before APROPERTY().");
+                }
+                aclass.AddProperty(aproperty);
+                continue;
             }
             else if (UnknownBracket.TryAccept(context, out var unknownBracket))
             {
