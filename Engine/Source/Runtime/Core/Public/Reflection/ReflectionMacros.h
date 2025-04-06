@@ -32,7 +32,8 @@ namespace Ayla \
 public: \
 	using Super = This; \
 	using This = ClassName; \
-	friend ::Ayla::TypeRegister;
+	friend ::Ayla::TypeRegister; \
+	friend ::Ayla::Object;
 
 #define GENERATED_BODY__DECLARE_GATHER_PROPERTIES() \
 protected: \

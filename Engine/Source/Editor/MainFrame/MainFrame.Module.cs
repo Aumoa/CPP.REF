@@ -9,6 +9,6 @@ public class MainFrame : ModuleRules
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
-        AddPublicDependencyModuleNames("Core", "SlateCore", "Slate", "Engine");
+        AddPublicDependencyModuleNames("Core", "Engine");
     }
 }

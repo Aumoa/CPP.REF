@@ -119,18 +119,6 @@ namespace Ayla
 			return std::move(ptr).value();
 		}
 
-		template<std::derived_from<Object> T>
-		static RPtr<T> New(std::function<T*()> factory)
-		{
-			std::optional<RPtr<T>> ptr;
-			ConfigureNew(typeid(T), [&]()
-			{
-				ptr.emplace(factory());
-				return ptr->Get();
-			});
-			return std::move(ptr).value();
-		}
-
 	private:
 		static void ConfigureNew(const std::type_info& typeInfo, std::function<Object*()> action);
 	};

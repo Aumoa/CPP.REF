@@ -57,6 +57,9 @@ internal static partial class BuildRunner
         int totalActions = 0;
         int log = 1;
 
+        Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
+        await DispatchGenerateHeaderWorkers();
+
         if (options.Clean == CleanOptions.CleanOnly)
         {
             foreach (var project in targetProjects.OfType<ModuleProject>())
@@ -70,11 +73,13 @@ internal static partial class BuildRunner
                 }
             }
 
+            await GenerateRunner.RunAsync(new GenerateOptions
+            {
+                ProjectFile = options.ProjectFile
+            }, cancellationToken);
             return;
         }
 
-        Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
-        await DispatchGenerateHeaderWorkers();
         List<ModuleTask> moduleTasks = [];
 
         foreach (var project in targetProjects)

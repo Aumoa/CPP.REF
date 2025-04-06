@@ -47,13 +47,20 @@ internal static partial class BuildRunner
 
         private static async Task CompareExchangeContentAsync(string filePath, string content, CancellationToken cancellationToken)
         {
-            if (File.Exists(filePath))
+            var directory = Path.GetDirectoryName(filePath);
+            bool directoryExist = Directory.Exists(directory);
+            if (directoryExist && File.Exists(filePath))
             {
                 var previousContent = await File.ReadAllTextAsync(filePath, cancellationToken);
                 if (previousContent.Trim().Replace("\r\n", "\n") == content)
                 {
                     return;
                 }
+            }
+
+            if (directoryExist == false && directory != null)
+            {
+                Directory.CreateDirectory(directory);
             }
 
             Console.WriteLine("{0} is newer.", filePath);

@@ -85,13 +85,13 @@ internal class ModuleRulesResolver
             var dependTargetProject = solution.FindProject(dep);
             if (dependTargetProject == null)
             {
-                AnsiConsole.MarkupLine("[red]Depend module [b]{0}[/] is not included in current solution.[/]");
+                AnsiConsole.MarkupLine("[red]Project [b]{0}[/], referenced by Project [b]{1}[/], is not included in this solution.[/]", dep, targetProject.Name);
                 throw TerminateException.User();
             }
 
             if (dependTargetProject is not ModuleProject mp)
             {
-                AnsiConsole.MarkupLine("[red]Depend module [b]{0}[/] is not Module project.[/]");
+                AnsiConsole.MarkupLine("[red]Project [b]{0}[/], referenced by Project [b]{1}[/], is not a valid C++ project.[/]", dep, targetProject.Name);
                 throw TerminateException.User();
             }
 
