@@ -222,7 +222,7 @@ namespace Ayla
 						else
 						{
 							U result = Body();
-							uAwaiter->SetResult(result);
+							uAwaiter->SetResult(std::move(result));
 						}
 					}
 					catch (...)

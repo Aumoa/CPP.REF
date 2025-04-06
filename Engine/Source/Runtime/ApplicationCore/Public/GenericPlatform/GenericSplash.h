@@ -3,11 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericSplash.gen.h"
 
 namespace Ayla
 {
-	class APPLICATIONCORE_API GenericSplash : virtual public Object
+	ACLASS()
+	class APPLICATIONCORE_API GenericSplash : public Object
 	{
+		GENERATED_BODY()
+
+	private:
 		GenericSplash() = delete;
 
 	public:

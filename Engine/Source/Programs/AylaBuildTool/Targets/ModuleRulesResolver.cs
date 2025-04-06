@@ -62,8 +62,9 @@ internal class ModuleRulesResolver
             return;
         }
 
+        var intDir = targetProject.Descriptor.Intermediate(targetProject.Name, targetInfo, FolderPolicy.PathType.Current);
         dependencyModuleNames.AddRange(rules.PublicDependencyModuleNames);
-        includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)));
+        includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)).Append(intDir));
         additionalMacros.AddRange(rules.PublicAdditionalMacros);
         disableWarnings.AddRange(rules.PublicDisableWarnings);
         additionalLibraries.AddRange(rules.PublicAdditionalLibraries);

@@ -4,19 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Rect.h"
+#include "GenericImage.gen.h"
 
 namespace Ayla
 {
-	class APPLICATIONCORE_API NGenericImage : virtual public Object
+	ACLASS()
+	class APPLICATIONCORE_API GenericImage : public Object
 	{
+		GENERATED_BODY()
+
 	private:
 		void* pImpl = nullptr;
 
 	private:
-		NGenericImage();
+		GenericImage();
 
 	public:
-		~NGenericImage() noexcept;
+		~GenericImage() noexcept;
 
 		void CopyPixels(int32 Stride, int32 BufferSize, void* DestBuf);
 		Task<> CopyPixelsAsync(int32 Stride, int32 BufferSize, void* DestBuf);
@@ -25,6 +29,6 @@ namespace Ayla
 
 		Vector2N GetSize() const;
 
-		static Task<std::shared_ptr<NGenericImage>> LoadFromFileAsync(String InFilename);
+		static Task<RPtr<GenericImage>> LoadFromFileAsync(String InFilename);
 	};
 }

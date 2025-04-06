@@ -14,7 +14,7 @@ namespace Ayla
     class GenericWindow;
 
     ACLASS()
-    class APPLICATIONCORE_API GenericApplication : virtual public Object
+    class APPLICATIONCORE_API GenericApplication : public Object
     {
         GENERATED_BODY()
 

@@ -12,11 +12,11 @@
 
 namespace Ayla
 {
-	NGenericImage::NGenericImage()
+	GenericImage::GenericImage()
 	{
 	}
 
-	NGenericImage::~NGenericImage() noexcept
+	GenericImage::~GenericImage() noexcept
 	{
 		if (pImpl)
 		{
@@ -24,13 +24,13 @@ namespace Ayla
 		}
 	}
 
-	void NGenericImage::CopyPixels(int32 Stride, int32 BufferSize, void* DestBuf)
+	void GenericImage::CopyPixels(int32 Stride, int32 BufferSize, void* DestBuf)
 	{
 		check(pImpl);
 		HR(IMPLV.CopyPixels(nullptr, (UINT)Stride, (UINT)BufferSize, (BYTE*)DestBuf));
 	}
 
-	Task<> NGenericImage::CopyPixelsAsync(int32 Stride, int32 BufferSize, void* DestBuf)
+	Task<> GenericImage::CopyPixelsAsync(int32 Stride, int32 BufferSize, void* DestBuf)
 	{
 		check(pImpl);
 		return Task<>::Run([Ptr = ComPtr<IWICFormatConverter>(&IMPLV), Stride, BufferSize, DestBuf]()
@@ -39,7 +39,7 @@ namespace Ayla
 			});
 	}
 
-	void NGenericImage::CopyPixels(const RectN& InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf)
+	void GenericImage::CopyPixels(const RectN& InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf)
 	{
 		check(pImpl);
 		WICRect WRect =
@@ -52,7 +52,7 @@ namespace Ayla
 		HR(IMPLV.CopyPixels(&WRect, (UINT)Stride, (UINT)BufferSize, (BYTE*)DestBuf));
 	}
 
-	Task<> NGenericImage::CopyPixelsAsync(RectN InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf)
+	Task<> GenericImage::CopyPixelsAsync(RectN InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf)
 	{
 		check(pImpl);
 		return Task<>::Run([Ptr = ComPtr<IWICFormatConverter>(&IMPLV), InCopyRect, Stride, BufferSize, DestBuf]()
@@ -68,7 +68,7 @@ namespace Ayla
 			});
 	}
 
-	Vector2N NGenericImage::GetSize() const
+	Vector2N GenericImage::GetSize() const
 	{
 		check(pImpl);
 		UINT iWidth, iHeight;
@@ -76,25 +76,25 @@ namespace Ayla
 		return Vector2N((int32)iWidth, (int32)iHeight);
 	}
 
-	Task<std::shared_ptr<NGenericImage>> NGenericImage::LoadFromFileAsync(String InFilename)
+	Task<RPtr<GenericImage>> GenericImage::LoadFromFileAsync(String InFilename)
 	{
 		return Task<>::Run([pFactory = NWindowsCoStatics::GetImagingFactory(), InFilename]()
-			{
-				ComPtr<IWICBitmapDecoder> pDecoder;
-				HR(pFactory->CreateDecoderFromFilename(InFilename.c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder));
+		{
+			ComPtr<IWICBitmapDecoder> pDecoder;
+			HR(pFactory->CreateDecoderFromFilename(InFilename.c_str(), nullptr, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &pDecoder));
 
-				ComPtr<IWICBitmapFrameDecode> pDecodedFrame;
-				HR(pDecoder->GetFrame(0, &pDecodedFrame));
+			ComPtr<IWICBitmapFrameDecode> pDecodedFrame;
+			HR(pDecoder->GetFrame(0, &pDecodedFrame));
 
-				ComPtr<IWICFormatConverter> pConverter;
-				HR(pFactory->CreateFormatConverter(&pConverter));
-				HR(pConverter->Initialize(pDecodedFrame.Get(), GUID_WICPixelFormat32bppPRGBA, WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
+			ComPtr<IWICFormatConverter> pConverter;
+			HR(pFactory->CreateFormatConverter(&pConverter));
+			HR(pConverter->Initialize(pDecodedFrame.Get(), GUID_WICPixelFormat32bppPRGBA, WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
 
-				auto Ptr = std::shared_ptr<NGenericImage>(new NGenericImage());
-				Ptr->pImpl = pConverter.Detach();
+			auto Ptr = Object::New<GenericImage>([]() { return new GenericImage(); });
+			Ptr->pImpl = pConverter.Detach();
 
-				return Ptr;
-			});
+			return Ptr;
+		});
 	}
 }
 

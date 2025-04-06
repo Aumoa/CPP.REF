@@ -10,7 +10,7 @@ namespace Ayla
 	class GenericApplication;
 
 	ACLASS()
-	class LAUNCH_API Launch : public virtual Object
+	class LAUNCH_API Launch : public Object
 	{
 		GENERATED_BODY()
 
