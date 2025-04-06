@@ -9,6 +9,6 @@ public class CoreEd : ModuleRules
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
-        AddPublicDependencyModuleNames("Core", "MainFrame", "Engine");
+        AddPublicDependencyModuleNames("Core", "Engine", "ApplicationCore");
     }
 }

@@ -90,7 +90,7 @@ namespace Ayla
 			HR(pFactory->CreateFormatConverter(&pConverter));
 			HR(pConverter->Initialize(pDecodedFrame.Get(), GUID_WICPixelFormat32bppPRGBA, WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom));
 
-			auto Ptr = Object::New<GenericImage>([]() { return new GenericImage(); });
+			auto Ptr = Object::New<GenericImage>();
 			Ptr->pImpl = pConverter.Detach();
 
 			return Ptr;

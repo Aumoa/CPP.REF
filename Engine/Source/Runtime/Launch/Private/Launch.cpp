@@ -5,6 +5,10 @@
 #include "GenericPlatform/GenericApplication.h"
 #include "GenericPlatform/GenericWIndow.h"
 #include "Localizational/Name.h"
+#include "InitializationContext.h"
+#if WITH_EDITOR
+#include "EditorEngine.h"
+#endif
 
 namespace Ayla
 {
@@ -27,24 +31,32 @@ namespace Ayla
             .bCaption = true
         };
         
-        GenericSplash::Show();
-        GenericSplash::SetSplashText(TEXT("Initialize... (0/100)"));
-        for (int i = 0; i < 100; ++i)
-        {
-            GenericSplash::SetSplashText(String::Format(TEXT("Initialize... ({0}/100)"), i + 1));
-            std::this_thread::sleep_for(16ms);
-        }
-        GenericSplash::Hide();
+#if WITH_EDITOR
+        Engine = New<EditorEngine>();
+#else
+        Engine = New<::Ayla::Engine>();
+#endif
+
+        auto initializationContext = Engine->PreInitialize();
+        Engine->Initialize(initializationContext);
 
         auto window = GenericApp->MakeWindow(wDef);
         window->Show();
 
         std::vector<GenericPlatformInputEvent> InputEvents;
 
-        while (!GenericApp->IsQuitRequested())
+        try
         {
-            GenericApp->PumpMessages(InputEvents);
-            New<Object>();
+            while (!GenericApp->IsQuitRequested())
+            {
+                GenericApp->PumpMessages(InputEvents);
+                New<Object>();
+            }
+        }
+        catch (Exception* e)
+        {
+            delete e;
+            throw;
         }
 
         return GenericApp->GetExitCode();

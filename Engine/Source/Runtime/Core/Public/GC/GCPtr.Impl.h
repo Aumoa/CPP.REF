@@ -160,6 +160,17 @@ namespace Ayla
 	}
 
 	template<class T>
+	inline RPtr<T>::RPtr(const RPtr& rhs) noexcept
+	{
+		m_Object = rhs.m_Object;
+		m_Ptr = rhs.m_Ptr;
+		if (m_Ptr != nullptr)
+		{
+			GC::AddRef(m_Ptr);
+		}
+	}
+
+	template<class T>
 	template<class U>
 	inline RPtr<T>::RPtr(const RPtr<U>& rhs) noexcept requires std::derived_from<U, T>
 	{

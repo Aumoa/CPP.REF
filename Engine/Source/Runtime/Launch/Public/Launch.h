@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericApplication.h"
+#include "Engine.h"
 #include "Launch.gen.h"
 
 namespace Ayla
@@ -17,12 +18,14 @@ namespace Ayla
 		std::vector<String> CmdArgs;
 		APROPERTY()
 		PPtr<GenericApplication> GenericApp;
+		APROPERTY()
+		PPtr<Engine> Engine;
 
 	protected:
 		Launch(std::vector<String> CmdArgs);
 
 	public:
-		int32 GuardedMain();
+		virtual int32 GuardedMain();
 
 		virtual void* GetApplicationPointer() = 0;
 	};

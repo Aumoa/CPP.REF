@@ -108,7 +108,10 @@ namespace Ayla
 
 	public:
 		template<std::derived_from<Object> T, class... TArgs>
-		static RPtr<T> New(TArgs&&... args) requires std::constructible_from<T, TArgs...>
+		static RPtr<T> New(TArgs&&... args) requires requires
+		{
+			{ new T(std::forward<TArgs>(args)...) } -> std::same_as<T*>;
+		}
 		{
 			std::optional<RPtr<T>> ptr;
 			ConfigureNew(typeid(T), [&]()

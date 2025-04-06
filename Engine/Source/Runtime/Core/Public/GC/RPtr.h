@@ -32,8 +32,17 @@ namespace Ayla
 		}
 
 		inline explicit RPtr(T* ptr) noexcept requires std::derived_from<T, Object>;
+
+		inline RPtr(const RPtr& rhs) noexcept;
+
 		template<class U>
 		inline RPtr(const RPtr<U>& rhs) noexcept requires std::derived_from<U, T>;
+
+		inline RPtr(RPtr&& rhs) noexcept
+		{
+			std::swap(m_Object = nullptr, rhs.m_Object);
+			std::swap(m_Ptr = nullptr, rhs.m_Ptr);
+		}
 
 		template<class U>
 		inline RPtr(RPtr<U>&& rhs) noexcept requires std::derived_from<U, T>

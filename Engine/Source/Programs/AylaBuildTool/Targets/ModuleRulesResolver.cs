@@ -4,18 +4,21 @@ namespace AylaEngine;
 
 internal class ModuleRulesResolver
 {
+    private readonly TargetInfo m_TargetInfo;
+
     public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group, GroupDescriptor primaryGroup)
     {
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
+        m_TargetInfo = targetInfo;
         Rules = rules;
         RuleFilePath = targetProject.RuleFilePath;
         Name = rules.Name;
         Group = group;
         PrimaryGroup = primaryGroup;
 
-        PrivateDependencyModuleNames = WithBuiltInDependencyModule(targetInfo, rules.PrivateDependencyModuleNames).Distinct().ToArray();
+        PrivateDependencyModuleNames = WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames).Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
-        PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Append($"PLATFORM_STRING=TEXT(\"{targetInfo.Platform}\")").Append($"CONFIG_STRING=TEXT(\"{targetInfo.Config}\")").Distinct().ToArray();
+        PrivateAdditionalMacros = WithAdditionalMacros(rules.PrivateAdditionalMacros).Distinct().ToArray();
         PrivateDisableWarnings = rules.PrivateDisableWarnings.Distinct().ToArray();
         PrivateAdditionalLibraries = rules.PrivateAdditionalLibraries.Distinct().ToArray();
 
@@ -26,7 +29,7 @@ internal class ModuleRulesResolver
         List<MacroSet> additionalMacros = [];
         List<int> disableWarnings = [];
         List<string> additionalLibraries = [];
-        Resolve(solution, targetInfo, targetProject, rules, route, true, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
+        Resolve(solution, targetProject, rules, route, true, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
         DependRuleFilePaths = dependRuleFilePaths.Distinct().ToArray();
         PublicDependencyModuleNames = dependencyModuleNames.Distinct().ToArray();
         PublicIncludePaths = includePaths.Distinct().ToArray();
@@ -37,11 +40,19 @@ internal class ModuleRulesResolver
         return;
     }
 
-    private IEnumerable<string> WithBuiltInDependencyModule(TargetInfo targetInfo, IEnumerable<string> source)
+    private IEnumerable<MacroSet> WithAdditionalMacros(IEnumerable<MacroSet> source)
+    {
+        return source
+            .Append($"PLATFORM_STRING=TEXT(\"{m_TargetInfo.Platform}\")")
+            .Append($"CONFIG_STRING=TEXT(\"{m_TargetInfo.Config}\")")
+            .Append($"WITH_EDITOR={(m_TargetInfo.Editor ? "1" : "0")}");
+    }
+
+    private IEnumerable<string> WithBuiltInDependencyModule(IEnumerable<string> source)
     {
         if (Rules.Type == ModuleType.Game)
         {
-            switch (targetInfo.Platform.Group)
+            switch (m_TargetInfo.Platform.Group)
             {
                 case PlatformGroup.Windows:
                     source = source.Append("WindowsLaunch");
@@ -55,14 +66,14 @@ internal class ModuleRulesResolver
         return source;
     }
 
-    private void Resolve(Solution solution, TargetInfo targetInfo, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependRuleFilePaths, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings, List<string> additionalLibraries)
+    private void Resolve(Solution solution, ModuleProject targetProject, ModuleRules rules, HashSet<string> route, bool isPrimary, List<string> dependRuleFilePaths, List<string> dependencyModuleNames, List<string> includePaths, List<MacroSet> additionalMacros, List<int> disableWarnings, List<string> additionalLibraries)
     {
         if (route.Add(rules.Name) == false)
         {
             return;
         }
 
-        var intDir = targetProject.Descriptor.Intermediate(targetProject.Name, targetInfo, FolderPolicy.PathType.Current);
+        var intDir = targetProject.Descriptor.Intermediate(targetProject.Name, m_TargetInfo, FolderPolicy.PathType.Current);
         dependencyModuleNames.AddRange(rules.PublicDependencyModuleNames);
         includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)).Append(intDir));
         additionalMacros.AddRange(rules.PublicAdditionalMacros);
@@ -72,7 +83,7 @@ internal class ModuleRulesResolver
         IEnumerable<string> deps = rules.PublicDependencyModuleNames;
         if (isPrimary)
         {
-            deps = deps.Concat(WithBuiltInDependencyModule(targetInfo, rules.PrivateDependencyModuleNames));
+            deps = deps.Concat(WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames));
             additionalMacros.Add(rules.Name.ToUpper() + "_API=PLATFORM_SHARED_EXPORT");
         }
         else
@@ -98,7 +109,7 @@ internal class ModuleRulesResolver
             var dependTargetRule = mp.GetRule(rules.TargetInfo);
             dependRuleFilePaths.Add(mp.RuleFilePath);
 
-            Resolve(solution, targetInfo, mp, dependTargetRule, route, false, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
+            Resolve(solution, mp, dependTargetRule, route, false, dependRuleFilePaths, dependencyModuleNames, includePaths, additionalMacros, disableWarnings, additionalLibraries);
         }
 
         return;

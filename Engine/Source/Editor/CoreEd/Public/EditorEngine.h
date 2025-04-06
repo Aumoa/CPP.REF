@@ -3,11 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameEngine.h"
+#include "Engine.h"
+#include "EditorEngine.gen.h"
 
-class COREED_API EditorEngine : public GameEngine
+namespace Ayla
 {
-public:
-	EditorEngine();
-	virtual ~EditorEngine() noexcept override;
-};
+	ACLASS()
+	class COREED_API EditorEngine : public Engine
+	{
+		GENERATED_BODY()
+
+	public:
+		EditorEngine();
+
+		virtual RPtr<InitializationContext> PreInitialize() override;
+		virtual void Initialize(RPtr<InitializationContext> context) override;
+	};
+}
