@@ -12,7 +12,7 @@ namespace Ayla
 	{
 		GENERATED_BODY()
 
-	private:
+	protected:
 		GenericSplash() = delete;
 
 	public:

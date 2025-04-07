@@ -8,8 +8,6 @@
 #include "Reflection/ReflectionMacros.h"
 #include "GC/GCPtr.Impl.h"
 
-ACLASS__IMPL_CLASS_REGISTER_2(Ayla, Object);
-
 namespace Ayla
 {
 	struct Object::CreationHack

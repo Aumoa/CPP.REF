@@ -10,10 +10,12 @@
 #include "GC/RPtr.h"
 #include "GC/GC.h"
 #include "Reflection/PropertyCollector.h"
+#include "Reflection/ReflectionMacros.h"
 #include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>
 #include <typeinfo>
+#include "Object.gen.h"
 
 namespace Ayla
 {
@@ -25,6 +27,7 @@ namespace Ayla
 	class Type;
 	class RuntimeType;
 
+	ACLASS()
 	class CORE_API Object
 	{
 		friend GC;
@@ -120,6 +123,21 @@ namespace Ayla
 				return ptr->Get();
 			});
 			return std::move(ptr).value();
+		}
+
+		template<std::derived_from<Object> T, class... TArgs>
+		static RPtr<T> UnsafeNew(int, TArgs&&... args) requires requires
+		{
+			{ new T(std::forward<TArgs>(args)...) } -> std::same_as<T*>;
+		}
+		{
+			return New<T>(std::forward<TArgs>(args)...);
+		}
+
+		template<std::derived_from<Object> T, class... TArgs>
+		static RPtr<T> UnsafeNew(short, TArgs&&... args)
+		{
+			return {};
 		}
 
 	private:

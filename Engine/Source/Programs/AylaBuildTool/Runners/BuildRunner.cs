@@ -185,19 +185,43 @@ internal static partial class BuildRunner
         async Task DispatchGenerateHeaderWorkers()
         {
             List<Task<GenerateReflectionHeaderTask>> tasks = [];
+            List<Task> simpleTasks = [];
 
             foreach (var project in targetProjects)
             {
+                bool generateBindings = false;
+
                 foreach (var sourceCode in project.GetSourceCodes())
                 {
                     if (sourceCode.Type == SourceCodeType.Header)
                     {
                         var ght = new GenerateReflectionHeaderTask(project, sourceCode);
                         tasks.Add(ght.GenerateAsync(buildTarget, cancellationToken));
+                        generateBindings = true;
                     }
+                }
+
+                if (generateBindings)
+                {
+                    const string BindingsProjectContent = """
+                        <Project Sdk="Microsoft.NET.Sdk">
+
+                          <PropertyGroup>
+                            <TargetFramework>net9.0</TargetFramework>
+                            <ImplicitUsings>enable</ImplicitUsings>
+                            <Nullable>disable</Nullable>
+                            <PlatformTarget>x64</PlatformTarget>
+                          </PropertyGroup>
+
+                        </Project>
+                        """;
+
+                    string bindingsProjectPath = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), project.Name + ".Bindings.csproj");
+                    simpleTasks.Add(File.WriteAllTextAsync(bindingsProjectPath, BindingsProjectContent, cancellationToken));
                 }
             }
 
+            await Task.WhenAll(simpleTasks);
             var results = await Task.WhenAll(tasks);
             if (results.Any(p => p.ErrorText != null))
             {

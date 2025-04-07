@@ -416,9 +416,9 @@ internal class RHTGenerator
 
         public override char? EscapeBracket => Class.EscapeBracket;
 
-        public GeneratedBody Body
+        public GeneratedBody? Body
         {
-            get => m_GeneratedBody ?? throw TerminateException.Internal();
+            get => m_GeneratedBody;
             set
             {
                 if (m_GeneratedBody != null)
@@ -608,14 +608,20 @@ internal class RHTGenerator
         {
             if (syntax is AClass aclass)
             {
-                var lineNumber = aclass.Body.LineNumber;
+                var lineNumber = aclass.LineNumber;
 
-                headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__NAMESPACE {aclass.Class.Namespace}\n";
-                headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__CLASSNAME {aclass.Class.Name}\n\n";
+                headerText += $"#define ACLASS__IMPL__{m_FileId}__{lineNumber}__NAMESPACE {aclass.Class.Namespace}\n";
+                var classNameDefine = $"ACLASS__IMPL__{m_FileId}__{lineNumber}__CLASSNAME";
+                headerText += $"#define {classNameDefine} {aclass.Class.Name}\n\n";
 
-                headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber} \\\n";
-                headerText += $"\tGENERATED_BODY__DEFAULT_BODY(GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__CLASSNAME) \\\n";
-                headerText += $"\tGENERATED_BODY__DECLARE_GATHER_PROPERTIES()\n\n";
+                if (aclass.Body != null)
+                {
+                    lineNumber = aclass.Body.LineNumber;
+
+                    headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber} \\\n";
+                    headerText += $"\tGENERATED_BODY__DEFAULT_BODY({classNameDefine}) \\\n";
+                    headerText += $"\tGENERATED_BODY__DECLARE_GATHER_PROPERTIES()\n\n";
+                }
             }
         }
 
@@ -638,26 +644,51 @@ internal class RHTGenerator
         {
             if (syntax is AClass aclass)
             {
-                var lineNumber = aclass.Body.LineNumber;
-                string namespaceDefine = $"GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__NAMESPACE";
-                string classNameDefine = $"GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__CLASSNAME";
+                var lineNumber = aclass.LineNumber;
+                string namespaceDefine = $"ACLASS__IMPL__{m_FileId}__{lineNumber}__NAMESPACE";
+                string classNameDefine = $"ACLASS__IMPL__{m_FileId}__{lineNumber}__CLASSNAME";
 
                 sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER_2(\n";
                 sourceCodeText += $"\t{namespaceDefine},\n";
                 sourceCodeText += $"\t{classNameDefine}\n";
                 sourceCodeText += $");\n\n";
 
-                sourceCodeText += $"namespace {namespaceDefine}\n";
-                sourceCodeText += "{\n";
-                sourceCodeText += $"\tvoid {classNameDefine}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
+                sourceCodeText +=  "extern \"C\"\n";
+                sourceCodeText +=  "{\n";
+                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT ::Ayla::ssize_t ACLASS__DEFINE_BINDING_FUNCTION(\n";
+                sourceCodeText += $"\t\t{namespaceDefine},\n";
+                sourceCodeText += $"\t\t{classNameDefine},\n";
+                sourceCodeText +=  "\t\tNew\n";
+                sourceCodeText +=  "\t)()\n";
                 sourceCodeText +=  "\t{\n";
-                sourceCodeText +=  "\t\tSuper::GatherProperties(collector);\n";
-                foreach (var property in aclass.Properties)
-                {
-                    sourceCodeText += $"\t\tGENERATED_BODY__GATHER_PROPERTIES_PROP({property.Name});\n";
-                }
+                sourceCodeText += $"\t\tACLASS__NEW_FUNCTION_BODY({namespaceDefine}, {classNameDefine});\n";
                 sourceCodeText +=  "\t}\n";
-                sourceCodeText +=  "}\n\n";
+                sourceCodeText +=  "\n";
+                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT void ACLASS__DEFINE_BINDING_FUNCTION(\n";
+                sourceCodeText += $"\t\t{namespaceDefine},\n";
+                sourceCodeText += $"\t\t{classNameDefine},\n";
+                sourceCodeText +=  "\t\tFinalize\n";
+                sourceCodeText +=  "\t)(::Ayla::ssize_t self_)\n";
+                sourceCodeText +=  "\t{\n";
+                sourceCodeText += $"\t\tdelete reinterpret_cast<::Ayla::RPtr<::Ayla::Object>*>(self_);\n";
+                sourceCodeText +=  "\t}\n";
+                sourceCodeText +=  "}\n";
+                sourceCodeText +=  "\n";
+
+                if (aclass.Body != null)
+                {
+                    sourceCodeText += $"namespace {namespaceDefine}\n";
+                    sourceCodeText +=  "{\n";
+                    sourceCodeText += $"\tvoid {classNameDefine}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
+                    sourceCodeText +=  "\t{\n";
+                    sourceCodeText +=  "\t\tSuper::GatherProperties(collector);\n";
+                    foreach (var property in aclass.Properties)
+                    {
+                        sourceCodeText += $"\t\tGENERATED_BODY__GATHER_PROPERTIES_PROP({property.Name});\n";
+                    }
+                    sourceCodeText +=  "\t}\n";
+                    sourceCodeText +=  "}\n\n";
+                }
             }
         }
 

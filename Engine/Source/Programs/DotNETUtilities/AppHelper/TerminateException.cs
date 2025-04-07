@@ -1,6 +1,6 @@
 ﻿namespace AylaEngine;
 
-public class TerminateException(int returnCode) : Exception
+public class TerminateException : Exception
 {
     public const int EC_Successfully = 0;
     public const int EC_User = 1;
@@ -9,7 +9,12 @@ public class TerminateException(int returnCode) : Exception
     public const int EC_Thirdparty = 4;
     public const int EC_Abort = 5;
 
-    public readonly int ReturnCode = returnCode;
+    public readonly int ReturnCode;
+
+    public TerminateException(int returnCode)
+    {
+        ReturnCode = returnCode;
+    }
 
     public static TerminateException Successfully() => new(EC_Successfully);
     public static TerminateException User() => new(EC_User);

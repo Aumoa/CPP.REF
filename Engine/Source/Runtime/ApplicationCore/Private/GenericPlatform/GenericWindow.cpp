@@ -7,19 +7,4 @@ namespace Ayla
 	GenericWindow::GenericWindow()
 	{
 	}
-
-	extern "C" void GenericWindow_Interop_Dispose(void* instancePtr)
-	{
-		delete (GenericWindow*)instancePtr;
-	}
-
-	extern "C" void GenericWindow_Interop_Show(void* instancePtr)
-	{
-		((GenericWindow*)instancePtr)->Show();
-	}
-
-	extern "C" void GenericWindow_Interop_Hide(void* instancePtr)
-	{
-		((GenericWindow*)instancePtr)->Hide();
-	}
 }
