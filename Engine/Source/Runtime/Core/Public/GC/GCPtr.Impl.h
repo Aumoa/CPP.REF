@@ -200,7 +200,6 @@ namespace Ayla
 	{
 		if (rhs.m_Object != nullptr)
 		{
-			auto lock = GC::GetLock();
 			m_Object = rhs.m_Object;
 			m_Ptr = rhs.m_Ptr;
 			GC::AddRef(m_Ptr);
