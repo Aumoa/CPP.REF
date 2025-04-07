@@ -25,6 +25,7 @@ internal static partial class BuildRunner
                 var intDir = Project.Descriptor.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
                 var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
                 var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
+                var generatedBindingCode = Path.Combine(intDir, fileName + ".bindings.cs");
                 var generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
                 if (generator != null)
                 {
@@ -34,7 +35,10 @@ internal static partial class BuildRunner
                     var sourceCodeText = generator.GenerateSourceCode().Replace("\r\n", "\n").Trim();
                     await CompareExchangeContentAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
-                    GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
+                    var bindingCodeText = generator.GenerateBindings().Replace("\r\n", "\n").Trim();
+                    await CompareExchangeContentAsync(generatedBindingCode, bindingCodeText, cancellationToken);
+
+                    GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, Project.Name, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
                 }
             }
             catch (Exception e)

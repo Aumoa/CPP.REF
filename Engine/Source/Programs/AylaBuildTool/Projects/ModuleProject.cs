@@ -38,7 +38,7 @@ internal class ModuleProject(string name, GroupDescriptor descriptor, string sou
     {
         foreach (var source in Directory.GetFiles(SourceDirectory, "*", SearchOption.AllDirectories))
         {
-            if (SourceCodeDescriptor.TryGet(Descriptor, source, SourceDirectory, out var descriptor))
+            if (SourceCodeDescriptor.TryGet(Descriptor, Name, source, SourceDirectory, out var descriptor))
             {
                 yield return descriptor;
             }

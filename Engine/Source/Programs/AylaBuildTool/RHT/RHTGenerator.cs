@@ -695,6 +695,39 @@ internal class RHTGenerator
         return sourceCodeText;
     }
 
+    public string GenerateBindings()
+    {
+        string sourceCodeText = $"""
+// Copyright 2020-2025 AylaEngine. All Rights Reserved.
+// This file is auto-generated. Do not edit it manually.
+
+using System.Runtime.InteropServices;
+
+
+""";
+
+        foreach (var syntax in m_Syntaxes)
+        {
+            if (syntax is AClass aclass)
+            {
+                sourceCodeText += $"namespace {aclass.Class.Namespace}\n";
+                sourceCodeText +=  "{\n";
+                sourceCodeText += $"\tpublic class {aclass.Class.Name}\n";
+                sourceCodeText +=  "\t{\n";
+                sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
+                sourceCodeText += $"\t\tprivate static extern nint {aclass.Class.Namespace}__{aclass.Class.Name}__New();\n";
+                sourceCodeText +=  "\t\t\n";
+                sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
+                sourceCodeText += $"\t\tprivate static extern void {aclass.Class.Namespace}__{aclass.Class.Name}__Finalize(nint self_);\n";
+                sourceCodeText += "\t}\n";
+                sourceCodeText +=  "}\n";
+                sourceCodeText +=  "\n";
+            }
+        }
+
+        return sourceCodeText;
+    }
+
     public static async Task<RHTGenerator?> ParseAsync(SourceCodeDescriptor sourceCode, CancellationToken cancellationToken = default)
     {
         var headerFileName = Path.GetFileNameWithoutExtension(sourceCode.FilePath);
