@@ -121,4 +121,12 @@ internal readonly struct SourceCodeCache
         }
         return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, dependRuleFilesWriteTime, depsWriteTimes);
     }
+
+    public static SourceCodeCache MakeCachedSimple(string sourceCode, string ruleFilePath)
+    {
+        var sourceCodeWriteTime = File.GetLastWriteTimeUtc(sourceCode);
+        var buildToolWriteTime = File.GetLastWriteTimeUtc(Global.AssemblyLocation);
+        var ruleFileWriteTime = File.GetLastWriteTimeUtc(ruleFilePath);
+        return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, Array.Empty<DateTime>(), Array.Empty<DateTime>());
+    }
 }

@@ -14,6 +14,8 @@ internal static partial class BuildRunner
         }
 
         public SourceCodeDescriptor? GeneratedSourceCode { get; private set; }
+        
+        public string? GeneratedBindingCode { get; private set; }
 
         public string? ErrorText { get; private set; }
 
@@ -39,6 +41,7 @@ internal static partial class BuildRunner
                     await CompareExchangeContentAsync(generatedBindingCode, bindingCodeText, cancellationToken);
 
                     GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, Project.Name, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
+                    GeneratedBindingCode = generatedBindingCode;
                 }
             }
             catch (Exception e)

@@ -185,44 +185,21 @@ internal static partial class BuildRunner
         async Task DispatchGenerateHeaderWorkers()
         {
             List<Task<GenerateReflectionHeaderTask>> tasks = [];
-            List<Task> simpleTasks = [];
 
             foreach (var project in targetProjects)
             {
-                bool generateBindings = false;
-
                 foreach (var sourceCode in project.GetSourceCodes())
                 {
                     if (sourceCode.Type == SourceCodeType.Header)
                     {
                         var ght = new GenerateReflectionHeaderTask(project, sourceCode);
                         tasks.Add(ght.GenerateAsync(buildTarget, cancellationToken));
-                        generateBindings = true;
                     }
-                }
-
-                if (generateBindings)
-                {
-                    const string BindingsProjectContent = """
-                        <Project Sdk="Microsoft.NET.Sdk">
-
-                          <PropertyGroup>
-                            <TargetFramework>net9.0</TargetFramework>
-                            <ImplicitUsings>enable</ImplicitUsings>
-                            <Nullable>disable</Nullable>
-                            <PlatformTarget>x64</PlatformTarget>
-                          </PropertyGroup>
-
-                        </Project>
-                        """;
-
-                    string bindingsProjectPath = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), project.Name + ".Bindings.csproj");
-                    simpleTasks.Add(File.WriteAllTextAsync(bindingsProjectPath, BindingsProjectContent, cancellationToken));
                 }
             }
 
-            await Task.WhenAll(simpleTasks);
             var results = await Task.WhenAll(tasks);
+
             if (results.Any(p => p.ErrorText != null))
             {
                 var errorMessages = results.Where(p => p.ErrorText != null).Select(p => p.ErrorText);
@@ -239,6 +216,7 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
+            Dictionary<ModuleProject, List<string>> generatedBindingsCodes = [];
             foreach (var result in results)
             {
                 var gsc = result.GeneratedSourceCode;
@@ -252,7 +230,53 @@ internal static partial class BuildRunner
 
                     list.Add(gsc.Value);
                 }
+
+                var gbc = result.GeneratedBindingCode;
+                if (gbc != null)
+                {
+                    if (generatedBindingsCodes.TryGetValue(result.Project, out var list) == false)
+                    {
+                        list = [];
+                        generatedBindingsCodes.Add(result.Project, list);
+                    }
+
+                    list.Add(gbc);
+                }
             }
+
+            List<Task> publishBindingsTasks = [];
+            foreach (var (project, list) in generatedBindingsCodes)
+            {
+                bool isNewer = list.Any(p =>
+                {
+                    string cacheFileName = p + ".cache";
+                    if (File.Exists(cacheFileName) == false)
+                    {
+                        return true;
+                    }
+
+                    return SourceCodeCache.LoadCached(cacheFileName).IsModified(SourceCodeCache.MakeCachedSimple(p, project.RuleFilePath));
+                });
+
+                if (isNewer)
+                {
+                    var outputPath = project.Descriptor.Output(buildTarget, FolderPolicy.PathType.Current);
+                    var assemblyName = $"{project.Name}.Bindings";
+                    var dllName = assemblyName + ".dll";
+                    publishBindingsTasks.Add(CSCompiler.CompileToAsync(assemblyName, Path.Combine(outputPath, dllName), list, [], true, cancellationToken).ContinueWith(r =>
+                    {
+                        r.GetAwaiter().GetResult();
+                        foreach (var bindingsCode in list)
+                        {
+                            string cacheFileName = bindingsCode + ".cache";
+                            var cache = SourceCodeCache.MakeCachedSimple(bindingsCode, project.RuleFilePath);
+                            cache.SaveCached(cacheFileName);
+                        }
+                    }));
+                }
+            }
+
+            await Task.WhenAll(publishBindingsTasks);
 
             if (ConsoleEnvironment.IsDynamic)
             {

@@ -66,6 +66,22 @@ public static class CSCompiler
         await File.WriteAllBytesAsync(saveTo, compiledBinary.GetBuffer(), cancellationToken);
     }
 
+    public static async Task CompileToAsync(string assemblyName, string saveTo, IEnumerable<string> sourceFiles, IEnumerable<string> referencedAssemblies, bool includeBaseAssemblies = true, CancellationToken cancellationToken = default)
+    {
+        if (includeBaseAssemblies)
+        {
+            referencedAssemblies = referencedAssemblies.Concat(new string[]
+            {
+                typeof(object).Assembly.Location,
+                Assembly.Load("System.Runtime").Location,
+                Assembly.Load("System.Collections").Location
+            });
+        }
+
+        using MemoryStream compiledBinary = await InternalCompileAsync(assemblyName, sourceFiles, referencedAssemblies, cancellationToken);
+        await File.WriteAllBytesAsync(saveTo, compiledBinary.GetBuffer(), cancellationToken);
+    }
+
     public static async Task<Assembly> CompileAsync(string assemblyName, string sourceFile, IEnumerable<string> referencedAssemblies, bool includeBaseAssemblies = true, CancellationToken cancellationToken = default)
     {
         if (includeBaseAssemblies)
