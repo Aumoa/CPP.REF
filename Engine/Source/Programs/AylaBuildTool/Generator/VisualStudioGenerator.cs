@@ -148,8 +148,8 @@ internal class VisualStudioGenerator : Generator
                         case ModuleProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
                             builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config), GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|Any CPU\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config), GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
                             break;
                         case ProgramProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
@@ -277,6 +277,14 @@ internal class VisualStudioGenerator : Generator
         {
             var fileName = Path.Combine(project.SourceDirectory, "Script", $"{project.Name}.Script.csproj");
 
+            var platforms = string.Join(';', TargetInfo.GetAllTargets()
+                .Select(p => GetArchitectureName(p))
+                .Distinct());
+
+            var configurations = string.Join(';', TargetInfo.GetAllTargets()
+                .Select(p => GetCppConfigName(p))
+                .Distinct());
+
             var builder = new StringBuilder();
             AppendFormatLine("""<Project Sdk="Microsoft.NET.Sdk">""");
             AppendFormatLine("""  """);
@@ -285,7 +293,21 @@ internal class VisualStudioGenerator : Generator
             AppendFormatLine("""    <ImplictUsings>enable</ImplictUsings>""");
             AppendFormatLine("""    <Nullable>enable</Nullable>""");
             AppendFormatLine("""    <RootNamespace>{0}</RootNamespace>""", project.Descriptor.IsEngine ? "Ayla" : "Game");
+            AppendFormatLine("""    <Platforms>{0}</Platforms>""", platforms);
+            AppendFormatLine("""    <Configurations>{0}</Configurations>""", configurations);
             AppendFormatLine("""  </PropertyGroup>""");
+            AppendFormatLine("""  """);
+            foreach (var buildConfig in TargetInfo.GetAllTargets())
+            {
+                // Visual Studio only support Windows platform.
+                if (buildConfig.Platform.Group != PlatformGroup.Windows)
+                {
+                    continue;
+                }
+
+                AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '{0}|{1}'">""", GetConfigName(buildConfig), GetArchitectureName(buildConfig));
+                AppendFormatLine("""  </PropertyGroup>""");
+            }
             AppendFormatLine("""  """);
             AppendFormatLine("""  <ItemGroup>""");
             AppendFormatLine("""    <Reference Include="Core.Bindings">""");
