@@ -125,7 +125,7 @@ internal class VisualStudioGenerator : Generator
                     continue;
                 }
 
-                builder.AppendFormat("\t\t{0}|{1} = {0}|{1}\n", GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform));
+                builder.AppendFormat("\t\t{0}|{1} = {0}|{1}\n", VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform));
             }
             builder.AppendFormat("\tEndGlobalSection\n");
         }
@@ -146,14 +146,14 @@ internal class VisualStudioGenerator : Generator
                     switch (project)
                     {
                         case ModuleProject:
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
                             break;
                         case ProgramProject:
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
                             break;
                     }
                 }
@@ -267,82 +267,24 @@ internal class VisualStudioGenerator : Generator
             builder.AppendFormat("EndProject\n");
         }
 
-        static string GetArchitectureName(TargetInfo value) => value.Platform.Architecture switch
-        {
-            Architecture.X64 => "x64",
-            _ => throw new InvalidOperationException()
-        };
-
         async Task GenerateScriptProjectAsync(Dictionary<ModuleProject, string> scriptProjectPaths, ModuleProject project, CancellationToken cancellationToken)
         {
             var fileName = Path.Combine(project.SourceDirectory, "Script", $"{project.Name}.Script.csproj");
 
             var platforms = string.Join(';', TargetInfo.GetAllTargets()
-                .Select(p => GetArchitectureName(p))
+                .Select(p => VSUtility.GetArchitectureName(p))
                 .Distinct());
 
             var configurations = string.Join(';', TargetInfo.GetAllTargets()
-                .Select(p => GetCppConfigName(p))
+                .Select(p => VSUtility.GetCppConfigName(p))
                 .Distinct());
 
-            var builder = new StringBuilder();
-            AppendFormatLine("""<Project Sdk="Microsoft.NET.Sdk">""");
-            AppendFormatLine("""  """);
-            AppendFormatLine("""  <PropertyGroup>""");
-            AppendFormatLine("""    <TargetFramework>net9.0</TargetFramework>""");
-            AppendFormatLine("""    <ImplictUsings>enable</ImplictUsings>""");
-            AppendFormatLine("""    <Nullable>enable</Nullable>""");
-            AppendFormatLine("""    <RootNamespace>{0}</RootNamespace>""", project.Descriptor.IsEngine ? "Ayla" : "Game");
-            AppendFormatLine("""    <Platforms>{0}</Platforms>""", platforms);
-            AppendFormatLine("""    <Configurations>{0}</Configurations>""", configurations);
-            AppendFormatLine("""    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>""", configurations);
-            AppendFormatLine("""  </PropertyGroup>""");
-            AppendFormatLine("""  """);
-            foreach (var buildConfig in TargetInfo.GetAllTargets())
-            {
-                AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
-                AppendFormatLine("""    <PropertyTarget>{0}</PropertyTarget>""", GetArchitectureName(buildConfig));
-                AppendFormatLine("""    <Optimize>{0}</Optimize>""", buildConfig.Config.IsOptimized());
-                AppendFormatLine("""    <OutputPath>{0}</OutputPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows));
-                AppendFormatLine("""  </PropertyGroup>""");
-            }
-            AppendFormatLine("""  """);
-            foreach (var buildConfig in TargetInfo.GetAllTargets())
-            {
-                AppendFormatLine("""  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
-                AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
-                AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
-                AppendFormatLine("""    </Reference>""");
-                var rules = project.GetRule(buildConfig);
-                var resolver = new ModuleRulesResolver(buildConfig, solution, rules, project.Descriptor);
-                foreach (var depend in resolver.DependencyModuleNames)
-                {
-                    var dependProject = solution.FindProject(depend);
-                    if (dependProject is ModuleProject mp)
-                    {
-                        AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
-                        AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
-                        AppendFormatLine("""    </Reference>""");
-                        AppendFormatLine("""    <ProjectReference Include="{0}" />""", Path.Combine(mp.SourceDirectory, "Script", mp.Name + ".Script.csproj"));
-                    }
-                }
-                AppendFormatLine("""  </ItemGroup>""");
-            }
-            AppendFormatLine("""  """);
-            AppendFormatLine("""</Project>""");
-
-            await TextFileHelper.WriteIfChangedAsync(fileName, builder.ToString(), cancellationToken);
+            var csproj = CSGenerator.GenerateModule(solution, project, TargetInfo.GetAllTargets());
+            await TextFileHelper.WriteIfChangedAsync(fileName, csproj, cancellationToken);
 
             lock (scriptProjectPaths)
             {
                 scriptProjectPaths.Add(project, fileName);
-            }
-
-            return;
-
-            void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
-            {
-                builder.AppendFormat(format + '\n', args);
             }
         }
 
@@ -378,7 +320,7 @@ internal class VisualStudioGenerator : Generator
                             continue;
                         }
 
-                        AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                        AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
                         Indent(() =>
                         {
                             var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildConfig.Platform });
@@ -551,8 +493,8 @@ internal class VisualStudioGenerator : Generator
                                 continue;
                             }
 
-                            var configName = GetConfigName(buildConfig);
-                            var archName = GetArchitectureName(buildConfig);
+                            var configName = VSUtility.GetConfigName(buildConfig);
+                            var archName = VSUtility.GetArchitectureName(buildConfig);
 
                             AppendFormatLine("""<ProjectConfiguration Include="{0}|{1}">""", configName, archName);
                             Indent(() =>
@@ -585,8 +527,8 @@ internal class VisualStudioGenerator : Generator
                             continue;
                         }
 
-                        var configName = GetConfigName(buildConfig);
-                        var archName = GetArchitectureName(buildConfig);
+                        var configName = VSUtility.GetConfigName(buildConfig);
+                        var archName = VSUtility.GetArchitectureName(buildConfig);
 
                         AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'" Label="Configuration">""", configName, archName);
                         Indent(() =>
@@ -615,8 +557,8 @@ internal class VisualStudioGenerator : Generator
                             continue;
                         }
 
-                        var configName = GetConfigName(buildTarget);
-                        var archName = GetArchitectureName(buildTarget);
+                        var configName = VSUtility.GetConfigName(buildTarget);
+                        var archName = VSUtility.GetArchitectureName(buildTarget);
                         var outDir = Path.Combine(group.BinariesDirectory, buildTarget.Platform.Name, buildTarget.Config.ToString());
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
                         var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform });
@@ -688,8 +630,6 @@ internal class VisualStudioGenerator : Generator
                     return string.Join(';', includes);
                 }
 
-                static string GetConfigName(TargetInfo value) => value.Config + (value.Editor ? "_Editor" : string.Empty);
-
                 static bool LibraryDebugLevel(TargetInfo value) => value.Config switch
                 {
                     Configuration.Debug => true,
@@ -736,11 +676,6 @@ internal class VisualStudioGenerator : Generator
             };
         }
 
-        static string GetConfigName(TargetInfo value)
-        {
-            return value.Config.ToString() + (value.Editor ? " Editor" : string.Empty);
-        }
-
         static string GetPlatformName(PlatformInfo value)
         {
             if (value == PlatformInfo.Win64)
@@ -751,11 +686,6 @@ internal class VisualStudioGenerator : Generator
             {
                 throw new NotImplementedException();
             }
-        }
-
-        static string GetCppConfigName(TargetInfo value)
-        {
-            return value.Config.ToString() + (value.Editor ? "_Editor" : string.Empty);
         }
 
         static string GetCSharpConfigName(Configuration value)

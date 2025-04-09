@@ -258,12 +258,18 @@ internal static partial class BuildRunner
                     return SourceCodeCache.LoadCached(cacheFileName).IsModified(SourceCodeCache.MakeCachedSimple(p, project.RuleFilePath));
                 });
 
-                if (isNewer)
+                if (isNewer || true)
                 {
                     var outputPath = project.Descriptor.Output(buildTarget, FolderPolicy.PathType.Current);
                     var assemblyName = $"{project.Name}.Bindings";
                     var dllName = assemblyName + ".dll";
-                    publishBindingsTasks.Add(CSCompiler.CompileToAsync(assemblyName, Path.Combine(outputPath, dllName), list, [], true, cancellationToken).ContinueWith(r =>
+                    var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Script", project.Name + ".Binding.csproj");
+                    await TextFileHelper.WriteIfChangedAsync(projectFile, CSGenerator.GenerateModule(solution, project, buildTarget), cancellationToken);
+                    publishBindingsTasks.Add(Terminal.ExecuteCommandAsync($"publish -c {VSUtility.GetCppConfigName(buildTarget)} -o {outputPath}", new Options
+                    {
+                        Executable = "dotnet",
+                        WorkingDirectory = Path.GetDirectoryName(projectFile)!,
+                    }, cancellationToken).AsTask().ContinueWith(r =>
                     {
                         r.GetAwaiter().GetResult();
                         foreach (var bindingsCode in list)

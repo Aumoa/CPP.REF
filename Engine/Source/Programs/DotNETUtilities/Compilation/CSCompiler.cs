@@ -70,12 +70,7 @@ public static class CSCompiler
     {
         if (includeBaseAssemblies)
         {
-            referencedAssemblies = referencedAssemblies.Concat(new string[]
-            {
-                typeof(object).Assembly.Location,
-                Assembly.Load("System.Runtime").Location,
-                Assembly.Load("System.Collections").Location
-            });
+            referencedAssemblies = referencedAssemblies.Concat(GetDefaultAssemblies());
         }
 
         using MemoryStream compiledBinary = await InternalCompileAsync(assemblyName, sourceFiles, referencedAssemblies, cancellationToken);
@@ -86,12 +81,7 @@ public static class CSCompiler
     {
         if (includeBaseAssemblies)
         {
-            referencedAssemblies = referencedAssemblies.Concat(new string[]
-            {
-                typeof(object).Assembly.Location,
-                Assembly.Load("System.Runtime").Location,
-                Assembly.Load("System.Collections").Location
-            });
+            referencedAssemblies = referencedAssemblies.Concat(GetDefaultAssemblies());
         }
 
         Assembly compiledAssembly = await CompileAsync(assemblyName, new string[] { sourceFile }, referencedAssemblies, cancellationToken);
@@ -102,12 +92,7 @@ public static class CSCompiler
     {
         if (includeBaseAssemblies)
         {
-            referencedAssemblies = referencedAssemblies.Concat(new string[]
-            {
-                typeof(object).Assembly.Location,
-                Assembly.Load("System.Runtime").Location,
-                Assembly.Load("System.Collections").Location
-            });
+            referencedAssemblies = referencedAssemblies.Concat(GetDefaultAssemblies());
         }
 
         await CompileToAsync(assemblyName, saveTo, new string[] { sourceFile }, referencedAssemblies, cancellationToken);
@@ -129,5 +114,15 @@ public static class CSCompiler
         }
 
         throw new ClassNotFoundException(assemblyName, basedType);
+    }
+
+    private static string[] GetDefaultAssemblies()
+    {
+        return
+        [
+            typeof(object).Assembly.Location,
+            Assembly.Load("System.Runtime").Location,
+            Assembly.Load("System.Collections").Location
+        ];
     }
 }
