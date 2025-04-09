@@ -32,13 +32,13 @@ internal static partial class BuildRunner
                 if (generator != null)
                 {
                     var headerText = generator.GenerateHeader().Replace("\r\n", "\n").Trim();
-                    await CompareExchangeContentAsync(generatedHeader, headerText, cancellationToken);
+                    await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
 
                     var sourceCodeText = generator.GenerateSourceCode().Replace("\r\n", "\n").Trim();
-                    await CompareExchangeContentAsync(generatedSourceCode, sourceCodeText, cancellationToken);
+                    await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
                     var bindingCodeText = generator.GenerateBindings().Replace("\r\n", "\n").Trim();
-                    await CompareExchangeContentAsync(generatedBindingCode, bindingCodeText, cancellationToken);
+                    await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
 
                     GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, Project.Name, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
                     GeneratedBindingCode = generatedBindingCode;
@@ -50,28 +50,6 @@ internal static partial class BuildRunner
             }
 
             return this;
-        }
-
-        private static async Task CompareExchangeContentAsync(string filePath, string content, CancellationToken cancellationToken)
-        {
-            var directory = Path.GetDirectoryName(filePath);
-            bool directoryExist = Directory.Exists(directory);
-            if (directoryExist && File.Exists(filePath))
-            {
-                var previousContent = await File.ReadAllTextAsync(filePath, cancellationToken);
-                if (previousContent.Trim().Replace("\r\n", "\n") == content)
-                {
-                    return;
-                }
-            }
-
-            if (directoryExist == false && directory != null)
-            {
-                Directory.CreateDirectory(directory);
-            }
-
-            Console.WriteLine("{0} is newer.", filePath);
-            await File.WriteAllTextAsync(filePath, content.Replace("\n", Environment.NewLine), cancellationToken);
         }
     }
 }

@@ -49,9 +49,11 @@ internal class VisualStudioGenerator : Generator
         }
 
         Dictionary<ModuleProject, string> vcxprojPaths = new();
+        Dictionary<ModuleProject, string> scriptProjectPaths = new();
         foreach (var project in solution.AllProjects.OfType<ModuleProject>())
         {
             await GenerateCppProjectAsync(vcxprojPaths, solution.PrimaryGroup, project, cancellationToken);
+            await GenerateScriptProjectAsync(scriptProjectPaths, project, cancellationToken);
         }
 
         var builder = new StringBuilder();
@@ -146,6 +148,8 @@ internal class VisualStudioGenerator : Generator
                         case ModuleProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
                             builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config), GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|Any CPU\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config), GetArchitectureName(buildConfig));
                             break;
                         case ProgramProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
@@ -184,15 +188,18 @@ internal class VisualStudioGenerator : Generator
                         if (directoryName.Replace('\\', '/').Contains("/Editor/"))
                         {
                             AddNested(project.Decl.Guid, EngineEditorFilterGuid);
+                            AddNested(project.Decl.ScriptGuid, EngineEditorFilterGuid);
                         }
                         else
                         {
                             AddNested(project.Decl.Guid, EngineRuntimeFilterGuid);
+                            AddNested(project.Decl.ScriptGuid, EngineRuntimeFilterGuid);
                         }
                     }
                     else
                     {
                         AddNested(project.Decl.Guid, GameFilterGuid);
+                        AddNested(project.Decl.ScriptGuid, GameFilterGuid);
                     }
                 }
             }
@@ -218,10 +225,10 @@ internal class VisualStudioGenerator : Generator
             switch (project)
             {
                 case ProgramProject pp:
-                    WriteCSProject(pp);
+                    WriteProgramProject(pp);
                     break;
                 case ModuleProject mp:
-                    WriteCppProject(mp);
+                    WriteModuleProject(mp);
                     break;
                 default:
                     throw new InvalidOperationException();
@@ -229,20 +236,28 @@ internal class VisualStudioGenerator : Generator
 
         }
 
-        void WriteCSProject(ProgramProject project)
+        void WriteProgramProject(ProgramProject project)
         {
             builder.AppendFormat("Project(\"{0}\") = \"{1}\", \"{2}\", \"{3}\"\n", CSharpProjectGuid.ToString("B").ToUpper(), project.Name, project.ProjectFilePath.Replace('/', '\\'), project.Decl.Guid.ToString("B").ToUpper());
             builder.AppendFormat("EndProject\n");
         }
 
-        void WriteCppProject(ModuleProject project)
+        void WriteModuleProject(ModuleProject project)
         {
-            string projectFilePath;
+            string projectFilePath, scriptFilePath;
             lock (vcxprojPaths)
             {
                 projectFilePath = vcxprojPaths[project];
             }
+            lock (scriptProjectPaths)
+            {
+                scriptFilePath = scriptProjectPaths[project];
+            }
+
             builder.AppendFormat("Project(\"{0}\") = \"{1}\", \"{2}\", \"{3}\"\n", CppProjectGuid.ToString("B").ToUpper(), project.Name, projectFilePath.Replace('/', '\\'), project.Decl.Guid.ToString("B").ToUpper());
+            builder.AppendFormat("EndProject\n");
+
+            builder.AppendFormat("Project(\"{0}\") = \"{1}.Script\", \"{2}\", \"{3}\"\n", CSharpProjectGuid.ToString("B").ToUpper(), project.Name, scriptFilePath.Replace('/', '\\'), project.Decl.ScriptGuid.ToString("B").ToUpper());
             builder.AppendFormat("EndProject\n");
         }
 
@@ -257,6 +272,43 @@ internal class VisualStudioGenerator : Generator
             Architecture.X64 => "x64",
             _ => throw new InvalidOperationException()
         };
+
+        async Task GenerateScriptProjectAsync(Dictionary<ModuleProject, string> scriptProjectPaths, ModuleProject project, CancellationToken cancellationToken)
+        {
+            var fileName = Path.Combine(project.SourceDirectory, "Script", $"{project.Name}.Script.csproj");
+
+            var builder = new StringBuilder();
+            AppendFormatLine("""<Project Sdk="Microsoft.NET.Sdk">""");
+            AppendFormatLine("""  """);
+            AppendFormatLine("""  <PropertyGroup>""");
+            AppendFormatLine("""    <TargetFramework>net9.0</TargetFramework>""");
+            AppendFormatLine("""    <ImplictUsings>enable</ImplictUsings>""");
+            AppendFormatLine("""    <Nullable>enable</Nullable>""");
+            AppendFormatLine("""    <RootNamespace>{0}</RootNamespace>""", project.Descriptor.IsEngine ? "Ayla" : "Game");
+            AppendFormatLine("""  </PropertyGroup>""");
+            AppendFormatLine("""  """);
+            AppendFormatLine("""  <ItemGroup>""");
+            AppendFormatLine("""    <Reference Include="Core.Bindings">""");
+            AppendFormatLine("""      <HintPath>..\..\..\..\Binaries\Win64\Debug\Core.Bindings.dll</HintPath>""");
+            AppendFormatLine("""    </Reference>""");
+            AppendFormatLine("""  </ItemGroup>""");
+            AppendFormatLine("""  """);
+            AppendFormatLine("""</Project>""");
+
+            await TextFileHelper.WriteIfChangedAsync(fileName, builder.ToString(), cancellationToken);
+
+            lock (scriptProjectPaths)
+            {
+                scriptProjectPaths.Add(project, fileName);
+            }
+
+            return;
+
+            void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
+            {
+                builder.AppendFormat(format + '\n', args);
+            }
+        }
 
         async Task GenerateCppProjectAsync(Dictionary<ModuleProject, string> vcxprojPaths, GroupDescriptor primaryGroup, ModuleProject project, CancellationToken cancellationToken)
         {
@@ -308,17 +360,8 @@ internal class VisualStudioGenerator : Generator
 
                 AppendFormatLine("""</Project>""");
 
-                string? previousXml = null;
-                if (File.Exists(fileName))
-                {
-                    previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
-                }
-
                 var currentXml = builder.ToString();
-                if (previousXml != currentXml)
-                {
-                    await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
-                }
+                await TextFileHelper.WriteIfChangedAsync(fileName, currentXml, cancellationToken);
 
                 return;
 
@@ -420,17 +463,8 @@ internal class VisualStudioGenerator : Generator
 
                 AppendFormatLine("""</Project>""");
 
-                string? previousXml = null;
-                if (File.Exists(fileName))
-                {
-                    previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
-                }
-
                 var currentXml = builder.ToString();
-                if (previousXml != currentXml)
-                {
-                    await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
-                }
+                await TextFileHelper.WriteIfChangedAsync(fileName, currentXml, cancellationToken);
 
                 return;
 
@@ -588,23 +622,8 @@ internal class VisualStudioGenerator : Generator
                 });
                 AppendFormatLine("""</Project>""");
 
-                string? previousXml = null;
-                if (File.Exists(fileName))
-                {
-                    previousXml = await File.ReadAllTextAsync(fileName, cancellationToken);
-                }
-
                 var currentXml = builder.ToString();
-                if (previousXml != currentXml)
-                {
-                    var dirName = Path.GetDirectoryName(fileName);
-                    if (Directory.Exists(dirName) == false)
-                    {
-                        Directory.CreateDirectory(dirName!);
-                    }
-
-                    await File.WriteAllTextAsync(fileName, currentXml, cancellationToken);
-                }
+                await TextFileHelper.WriteIfChangedAsync(fileName, currentXml, cancellationToken);
 
                 return;
 

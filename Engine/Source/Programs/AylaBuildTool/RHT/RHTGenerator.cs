@@ -650,7 +650,7 @@ internal class RHTGenerator
                     return $"{@namespace}__{@class}__{name}";
                 }
 
-                sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER_2({@namespace}, {@class});\n";
+                sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {@class});\n";
                 sourceCodeText +=  "\n";
                 sourceCodeText +=  "extern \"C\"\n";
                 sourceCodeText +=  "{\n";

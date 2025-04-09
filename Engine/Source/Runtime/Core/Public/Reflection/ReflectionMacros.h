@@ -24,8 +24,6 @@ namespace Ayla \
 	})(); \
 }
 
-#define ACLASS__IMPL_CLASS_REGISTER_2(NamespaceName, ClassName) ACLASS__IMPL_CLASS_REGISTER(NamespaceName, ClassName)
-
 #define ACLASS(...)
 
 #define GENERATED_BODY__DEFAULT_BODY(ClassName) \

@@ -3,6 +3,7 @@
 *.sln
 Engine/.vs
 
-# Interop Project Files
-*.Interop.csproj
-**/*.Interop/Properties/launchSettings.json
+# Script Projects
+*.Script.csproj
+**/Script/bin
+**/Script/obj
