@@ -26,10 +26,6 @@ namespace Ayla \
 
 #define ACLASS__IMPL_CLASS_REGISTER_2(NamespaceName, ClassName) ACLASS__IMPL_CLASS_REGISTER(NamespaceName, ClassName)
 
-#define ACLASS__DEFINE_BINDING_FUNCTION(NamespaceName, ClassName, FunctionName) AYLA__COMBINE_3_MACROS(NamespaceName, ClassName, FunctionName)
-#define ACLASS__NEW_FUNCTION_BODY(NamespaceName, ClassName) \
-return reinterpret_cast<::Ayla::ssize_t>(new ::Ayla::RPtr<::Ayla::Object>(::Ayla::Object::UnsafeNew<::NamespaceName::ClassName>(0)));
-
 #define ACLASS(...)
 
 #define GENERATED_BODY__DEFAULT_BODY(ClassName) \

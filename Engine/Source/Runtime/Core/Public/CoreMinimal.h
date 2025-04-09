@@ -55,6 +55,8 @@
 #include "GC/PPtr.h"
 #include "GC/GCPtr.Impl.h"
 
+#include "InteropServices/Marshal.h"
+
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/PPtrGather.h"
 #include "Reflection/ReflectionMacros.h"

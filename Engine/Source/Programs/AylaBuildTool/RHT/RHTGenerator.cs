@@ -610,16 +610,12 @@ internal class RHTGenerator
             {
                 var lineNumber = aclass.LineNumber;
 
-                headerText += $"#define ACLASS__IMPL__{m_FileId}__{lineNumber}__NAMESPACE {aclass.Class.Namespace}\n";
-                var classNameDefine = $"ACLASS__IMPL__{m_FileId}__{lineNumber}__CLASSNAME";
-                headerText += $"#define {classNameDefine} {aclass.Class.Name}\n\n";
-
                 if (aclass.Body != null)
                 {
                     lineNumber = aclass.Body.LineNumber;
 
                     headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber} \\\n";
-                    headerText += $"\tGENERATED_BODY__DEFAULT_BODY({classNameDefine}) \\\n";
+                    headerText += $"\tGENERATED_BODY__DEFAULT_BODY({aclass.Class.Name}) \\\n";
                     headerText += $"\tGENERATED_BODY__DECLARE_GATHER_PROPERTIES()\n\n";
                 }
             }
@@ -645,41 +641,39 @@ internal class RHTGenerator
             if (syntax is AClass aclass)
             {
                 var lineNumber = aclass.LineNumber;
-                string namespaceDefine = $"ACLASS__IMPL__{m_FileId}__{lineNumber}__NAMESPACE";
-                string classNameDefine = $"ACLASS__IMPL__{m_FileId}__{lineNumber}__CLASSNAME";
 
-                sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER_2(\n";
-                sourceCodeText += $"\t{namespaceDefine},\n";
-                sourceCodeText += $"\t{classNameDefine}\n";
-                sourceCodeText += $");\n\n";
+                string @namespace = aclass.Class.Namespace;
+                string @class = aclass.Class.Name;
 
+                string FunctionName(string name)
+                {
+                    return $"{@namespace}__{@class}__{name}";
+                }
+
+                sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER_2({@namespace}, {@class});\n";
+                sourceCodeText +=  "\n";
                 sourceCodeText +=  "extern \"C\"\n";
                 sourceCodeText +=  "{\n";
-                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT ::Ayla::ssize_t ACLASS__DEFINE_BINDING_FUNCTION(\n";
-                sourceCodeText += $"\t\t{namespaceDefine},\n";
-                sourceCodeText += $"\t\t{classNameDefine},\n";
-                sourceCodeText +=  "\t\tNew\n";
-                sourceCodeText +=  "\t)()\n";
+                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT ::Ayla::ssize_t {FunctionName("New")}()\n";
                 sourceCodeText +=  "\t{\n";
-                sourceCodeText += $"\t\tACLASS__NEW_FUNCTION_BODY({namespaceDefine}, {classNameDefine});\n";
+                sourceCodeText += $"\t\tauto new_ = ::Ayla::Object::UnsafeNew<::{@namespace}::{@class}>(0);\n";
+                sourceCodeText += $"\t\tauto& self__ = *new ::Ayla::RPtr<::Ayla::Object>(new_);\n";
+                sourceCodeText += $"\t\treturn ::Ayla::Marshal::RPtrToIntPtr(self__);\n";
                 sourceCodeText +=  "\t}\n";
                 sourceCodeText +=  "\n";
-                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT void ACLASS__DEFINE_BINDING_FUNCTION(\n";
-                sourceCodeText += $"\t\t{namespaceDefine},\n";
-                sourceCodeText += $"\t\t{classNameDefine},\n";
-                sourceCodeText +=  "\t\tFinalize\n";
-                sourceCodeText +=  "\t)(::Ayla::ssize_t self_)\n";
+                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT void {FunctionName("Finalize")}(::Ayla::ssize_t self_)\n";
                 sourceCodeText +=  "\t{\n";
-                sourceCodeText += $"\t\tdelete reinterpret_cast<::Ayla::RPtr<::Ayla::Object>*>(self_);\n";
+                sourceCodeText += $"\t\tauto& self__ = ::Ayla::Marshal::IntPtrToRPtr(self_);\n";
+                sourceCodeText += $"\t\tdelete &self__;\n";
                 sourceCodeText +=  "\t}\n";
                 sourceCodeText +=  "}\n";
                 sourceCodeText +=  "\n";
 
                 if (aclass.Body != null)
                 {
-                    sourceCodeText += $"namespace {namespaceDefine}\n";
+                    sourceCodeText += $"namespace {@namespace}\n";
                     sourceCodeText +=  "{\n";
-                    sourceCodeText += $"\tvoid {classNameDefine}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
+                    sourceCodeText += $"\tvoid {@class}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
                     sourceCodeText +=  "\t{\n";
                     sourceCodeText +=  "\t\tSuper::GatherProperties(collector);\n";
                     foreach (var property in aclass.Properties)
