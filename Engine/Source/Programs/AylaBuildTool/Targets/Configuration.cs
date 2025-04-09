@@ -7,3 +7,11 @@ public enum Configuration
     Development,
     Shipping
 }
+
+public static class ConfigurationExtensions
+{
+    public static bool IsOptimized(this Configuration configuration)
+    {
+        return configuration == Configuration.Shipping || configuration == Configuration.Development;
+    }
+}

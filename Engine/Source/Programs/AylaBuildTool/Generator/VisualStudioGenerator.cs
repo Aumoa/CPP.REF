@@ -295,25 +295,39 @@ internal class VisualStudioGenerator : Generator
             AppendFormatLine("""    <RootNamespace>{0}</RootNamespace>""", project.Descriptor.IsEngine ? "Ayla" : "Game");
             AppendFormatLine("""    <Platforms>{0}</Platforms>""", platforms);
             AppendFormatLine("""    <Configurations>{0}</Configurations>""", configurations);
+            AppendFormatLine("""    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>""", configurations);
             AppendFormatLine("""  </PropertyGroup>""");
             AppendFormatLine("""  """);
             foreach (var buildConfig in TargetInfo.GetAllTargets())
             {
-                // Visual Studio only support Windows platform.
-                if (buildConfig.Platform.Group != PlatformGroup.Windows)
-                {
-                    continue;
-                }
-
-                AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '{0}|{1}'">""", GetConfigName(buildConfig), GetArchitectureName(buildConfig));
+                AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                AppendFormatLine("""    <PropertyTarget>{0}</PropertyTarget>""", GetArchitectureName(buildConfig));
+                AppendFormatLine("""    <Optimize>{0}</Optimize>""", buildConfig.Config.IsOptimized());
+                AppendFormatLine("""    <OutputPath>{0}</OutputPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows));
                 AppendFormatLine("""  </PropertyGroup>""");
             }
             AppendFormatLine("""  """);
-            AppendFormatLine("""  <ItemGroup>""");
-            AppendFormatLine("""    <Reference Include="Core.Bindings">""");
-            AppendFormatLine("""      <HintPath>..\..\..\..\Binaries\Win64\Debug\Core.Bindings.dll</HintPath>""");
-            AppendFormatLine("""    </Reference>""");
-            AppendFormatLine("""  </ItemGroup>""");
+            foreach (var buildConfig in TargetInfo.GetAllTargets())
+            {
+                AppendFormatLine("""  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", GetCppConfigName(buildConfig), GetArchitectureName(buildConfig));
+                AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
+                AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
+                AppendFormatLine("""    </Reference>""");
+                var rules = project.GetRule(buildConfig);
+                var resolver = new ModuleRulesResolver(buildConfig, solution, rules, project.Descriptor);
+                foreach (var depend in resolver.DependencyModuleNames)
+                {
+                    var dependProject = solution.FindProject(depend);
+                    if (dependProject is ModuleProject mp)
+                    {
+                        AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
+                        AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
+                        AppendFormatLine("""    </Reference>""");
+                        AppendFormatLine("""    <ProjectReference Include="{0}" />""", Path.Combine(mp.SourceDirectory, "Script", mp.Name + ".Script.csproj"));
+                    }
+                }
+                AppendFormatLine("""  </ItemGroup>""");
+            }
             AppendFormatLine("""  """);
             AppendFormatLine("""</Project>""");
 
@@ -606,7 +620,7 @@ internal class VisualStudioGenerator : Generator
                         var outDir = Path.Combine(group.BinariesDirectory, buildTarget.Platform.Name, buildTarget.Config.ToString());
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
                         var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform });
-                        var resolver = new ModuleRulesResolver(buildTarget, solution, rules, group, primaryGroup);
+                        var resolver = new ModuleRulesResolver(buildTarget, solution, rules, group);
                         var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                         var includes = GenerateIncludePaths(resolver);
                         var outputFileName = group.OutputFileName(project.Name, rules.Type, FolderPolicy.PathType.Current);

@@ -47,7 +47,7 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor, primaryGroup);
+            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor);
             var depends = solution.FindDepends(resolver.DependencyModuleNames).OfType<ModuleProject>();
             targetProjects = depends.Append(targetProject);
         }
@@ -84,7 +84,7 @@ internal static partial class BuildRunner
 
         foreach (var project in targetProjects)
         {
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, buildTarget), project.Descriptor, primaryGroup);
+            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, buildTarget), project.Descriptor);
             List<CompileItem> allCompiles = [];
             List<CompileTask> needCompiles = [];
             var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);

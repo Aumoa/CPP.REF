@@ -73,7 +73,7 @@ internal class MSLinker : Linker
 
         foreach (var libPath in VisualStudioInstallation.GatherWindowsKitSharedLibrary(m_TargetInfo.Platform.Architecture)
             .Append(libraryPath)
-            .Append(outputPath)
+            .Append(module.EngineGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
             .Append(module.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
             .Distinct())
         {

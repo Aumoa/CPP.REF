@@ -6,7 +6,7 @@ internal class ModuleRulesResolver
 {
     private readonly TargetInfo m_TargetInfo;
 
-    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group, GroupDescriptor primaryGroup)
+    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
     {
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         m_TargetInfo = targetInfo;
@@ -14,7 +14,8 @@ internal class ModuleRulesResolver
         RuleFilePath = targetProject.RuleFilePath;
         Name = rules.Name;
         Group = group;
-        PrimaryGroup = primaryGroup;
+        EngineGroup = solution.EngineProjects.First().Descriptor;
+        PrimaryGroup = solution.PrimaryGroup;
 
         PrivateDependencyModuleNames = WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames).Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
@@ -124,6 +125,7 @@ internal class ModuleRulesResolver
     public readonly string RuleFilePath;
     public readonly string Name;
     public readonly GroupDescriptor Group;
+    public readonly GroupDescriptor EngineGroup;
     public readonly GroupDescriptor PrimaryGroup;
     public readonly string[] DependRuleFilePaths;
 

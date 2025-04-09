@@ -5,7 +5,8 @@ internal static class FolderPolicy
     public enum PathType
     {
         Current,
-        Linux
+        Linux,
+        Windows
     }
 
     public static string Intermediate(this GroupDescriptor descriptor, string name, ITargetInfo targetInfo, PathType pathType)
@@ -55,6 +56,8 @@ internal static class FolderPolicy
         {
             case PathType.Linux:
                 return value.Replace(Path.DirectorySeparatorChar, '/');
+            case PathType.Windows:
+                return value.Replace(Path.DirectorySeparatorChar, '\\');
             default:
                 return value;
         }
