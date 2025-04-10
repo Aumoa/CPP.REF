@@ -258,25 +258,39 @@ internal static partial class BuildRunner
                     return SourceCodeCache.LoadCached(cacheFileName).IsModified(SourceCodeCache.MakeCachedSimple(p, project.RuleFilePath));
                 });
 
-                if (isNewer || true)
+                if (isNewer)
                 {
                     var outputPath = project.Descriptor.Output(buildTarget, FolderPolicy.PathType.Current);
                     var assemblyName = $"{project.Name}.Bindings";
                     var dllName = assemblyName + ".dll";
                     var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Script", project.Name + ".Binding.csproj");
                     await TextFileHelper.WriteIfChangedAsync(projectFile, CSGenerator.GenerateModule(solution, project, buildTarget), cancellationToken);
-                    publishBindingsTasks.Add(Terminal.ExecuteCommandAsync($"publish -c {VSUtility.GetCppConfigName(buildTarget)} -o {outputPath}", new Options
+                    publishBindingsTasks.Add(Terminal.ExecuteCommandAsync($"publish -c {VSUtility.GetCppConfigName(buildTarget)} --nologo -o {outputPath}", new Options
                     {
                         Executable = "dotnet",
                         WorkingDirectory = Path.GetDirectoryName(projectFile)!,
+                        Logging = Logging.None,
                     }, cancellationToken).AsTask().ContinueWith(r =>
                     {
-                        r.GetAwaiter().GetResult();
-                        foreach (var bindingsCode in list)
+                        var output = r.Result;
+                        if (output.IsCompletedSuccessfully)
                         {
-                            string cacheFileName = bindingsCode + ".cache";
-                            var cache = SourceCodeCache.MakeCachedSimple(bindingsCode, project.RuleFilePath);
-                            cache.SaveCached(cacheFileName);
+                            foreach (var bindingsCode in list)
+                            {
+                                string cacheFileName = bindingsCode + ".cache";
+                                var cache = SourceCodeCache.MakeCachedSimple(bindingsCode, project.RuleFilePath);
+                                cache.SaveCached(cacheFileName);
+                            }
+
+                            var outputDll = Path.Combine(outputPath, dllName);
+                            if (ConsoleEnvironment.IsDynamic)
+                            {
+                                AnsiConsole.MarkupLine("[green]{0}[/]", outputDll);
+                            }
+                            else
+                            {
+                                Console.WriteLine("{0}", outputDll);
+                            }
                         }
                     }));
                 }
