@@ -329,8 +329,9 @@ internal class RHTGenerator
         public readonly string? DllSpec;
         private char? m_EscapeBracket;
         private Namespace[] m_Namespaces;
+        public readonly string BaseClass;
 
-        private Class(Context context, string name, char? escapeBracket, Namespace[] namespaces) : base(context)
+        private Class(Context context, string name, char? escapeBracket, Namespace[] namespaces, string @base) : base(context)
         {
             var values = name.Split(' ', '\n', '\t', '\r');
             if (values.Length >= 2)
@@ -345,6 +346,7 @@ internal class RHTGenerator
             }
             m_EscapeBracket = escapeBracket;
             m_Namespaces = namespaces;
+            BaseClass = @base;
         }
 
         public override string ToString()
@@ -376,6 +378,7 @@ internal class RHTGenerator
             ReadOnlySpan<char> name;
             Context capture = context.Capture();
             char? escapeBracket = null;
+            string @base = string.Empty;
             switch (context.SelectExport(0, "{", ";", ":"))
             {
                 case 0:
@@ -387,14 +390,16 @@ internal class RHTGenerator
                     break;
                 case 2:
                     name = context.Export(0, ":").Trim();
-                    context.Export(0, "{");
+                    var inheritanceStr = context.Export(0, "{");
+                    var inheritances = inheritanceStr.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    @base = inheritances[0].Replace("public ", string.Empty);
                     escapeBracket = '}';
                     break;
                 default:
                     throw context.ParsingError("Syntax Error: Expected '{' or ';' but found an unexpected character.");
             }
 
-            @class = new Class(context, name.ToString(), escapeBracket, bracketStack.OfType<Namespace>().ToArray());
+            @class = new Class(context, name.ToString(), escapeBracket, bracketStack.OfType<Namespace>().ToArray(), @base);
             return true;
         }
     }
@@ -866,23 +871,50 @@ using System.Runtime.InteropServices;
             {
                 string @namespace = aclass.Class.Namespace;
                 string @class = aclass.Class.Name;
+                string inherit = string.Empty;
+                if (string.IsNullOrEmpty(aclass.Class.BaseClass) == false)
+                {
+                    inherit = $" : {aclass.Class.BaseClass}";
+                }
 
                 sourceCodeText += $"namespace {@namespace}\n";
                 sourceCodeText +=  "{\n";
-                sourceCodeText += $"\tpublic class {@class}\n";
+                sourceCodeText += $"\tpublic class {@class}{inherit}\n";
                 sourceCodeText +=  "\t{\n";
-                sourceCodeText += $"\t\tprivate nint m_InstancePtr;\n";
-                sourceCodeText +=  "\t\t\n";
-                sourceCodeText += $"\t\tpublic {@class}()\n";
-                sourceCodeText +=  "\t\t{\n";
-                sourceCodeText += $"\t\t\tm_InstancePtr = {FunctionName1("New")}();\n";
-                sourceCodeText +=  "\t\t}\n";
-                sourceCodeText +=  "\t\t\n";
-                sourceCodeText += $"\t\t~{@class}()\n";
-                sourceCodeText +=  "\t\t{\n";
-                sourceCodeText += $"\t\t\t{FunctionName1("Finalize")}(m_InstancePtr);\n";
-                sourceCodeText +=  "\t\t}\n";
-                sourceCodeText +=  "\t\t\n";
+                if (string.IsNullOrEmpty(aclass.Class.BaseClass))
+                {
+                    sourceCodeText += $"\t\tprivate nint m_InstancePtr;\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText += $"\t\tpublic long InstancePtr => m_InstancePtr;\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText += $"\t\tpublic {@class}()\n";
+                    sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText += $"\t\t\tm_InstancePtr = {FunctionName1("New")}();\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText += $"\t\tprotected {@class}(nint instancePtr)\n";
+                    sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText += $"\t\t\tm_InstancePtr = instancePtr;\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText += $"\t\t~{@class}()\n";
+                    sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText += $"\t\t\t{FunctionName1("Finalize")}(m_InstancePtr);\n";
+                    sourceCodeText += $"\t\t\tm_InstancePtr = 0;\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                }
+                else
+                {
+                    sourceCodeText += $"\t\tpublic {@class}() : base({FunctionName1("New")}())\n";
+                    sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText += $"\t\tprotected {@class}(nint instancePtr) : base(instancePtr)\n";
+                    sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                }
                 sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
                 sourceCodeText += $"\t\tprivate static extern nint {FunctionName1("New")}();\n";
                 sourceCodeText +=  "\t\t\n";
@@ -900,7 +932,7 @@ using System.Runtime.InteropServices;
                     if (function.Static == false)
                     {
                         parametersWithSelf = Enumerable.Repeat("nint self_", 1).Concat(parameters);
-                        argumentsWithSelf = Enumerable.Repeat("m_InstancePtr", 1).Concat(arguments);
+                        argumentsWithSelf = Enumerable.Repeat("(nint)InstancePtr", 1).Concat(arguments);
                     }
                     else
                     {

@@ -6,7 +6,7 @@ namespace AylaEngine;
 
 internal static class CSGenerator
 {
-    public static string GenerateModule(Solution solution, ModuleProject project, params IEnumerable<TargetInfo> targets)
+    public static string GenerateModule(Solution solution, ModuleProject project, bool includeSelfBindings, params IEnumerable<TargetInfo> targets)
     {
         var platforms = string.Join(';', targets
             .Select(p => VSUtility.GetArchitectureName(p))
@@ -40,10 +40,13 @@ internal static class CSGenerator
         AppendFormatLine("""  """);
         foreach (var buildConfig in targets)
         {
-            AppendFormatLine("""  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-            AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
-            AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
-            AppendFormatLine("""    </Reference>""");
+            AppendFormatLine("""  <ItemGroup>""", VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+            if (includeSelfBindings)
+            {
+                AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
+                AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
+                AppendFormatLine("""    </Reference>""");
+            }
             var rules = project.GetRule(buildConfig);
             var resolver = new ModuleRulesResolver(buildConfig, solution, rules, project.Descriptor);
             foreach (var depend in resolver.DependencyModuleNames)

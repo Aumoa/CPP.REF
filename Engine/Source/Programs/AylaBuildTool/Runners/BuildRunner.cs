@@ -20,7 +20,7 @@ internal static partial class BuildRunner
         var buildTarget = new TargetInfo
         {
             Platform = PlatformInfo.Win64,
-            Editor = true,
+            Editor = options.Editor,
             Config = options.Config
         };
 
@@ -58,7 +58,6 @@ internal static partial class BuildRunner
         int log = 1;
 
         Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
-        await DispatchGenerateHeaderWorkers();
 
         if (options.Clean == CleanOptions.CleanOnly)
         {
@@ -67,12 +66,37 @@ internal static partial class BuildRunner
                 var intDir = project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
                 foreach (var sourceCode in project.GetSourceCodes())
                 {
-                    var fileName = Path.GetFileName(sourceCode.FilePath);
-                    var cacheFileName = Path.Combine(intDir, fileName + ".cache");
-                    File.Delete(cacheFileName);
+                    if (sourceCode.Type == SourceCodeType.SourceCode)
+                    {
+                        var fileName = Path.GetFileName(sourceCode.FilePath);
+                        var cacheFileName = Path.Combine(intDir, fileName + ".cache");
+                        File.Delete(cacheFileName);
+                        var outputFileName = Path.Combine(intDir, fileName + ".o");
+                        File.Delete(outputFileName);
+                        var pdbFileName = Path.Combine(intDir, fileName + ".pdb");
+                        File.Delete(pdbFileName);
+                        var depsFileName = Path.Combine(intDir, fileName + ".deps");
+                        File.Delete(depsFileName);
+                        fileName = Path.ChangeExtension(fileName, null);
+                        var genSourceFileName = Path.Combine(intDir, fileName + ".gen.cpp");
+                        File.Delete(genSourceFileName);
+                        var genHeaderFileName = Path.Combine(intDir, fileName + ".gen.h");
+                        File.Delete(genHeaderFileName);
+                        var genDepsFileName = Path.Combine(intDir, fileName + ".gen.cpp.deps");
+                        File.Delete(genDepsFileName);
+                        var genCacheFileName = Path.Combine(intDir, fileName + ".gen.cpp.cache");
+                        File.Delete(genCacheFileName);
+                        var genPdbFileName = Path.Combine(intDir, fileName + ".gen.cpp.pdb");
+                        File.Delete(genPdbFileName);
+                        var genOutputFileName = Path.Combine(intDir, fileName + ".gen.cpp.o");
+                        File.Delete(genOutputFileName);
+                    }
                 }
+
+                Directory.Delete(Path.Combine(intDir, "Bindings"), true);
             }
 
+            await DispatchGenerateHeaderWorkers();
             await GenerateRunner.RunAsync(new GenerateOptions
             {
                 ProjectFile = options.ProjectFile
@@ -80,6 +104,7 @@ internal static partial class BuildRunner
             return;
         }
 
+        await DispatchGenerateHeaderWorkers();
         List<ModuleTask> moduleTasks = [];
 
         foreach (var project in targetProjects)
@@ -102,7 +127,7 @@ internal static partial class BuildRunner
 
                     var fileName = Path.GetFileName(item.SourceCode.FilePath);
                     var cacheFileName = Path.Combine(intDir, fileName + ".cache");
-                    var depsFileName = Path.Combine(intDir, fileName + ".deps.json");
+                    var depsFileName = Path.Combine(intDir, fileName + ".deps");
                     allCompiles.Add(item);
 
                     if (options.Clean != CleanOptions.Rebuild)
@@ -244,10 +269,21 @@ internal static partial class BuildRunner
                 }
             }
 
-            List<Task> publishBindingsTasks = [];
+            Dictionary<string, TaskCompletionSource> publishBindingsTasks = [];
             foreach (var (project, list) in generatedBindingsCodes)
             {
-                bool isNewer = list.Any(p =>
+                var rule = project.GetRule(buildTarget);
+                if (rule.DisableGenerateBindings == false)
+                {
+                    publishBindingsTasks.Add(project.Name, new TaskCompletionSource());
+                }
+            }
+
+            foreach (var (project, list) in generatedBindingsCodes)
+            {
+                var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
+
+                bool isNewer = list.Append(projectFile).Any(p =>
                 {
                     string cacheFileName = p + ".cache";
                     if (File.Exists(cacheFileName) == false)
@@ -263,41 +299,114 @@ internal static partial class BuildRunner
                     var outputPath = project.Descriptor.Output(buildTarget, FolderPolicy.PathType.Current);
                     var assemblyName = $"{project.Name}.Bindings";
                     var dllName = assemblyName + ".dll";
-                    var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
-                    var csproj = CSGenerator.GenerateModule(solution, project, buildTarget);
+                    var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
                     await TextFileHelper.WriteIfChangedAsync(projectFile, csproj, cancellationToken);
-                    publishBindingsTasks.Add(Terminal.ExecuteCommandAsync($"publish -c {VSUtility.GetCppConfigName(buildTarget)} --nologo -o {outputPath}", new Options
-                    {
-                        Executable = "dotnet",
-                        WorkingDirectory = Path.GetDirectoryName(projectFile)!,
-                        Logging = Logging.None,
-                    }, cancellationToken).AsTask().ContinueWith(r =>
-                    {
-                        var output = r.Result;
-                        if (output.IsCompletedSuccessfully)
-                        {
-                            foreach (var bindingsCode in list)
-                            {
-                                string cacheFileName = bindingsCode + ".cache";
-                                var cache = SourceCodeCache.MakeCachedSimple(bindingsCode, project.RuleFilePath);
-                                cache.SaveCached(cacheFileName);
-                            }
 
-                            var outputDll = Path.Combine(outputPath, dllName);
-                            if (ConsoleEnvironment.IsDynamic)
+                    _ = PublishAsync().ContinueWith(r =>
+                    {
+                        try
+                        {
+                            var output = r.Result;
+                            if (output.IsCompletedSuccessfully)
                             {
-                                AnsiConsole.MarkupLine("[green]{0}[/]", outputDll);
+                                SourceCodeCache cache;
+
+                                foreach (var bindingsCode in list)
+                                {
+                                    string cacheFileName = bindingsCode + ".cache";
+                                    cache = SourceCodeCache.MakeCachedSimple(bindingsCode, project.RuleFilePath);
+                                    cache.SaveCached(cacheFileName);
+                                }
+
+                                cache = SourceCodeCache.MakeCachedSimple(projectFile, project.RuleFilePath);
+                                cache.SaveCached(projectFile + ".cache");
+
+                                var outputDll = Path.Combine(outputPath, dllName);
+                                if (ConsoleEnvironment.IsDynamic)
+                                {
+                                    AnsiConsole.MarkupLine("[green]{0} generated.[/]", outputDll);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("{0} generated.", outputDll);
+                                }
+
+                                lock (publishBindingsTasks)
+                                {
+                                    publishBindingsTasks[project.Name].SetResult();
+                                }
                             }
                             else
                             {
-                                Console.WriteLine("{0}", outputDll);
+                                var outputDll = Path.Combine(outputPath, dllName);
+                                if (ConsoleEnvironment.IsDynamic)
+                                {
+                                    AnsiConsole.MarkupLine("[red]{0} failed.[/]\n{1}", outputDll, string.Join('\n', output.Logs.Select(p => p.Value)).EscapeMarkup());
+                                }
+                                else
+                                {
+                                    Console.WriteLine("{0} failed.\n{1}", outputDll, string.Join('\n', output.Logs.Select(p => p.Value)));
+                                }
+
+                                throw TerminateException.User();
                             }
                         }
-                    }));
+                        catch (OperationCanceledException)
+                        {
+                            lock (publishBindingsTasks)
+                            {
+                                publishBindingsTasks[project.Name].SetCanceled();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            lock (publishBindingsTasks)
+                            {
+                                publishBindingsTasks[project.Name].SetException(e);
+                            }
+                        }
+                    });
+
+                    async Task<Terminal.Output> PublishAsync()
+                    {
+                        var resolver = new ModuleRulesResolver(buildTarget, solution, project.GetRule(buildTarget), project.Descriptor);
+                        foreach (var depend in resolver.DependencyModuleNames)
+                        {
+                            Task dependTask;
+                            lock (publishBindingsTasks)
+                            {
+                                if (publishBindingsTasks.TryGetValue(depend, out var tcs))
+                                {
+                                    dependTask = tcs.Task;
+                                }
+                                else
+                                {
+                                    dependTask = Task.CompletedTask;
+                                }
+                            }
+
+                            await dependTask;
+                        }
+
+                        Directory.CreateDirectory(outputPath);
+                        return await Terminal.ExecuteCommandAsync($"publish {projectFile} -c \"{VSUtility.GetConfigName(buildTarget)}\" --nologo -o {outputPath}", new Options
+                        {
+                            Executable = "dotnet",
+                            WorkingDirectory = outputPath,
+                            Logging = Logging.None,
+                        }, cancellationToken);
+                    }
+                }
+                else
+                {
+                    lock (publishBindingsTasks)
+                    {
+                        publishBindingsTasks[project.Name].SetResult();
+                    }
                 }
             }
 
-            await Task.WhenAll(publishBindingsTasks);
+            await Task.WhenAll(publishBindingsTasks.Values.Select(p => p.Task));
 
             if (ConsoleEnvironment.IsDynamic)
             {
