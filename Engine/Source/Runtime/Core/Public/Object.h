@@ -8,7 +8,6 @@
 #include "Platform/PlatformMacros.h"
 #include "GC/PPtr.h"
 #include "GC/RPtr.h"
-#include "GC/GC.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Threading/Spinlock.h"
@@ -22,7 +21,7 @@ namespace Ayla
 	template<class T>
 	struct PropertyGather;
 
-	struct GC;
+	class GC;
 	struct TypeRegister;
 	class Type;
 	class RuntimeType;

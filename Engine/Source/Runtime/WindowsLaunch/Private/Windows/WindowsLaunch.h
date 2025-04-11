@@ -21,7 +21,7 @@ namespace Ayla
 		void* ApplicationPointer = nullptr;
 
 	public:
-		WindowsLaunch(std::vector<String> CmdArgs);
+		WindowsLaunch();
 
 		void* GetApplicationPointer() override;
 	};

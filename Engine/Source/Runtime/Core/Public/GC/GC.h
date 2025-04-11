@@ -2,14 +2,17 @@
 
 #pragma once
 
-#include "Platform/PlatformMacros.h"
 #include "StaticClass.h"
 #include "AssertionMacros.h"
+#include "Object.h"
 #include "GC/RPtr.h"
+#include "Platform/PlatformMacros.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
+#include "Reflection/ReflectionMacros.h"
 #include <chrono>
 #include <thread>
+#include "GC.gen.h"
 
 namespace Ayla
 {
@@ -19,8 +22,12 @@ namespace Ayla
 	template<class T>
 	class PPtr;
 
-	struct CORE_API GC : public StaticClass
+	ACLASS()
+	class CORE_API GC : public Object
 	{
+		GENERATED_BODY()
+
+	private:
 		friend class Object;
 		template<class T>
 		friend class RPtr;
@@ -34,6 +41,9 @@ namespace Ayla
 		static int32 s_DuringFinalize;
 		static Spinlock s_NotifyMtx;
 		static SpinlockConditionVariable s_CompleteToFinalize;
+
+	private:
+		GC() = delete;
 
 	public:
 		static void SuppressFinalize(const RPtr<Object>& target);

@@ -10,5 +10,6 @@ public class WindowsLaunch : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Launch");
+        EnableScript = true;
     }
 }

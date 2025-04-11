@@ -244,21 +244,25 @@ internal class VisualStudioGenerator : Generator
 
         void WriteModuleProject(ModuleProject project)
         {
-            string projectFilePath, scriptFilePath;
+            string projectFilePath;
+            string? scriptFilePath;
             lock (vcxprojPaths)
             {
                 projectFilePath = vcxprojPaths[project];
             }
             lock (scriptProjectPaths)
             {
-                scriptFilePath = scriptProjectPaths[project];
+                scriptProjectPaths.TryGetValue(project, out scriptFilePath);
             }
 
             builder.AppendFormat("Project(\"{0}\") = \"{1}\", \"{2}\", \"{3}\"\n", CppProjectGuid.ToString("B").ToUpper(), project.Name, projectFilePath.Replace('/', '\\'), project.Decl.Guid.ToString("B").ToUpper());
             builder.AppendFormat("EndProject\n");
 
-            builder.AppendFormat("Project(\"{0}\") = \"{1}.Script\", \"{2}\", \"{3}\"\n", CSharpProjectGuid.ToString("B").ToUpper(), project.Name, scriptFilePath.Replace('/', '\\'), project.Decl.ScriptGuid.ToString("B").ToUpper());
-            builder.AppendFormat("EndProject\n");
+            if (scriptFilePath != null)
+            {
+                builder.AppendFormat("Project(\"{0}\") = \"{1}.Script\", \"{2}\", \"{3}\"\n", CSharpProjectGuid.ToString("B").ToUpper(), project.Name, scriptFilePath.Replace('/', '\\'), project.Decl.ScriptGuid.ToString("B").ToUpper());
+                builder.AppendFormat("EndProject\n");
+            }
         }
 
         void WriteFilter(string name, Guid guid)
@@ -278,6 +282,11 @@ internal class VisualStudioGenerator : Generator
             var configurations = string.Join(';', TargetInfo.GetAllTargets()
                 .Select(p => VSUtility.GetCppConfigName(p))
                 .Distinct());
+
+            if (TargetInfo.GetAllTargets().Any(p => project.GetRule(p).EnableScript) == false)
+            {
+                return;
+            }
 
             var csproj = CSGenerator.GenerateModule(solution, project, TargetInfo.GetAllTargets());
             await TextFileHelper.WriteIfChangedAsync(fileName, csproj, cancellationToken);

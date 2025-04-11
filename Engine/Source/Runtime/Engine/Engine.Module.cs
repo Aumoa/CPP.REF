@@ -10,5 +10,7 @@ public class Engine : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics");
+
+        EnableScript = true;
     }
 }

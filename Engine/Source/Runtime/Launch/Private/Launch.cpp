@@ -12,8 +12,7 @@
 
 namespace Ayla
 {
-    Launch::Launch(std::vector<String> CmdArgs)
-        : CmdArgs(std::move(CmdArgs))
+    Launch::Launch()
     {
         GenericApp = GenericApplication::CreateApplication();
     }

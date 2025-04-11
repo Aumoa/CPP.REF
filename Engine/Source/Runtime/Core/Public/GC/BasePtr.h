@@ -5,7 +5,7 @@
 namespace Ayla
 {
 	class Object;
-	struct GC;
+	class GC;
 
 	class BasePtr
 	{

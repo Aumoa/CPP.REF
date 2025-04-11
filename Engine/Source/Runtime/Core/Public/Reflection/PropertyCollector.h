@@ -8,7 +8,7 @@
 
 namespace Ayla
 {
-	struct GC;
+	class GC;
 	class BasePtr;
 
 	class PropertyCollector

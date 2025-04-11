@@ -15,16 +15,16 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::vector<String> CmdArgs;
 		APROPERTY()
 		PPtr<GenericApplication> GenericApp;
 		APROPERTY()
 		PPtr<Engine> Engine;
 
 	protected:
-		Launch(std::vector<String> CmdArgs);
+		Launch();
 
 	public:
+		AFUNCTION()
 		virtual int32 GuardedMain();
 
 		virtual void* GetApplicationPointer() = 0;

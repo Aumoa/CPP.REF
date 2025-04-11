@@ -51,10 +51,17 @@ internal static class CSGenerator
                 var dependProject = solution.FindProject(depend);
                 if (dependProject is ModuleProject mp)
                 {
-                    AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
-                    AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
-                    AppendFormatLine("""    </Reference>""");
-                    AppendFormatLine("""    <ProjectReference Include="{0}" />""", Path.Combine(mp.SourceDirectory, "Script", mp.Name + ".Script.csproj"));
+                    var dependProjectRule = mp.GetRule(buildConfig);
+                    if (dependProjectRule.EnableScript)
+                    {
+                        AppendFormatLine("""    <ProjectReference Include="{0}" />""", Path.Combine(mp.SourceDirectory, "Script", mp.Name + ".Script.csproj"));
+                    }
+                    else if (dependProjectRule.DisableGenerateBindings == false)
+                    {
+                        AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
+                        AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
+                        AppendFormatLine("""    </Reference>""");
+                    }
                 }
             }
             AppendFormatLine("""  </ItemGroup>""");

@@ -38,6 +38,10 @@ public class ModuleRules
 
     public string Name => GetType().Name;
 
+    public bool EnableScript { get; protected init; }
+
+    public bool DisableGenerateBindings { get; protected init; }
+
     public void AddPublicIncludePaths(params string[] items)
     {
         if (m_FreezeCollections)

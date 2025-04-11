@@ -263,8 +263,9 @@ internal static partial class BuildRunner
                     var outputPath = project.Descriptor.Output(buildTarget, FolderPolicy.PathType.Current);
                     var assemblyName = $"{project.Name}.Bindings";
                     var dllName = assemblyName + ".dll";
-                    var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Script", project.Name + ".Binding.csproj");
-                    await TextFileHelper.WriteIfChangedAsync(projectFile, CSGenerator.GenerateModule(solution, project, buildTarget), cancellationToken);
+                    var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Script", project.Name + ".Bindings.csproj");
+                    var csproj = CSGenerator.GenerateModule(solution, project, buildTarget);
+                    await TextFileHelper.WriteIfChangedAsync(projectFile, csproj, cancellationToken);
                     publishBindingsTasks.Add(Terminal.ExecuteCommandAsync($"publish -c {VSUtility.GetCppConfigName(buildTarget)} --nologo -o {outputPath}", new Options
                     {
                         Executable = "dotnet",

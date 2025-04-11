@@ -38,11 +38,15 @@ internal static partial class BuildRunner
                     var sourceCodeText = generator.GenerateSourceCode().Replace("\r\n", "\n").Trim();
                     await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
-                    var bindingCodeText = generator.GenerateBindings().Replace("\r\n", "\n").Trim();
-                    await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
-
                     GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, Project.Name, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
-                    GeneratedBindingCode = generatedBindingCode;
+
+                    if (Project.GetRule(targetInfo).DisableGenerateBindings == false)
+                    {
+                        var bindingCodeText = generator.GenerateBindings().Replace("\r\n", "\n").Trim();
+                        await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
+
+                        GeneratedBindingCode = generatedBindingCode;
+                    }
                 }
             }
             catch (Exception e)

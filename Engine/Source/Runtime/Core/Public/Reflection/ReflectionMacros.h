@@ -45,3 +45,5 @@ protected: \
 #define GENERATED_BODY(...) GENERATED_BODY__IMPL(GENERATED_BODY__IMPL, GENERATED_BODY__FILE_ID__, __LINE__)
 
 #define APROPERTY(...)
+
+#define AFUNCTION(...)

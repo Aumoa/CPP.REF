@@ -1,13 +1,23 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
+
+object? launch;
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 {
-    return Ayla__WindowsLaunch__StartApplication(args, args.Length);
+    var launchDll = Assembly.LoadFrom("WindowsLaunch.Script.dll");
+    var launchType = launchDll.GetType("Ayla.ScriptingLaunch");
+    if (launchType == null)
+    {
+        throw new PlatformNotSupportedException("This host platform is currently not supported.");
+    }
+
+    launch = Activator.CreateInstance(launchType);
 }
 else
 {
     throw new PlatformNotSupportedException("This host platform is currently not supported.");
 }
 
-[DllImport("WindowsLaunch.dll", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
-static extern int Ayla__WindowsLaunch__StartApplication(string[] args, int length);
+var coreAssembly = Assembly.LoadFrom("Core.Bindings.dll");
+var gcType = coreAssembly.GetType("Ayla.GC");
