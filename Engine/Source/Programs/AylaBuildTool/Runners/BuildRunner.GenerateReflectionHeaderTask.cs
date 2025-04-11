@@ -27,9 +27,9 @@ internal static partial class BuildRunner
                 var intDir = Project.Descriptor.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
                 var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
                 var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
-                var generatedBindingCode = Path.Combine(intDir, "Script", fileName + ".bindings.cs");
+                var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
                 var generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
-                Directory.CreateDirectory(Path.Combine(intDir, "Script"));
+                Directory.CreateDirectory(Path.Combine(intDir, "Bindings"));
                 if (generator != null)
                 {
                     var headerText = generator.GenerateHeader().Replace("\r\n", "\n").Trim();

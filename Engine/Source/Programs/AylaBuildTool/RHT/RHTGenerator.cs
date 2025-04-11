@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Spectre.Console;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static AylaEngine.RHTGenerator;
 
 namespace AylaEngine;
@@ -403,6 +404,7 @@ internal class RHTGenerator
         public readonly Class Class;
         private GeneratedBody? m_GeneratedBody;
         private List<AProperty> m_Properties = [];
+        private List<AFunction> m_Functions = [];
 
         private AClass(Context context, Class @class) : base(context)
         {
@@ -432,9 +434,16 @@ internal class RHTGenerator
 
         public IReadOnlyList<AProperty> Properties => m_Properties;
 
+        public IReadOnlyList<AFunction> Functions => m_Functions;
+
         public void AddProperty(AProperty property)
         {
             m_Properties.Add(property);
+        }
+
+        public void AddFunction(AFunction function)
+        {
+            m_Functions.Add(function);
         }
 
         public static bool TryAccept(Context context, List<Syntax> bracketStack, [NotNullWhen(true)] out AClass? aclass)
@@ -516,7 +525,7 @@ internal class RHTGenerator
             context.Advance("APROPERTY()".Length);
 
             context.SkipWhiteSpace(true);
-            var nextLine = context.Export(0, "\n").Trim(';').ToString();
+            var nextLine = context.Export(0, ";").ToString();
             var items = nextLine.Split('=');
             var declare = items[0].Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             if (declare.Length != 2)
@@ -526,6 +535,115 @@ internal class RHTGenerator
 
             aproperty = new AProperty(capture, declare[1]);
             return true;
+        }
+    }
+
+    internal class AFunction : Syntax
+    {
+        public readonly string Name;
+        public readonly string Return;
+        public readonly bool Static;
+        public readonly bool Virtual;
+
+        private AFunction(Context context, string name, string @return, bool @static, bool @virtual) : base(context)
+        {
+            Name = name;
+            Return = @return;
+            Static = @static;
+            Virtual = @virtual;
+        }
+
+        public override string ToString()
+        {
+            return FormatLineNumber() + "AFUNCTION()";
+        }
+
+        public override char? EscapeBracket => null;
+
+        public static bool TryAccept(Context context, [NotNullWhen(true)] out AFunction? afunction)
+        {
+            if (context.WholeEquals("AFUNCTION()") == false)
+            {
+                afunction = null;
+                return false;
+            }
+
+            var capture = context.Capture();
+            context.Advance("AFUNCTION()".Length);
+
+            context.SkipWhiteSpace(true);
+            var nextLine = context.Export(0, ";").ToString();
+            var items = nextLine.Split([' ', '\t', '\n', '(', ')', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            int index = 0;
+            int step = 0;
+            bool @virtual = false, @static = false;
+            string returnType = string.Empty;
+            string name = string.Empty;
+            AssertExpression("Syntax Error: A function implementation is required, but no implementation exists.");
+            while (index < items.Length)
+            {
+                _ = TryAcceptStaticOrVirtual() ||
+                    TryAcceptReturnType() ||
+                    TryAcceptName();
+            }
+
+            afunction = new AFunction(capture, name, returnType, @static, @virtual);
+            return true;
+
+            bool TryAcceptStaticOrVirtual()
+            {
+                if (step != 0)
+                {
+                    return false;
+                }
+
+                if (items[index] == "virtual")
+                {
+                    @virtual = true;
+                    ++index;
+                    return true;
+                }
+
+                if (items[index] == "static")
+                {
+                    @static = true;
+                    ++index;
+                    return true;
+                }
+
+                return false;
+            }
+
+            bool TryAcceptReturnType()
+            {
+                if (step != 0)
+                {
+                    return false;
+                }
+
+                returnType = items[index++];
+                ++step;
+                return true;
+            }
+
+            bool TryAcceptName()
+            {
+                if (step != 1)
+                {
+                    return false;
+                }
+
+                name = items[index++];
+                return true;
+            }
+
+            void AssertExpression(string message)
+            {
+                if (index >= items.Length)
+                {
+                    throw capture.ParsingError(message);
+                }
+            }
         }
     }
 
@@ -645,23 +763,18 @@ internal class RHTGenerator
                 string @namespace = aclass.Class.Namespace;
                 string @class = aclass.Class.Name;
 
-                string FunctionName(string name)
-                {
-                    return $"{@namespace}__{@class}__{name}";
-                }
-
                 sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {@class});\n";
                 sourceCodeText +=  "\n";
                 sourceCodeText +=  "extern \"C\"\n";
                 sourceCodeText +=  "{\n";
-                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT ::Ayla::ssize_t {FunctionName("New")}()\n";
+                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT ::Ayla::ssize_t {FunctionName1("New")}()\n";
                 sourceCodeText +=  "\t{\n";
                 sourceCodeText += $"\t\tauto new_ = ::Ayla::Object::UnsafeNew<::{@namespace}::{@class}>(0);\n";
                 sourceCodeText += $"\t\tauto& self__ = *new ::Ayla::RPtr<::Ayla::Object>(new_);\n";
                 sourceCodeText += $"\t\treturn ::Ayla::Marshal::RPtrToIntPtr(self__);\n";
                 sourceCodeText +=  "\t}\n";
                 sourceCodeText +=  "\n";
-                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT void {FunctionName("Finalize")}(::Ayla::ssize_t self_)\n";
+                sourceCodeText += $"\tPLATFORM_SHARED_EXPORT void {FunctionName1("Finalize")}(::Ayla::ssize_t self_)\n";
                 sourceCodeText +=  "\t{\n";
                 sourceCodeText += $"\t\tauto& self__ = ::Ayla::Marshal::IntPtrToRPtr(self_);\n";
                 sourceCodeText += $"\t\tdelete &self__;\n";
@@ -682,6 +795,53 @@ internal class RHTGenerator
                     }
                     sourceCodeText +=  "\t}\n";
                     sourceCodeText +=  "}\n\n";
+                    sourceCodeText +=  "extern \"C\"\n";
+                    sourceCodeText +=  "{\n";
+                    foreach (var function in aclass.Functions)
+                    {
+                        List<string> parameters = [];
+                        if (function.Static == false)
+                        {
+                            parameters.Add("::Ayla::ssize_t self_");
+                        }
+
+                        List<string> arguments = [];
+
+                        sourceCodeText += $"\tPLATFORM_SHARED_EXPORT {FormatReturnType1()} {FunctionName1(function.Name)}({string.Join(", ", parameters)})\n";
+                        sourceCodeText +=  "\t{\n";
+                        if (function.Static == false)
+                        {
+                            sourceCodeText += $"\t\tauto& self__ = {Self__()};\n";
+                        }
+                        sourceCodeText += $"\t\treturn {CallFunction()};\n";
+                        sourceCodeText +=  "\t}\n";
+
+                        string CallFunction()
+                        {
+                            string prefix;
+                            if (function.Static)
+                            {
+                                prefix = $"::{@namespace}::{@class}::";
+                            }
+                            else
+                            {
+                                prefix = $"self__->";
+                            }
+
+                            return $"{prefix}{function.Name}(" + string.Join(", ", arguments) + ")";
+                        }
+
+                        string FormatReturnType1() => FormatReturnType(function);
+                    }
+                    sourceCodeText += "}\n";
+                    sourceCodeText += "\n";
+                }
+
+                string FunctionName1(string name) => FunctionName(@namespace, @class, name);
+
+                string Self__()
+                {
+                    return $"(::Ayla::Marshal::IntPtrToRPtr<::{@namespace}::{@class}>(self_))";
                 }
             }
         }
@@ -704,29 +864,96 @@ using System.Runtime.InteropServices;
         {
             if (syntax is AClass aclass)
             {
-                sourceCodeText += $"namespace {aclass.Class.Namespace}\n";
+                string @namespace = aclass.Class.Namespace;
+                string @class = aclass.Class.Name;
+
+                sourceCodeText += $"namespace {@namespace}\n";
                 sourceCodeText +=  "{\n";
-                sourceCodeText += $"\tpublic class {aclass.Class.Name}\n";
+                sourceCodeText += $"\tpublic class {@class}\n";
                 sourceCodeText +=  "\t{\n";
                 sourceCodeText += $"\t\tprivate nint m_InstancePtr;\n";
                 sourceCodeText +=  "\t\t\n";
-                sourceCodeText += $"\t\tpublic {aclass.Class.Name}()\n";
+                sourceCodeText += $"\t\tpublic {@class}()\n";
                 sourceCodeText +=  "\t\t{\n";
-                sourceCodeText += $"\t\t\tm_InstancePtr = {aclass.Class.Namespace}__{aclass.Class.Name}__New();\n";
+                sourceCodeText += $"\t\t\tm_InstancePtr = {FunctionName1("New")}();\n";
+                sourceCodeText +=  "\t\t}\n";
+                sourceCodeText +=  "\t\t\n";
+                sourceCodeText += $"\t\t~{@class}()\n";
+                sourceCodeText +=  "\t\t{\n";
+                sourceCodeText += $"\t\t\t{FunctionName1("Finalize")}(m_InstancePtr);\n";
                 sourceCodeText +=  "\t\t}\n";
                 sourceCodeText +=  "\t\t\n";
                 sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
-                sourceCodeText += $"\t\tprivate static extern nint {aclass.Class.Namespace}__{aclass.Class.Name}__New();\n";
+                sourceCodeText += $"\t\tprivate static extern nint {FunctionName1("New")}();\n";
                 sourceCodeText +=  "\t\t\n";
                 sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
-                sourceCodeText += $"\t\tprivate static extern void {aclass.Class.Namespace}__{aclass.Class.Name}__Finalize(nint self_);\n";
+                sourceCodeText += $"\t\tprivate static extern void {FunctionName1("Finalize")}(nint self_);\n";
+                foreach (var function in aclass.Functions)
+                {
+                    List<string> parameters = [];
+                    List<string> arguments = [];
+
+                    IEnumerable<string> parametersWithSelf = parameters;
+                    IEnumerable<string> argumentsWithSelf = arguments;
+                    string prefix = string.Empty;
+
+                    if (function.Static == false)
+                    {
+                        parametersWithSelf = Enumerable.Repeat("nint self_", 1).Concat(parameters);
+                        argumentsWithSelf = Enumerable.Repeat("m_InstancePtr", 1).Concat(arguments);
+                    }
+                    else
+                    {
+                        prefix += "static ";
+                    }
+
+                    if (function.Virtual)
+                    {
+                        prefix += "virtual ";
+                    }
+
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText += $"\t\tpublic {prefix}{FormatReturnType1()} {function.Name}({string.Join(", ", parameters)})\n";
+                    sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText += $"\t\t\treturn {FunctionName1(function.Name)}({string.Join(", ", argumentsWithSelf)});\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
+                    sourceCodeText += $"\t\tprivate static extern {FormatReturnType1()} {FunctionName1(function.Name)}({string.Join(", ", parametersWithSelf)});\n";
+
+                    string FormatReturnType1() => FormatReturnType(function);
+                }
                 sourceCodeText += "\t}\n";
                 sourceCodeText +=  "}\n";
                 sourceCodeText +=  "\n";
+
+                string FunctionName1(string name) => FunctionName(@namespace, @class, name);
             }
         }
 
         return sourceCodeText;
+    }
+
+    private static string FunctionName(string @namespace, string @class, string name)
+    {
+        return $"Injected__{@namespace}__{@class}__{name}";
+    }
+
+    private static string FormatReturnType(AFunction function)
+    {
+        return function.Return switch
+        {
+            "void" => "void",
+            "bool" => "bool",
+            "::Ayla::int32" or "Ayla::int32" or "int32" => "int",
+            "::Ayla::int64" or "Ayla::int64" or "int64" => "long",
+            "::Ayla::ssize_t" or "Ayla::ssize_t" or "ssize_t" => "nint",
+            "::Ayla::uint32" or "Ayla::uint32" or "uint32" => "uint",
+            "::Ayla::uint64" or "Ayla::uint64" or "uint64" => "ulong",
+            "::Ayla::string" or "Ayla::string" or "string" => "string",
+            _ => throw function.Context.ParsingError($"Syntax Error: Unsupported return type '{function.Return}'.")
+        };
     }
 
     public static async Task<RHTGenerator?> ParseAsync(SourceCodeDescriptor sourceCode, CancellationToken cancellationToken = default)
@@ -797,6 +1024,16 @@ using System.Runtime.InteropServices;
                     throw aproperty.Context.ParsingError("Syntax Error: A class definition is required before APROPERTY().");
                 }
                 aclass.AddProperty(aproperty);
+                continue;
+            }
+            else if (AFunction.TryAccept(context, out var afunction))
+            {
+                aclass = syntaxes.OfType<AClass>().LastOrDefault();
+                if (aclass == null)
+                {
+                    throw afunction.Context.ParsingError("Syntax Error: A class definition is required before AFUNCTION().");
+                }
+                aclass.AddFunction(afunction);
                 continue;
             }
             else if (UnknownBracket.TryAccept(context, out var unknownBracket))
