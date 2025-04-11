@@ -58,7 +58,7 @@ internal static class CSGenerator
                     }
                     else if (dependProjectRule.DisableGenerateBindings == false)
                     {
-                        AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
+                        AppendFormatLine("""    <Reference Include="{0}.Bindings">""", dependProject.Name);
                         AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
                         AppendFormatLine("""    </Reference>""");
                     }
