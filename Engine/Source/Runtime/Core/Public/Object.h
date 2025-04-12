@@ -85,6 +85,7 @@ namespace Ayla
 		int32 m_InstanceIndex = -1;
 		uint8 m_FinalizeSuppressed : 1 = false;
 		Type* m_Type;
+		size_t m_GCHandle = 0;
 
 	protected:
 		static void GatherProperties(PropertyCollector& collection)
@@ -141,5 +142,8 @@ namespace Ayla
 
 	private:
 		static void ConfigureNew(const std::type_info& typeInfo, std::function<Object*()> action);
+
+		AFUNCTION()
+		static void RegisterWeakReferenceHandle(ssize_t instancePtr, ssize_t gcHandle);
 	};
 }

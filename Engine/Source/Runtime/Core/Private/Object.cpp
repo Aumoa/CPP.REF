@@ -1,12 +1,28 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Object.h"
+#include "Type.h"
 #include "TypeNotFoundException.h"
+#include "InteropServices/Marshal.h"
 #include "Platform/PlatformAtomics.h"
 #include "Reflection/TypeRegister.h"
 #include "Reflection/TypeCollector.h"
 #include "Reflection/ReflectionMacros.h"
 #include "GC/GCPtr.Impl.h"
+
+namespace Ayla
+{
+	using CreateManagedInstanceCallbackDelegate = void(*)(::Ayla::int32 instanceId, const wchar_t* bindingTypeName);
+	static CreateManagedInstanceCallbackDelegate g_CreateManagedInstance;
+}
+
+extern "C"
+{
+	PLATFORM_SHARED_EXPORT void Ayla__RegisterBindingCallbacks(Ayla::CreateManagedInstanceCallbackDelegate createManagedInstanceCallback)
+	{
+		Ayla::g_CreateManagedInstance = createManagedInstanceCallback;;
+	}
+}
 
 namespace Ayla
 {
@@ -108,15 +124,23 @@ namespace Ayla
 	void Object::ConfigureNew(const std::type_info& typeInfo, std::function<Object*()> action)
 	{
 		CreationHack::s_Hack.AllowConstruct = true;
-		CreationHack::s_Hack.ObjectType = TypeCollector::FindType(typeInfo);
+		auto type = CreationHack::s_Hack.ObjectType = TypeCollector::FindType(typeInfo);
 		if (CreationHack::s_Hack.ObjectType == nullptr)
 		{
 			throw new TypeNotFoundException(String::FromLiteral(typeInfo.name()));
 		}
 		auto object = action();
+		auto typeName = String::Format(TEXT("{0}.{1}"), type->GetNamespace(), type->GetName());
 		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
 		lock.unlock();
 		GC::Release(object);  // This corresponds to the AddRef called in the Object constructor.
 		CreationHack::s_Hack.AllowConstruct = false;
+	}
+
+	void Object::RegisterWeakReferenceHandle(ssize_t instancePtr, ssize_t gcHandle)
+	{
+		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
+		auto ptr = Marshal::IntPtrToRPtr(instancePtr);
+		ptr->m_GCHandle = gcHandle;
 	}
 }

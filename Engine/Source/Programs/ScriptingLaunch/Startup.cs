@@ -1,21 +1,15 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-object? launch;
+Type? launchType;
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 {
     var platformDll = Assembly.LoadFrom("WindowsLaunch.Bindings.dll");
-    var launchType = platformDll.GetType("Ayla.WindowsLaunch");
+    launchType = platformDll.GetType("Ayla.WindowsLaunch");
     if (launchType == null)
     {
         throw new PlatformNotSupportedException("This host platform is currently not supported.");
-    }
-
-    launch = Activator.CreateInstance(launchType);
-    if (launch == null)
-    {
-        throw new InvalidOperationException($"Cannot create '{launchType.FullName}' instance.");
     }
 }
 else
@@ -36,7 +30,7 @@ if (guardedMainMethod == null)
     throw new InvalidOperationException("The build version of the `ScriptingLaunch` assembly is different.");
 }
 
-var returnValue = guardedMainMethod.Invoke(null, [launch, args]);
+var returnValue = guardedMainMethod.Invoke(null, [launchType, args]);
 if (returnValue != null)
 {
     return (int)returnValue;

@@ -93,7 +93,11 @@ internal static partial class BuildRunner
                     }
                 }
 
-                Directory.Delete(Path.Combine(intDir, "Bindings"), true);
+                var bindingsDir = Path.Combine(intDir, "Bindings");
+                if (Directory.Exists(bindingsDir))
+                {
+                    Directory.Delete(bindingsDir, true);
+                }
             }
 
             await DispatchGenerateHeaderWorkers();
