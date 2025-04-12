@@ -10,6 +10,7 @@ public class Launch : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "ApplicationCore", "Engine");
+        EnableScript = true;
 
         if (TargetInfo.Editor)
         {
