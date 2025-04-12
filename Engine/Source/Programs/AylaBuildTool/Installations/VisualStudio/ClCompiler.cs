@@ -143,7 +143,7 @@ internal class ClCompiler : Compiler
         var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
         var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
         var pdbFileName = Path.Combine(intermediateDirectory, fileName + ".pdb");
-        var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps.json");
+        var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps");
         var cacheFileName = Path.Combine(intermediateDirectory, fileName + ".cache");
 
         Directory.CreateDirectory(intermediateDirectory);

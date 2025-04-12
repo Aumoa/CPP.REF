@@ -146,10 +146,10 @@ internal class VisualStudioGenerator : Generator
                     switch (project)
                     {
                         case ModuleProject:
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
                             break;
                         case ProgramProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
@@ -288,7 +288,7 @@ internal class VisualStudioGenerator : Generator
                 return;
             }
 
-            var csproj = CSGenerator.GenerateModule(solution, project, TargetInfo.GetAllTargets());
+            var csproj = CSGenerator.GenerateModule(solution, project, true, TargetInfo.GetAllTargets());
             await TextFileHelper.WriteIfChangedAsync(fileName, csproj, cancellationToken);
 
             lock (scriptProjectPaths)
@@ -329,7 +329,7 @@ internal class VisualStudioGenerator : Generator
                             continue;
                         }
 
-                        AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                        AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
                         Indent(() =>
                         {
                             var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildConfig.Platform });
@@ -568,18 +568,18 @@ internal class VisualStudioGenerator : Generator
 
                         var configName = VSUtility.GetConfigName(buildTarget);
                         var archName = VSUtility.GetArchitectureName(buildTarget);
-                        var outDir = Path.Combine(group.BinariesDirectory, buildTarget.Platform.Name, buildTarget.Config.ToString());
+                        var outDir = group.Output(buildTarget, FolderPolicy.PathType.Windows);
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
-                        var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildTarget.Platform });
+                        var rules = ModuleRules.New(project.RuleType, buildTarget);
                         var resolver = new ModuleRulesResolver(buildTarget, solution, rules, group);
                         var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                         var includes = GenerateIncludePaths(resolver);
-                        var outputFileName = group.OutputFileName(project.Name, rules.Type, FolderPolicy.PathType.Current);
+                        var outputFileName = FolderPolicy.OutputFileName(project.Name, rules.Type);
 
                         AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                         Indent(() =>
                         {
-                            var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build {projectPath}--target \"{project.Name}\" --config {buildTarget.Config}";
+                            var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build {projectPath}--target \"{project.Name}\" --config {buildTarget.Config} {(buildTarget.Editor ? "--editor " : string.Empty)}";
                             AppendFormatLine("""<AdditionalOptions>/std:c++20 /Zc:preprocessor</AdditionalOptions>""", outDir);
                             AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
                             AppendFormatLine("""<NMakeBuildCommandLine>dotnet {0}</NMakeBuildCommandLine>""", buildCommand);
