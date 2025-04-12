@@ -13,9 +13,10 @@ namespace Ayla
 
 	struct CORE_API Marshal : public StaticClass
 	{
-		static inline RPtr<Object>& IntPtrToRPtr(ssize_t intptr)
+		template<class T = Object>
+		static inline RPtr<T>& IntPtrToRPtr(ssize_t intptr)
 		{
-			return *reinterpret_cast<RPtr<Object>*>(intptr);
+			return *reinterpret_cast<RPtr<T>*>(reinterpret_cast<RPtr<Object>*>(intptr));
 		}
 
 		static inline ssize_t RPtrToIntPtr(RPtr<Object>& ptr)

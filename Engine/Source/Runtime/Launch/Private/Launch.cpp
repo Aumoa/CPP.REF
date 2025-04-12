@@ -49,7 +49,6 @@ namespace Ayla
             while (!GenericApp->IsQuitRequested())
             {
                 GenericApp->PumpMessages(InputEvents);
-                New<Object>();
             }
         }
         catch (Exception* e)
