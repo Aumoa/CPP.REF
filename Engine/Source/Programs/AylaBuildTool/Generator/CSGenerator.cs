@@ -13,7 +13,7 @@ internal static class CSGenerator
             .Distinct());
 
         var configurations = string.Join(';', targets
-            .Select(p => VSUtility.GetCppConfigName(p))
+            .Select(p => VSUtility.GetConfigName(p))
             .Distinct());
 
         var builder = new StringBuilder();
@@ -31,7 +31,7 @@ internal static class CSGenerator
         AppendFormatLine("""  """);
         foreach (var buildConfig in targets)
         {
-            AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+            AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
             AppendFormatLine("""    <PropertyTarget>{0}</PropertyTarget>""", VSUtility.GetArchitectureName(buildConfig));
             AppendFormatLine("""    <Optimize>{0}</Optimize>""", buildConfig.Config.IsOptimized());
             AppendFormatLine("""    <OutputPath>{0}</OutputPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows));
@@ -40,7 +40,7 @@ internal static class CSGenerator
         AppendFormatLine("""  """);
         foreach (var buildConfig in targets)
         {
-            AppendFormatLine("""  <ItemGroup>""", VSUtility.GetCppConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+            AppendFormatLine("""  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
             if (includeSelfBindings)
             {
                 AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
@@ -59,7 +59,8 @@ internal static class CSGenerator
                     {
                         AppendFormatLine("""    <ProjectReference Include="{0}" />""", Path.Combine(mp.SourceDirectory, "Script", mp.Name + ".Script.csproj"));
                     }
-                    else if (dependProjectRule.DisableGenerateBindings == false)
+
+                    if (dependProjectRule.DisableGenerateBindings == false)
                     {
                         AppendFormatLine("""    <Reference Include="{0}.Bindings">""", dependProject.Name);
                         AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);

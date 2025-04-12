@@ -17,7 +17,7 @@ namespace Ayla
         GenericApp = GenericApplication::CreateApplication();
     }
 
-    int32 Launch::GuardedMain()
+    int32 Launch::StartApplication()
     {
         GenericApp->SetApplicationPointer(GetApplicationPointer());
 
