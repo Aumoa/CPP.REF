@@ -233,7 +233,6 @@ internal class VisualStudioGenerator : Generator
                 default:
                     throw new InvalidOperationException();
             }
-
         }
 
         void WriteProgramProject(ProgramProject project)
@@ -256,6 +255,21 @@ internal class VisualStudioGenerator : Generator
             }
 
             builder.AppendFormat("Project(\"{0}\") = \"{1}\", \"{2}\", \"{3}\"\n", CppProjectGuid.ToString("B").ToUpper(), project.Name, projectFilePath.Replace('/', '\\'), project.Decl.Guid.ToString("B").ToUpper());
+            List<string> projectDependencies = [];
+            if (project.Name == "Launch")
+            {
+                var scriptingLaunch = solution.AllProjects.First(p => p.Name == "ScriptingLaunch");
+                projectDependencies.Add(scriptingLaunch.Decl.Guid.ToString("B").ToUpper());
+            }
+            if (projectDependencies.Count > 0)
+            {
+                builder.AppendFormat("  ProjectSection(ProjectDependencies) = postProject\n");
+                foreach (var dependency in projectDependencies)
+                {
+                    builder.AppendFormat("    {0} = {0}\n", dependency);
+                }
+                builder.AppendFormat("  EndProjectSection");
+            }
             builder.AppendFormat("EndProject\n");
 
             if (scriptFilePath != null)
@@ -273,7 +287,7 @@ internal class VisualStudioGenerator : Generator
 
         async Task GenerateScriptProjectAsync(Dictionary<ModuleProject, string> scriptProjectPaths, ModuleProject project, CancellationToken cancellationToken)
         {
-            var fileName = Path.Combine(project.SourceDirectory, "Script", $"{project.Name}.Script.csproj");
+            var fileName = project.GetScriptProjectName();
 
             var platforms = string.Join(';', TargetInfo.GetAllTargets()
                 .Select(p => VSUtility.GetArchitectureName(p))
@@ -570,7 +584,7 @@ internal class VisualStudioGenerator : Generator
                         var archName = VSUtility.GetArchitectureName(buildTarget);
                         var outDir = group.Output(buildTarget, FolderPolicy.PathType.Windows);
                         var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
-                        var rules = ModuleRules.New(project.RuleType, buildTarget);
+                        var rules = project.GetRule(buildTarget);
                         var resolver = new ModuleRulesResolver(buildTarget, solution, rules, group);
                         var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                         var includes = GenerateIncludePaths(resolver);
@@ -602,6 +616,33 @@ internal class VisualStudioGenerator : Generator
                         }
                     });
                     AppendFormatLine("""</ItemGroup>""");
+
+                    foreach (var buildTarget in TargetInfo.GetAllTargets())
+                    {
+                        // Visual Studio only support Windows platform.
+                        if (buildTarget.Platform.Group != PlatformGroup.Windows)
+                        {
+                            continue;
+                        }
+
+                        var configName = VSUtility.GetConfigName(buildTarget);
+                        var archName = VSUtility.GetArchitectureName(buildTarget);
+                        var rules = project.GetRule(buildTarget);
+                        if (rules.EnableScript)
+                        {
+                            AppendFormatLine("""<ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
+                            Indent(() =>
+                            {
+                                AppendFormatLine("""<ProjectReference Include="{0}">""", project.GetScriptProjectName());
+                                Indent(() =>
+                                {
+                                    AppendFormatLine("""<Project>{0}</Project>""", project.Decl.ScriptGuid.ToString("B").ToUpper());
+                                });
+                                AppendFormatLine("""</ProjectReference>""");
+                            });
+                            AppendFormatLine("""</ItemGroup>""");
+                        }
+                    }
 
                     AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />""");
                     AppendFormatLine("""<ImportGroup Label="ExtensionTargets">""");
