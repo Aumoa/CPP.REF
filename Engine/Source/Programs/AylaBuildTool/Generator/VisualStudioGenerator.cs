@@ -182,8 +182,8 @@ internal class VisualStudioGenerator : Generator
                 else if (project is ModuleProject mp)
                 {
                     var directoryName = mp.SourceDirectory;
-                    directoryName = directoryName.Replace(mp.Descriptor.RootDirectory, string.Empty);
-                    if (project.Descriptor.Name == "Engine")
+                    directoryName = directoryName.Replace(mp.Group.RootDirectory, string.Empty);
+                    if (project.Group.Name == "Engine")
                     {
                         if (directoryName.Replace('\\', '/').Contains("/Editor/"))
                         {
@@ -313,9 +313,9 @@ internal class VisualStudioGenerator : Generator
 
         async Task GenerateCppProjectAsync(Dictionary<ModuleProject, string> vcxprojPaths, GroupDescriptor primaryGroup, ModuleProject project, CancellationToken cancellationToken)
         {
-            var engineGroup = solution.EngineProjects.First().Descriptor;
+            var engineGroup = solution.EngineProjects.First().Group;
 
-            var group = project.Descriptor;
+            var group = project.Group;
             var projectFilesDirectory = Path.Combine(primaryGroup.IntermediateDirectory, "ProjectFiles");
             await Task.WhenAll(
                 GenerateVcxprojAsync(),
@@ -567,7 +567,7 @@ internal class VisualStudioGenerator : Generator
                     AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />""");
 
                     string projectPath = string.Empty;
-                    if (project.Descriptor.IsEngine == false)
+                    if (project.Group.IsEngine == false)
                     {
                         projectPath = $"--project \"{primaryGroup.RootDirectory}\\{primaryGroup.Name}.aproject\" ";
                     }
@@ -583,9 +583,8 @@ internal class VisualStudioGenerator : Generator
                         var configName = VSUtility.GetConfigName(buildTarget);
                         var archName = VSUtility.GetArchitectureName(buildTarget);
                         var outDir = group.Output(buildTarget, FolderPolicy.PathType.Windows);
-                        var intDir = Path.Combine(group.IntermediateDirectory, "Unused");
                         var rules = project.GetRule(buildTarget);
-                        var resolver = new ModuleRulesResolver(buildTarget, solution, rules, group);
+                        var resolver = project.GetResolver(buildTarget);
                         var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                         var includes = GenerateIncludePaths(resolver);
                         var outputFileName = FolderPolicy.OutputFileName(project.Name, rules.Type);
@@ -627,20 +626,25 @@ internal class VisualStudioGenerator : Generator
 
                         var configName = VSUtility.GetConfigName(buildTarget);
                         var archName = VSUtility.GetArchitectureName(buildTarget);
-                        var rules = project.GetRule(buildTarget);
-                        if (rules.EnableScript)
+                        var resolver = project.GetResolver(buildTarget);
+                        var depends = solution.FindDepends(resolver.DependencyModuleNames);
+                        foreach (var depend in depends.OfType<ModuleProject>())
                         {
-                            AppendFormatLine("""<ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
-                            Indent(() =>
+                            var rules = depend.GetRule(buildTarget);
+                            if (rules.EnableScript)
                             {
-                                AppendFormatLine("""<ProjectReference Include="{0}">""", project.GetScriptProjectName());
+                                AppendFormatLine("""<ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                                 Indent(() =>
                                 {
-                                    AppendFormatLine("""<Project>{0}</Project>""", project.Decl.ScriptGuid.ToString("B").ToUpper());
+                                    AppendFormatLine("""<ProjectReference Include="{0}">""", depend.GetScriptProjectName());
+                                    Indent(() =>
+                                    {
+                                        AppendFormatLine("""<Project>{0}</Project>""", depend.Decl.ScriptGuid.ToString("B").ToUpper());
+                                    });
+                                    AppendFormatLine("""</ProjectReference>""");
                                 });
-                                AppendFormatLine("""</ProjectReference>""");
-                            });
-                            AppendFormatLine("""</ItemGroup>""");
+                                AppendFormatLine("""</ItemGroup>""");
+                            }
                         }
                     }
 

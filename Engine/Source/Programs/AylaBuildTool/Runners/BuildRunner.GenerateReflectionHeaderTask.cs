@@ -46,7 +46,7 @@ internal static partial class BuildRunner
             }
 
             var fileName = Path.GetFileNameWithoutExtension(m_SourceCode.FilePath);
-            var intDir = Project.Descriptor.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
+            var intDir = Project.Group.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
             var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
             var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
             var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
@@ -58,7 +58,7 @@ internal static partial class BuildRunner
             var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n").Trim();
             await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
-            GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, Project.Name, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
+            GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Group, Project.Name, generatedSourceCode, Project.Group.IntermediateDirectory);
 
             if (Project.GetRule(targetInfo).DisableGenerateBindings == false)
             {

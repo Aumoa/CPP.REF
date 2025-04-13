@@ -6,12 +6,16 @@ namespace AylaEngine;
 
 internal class Solution
 {
-    public readonly IReadOnlyList<Project> EngineProjects;
-    public readonly IReadOnlyList<Project> GameProjects;
-    public readonly IReadOnlyList<Project> AllProjects;
-    public readonly GroupDescriptor PrimaryGroup;
+    public IReadOnlyList<Project> EngineProjects = null!;
+    public IReadOnlyList<Project> GameProjects = null!;
+    public IReadOnlyList<Project> AllProjects = null!;
+    public GroupDescriptor PrimaryGroup = null!;
 
-    private Solution(List<Project> engineProjects, List<Project> gameProjects, GroupDescriptor primaryGroup)
+    private Solution()
+    {
+    }
+
+    private void Assign(List<Project> engineProjects, List<Project> gameProjects, GroupDescriptor primaryGroup)
     {
         EngineProjects = engineProjects;
         GameProjects = gameProjects;
@@ -45,6 +49,8 @@ internal class Solution
 
     public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? gameFolder, CancellationToken cancellationToken = default)
     {
+        var solution = new Solution();
+
         List<Task> tasks = new();
         GroupDescriptor primaryGroup = GroupDescriptor.FromRoot(engineFolder, true);
 
@@ -60,7 +66,9 @@ internal class Solution
         await Task.WhenAll(tasks);
         engineProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
         gameProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
-        return new Solution(engineProjects, gameProjects, primaryGroup);
+
+        solution.Assign(engineProjects, gameProjects, primaryGroup);
+        return solution;
 
         async Task ScanDirectoryRecursive(IList<Project> results, GroupDescriptor descriptor, string currentDir)
         {
@@ -93,7 +101,7 @@ internal class Solution
 
                 lock (results)
                 {
-                    results.Add(new ModuleProject(directoryName, descriptor, currentDir, ruleType, ruleFileName, declaration));
+                    results.Add(new ModuleProject(solution, directoryName, descriptor, currentDir, ruleType, ruleFileName, declaration));
                 }
                 return;
             }

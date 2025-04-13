@@ -26,7 +26,6 @@ internal static partial class BuildRunner
 
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
-        var primaryGroup = solution.EngineProjects.First().Descriptor;
         IEnumerable<ModuleProject> targetProjects;
         if (string.IsNullOrEmpty(options.Target))
         {
@@ -47,7 +46,7 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor);
+            var resolver = mp.GetResolver(buildTarget);
             var depends = solution.FindDepends(resolver.DependencyModuleNames).OfType<ModuleProject>();
             targetProjects = depends.Append(targetProject);
         }
@@ -63,7 +62,7 @@ internal static partial class BuildRunner
         {
             foreach (var project in targetProjects.OfType<ModuleProject>())
             {
-                var intDir = project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
+                var intDir = project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
                 foreach (var sourceCode in project.GetSourceCodes())
                 {
                     if (sourceCode.Type == SourceCodeType.SourceCode)
@@ -113,7 +112,7 @@ internal static partial class BuildRunner
 
         foreach (var project in targetProjects)
         {
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, buildTarget), project.Descriptor);
+            var resolver = project.GetResolver(buildTarget);
             List<CompileItem> allCompiles = [];
             List<CompileTask> needCompiles = [];
             var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
@@ -126,7 +125,7 @@ internal static partial class BuildRunner
                     {
                         Resolver = resolver,
                         SourceCode = sourceCode,
-                        Descriptor = project.Descriptor
+                        Descriptor = project.Group
                     };
 
                     var fileName = Path.GetFileName(item.SourceCode.FilePath);
@@ -312,7 +311,7 @@ internal static partial class BuildRunner
 
             foreach (var (project, list) in generatedBindingsCodes)
             {
-                var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
+                var projectFile = Path.Combine(project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
 
                 bool isNewer = list.Append(projectFile).Any(p =>
                 {
@@ -327,7 +326,7 @@ internal static partial class BuildRunner
 
                 if (isNewer)
                 {
-                    var outputPath = project.Descriptor.Output(buildTarget, FolderPolicy.PathType.Current);
+                    var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
                     var assemblyName = $"{project.Name}.Bindings";
                     var dllName = assemblyName + ".dll";
                     var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
@@ -400,7 +399,7 @@ internal static partial class BuildRunner
 
                     async Task<Terminal.Output> PublishAsync()
                     {
-                        var resolver = new ModuleRulesResolver(buildTarget, solution, project.GetRule(buildTarget), project.Descriptor);
+                        var resolver = project.GetResolver(buildTarget);
                         foreach (var depend in resolver.DependencyModuleNames)
                         {
                             Task dependTask;

@@ -4,9 +4,9 @@ namespace AylaEngine;
 
 internal class ModuleRulesResolver
 {
-    private readonly TargetInfo m_TargetInfo;
+    private readonly ITargetInfo m_TargetInfo;
 
-    public ModuleRulesResolver(TargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
+    public ModuleRulesResolver(ITargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
     {
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         m_TargetInfo = targetInfo;
@@ -14,7 +14,7 @@ internal class ModuleRulesResolver
         RuleFilePath = targetProject.RuleFilePath;
         Name = rules.Name;
         Group = group;
-        EngineGroup = solution.EngineProjects.First().Descriptor;
+        EngineGroup = solution.EngineProjects.First().Group;
         PrimaryGroup = solution.PrimaryGroup;
 
         PrivateDependencyModuleNames = WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames).Distinct().ToArray();
@@ -74,7 +74,7 @@ internal class ModuleRulesResolver
             return;
         }
 
-        var intDir = targetProject.Descriptor.Intermediate(targetProject.Name, m_TargetInfo, FolderPolicy.PathType.Current);
+        var intDir = targetProject.Group.Intermediate(targetProject.Name, m_TargetInfo, FolderPolicy.PathType.Current);
         dependencyModuleNames.AddRange(rules.PublicDependencyModuleNames);
         includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)).Append(intDir));
         additionalMacros.AddRange(rules.PublicAdditionalMacros);

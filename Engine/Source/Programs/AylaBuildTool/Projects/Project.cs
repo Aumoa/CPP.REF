@@ -16,7 +16,7 @@ internal abstract class Project(string name, GroupDescriptor descriptor, Project
     }
 
     public readonly string Name = name;
-    public readonly GroupDescriptor Descriptor = descriptor;
+    public readonly GroupDescriptor Group = descriptor;
     public readonly Declaration Decl = declaration;
 
     public override string ToString()
