@@ -6,26 +6,26 @@ namespace AylaEngine;
 
 internal class Solution
 {
-    public IReadOnlyList<Project> EngineProjects = null!;
-    public IReadOnlyList<Project> GameProjects = null!;
-    public IReadOnlyList<Project> AllProjects = null!;
-    public GroupDescriptor PrimaryGroup = null!;
+    public IReadOnlyList<Project> Projects { get; private set; } = null!;
+
+    public GroupDescriptor EngineGroup { get; private set; } = null!;
+
+    public GroupDescriptor PrimaryGroup { get; private set; } = null!;
 
     private Solution()
     {
     }
 
-    private void Assign(List<Project> engineProjects, List<Project> gameProjects, GroupDescriptor primaryGroup)
+    private void Assign(IEnumerable<Project> projects, GroupDescriptor engineGroup, GroupDescriptor primaryGroup)
     {
-        EngineProjects = engineProjects;
-        GameProjects = gameProjects;
-        AllProjects = gameProjects.Concat(engineProjects).ToArray();
+        Projects = projects.ToArray();
+        EngineGroup = engineGroup;
         PrimaryGroup = primaryGroup;
     }
 
     public Project? FindProject(string name)
     {
-        return AllProjects.FirstOrDefault(p => p.Name == name);
+        return Projects.FirstOrDefault(p => p.Name == name);
     }
 
     public Project[] FindDepends(params IEnumerable<string> names)
@@ -52,7 +52,8 @@ internal class Solution
         var solution = new Solution();
 
         List<Task> tasks = new();
-        GroupDescriptor primaryGroup = GroupDescriptor.FromRoot(engineFolder, true);
+        GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
+        GroupDescriptor primaryGroup = engineGroup;
 
         List<Project> engineProjects = new();;
         tasks.Add(ScanDirectoryRecursive(engineProjects, primaryGroup, Path.Combine(engineFolder, "Source")));
@@ -67,7 +68,7 @@ internal class Solution
         engineProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
         gameProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
 
-        solution.Assign(engineProjects, gameProjects, primaryGroup);
+        solution.Assign(engineProjects.Concat(gameProjects), engineGroup, primaryGroup);
         return solution;
 
         async Task ScanDirectoryRecursive(IList<Project> results, GroupDescriptor descriptor, string currentDir)

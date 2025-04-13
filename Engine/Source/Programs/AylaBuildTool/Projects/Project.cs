@@ -19,6 +19,8 @@ internal abstract class Project(string name, GroupDescriptor descriptor, Project
     public readonly GroupDescriptor Group = descriptor;
     public readonly Declaration Decl = declaration;
 
+    public bool IsEngine => Group.IsEngine;
+
     public override string ToString()
     {
         return $"({GetType().Name[..^("Project".Length)]}) {Name} {Decl.Guid.ToString("P").ToUpper()}";

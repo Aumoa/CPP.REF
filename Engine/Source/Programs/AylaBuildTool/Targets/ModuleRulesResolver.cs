@@ -14,7 +14,7 @@ internal class ModuleRulesResolver
         RuleFilePath = targetProject.RuleFilePath;
         Name = rules.Name;
         Group = group;
-        EngineGroup = solution.EngineProjects.First().Group;
+        EngineGroup = solution.EngineGroup;
         PrimaryGroup = solution.PrimaryGroup;
 
         PrivateDependencyModuleNames = WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames).Distinct().ToArray();

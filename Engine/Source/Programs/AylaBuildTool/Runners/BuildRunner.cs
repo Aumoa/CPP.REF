@@ -29,7 +29,7 @@ internal static partial class BuildRunner
         IEnumerable<ModuleProject> targetProjects;
         if (string.IsNullOrEmpty(options.Target))
         {
-            targetProjects = solution.AllProjects.OfType<ModuleProject>();
+            targetProjects = solution.Projects.OfType<ModuleProject>();
         }
         else
         {
