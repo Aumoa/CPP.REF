@@ -1,10 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.CodeAnalysis;
-using Spectre.Console;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static AylaEngine.RHTGenerator;
-
-namespace AylaEngine;
+﻿namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
@@ -206,15 +200,19 @@ internal partial class RHTGenerator
         }
     }
 
-    private readonly SourceCodeDescriptor m_SourceCode;
     private readonly Syntax[] m_Syntaxes;
     private readonly string m_FileId;
 
+    public SourceCodeDescriptor SourceCode { get; }
+
+    public AClass[] Classes { get; }
+
     private RHTGenerator(SourceCodeDescriptor sourceCode, Syntax[] syntaxes)
     {
-        m_SourceCode = sourceCode;
+        SourceCode = sourceCode;
         m_Syntaxes = syntaxes;
-        var sourceRelativePath = Path.GetRelativePath(m_SourceCode.Group.SourceDirectory, m_SourceCode.FilePath);
+        Classes = syntaxes.OfType<AClass>().ToArray();
+        var sourceRelativePath = Path.GetRelativePath(SourceCode.Group.SourceDirectory, SourceCode.FilePath);
         m_FileId = sourceRelativePath
             .Replace('/', '_')
             .Replace('\\', '_')
@@ -225,28 +223,6 @@ internal partial class RHTGenerator
     private static string FunctionName(string @namespace, string @class, string name)
     {
         return $"Injected__{@namespace}__{@class}__{name}";
-    }
-
-    private static string FormatTypeToCSharp(Context context, string type)
-    {
-        var typeName = TypeName.FromNative(type);
-        if (typeName.HasValue == false)
-        {
-            throw context.ParsingError($"Syntax Error: Unsupported return type '{type}'.");
-        }
-
-        return typeName.Value.CSharp;
-    }
-
-    private static string FormatTypeToCpp(Context context, string type)
-    {
-        var typeName = TypeName.FromNative(type);
-        if (typeName.HasValue == false)
-        {
-            throw context.ParsingError($"Syntax Error: Unsupported return type '{type}'.");
-        }
-
-        return typeName.Value.Cpp;
     }
 
     public static async Task<RHTGenerator?> ParseAsync(SourceCodeDescriptor sourceCode, CancellationToken cancellationToken = default)

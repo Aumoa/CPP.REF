@@ -6,7 +6,7 @@ namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
-    internal class Include : Syntax
+    public class Include : Syntax
     {
         public readonly string Path;
 
@@ -53,7 +53,7 @@ internal partial class RHTGenerator
         }
     }
 
-    internal class Comment : Syntax
+    public class Comment : Syntax
     {
         public readonly string Text;
 
@@ -90,7 +90,7 @@ internal partial class RHTGenerator
         }
     }
 
-    internal class Namespace : Syntax
+    public class Namespace : Syntax
     {
         public readonly string Name;
 
@@ -123,7 +123,7 @@ internal partial class RHTGenerator
         }
     }
 
-    internal class Class : Syntax
+    public class Class : Syntax
     {
         public readonly string Name;
         public readonly string? DllSpec;
@@ -204,7 +204,7 @@ internal partial class RHTGenerator
         }
     }
 
-    internal class AClass : Syntax
+    public class AClass : Syntax
     {
         public readonly Class Class;
         private GeneratedBody? m_GeneratedBody;
@@ -274,7 +274,7 @@ internal partial class RHTGenerator
         }
     }
 
-    internal class GeneratedBody : Syntax
+    public class GeneratedBody : Syntax
     {
         private GeneratedBody(Context context) : base(context)
         {
@@ -302,12 +302,14 @@ internal partial class RHTGenerator
         }
     }
 
-    internal class AProperty : Syntax
+    public class AProperty : Syntax
     {
+        public readonly TypeName TypeName;
         public readonly string Name;
 
-        private AProperty(Context context, string name) : base(context)
+        private AProperty(Context context, TypeName typeName, string name) : base(context)
         {
+            TypeName = typeName;
             Name = name;
         }
 
@@ -338,27 +340,27 @@ internal partial class RHTGenerator
                 throw capture.ParsingError("Syntax Error: Expected 'Type Name[ = DefaultValue];' but found an unexpected character.");
             }
 
-            aproperty = new AProperty(capture, declare[1]);
+            aproperty = new AProperty(capture, TypeName.FromNative(capture, declare[0]), declare[1]);
             return true;
         }
     }
 
-    internal class AFunction : Syntax
+    public class AFunction : Syntax
     {
         public record ParameterInfo
         {
-            public required string TypeName { get; init; }
+            public required TypeName TypeName { get; init; }
             public required string Name { get; init; }
             public required string? DefaultValue { get; init; }
         }
 
         public readonly string Name;
-        public readonly string Return;
+        public readonly TypeName Return;
         public readonly bool Static;
         public readonly bool Virtual;
         public readonly ParameterInfo[] ParameterInfos;
 
-        private AFunction(Context context, string name, string @return, bool @static, bool @virtual, IEnumerable<ParameterInfo> parameterInfos) : base(context)
+        private AFunction(Context context, string name, TypeName @return, bool @static, bool @virtual, IEnumerable<ParameterInfo> parameterInfos) : base(context)
         {
             Name = name;
             Return = @return;
@@ -417,12 +419,12 @@ internal partial class RHTGenerator
                 var declare = defaultValueSplit[0].Split(' ', '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 parameterInfos.Add(new ParameterInfo
                 {
-                    TypeName = declare[0],
+                    TypeName = TypeName.FromNative(capture, declare[0]),
                     Name = declare[1],
                     DefaultValue = defaultValue
                 });
             }
-            afunction = new AFunction(capture, name, returnType, @static, @virtual, parameterInfos);
+            afunction = new AFunction(capture, name, TypeName.FromNative(capture, returnType), @static, @virtual, parameterInfos);
             return true;
 
             bool TryAcceptStaticOrVirtual()
@@ -482,7 +484,7 @@ internal partial class RHTGenerator
         }
     }
 
-    internal class UnknownBracket : Syntax
+    public class UnknownBracket : Syntax
     {
         private char m_EscapeBracket;
 

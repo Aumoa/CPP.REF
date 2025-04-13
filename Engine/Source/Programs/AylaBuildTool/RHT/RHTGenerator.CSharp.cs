@@ -80,10 +80,10 @@ using System.Runtime.InteropServices;
                     sourceCodeText += "\t\t}\n";
                     sourceCodeText += "\t\t\n";
                 }
-                sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
+                sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\")]\n";
                 sourceCodeText += $"\t\tprivate static extern nint {FunctionName1("New")}();\n";
                 sourceCodeText += "\t\t\n";
-                sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
+                sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\")]\n";
                 sourceCodeText += $"\t\tprivate static extern void {FunctionName1("Finalize")}(nint self_);\n";
                 foreach (var function in aclass.Functions)
                 {
@@ -96,7 +96,7 @@ using System.Runtime.InteropServices;
 
                     foreach (var parameter in function.ParameterInfos)
                     {
-                        parameters.Add($"{FormatTypeToCSharp(function.Context, parameter.TypeName)} {parameter.Name}{(parameter.DefaultValue == null ? string.Empty : $" = {parameter.DefaultValue}")}");
+                        parameters.Add($"{parameter.TypeName.CSharp} {parameter.Name}{(parameter.DefaultValue == null ? string.Empty : $" = {parameter.DefaultValue}")}");
                         arguments.Add(parameter.Name);
                     }
 
@@ -116,17 +116,16 @@ using System.Runtime.InteropServices;
                     }
 
                     sourceCodeText += "\t\t\n";
-                    sourceCodeText += $"\t\tpublic {prefix}{FormatReturnType1()} {function.Name}({string.Join(", ", parameters)})\n";
+                    sourceCodeText += $"\t\tpublic {prefix}{function.Return.CSharp} {function.Name}({string.Join(", ", parameters)})\n";
                     sourceCodeText += "\t\t{\n";
                     sourceCodeText += $"\t\t\t{ReturnSyntax()}{FunctionName1(function.Name)}({string.Join(", ", argumentsWithSelf)});\n";
                     sourceCodeText += "\t\t}\n";
                     sourceCodeText += "\t\t\n";
                     sourceCodeText += "\t\t\n";
-                    sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
-                    sourceCodeText += $"\t\tprivate static extern {FormatReturnType1()} {FunctionName1(function.Name)}({string.Join(", ", parametersWithSelf)});\n";
+                    sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\")]\n";
+                    sourceCodeText += $"\t\tprivate static extern {function.Return.CSharp} {FunctionName1(function.Name)}({string.Join(", ", parametersWithSelf)});\n";
 
-                    string FormatReturnType1() => FormatTypeToCSharp(function.Context, function.Return);
-                    string ReturnSyntax() => function.Return == "void" ? string.Empty : "return ";
+                    string ReturnSyntax() => function.Return.IsVoid ? string.Empty : "return ";
                 }
                 sourceCodeText += "\t}\n";
                 sourceCodeText += "}\n";

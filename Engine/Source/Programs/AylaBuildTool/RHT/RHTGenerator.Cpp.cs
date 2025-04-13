@@ -4,14 +4,35 @@ namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
-    public string GenerateSourceCode()
+    public string GenerateSourceCode(RHTGenerator.Collection collection)
     {
+        List<string> headers = [];
+        foreach (var aclass in Classes)
+        {
+            foreach (var property in aclass.Properties)
+            {
+                if (collection.FindMatch(property.TypeName, aclass, out var generator, out _) == false)
+                {
+                    var context = property.Context;
+                    throw new ParsingErrorException(context.FilePath, context.LineNumber, context.ColumnNumber, $"The requested class \"{property.TypeName.Cpp}\"'s defining header file could not be found in the Reflection header file list.");
+                }
+
+                headers.Add(generator.SourceCode.FilePath);
+            }
+        }
+
+        string headersInclude = string.Empty;
+        if (headers.Count > 0)
+        {
+            headersInclude = "\n" + string.Join("\n", headers.Select(header => $"#include \"{header.Replace('\\', '/')}\""));
+        }
+
         string sourceCodeText = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.
 
-#include "CoreMinimal.h"
-#include "{m_SourceCode.FilePath.Replace('\\', '/')}"
+#include "CoreMinimal.h"{headersInclude}
+#include "{SourceCode.FilePath.Replace('\\', '/')}"
 
 
 """;
@@ -69,7 +90,7 @@ internal partial class RHTGenerator
 
                         foreach (var parameter in function.ParameterInfos)
                         {
-                            parameters.Add($"{FormatTypeToCpp(function.Context, parameter.TypeName)} {parameter.Name}");
+                            parameters.Add($"{parameter.TypeName.Cpp} {parameter.Name}");
                             arguments.Add(parameter.Name);
                         }
 
@@ -78,7 +99,7 @@ internal partial class RHTGenerator
                             parameters.Add("::Ayla::ssize_t self_");
                         }
 
-                        sourceCodeText += $"\tPLATFORM_SHARED_EXPORT {FormatReturnType1()} {FunctionName1(function.Name)}({string.Join(", ", parameters)})\n";
+                        sourceCodeText += $"\tPLATFORM_SHARED_EXPORT {function.Return.Cpp} {FunctionName1(function.Name)}({string.Join(", ", parameters)})\n";
                         sourceCodeText += "\t{\n";
                         if (function.Static == false)
                         {
@@ -102,8 +123,6 @@ internal partial class RHTGenerator
 
                             return $"{prefix}{function.Name}(" + string.Join(", ", arguments) + ")";
                         }
-
-                        string FormatReturnType1() => FormatTypeToCpp(function.Context, function.Return);
                     }
                     sourceCodeText += "}\n";
                     sourceCodeText += "\n";

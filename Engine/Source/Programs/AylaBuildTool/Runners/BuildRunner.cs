@@ -243,10 +243,34 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
+            RHTGenerator.Collection generators;
+            {
+                Dictionary<string, List<RHTGenerator>> dict = [];
+                foreach (var result in results)
+                {
+                    if (result.Generator != null)
+                    {
+                        foreach (var @class in result.Generator.Classes)
+                        {
+                            var cname = @class.Class.Name;
+                            if (dict.TryGetValue(cname, out var list) == false)
+                            {
+                                list = new List<RHTGenerator>();
+                                dict.Add(cname, list);
+                            }
+
+                            list.Add(result.Generator);
+                        }
+                    }
+                }
+
+                generators = new RHTGenerator.Collection(dict);
+            }
+
             Dictionary<ModuleProject, List<string>> generatedBindingsCodes = [];
             foreach (var result in results)
             {
-                if (await result.TryGenerateAsync(buildTarget, cancellationToken) == false)
+                if (await result.TryGenerateAsync(generators, buildTarget, cancellationToken) == false)
                 {
                     continue;
                 }

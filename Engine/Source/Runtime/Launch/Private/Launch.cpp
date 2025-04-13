@@ -1,9 +1,10 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Launch.h"
-#include "GenericPlatform/GenericSplash.h"
+#include "Engine.h"
 #include "GenericPlatform/GenericApplication.h"
-#include "GenericPlatform/GenericWIndow.h"
+#include "GenericPlatform/GenericSplash.h"
+#include "GenericPlatform/GenericWindow.h"
 #include "Localizational/Name.h"
 #include "InitializationContext.h"
 #if WITH_EDITOR
@@ -15,6 +16,10 @@ namespace Ayla
     Launch::Launch()
     {
         GenericApp = GenericApplication::CreateApplication();
+    }
+
+    Launch::~Launch() noexcept
+    {
     }
 
     int32 Launch::StartApplication()

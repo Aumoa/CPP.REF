@@ -9,7 +9,6 @@ internal static partial class BuildRunner
     {
         public readonly ModuleProject Project;
         private readonly SourceCodeDescriptor m_SourceCode;
-        private RHTGenerator? m_Generator;
 
         public GenerateReflectionHeaderTask(ModuleProject project, SourceCodeDescriptor sourceCode)
         {
@@ -23,11 +22,13 @@ internal static partial class BuildRunner
 
         public string? ErrorText { get; private set; }
 
+        public RHTGenerator? Generator { get; private set; }
+
         public async Task<GenerateReflectionHeaderTask> ParseAsync(CancellationToken cancellationToken)
         {
             try
             {
-                m_Generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
+                Generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
             }
             catch (Exception e)
             {
@@ -37,9 +38,9 @@ internal static partial class BuildRunner
             return this;
         }
 
-        public async Task<bool> TryGenerateAsync(TargetInfo targetInfo, CancellationToken cancellationToken = default)
+        public async Task<bool> TryGenerateAsync(RHTGenerator.Collection collection, TargetInfo targetInfo, CancellationToken cancellationToken = default)
         {
-            if (m_Generator == null)
+            if (Generator == null)
             {
                 return false;
             }
@@ -51,17 +52,17 @@ internal static partial class BuildRunner
             var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
 
             Directory.CreateDirectory(Path.Combine(intDir, "Bindings"));
-            var headerText = m_Generator.GenerateHeader().Replace("\r\n", "\n").Trim();
+            var headerText = Generator.GenerateHeader().Replace("\r\n", "\n").Trim();
             await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
 
-            var sourceCodeText = m_Generator.GenerateSourceCode().Replace("\r\n", "\n").Trim();
+            var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n").Trim();
             await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
             GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, Project.Name, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
 
             if (Project.GetRule(targetInfo).DisableGenerateBindings == false)
             {
-                var bindingCodeText = m_Generator.GenerateBindings().Replace("\r\n", "\n").Trim();
+                var bindingCodeText = Generator.GenerateBindings().Replace("\r\n", "\n").Trim();
                 await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
 
                 GeneratedBindingCode = generatedBindingCode;
