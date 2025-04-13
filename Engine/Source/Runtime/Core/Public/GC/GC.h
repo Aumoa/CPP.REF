@@ -47,7 +47,9 @@ namespace Ayla
 
 	public:
 		static void SuppressFinalize(const RPtr<Object>& target);
+		AFUNCTION()
 		static void Collect(int32 generation = 2);
+		AFUNCTION()
 		static void WaitForCompleteToFinalize();
 
 	private:

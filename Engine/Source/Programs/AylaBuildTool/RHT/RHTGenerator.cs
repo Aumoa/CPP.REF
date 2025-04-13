@@ -545,17 +545,26 @@ internal class RHTGenerator
 
     internal class AFunction : Syntax
     {
+        public record ParameterInfo
+        {
+            public required string TypeName { get; init; }
+            public required string Name { get; init; }
+            public required string? DefaultValue { get; init; }
+        }
+
         public readonly string Name;
         public readonly string Return;
         public readonly bool Static;
         public readonly bool Virtual;
+        public readonly ParameterInfo[] ParameterInfos;
 
-        private AFunction(Context context, string name, string @return, bool @static, bool @virtual) : base(context)
+        private AFunction(Context context, string name, string @return, bool @static, bool @virtual, IEnumerable<ParameterInfo> parameterInfos) : base(context)
         {
             Name = name;
             Return = @return;
             Static = @static;
             Virtual = @virtual;
+            ParameterInfos = parameterInfos.ToArray();
         }
 
         public override string ToString()
@@ -577,8 +586,8 @@ internal class RHTGenerator
             context.Advance("AFUNCTION()".Length);
 
             context.SkipWhiteSpace(true);
-            var nextLine = context.Export(0, ";").ToString();
-            var items = nextLine.Split([' ', '\t', '\n', '(', ')', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var nextLine = context.Export(0, "(").ToString();
+            var items = nextLine.Split([' ', '\t', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             int index = 0;
             int step = 0;
             bool @virtual = false, @static = false;
@@ -592,7 +601,28 @@ internal class RHTGenerator
                     TryAcceptName();
             }
 
-            afunction = new AFunction(capture, name, returnType, @static, @virtual);
+            var parametersStr = context.Export(0, ";").Trim([' ', '\t', '\n', '(', ')']).ToString();
+            var parameters = parametersStr.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            List<ParameterInfo> parameterInfos = [];
+            foreach (var parameter in parameters)
+            {
+                string? defaultValue = null;
+
+                var defaultValueSplit = parameter.Split('=');
+                if (defaultValueSplit.Length >= 2)
+                {
+                    defaultValue = defaultValueSplit[1].Trim();
+                }
+
+                var declare = defaultValueSplit[0].Split(' ', '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                parameterInfos.Add(new ParameterInfo
+                {
+                    TypeName = declare[0],
+                    Name = declare[1],
+                    DefaultValue = defaultValue
+                });
+            }
+            afunction = new AFunction(capture, name, returnType, @static, @virtual, parameterInfos);
             return true;
 
             bool TryAcceptStaticOrVirtual()
@@ -836,7 +866,7 @@ internal class RHTGenerator
                             return $"{prefix}{function.Name}(" + string.Join(", ", arguments) + ")";
                         }
 
-                        string FormatReturnType1() => FormatReturnType(function);
+                        string FormatReturnType1() => FormatVariableType(function.Context, function.Return);
                     }
                     sourceCodeText += "}\n";
                     sourceCodeText += "\n";
@@ -871,10 +901,14 @@ using System.Runtime.InteropServices;
             {
                 string @namespace = aclass.Class.Namespace;
                 string @class = aclass.Class.Name;
-                string inherit = string.Empty;
+                string inherit;
                 if (string.IsNullOrEmpty(aclass.Class.BaseClass) == false)
                 {
                     inherit = $" : {aclass.Class.BaseClass}";
+                }
+                else
+                {
+                    inherit = " : global::System.IDisposable";
                 }
 
                 sourceCodeText += $"namespace {@namespace}\n";
@@ -883,9 +917,9 @@ using System.Runtime.InteropServices;
                 sourceCodeText +=  "\t{\n";
                 if (string.IsNullOrEmpty(aclass.Class.BaseClass))
                 {
-                    sourceCodeText += $"\t\tprivate nint m_InstancePtr;\n";
+                    sourceCodeText +=  "\t\tprivate nint m_InstancePtr;\n";
                     sourceCodeText +=  "\t\t\n";
-                    sourceCodeText += $"\t\tpublic long InstancePtr => m_InstancePtr;\n";
+                    sourceCodeText +=  "\t\tpublic long InstancePtr => m_InstancePtr;\n";
                     sourceCodeText +=  "\t\t\n";
                     sourceCodeText += $"\t\tpublic {@class}()\n";
                     sourceCodeText +=  "\t\t{\n";
@@ -894,13 +928,24 @@ using System.Runtime.InteropServices;
                     sourceCodeText +=  "\t\t\n";
                     sourceCodeText += $"\t\tprotected {@class}(nint instancePtr)\n";
                     sourceCodeText +=  "\t\t{\n";
-                    sourceCodeText += $"\t\t\tm_InstancePtr = instancePtr;\n";
+                    sourceCodeText +=  "\t\t\tm_InstancePtr = instancePtr;\n";
                     sourceCodeText +=  "\t\t}\n";
                     sourceCodeText +=  "\t\t\n";
                     sourceCodeText += $"\t\t~{@class}()\n";
                     sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText +=  "\t\t\tDispose(false);\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText +=  "\t\tpublic void Dispose()\n";
+                    sourceCodeText +=  "\t\t{\n";
+                    sourceCodeText +=  "\t\t\tDispose(true);\n";
+                    sourceCodeText +=  "\t\t\tglobal::System.GC.SuppressFinalize(this);\n";
+                    sourceCodeText +=  "\t\t}\n";
+                    sourceCodeText +=  "\t\t\n";
+                    sourceCodeText +=  "\t\tprotected virtual void Dispose(bool disposing)\n";
+                    sourceCodeText +=  "\t\t{\n";
                     sourceCodeText += $"\t\t\t{FunctionName1("Finalize")}(m_InstancePtr);\n";
-                    sourceCodeText += $"\t\t\tm_InstancePtr = 0;\n";
+                    sourceCodeText +=  "\t\t\tm_InstancePtr = 0;\n";
                     sourceCodeText +=  "\t\t}\n";
                     sourceCodeText +=  "\t\t\n";
                 }
@@ -929,6 +974,12 @@ using System.Runtime.InteropServices;
                     IEnumerable<string> argumentsWithSelf = arguments;
                     string prefix = string.Empty;
 
+                    foreach (var parameter in function.ParameterInfos)
+                    {
+                        parameters.Add($"{FormatVariableType(function.Context, parameter.TypeName)} {parameter.Name}{(parameter.DefaultValue == null ? string.Empty : $" = {parameter.DefaultValue}")}");
+                        arguments.Add(parameter.Name);
+                    }
+
                     if (function.Static == false)
                     {
                         parametersWithSelf = Enumerable.Repeat("nint self_", 1).Concat(parameters);
@@ -947,14 +998,15 @@ using System.Runtime.InteropServices;
                     sourceCodeText +=  "\t\t\n";
                     sourceCodeText += $"\t\tpublic {prefix}{FormatReturnType1()} {function.Name}({string.Join(", ", parameters)})\n";
                     sourceCodeText +=  "\t\t{\n";
-                    sourceCodeText += $"\t\t\treturn {FunctionName1(function.Name)}({string.Join(", ", argumentsWithSelf)});\n";
+                    sourceCodeText += $"\t\t\t{ReturnSyntax()}{FunctionName1(function.Name)}({string.Join(", ", argumentsWithSelf)});\n";
                     sourceCodeText +=  "\t\t}\n";
                     sourceCodeText +=  "\t\t\n";
                     sourceCodeText +=  "\t\t\n";
                     sourceCodeText += $"\t\t[DllImport(\"{m_SourceCode.ModuleName}\")]\n";
                     sourceCodeText += $"\t\tprivate static extern {FormatReturnType1()} {FunctionName1(function.Name)}({string.Join(", ", parametersWithSelf)});\n";
 
-                    string FormatReturnType1() => FormatReturnType(function);
+                    string FormatReturnType1() => FormatVariableType(function.Context, function.Return);
+                    string ReturnSyntax() => function.Return == "void" ? string.Empty : "return ";
                 }
                 sourceCodeText += "\t}\n";
                 sourceCodeText +=  "}\n";
@@ -972,9 +1024,9 @@ using System.Runtime.InteropServices;
         return $"Injected__{@namespace}__{@class}__{name}";
     }
 
-    private static string FormatReturnType(AFunction function)
+    private static string FormatVariableType(Context context, string variableType)
     {
-        return function.Return switch
+        return variableType switch
         {
             "void" => "void",
             "bool" => "bool",
@@ -984,7 +1036,7 @@ using System.Runtime.InteropServices;
             "::Ayla::uint32" or "Ayla::uint32" or "uint32" => "uint",
             "::Ayla::uint64" or "Ayla::uint64" or "uint64" => "ulong",
             "::Ayla::string" or "Ayla::string" or "string" => "string",
-            _ => throw function.Context.ParsingError($"Syntax Error: Unsupported return type '{function.Return}'.")
+            _ => throw context.ParsingError($"Syntax Error: Unsupported return type '{variableType}'.")
         };
     }
 

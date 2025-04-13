@@ -25,7 +25,7 @@ namespace Ayla
 
 	public:
 		AFUNCTION()
-		virtual int32 GuardedMain();
+		virtual int32 StartApplication();
 
 		virtual void* GetApplicationPointer() = 0;
 	};

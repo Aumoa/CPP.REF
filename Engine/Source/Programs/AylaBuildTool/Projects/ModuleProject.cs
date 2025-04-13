@@ -44,4 +44,9 @@ internal class ModuleProject(string name, GroupDescriptor descriptor, string sou
             }
         }
     }
+
+    public string GetScriptProjectName()
+    {
+        return Path.Combine(SourceDirectory, "Script", Name + ".Script.csproj");
+    }
 }
