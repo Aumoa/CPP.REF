@@ -3,14 +3,19 @@
 #pragma once
 
 #include "String_.h"
-#include "StaticClass.h"
+#include "Object.h"
 #include "Diagnostics/LogCategory.h"
 #include "Diagnostics/LogVerbosity.h"
+#include "Debug.gen.h"
 
 namespace Ayla
 {
-	struct CORE_API Debug : public StaticClass
+	ACLASS()
+	class CORE_API Debug : public Object
 	{
+		GENERATED_BODY()
+
+	public:
 		static void Log(const LogCategory& category, LogVerbosity logLevel, String message);
 
 		template<class... TArgs>

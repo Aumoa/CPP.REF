@@ -1,4 +1,7 @@
-﻿namespace AylaEngine;
+﻿using System.Threading;
+using System;
+
+namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
@@ -19,35 +22,13 @@ internal static partial class BuildRunner
 
         public string? ErrorText { get; private set; }
 
-        public async Task<GenerateReflectionHeaderTask> GenerateAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
+        public RHTGenerator? Generator { get; private set; }
+
+        public async Task<GenerateReflectionHeaderTask> ParseAsync(CancellationToken cancellationToken)
         {
             try
             {
-                var fileName = Path.GetFileNameWithoutExtension(m_SourceCode.FilePath);
-                var intDir = Project.Descriptor.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
-                var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
-                var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
-                var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
-                var generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
-                Directory.CreateDirectory(Path.Combine(intDir, "Bindings"));
-                if (generator != null)
-                {
-                    var headerText = generator.GenerateHeader().Replace("\r\n", "\n").Trim();
-                    await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
-
-                    var sourceCodeText = generator.GenerateSourceCode().Replace("\r\n", "\n").Trim();
-                    await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
-
-                    GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Descriptor, Project.Name, generatedSourceCode, Project.Descriptor.IntermediateDirectory);
-
-                    if (Project.GetRule(targetInfo).DisableGenerateBindings == false)
-                    {
-                        var bindingCodeText = generator.GenerateBindings().Replace("\r\n", "\n").Trim();
-                        await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
-
-                        GeneratedBindingCode = generatedBindingCode;
-                    }
-                }
+                Generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
             }
             catch (Exception e)
             {
@@ -55,6 +36,39 @@ internal static partial class BuildRunner
             }
 
             return this;
+        }
+
+        public async Task<bool> TryGenerateAsync(RHTGenerator.Collection collection, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+        {
+            if (Generator == null)
+            {
+                return false;
+            }
+
+            var fileName = Path.GetFileNameWithoutExtension(m_SourceCode.FilePath);
+            var intDir = Project.Group.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
+            var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
+            var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
+            var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
+
+            Directory.CreateDirectory(Path.Combine(intDir, "Bindings"));
+            var headerText = Generator.GenerateHeader().Replace("\r\n", "\n").Trim();
+            await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
+
+            var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n").Trim();
+            await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
+
+            GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Group, Project.Name, generatedSourceCode, Project.Group.IntermediateDirectory);
+
+            if (Project.GetRule(targetInfo).DisableGenerateBindings == false)
+            {
+                var bindingCodeText = Generator.GenerateBindings().Replace("\r\n", "\n").Trim();
+                await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
+
+                GeneratedBindingCode = generatedBindingCode;
+            }
+
+            return true;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using static AylaEngine.Compiler;
+﻿using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
 
@@ -14,9 +14,8 @@ internal static partial class BuildRunner
             Item = item;
         }
 
-        public async Task<Terminal.Output> CompileAsync(SemaphoreSlim access, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> CompileAsync(Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
-            await access.WaitAsync(cancellationToken);
             try
             {
                 var compiler = await installation.SpawnCompilerAsync(targetInfo, cancellationToken);
@@ -33,10 +32,6 @@ internal static partial class BuildRunner
             {
                 m_CompletionSource.SetException(e);
                 throw;
-            }
-            finally
-            {
-                access.Release();
             }
         }
 

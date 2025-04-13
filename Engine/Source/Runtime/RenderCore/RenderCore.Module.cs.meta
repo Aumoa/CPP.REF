@@ -1,2 +1,4 @@
-Guid: 5fc5b149-aa0b-42db-ab2a-ff394826b401
-ScriptGuid: 604337a7-0fb1-43ef-84f6-e40860aff759
+ModuleDeclaration:
+  ScriptGuid: 6878af7f-d6ca-487b-a19a-4fb2c90ea89b
+  BindingGuid: e5b6cafc-9b0b-4376-9630-46a56fa553f5
+  Guid: 33e20f49-7618-44e1-b4f8-3a3f8adaa8a0

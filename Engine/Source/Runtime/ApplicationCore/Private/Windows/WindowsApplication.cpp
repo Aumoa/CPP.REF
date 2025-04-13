@@ -16,7 +16,7 @@ namespace Ayla
 
     RPtr<GenericWindow> WindowsApplication::MakeWindow(const GenericWindowDefinition& InDefinition)
     {
-        return New<WindowsWindow>((HINSTANCE)GetApplicationPointer(), InDefinition);
+        return WindowsWindow::Create((HINSTANCE)GetApplicationPointer(), InDefinition);
     }
 
     Vector2N WindowsApplication::GetScreenResolution()

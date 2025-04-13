@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Spectre.Console;
-using static AylaEngine.Compiler;
+using static AylaEngine.CppCompiler;
 using static AylaEngine.Terminal;
 
 namespace AylaEngine;
@@ -26,11 +26,10 @@ internal static partial class BuildRunner
 
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
-        var primaryGroup = solution.EngineProjects.First().Descriptor;
         IEnumerable<ModuleProject> targetProjects;
         if (string.IsNullOrEmpty(options.Target))
         {
-            targetProjects = solution.AllProjects.OfType<ModuleProject>();
+            targetProjects = solution.Projects.OfType<ModuleProject>();
         }
         else
         {
@@ -47,7 +46,7 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(mp.RuleType, buildTarget), mp.Descriptor);
+            var resolver = mp.GetResolver(buildTarget);
             var depends = solution.FindDepends(resolver.DependencyModuleNames).OfType<ModuleProject>();
             targetProjects = depends.Append(targetProject);
         }
@@ -63,7 +62,7 @@ internal static partial class BuildRunner
         {
             foreach (var project in targetProjects.OfType<ModuleProject>())
             {
-                var intDir = project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
+                var intDir = project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
                 foreach (var sourceCode in project.GetSourceCodes())
                 {
                     if (sourceCode.Type == SourceCodeType.SourceCode)
@@ -93,7 +92,11 @@ internal static partial class BuildRunner
                     }
                 }
 
-                Directory.Delete(Path.Combine(intDir, "Bindings"), true);
+                var bindingsDir = Path.Combine(intDir, "Bindings");
+                if (Directory.Exists(bindingsDir))
+                {
+                    Directory.Delete(bindingsDir, true);
+                }
             }
 
             await DispatchGenerateHeaderWorkers();
@@ -109,7 +112,7 @@ internal static partial class BuildRunner
 
         foreach (var project in targetProjects)
         {
-            var resolver = new ModuleRulesResolver(buildTarget, solution, ModuleRules.New(project.RuleType, buildTarget), project.Descriptor);
+            var resolver = project.GetResolver(buildTarget);
             List<CompileItem> allCompiles = [];
             List<CompileTask> needCompiles = [];
             var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
@@ -118,11 +121,11 @@ internal static partial class BuildRunner
             {
                 if (sourceCode.Type == SourceCodeType.SourceCode)
                 {
-                    var item = new Compiler.CompileItem
+                    var item = new CppCompiler.CompileItem
                     {
                         Resolver = resolver,
                         SourceCode = sourceCode,
-                        Descriptor = project.Descriptor
+                        Descriptor = project.Group
                     };
 
                     var fileName = Path.GetFileName(item.SourceCode.FilePath);
@@ -149,8 +152,6 @@ internal static partial class BuildRunner
             moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray()));
         }
 
-        int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
-        SemaphoreSlim semaphore = new(hardwareConcurrency);
         const int LinkTasks = 1;
         totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length + LinkTasks);
         log = totalActions switch
@@ -218,7 +219,7 @@ internal static partial class BuildRunner
                     if (sourceCode.Type == SourceCodeType.Header)
                     {
                         var ght = new GenerateReflectionHeaderTask(project, sourceCode);
-                        tasks.Add(ght.GenerateAsync(buildTarget, cancellationToken));
+                        tasks.Add(ght.ParseAsync(cancellationToken));
                     }
                 }
             }
@@ -241,9 +242,38 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
+            RHTGenerator.Collection generators;
+            {
+                Dictionary<string, List<RHTGenerator>> dict = [];
+                foreach (var result in results)
+                {
+                    if (result.Generator != null)
+                    {
+                        foreach (var @class in result.Generator.Classes)
+                        {
+                            var cname = @class.Class.Name;
+                            if (dict.TryGetValue(cname, out var list) == false)
+                            {
+                                list = new List<RHTGenerator>();
+                                dict.Add(cname, list);
+                            }
+
+                            list.Add(result.Generator);
+                        }
+                    }
+                }
+
+                generators = new RHTGenerator.Collection(dict);
+            }
+
             Dictionary<ModuleProject, List<string>> generatedBindingsCodes = [];
             foreach (var result in results)
             {
+                if (await result.TryGenerateAsync(generators, buildTarget, cancellationToken) == false)
+                {
+                    continue;
+                }
+
                 var gsc = result.GeneratedSourceCode;
                 if (gsc.HasValue)
                 {
@@ -281,7 +311,7 @@ internal static partial class BuildRunner
 
             foreach (var (project, list) in generatedBindingsCodes)
             {
-                var projectFile = Path.Combine(project.Descriptor.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
+                var projectFile = Path.Combine(project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
 
                 bool isNewer = list.Append(projectFile).Any(p =>
                 {
@@ -296,7 +326,7 @@ internal static partial class BuildRunner
 
                 if (isNewer)
                 {
-                    var outputPath = project.Descriptor.Output(buildTarget, FolderPolicy.PathType.Current);
+                    var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
                     var assemblyName = $"{project.Name}.Bindings";
                     var dllName = assemblyName + ".dll";
                     var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
@@ -369,7 +399,7 @@ internal static partial class BuildRunner
 
                     async Task<Terminal.Output> PublishAsync()
                     {
-                        var resolver = new ModuleRulesResolver(buildTarget, solution, project.GetRule(buildTarget), project.Descriptor);
+                        var resolver = project.GetResolver(buildTarget);
                         foreach (var depend in resolver.DependencyModuleNames)
                         {
                             Task dependTask;
@@ -389,12 +419,8 @@ internal static partial class BuildRunner
                         }
 
                         Directory.CreateDirectory(outputPath);
-                        return await Terminal.ExecuteCommandAsync($"publish {projectFile} -c \"{VSUtility.GetConfigName(buildTarget)}\" /p:Platform={VSUtility.GetArchitectureName(buildTarget)} --nologo -o {outputPath}", new Options
-                        {
-                            Executable = "dotnet",
-                            WorkingDirectory = outputPath,
-                            Logging = Logging.None,
-                        }, cancellationToken);
+                        var compiler = new DotNETCompiler();
+                        return await compiler.PublishAsync(projectFile, VSUtility.GetConfigName(buildTarget), VSUtility.GetArchitectureName(buildTarget), outputPath, cancellationToken);
                     }
                 }
                 else
@@ -422,7 +448,7 @@ internal static partial class BuildRunner
         {
             foreach (var moduleTask in moduleTasks)
             {
-                moduleTask.LinkAsync(semaphore, moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
+                moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
                     try
                     {
@@ -463,7 +489,7 @@ internal static partial class BuildRunner
             var allCompiles = moduleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
             foreach (var compileTask in allCompiles)
             {
-                compileTask.CompileAsync(semaphore, installation, buildTarget, cancellationToken).ContinueWith(r =>
+                compileTask.CompileAsync(installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
                     try
                     {
