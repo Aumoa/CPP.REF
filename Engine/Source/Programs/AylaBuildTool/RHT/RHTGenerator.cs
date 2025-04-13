@@ -229,34 +229,24 @@ internal partial class RHTGenerator
 
     private static string FormatTypeToCSharp(Context context, string type)
     {
-        return type switch
+        var typeName = TypeName.FromNative(type);
+        if (typeName.HasValue == false)
         {
-            "void" => "void",
-            "bool" => "bool",
-            "::Ayla::int32" or "Ayla::int32" or "int32" => "int",
-            "::Ayla::int64" or "Ayla::int64" or "int64" => "long",
-            "::Ayla::ssize_t" or "Ayla::ssize_t" or "ssize_t" => "nint",
-            "::Ayla::uint32" or "Ayla::uint32" or "uint32" => "uint",
-            "::Ayla::uint64" or "Ayla::uint64" or "uint64" => "ulong",
-            "::Ayla::String" or "Ayla::String" or "String" => "string",
-            _ => throw context.ParsingError($"Syntax Error: Unsupported return type '{type}'.")
-        };
+            throw context.ParsingError($"Syntax Error: Unsupported return type '{type}'.");
+        }
+
+        return typeName.Value.CSharp;
     }
 
     private static string FormatTypeToCpp(Context context, string type)
     {
-        return type switch
+        var typeName = TypeName.FromNative(type);
+        if (typeName.HasValue == false)
         {
-            "void" => "void",
-            "bool" => "bool",
-            "::Ayla::int32" or "Ayla::int32" or "int32" => "::Ayla::int32",
-            "::Ayla::int64" or "Ayla::int64" or "int64" => "::Ayla::int64",
-            "::Ayla::ssize_t" or "Ayla::ssize_t" or "ssize_t" => "::Ayla::ssize_t",
-            "::Ayla::uint32" or "Ayla::uint32" or "uint32" => "::Ayla::uint32",
-            "::Ayla::uint64" or "Ayla::uint64" or "uint64" => "::Ayla::uint64",
-            "::Ayla::String" or "Ayla::String" or "String" => "::Ayla::String",
-            _ => throw context.ParsingError($"Syntax Error: Unsupported return type '{type}'.")
-        };
+            throw context.ParsingError($"Syntax Error: Unsupported return type '{type}'.");
+        }
+
+        return typeName.Value.Cpp;
     }
 
     public static async Task<RHTGenerator?> ParseAsync(SourceCodeDescriptor sourceCode, CancellationToken cancellationToken = default)
