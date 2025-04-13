@@ -20,12 +20,14 @@ public static class BindingActivator
     {
         if (ReflectionUtility.FindTypeSimple(bindingTypeName, out var type) != ReflectionUtility.FindResult.Success)
         {
+            Debug.LogCriticalFormat("LogBindings", "Failed to find nativie type {0}", bindingTypeName);
             return 0;
         }
 
         var instance = (Object?)Activator.CreateInstance(type!, true);
         if (instance == null)
         {
+            Debug.LogCriticalFormat("LogBindings", "Failed to create native instance of {0}", bindingTypeName);
             return 0;
         }
 

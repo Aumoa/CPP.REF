@@ -2,6 +2,7 @@
 
 using System.Data.Common;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using static AylaEngine.RHTGenerator;
 
 namespace AylaEngine;
@@ -33,7 +34,7 @@ internal partial class RHTGenerator
         private static TypeName UInt64 = new TypeName("::Ayla::uint64", "ulong", null, false);
         private static TypeName IntPtr = new TypeName("::Ayla::ssize_t", "nint", null, false);
         private static TypeName UIntPtr = new TypeName("::Ayla::size_t", "unint", null, false);
-        private static TypeName String = new TypeName("::Ayla::String", "string", null, false);
+        private static TypeName String = new TypeName("const wchar_t*", "string", null, false);
         private static TypeName Single = new TypeName("float", "float", null, false);
         private static TypeName Double = new TypeName("double", "double", null, false);
 
@@ -78,7 +79,20 @@ internal partial class RHTGenerator
         public readonly string CppBindingsParameter => ByRef ? "::Ayla::ssize_t" : Cpp;
 
         public string CppBindingsArgument(AClass fromClass, string name)
-            => ByRef ? $"(::Ayla::Marshal::IntPtrToRPtr<{CppFullName(fromClass)}>({name}))" : name;
+        {
+            if (ByRef)
+            {
+                return $"(::Ayla::Marshal::IntPtrToRPtr<{CppFullName(fromClass)}>({name}))";
+            }
+            else if (CSharp == "string")
+            {
+                return $"::Ayla::String::FromLiteral({name})";
+            }
+            else
+            {
+                return name;
+            }
+        }
 
         public string CSharpBindingParameter(AClass fromClass)
             => ByRef ? CSharpFullName(fromClass) : CSharp;

@@ -16,6 +16,7 @@ static class ScriptingLaunch
             throw new InvalidOperationException($"Cannot create '{launchType.FullName}' instance.");
         }
 
+        Debug.LogInfoFormat("LogLaunch", "Test logging");
         try
         {
             return launch.StartApplication();
