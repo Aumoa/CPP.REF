@@ -25,8 +25,10 @@ namespace Ayla
         GenericWindowDefinition CachedDefinition;
         HWND hWnd = NULL;
 
+    private:
+        WindowsWindow();
+
     public:
-        WindowsWindow(HINSTANCE hInstance, const GenericWindowDefinition& InDefinition);
         virtual ~WindowsWindow() noexcept override;
 
         virtual GenericWindowDefinition GetDefinition() const override;
@@ -34,6 +36,8 @@ namespace Ayla
         virtual void Show() override;
         virtual void Hide() override;
         virtual Vector2N GetSize() const override;
+
+        static RPtr<WindowsWindow> Create(HINSTANCE hInstance, const GenericWindowDefinition& InDefinition);
     };
 }
 

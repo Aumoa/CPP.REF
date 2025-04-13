@@ -72,8 +72,8 @@ namespace Ayla
 	private:
 		enum class CreationFlags
 		{
-			None,
-			Static
+			FromNative,
+			FromScript
 		};
 
 		GENERATE_BITMASK_ENUM_OPERATORS_FRIEND(::Ayla::Object::CreationFlags);
@@ -97,9 +97,6 @@ namespace Ayla
 		{
 		}
 
-	private:
-		Object(CreationFlags flags);
-
 	public:
 		Object();
 		Object(const Object&) = delete;
@@ -110,38 +107,38 @@ namespace Ayla
 		Object& operator =(const Object&) = delete;
 
 	public:
-		template<std::derived_from<Object> T, class... TArgs>
-		static RPtr<T> New(TArgs&&... args) requires requires
-		{
-			{ new T(std::forward<TArgs>(args)...) } -> std::same_as<T*>;
-		}
+		template<std::derived_from<Object> T>
+		static RPtr<T> New()
 		{
 			std::optional<RPtr<T>> ptr;
-			ConfigureNew(typeid(T), [&]()
+			ConfigureNew(typeid(T), CreationFlags::FromNative, [&]()
 			{
-				ptr.emplace(new T(std::forward<TArgs>(args)...));
+				ptr.emplace(new T());
 				return ptr->Get();
 			});
 			return std::move(ptr).value();
 		}
 
-		template<std::derived_from<Object> T, class... TArgs>
-		static RPtr<T> UnsafeNew(int, TArgs&&... args) requires requires
+		template<std::derived_from<Object> T>
+		static RPtr<T> ScriptNew(int) requires std::is_constructible_v<T>
 		{
-			{ new T(std::forward<TArgs>(args)...) } -> std::same_as<T*>;
-		}
-		{
-			return New<T>(std::forward<TArgs>(args)...);
+			std::optional<RPtr<T>> ptr;
+			ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
+			{
+				ptr.emplace(new T());
+				return ptr->Get();
+			});
+			return std::move(ptr).value();
 		}
 
-		template<std::derived_from<Object> T, class... TArgs>
-		static RPtr<T> UnsafeNew(short, TArgs&&... args)
+		template<std::derived_from<Object> T>
+		static RPtr<T> ScriptNew(short) requires (std::is_constructible_v<T> == false)
 		{
 			return {};
 		}
 
 	private:
-		static void ConfigureNew(const std::type_info& typeInfo, std::function<Object*()> action);
+		static void ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<Object*()> action);
 
 		AFUNCTION()
 		static void RegisterWeakReferenceHandle(ssize_t instancePtr, ssize_t gcHandle);

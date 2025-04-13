@@ -47,33 +47,33 @@ public static class ReflectionUtility
 
             s_FullNameMap = fullNameMap.ToFrozenDictionary();
         }
+    }
 
-        /// <summary>
-        /// Find the type corresponding to <paramref name="fullName"/> from the list of all currently loaded assemblies.
-        /// </summary>
-        public static FindResult FindTypeSimple(string fullName, [MaybeNullWhen(false)] out Type? result)
+    /// <summary>
+    /// Find the type corresponding to <paramref name="fullName"/> from the list of all currently loaded assemblies.
+    /// </summary>
+    public static FindResult FindTypeSimple(string fullName, out Type? result)
+    {
+        if (Nested.s_FullNameMap.TryGetValue(fullName, out var index))
         {
-            if (s_FullNameMap.TryGetValue(fullName, out var index))
+            if (index.HasValue == false)
             {
-                if (index.HasValue == false)
-                {
-                    // The type is ambiguous.
-                    result = null;
-                    return FindResult.Ambiguous;
-                }
-                else
-                {
-                    // The type is found.
-                    result = s_All[index.Value];
-                    return FindResult.Success;
-                }
+                // The type is ambiguous.
+                result = null;
+                return FindResult.Ambiguous;
             }
             else
             {
-                // The type is not found.
-                result = null;
-                return FindResult.NotFound;
+                // The type is found.
+                result = Nested.s_All[index.Value];
+                return FindResult.Success;
             }
+        }
+        else
+        {
+            // The type is not found.
+            result = null;
+            return FindResult.NotFound;
         }
     }
 }

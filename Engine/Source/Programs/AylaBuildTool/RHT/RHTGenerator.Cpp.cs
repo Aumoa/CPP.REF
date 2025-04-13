@@ -52,7 +52,7 @@ internal partial class RHTGenerator
                 sourceCodeText += "{\n";
                 sourceCodeText += $"\tPLATFORM_SHARED_EXPORT ::Ayla::ssize_t {FunctionName1("New")}()\n";
                 sourceCodeText += "\t{\n";
-                sourceCodeText += $"\t\tauto new_ = ::Ayla::Object::UnsafeNew<::{@namespace}::{@class}>(0);\n";
+                sourceCodeText += $"\t\tauto new_ = ::Ayla::Object::ScriptNew<::{@namespace}::{@class}>(0);\n";
                 sourceCodeText += $"\t\tauto& self__ = *new ::Ayla::RPtr<::Ayla::Object>(new_);\n";
                 sourceCodeText += $"\t\treturn ::Ayla::Marshal::RPtrToIntPtr(self__);\n";
                 sourceCodeText += "\t}\n";

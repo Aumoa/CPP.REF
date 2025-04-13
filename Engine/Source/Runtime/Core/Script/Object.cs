@@ -8,24 +8,6 @@ namespace Ayla;
 
 public class Object : IDisposable
 {
-    protected enum CreationMode
-    {
-        FromNative,
-        FromManaged
-    }
-
-    protected static class Construction
-    {
-        private record Impl
-        {
-            public CreationMode CreationMode;
-        }
-
-        private static readonly ThreadLocal<Impl> s_ThreadImpl = new(() => new Impl());
-
-        public static CreationMode CreationMode => s_ThreadImpl.Value!.CreationMode;
-    }
-
     private nint m_InstancePtr;
 
     public long InstancePtr => m_InstancePtr;
@@ -67,7 +49,6 @@ public class Object : IDisposable
     {
         Injected__Ayla__Object__RegisterWeakReferenceHandle(instancePtr, gcHandle);
     }
-
 
     [DllImport("Core")]
     private static extern void Injected__Ayla__Object__RegisterWeakReferenceHandle(nint instancePtr, nint gcHandle);

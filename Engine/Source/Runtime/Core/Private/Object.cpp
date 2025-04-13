@@ -12,7 +12,7 @@
 
 namespace Ayla
 {
-	using CreateManagedInstanceCallbackDelegate = void(*)(::Ayla::int32 instanceId, const wchar_t* bindingTypeName);
+	using CreateManagedInstanceCallbackDelegate = ssize_t(*)(const wchar_t* bindingTypeName);
 	static CreateManagedInstanceCallbackDelegate g_CreateManagedInstance;
 }
 
@@ -31,6 +31,22 @@ namespace Ayla
 		static thread_local CreationHack s_Hack;
 		bool AllowConstruct = false;
 		Type* ObjectType;
+		CreationFlags Flags;
+
+		static inline CreationHack& BeginLock(Type* type, CreationFlags flags)
+		{
+			s_Hack.AllowConstruct = true;
+			s_Hack.ObjectType = type;
+			s_Hack.Flags = flags;
+			return s_Hack;
+		}
+
+		inline void EndLock()
+		{
+			AllowConstruct = false;
+			ObjectType = nullptr;
+			Flags = {};
+		}
 	};
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
@@ -89,24 +105,16 @@ namespace Ayla
 		return m_Roots[object->m_InstanceIndex];
 	}
 
-	Object::Object(CreationFlags flags)
-		: m_Type(nullptr)
+	Object::Object()
+		: m_Type(CreationHack::s_Hack.ObjectType)
 	{
-		if (flags != CreationFlags::Static)
+		if (CreationHack::s_Hack.AllowConstruct == false)
 		{
-			if (CreationHack::s_Hack.AllowConstruct == false)
-			{
-				throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
-			}
-
-			PlatformAtomics::InterlockedIncrement(&s_LiveObjects);
-			m_InstanceIndex = s_RootCollection.AddObject(this);
-			m_Type = CreationHack::s_Hack.ObjectType;
+			throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
 		}
-	}
 
-	Object::Object() : Object(CreationFlags::None)
-	{
+		PlatformAtomics::InterlockedIncrement(&s_LiveObjects);
+		m_InstanceIndex = s_RootCollection.AddObject(this);
 	}
 
 	Object::~Object() noexcept
@@ -121,20 +129,21 @@ namespace Ayla
 		return String::Format(TEXT("{}"), String::FromLiteral(typeid(*this).name()));
 	}
 
-	void Object::ConfigureNew(const std::type_info& typeInfo, std::function<Object*()> action)
+	void Object::ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<Object*()> action)
 	{
-		CreationHack::s_Hack.AllowConstruct = true;
-		auto type = CreationHack::s_Hack.ObjectType = TypeCollector::FindType(typeInfo);
-		if (CreationHack::s_Hack.ObjectType == nullptr)
+		auto type = TypeCollector::FindType(typeInfo);
+		if (type == nullptr)
 		{
 			throw new TypeNotFoundException(String::FromLiteral(typeInfo.name()));
 		}
+
+		auto& hack = CreationHack::BeginLock(type, flags);
 		auto object = action();
 		auto typeName = String::Format(TEXT("{0}.{1}"), type->GetNamespace(), type->GetName());
 		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
 		lock.unlock();
 		GC::Release(object);  // This corresponds to the AddRef called in the Object constructor.
-		CreationHack::s_Hack.AllowConstruct = false;
+		hack.EndLock();
 	}
 
 	void Object::RegisterWeakReferenceHandle(ssize_t instancePtr, ssize_t gcHandle)

@@ -263,4 +263,34 @@ namespace Ayla
 		m_Ptr = nullptr;
 		return *this;
 	}
+
+	template<class T>
+	template<std::derived_from<T> U>
+	inline RPtr<T>::operator RPtr<U>() const noexcept
+	{
+		RPtr<U> result;
+		result.m_Object = m_Object;
+		result.m_Ptr = dynamic_cast<U*>(m_Ptr);
+		if (result.m_Ptr != nullptr)
+		{
+			GC::AddRef(m_Object);
+		}
+
+		return result;
+	}
+
+	template<class T>
+	template<class U> requires (!std::derived_from<U, T>)
+	inline RPtr<T>::operator RPtr<U>() const noexcept
+	{
+		RPtr<U> result;
+		result.m_Object = m_Object;
+		result.m_Ptr = dynamic_cast<U*>(m_Ptr);
+		if (result.m_Ptr != nullptr)
+		{
+			GC::AddRef(m_Object);
+		}
+
+		return result;
+	}
 }

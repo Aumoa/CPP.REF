@@ -43,9 +43,12 @@ internal static class CSGenerator
             AppendFormatLine("""  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
             if (includeSelfBindings)
             {
-                AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
-                AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
-                AppendFormatLine("""    </Reference>""");
+                if (project.GetRule(buildConfig).DisableGenerateBindings == false)
+                {
+                    AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
+                    AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
+                    AppendFormatLine("""    </Reference>""");
+                }
             }
             var rules = project.GetRule(buildConfig);
             var resolver = new ModuleRulesResolver(buildConfig, solution, rules, project.Descriptor);
