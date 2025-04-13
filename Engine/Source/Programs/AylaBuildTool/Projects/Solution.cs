@@ -98,7 +98,7 @@ internal class Solution
                 }
 
                 var ruleType = assembly.GetTypes().First(p => p.Name == directoryName);
-                Project.Declaration declaration = await ConfigureDeclarationAsync(ruleFileName);
+                ModuleProject.ModuleDeclaration declaration = await ConfigureModuleDeclarationAsync(ruleFileName);
 
                 lock (results)
                 {
@@ -160,6 +160,25 @@ internal class Solution
             if (declaration is not { IsValid: true })
             {
                 declaration = Project.Declaration.New();
+                await MetadataHelper.SerializeToFileAsync(declaration, fileName, cancellationToken);
+            }
+
+            return declaration;
+        }
+
+        async Task<ModuleProject.ModuleDeclaration> ConfigureModuleDeclarationAsync(string fileName)
+        {
+            fileName += ".meta";
+
+            ModuleProject.ModuleDeclaration? declaration = null;
+            if (File.Exists(fileName))
+            {
+                declaration = await MetadataHelper.DeserializeFromFileAsync<ModuleProject.ModuleDeclaration>(fileName, cancellationToken);
+            }
+
+            if (declaration is not { IsValid: true })
+            {
+                declaration = ModuleProject.ModuleDeclaration.New();
                 await MetadataHelper.SerializeToFileAsync(declaration, fileName, cancellationToken);
             }
 

@@ -1,11 +1,30 @@
-﻿namespace AylaEngine;
+﻿using YamlDotNet.Serialization;
 
-internal class ModuleProject(Solution solution, string name, GroupDescriptor descriptor, string sourceDirectory, Type ruleType, string ruleFilePath, Project.Declaration declaration) : Project(name, descriptor, declaration)
+namespace AylaEngine;
+
+internal class ModuleProject(Solution solution, string name, GroupDescriptor descriptor, string sourceDirectory, Type ruleType, string ruleFilePath, ModuleProject.ModuleDeclaration declaration) : Project(name, descriptor, declaration)
 {
+    public record ModuleDeclaration : Project.Declaration
+    {
+        public Guid ScriptGuid { get; init; } = default;
+        public Guid BindingGuid { get; init; } = default;
+
+        [YamlIgnore]
+        public override bool IsValid => base.IsValid && ScriptGuid != default && BindingGuid != default;
+
+        public static new ModuleDeclaration New() => new ModuleDeclaration
+        {
+            Guid = Guid.NewGuid(),
+            ScriptGuid = Guid.NewGuid(),
+            BindingGuid = Guid.NewGuid()
+        };
+    }
+
     public readonly Solution Solution = solution;
     public readonly Type RuleType = ruleType;
     public readonly string RuleFilePath = ruleFilePath;
     public readonly string SourceDirectory = sourceDirectory;
+    public readonly new ModuleDeclaration Decl = declaration;
 
     private readonly Dictionary<ITargetInfo, ModuleRules> m_CachedRules = new();
     private readonly Dictionary<ITargetInfo, ModuleRulesResolver> m_CachedResolvers = new();

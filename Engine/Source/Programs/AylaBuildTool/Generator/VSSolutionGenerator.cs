@@ -145,11 +145,11 @@ internal class VSSolutionGenerator : Generator
 
                     switch (project)
                     {
-                        case ModuleProject:
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", project.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                        case ModuleProject mp:
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", mp.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", mp.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", mp.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", mp.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
                             break;
                         case ProgramProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));
@@ -187,19 +187,19 @@ internal class VSSolutionGenerator : Generator
                     {
                         if (directoryName.Replace('\\', '/').Contains("/Editor/"))
                         {
-                            AddNested(project.Decl.Guid, EngineEditorFilterGuid);
-                            AddNested(project.Decl.ScriptGuid, EngineEditorFilterGuid);
+                            AddNested(mp.Decl.Guid, EngineEditorFilterGuid);
+                            AddNested(mp.Decl.ScriptGuid, EngineEditorFilterGuid);
                         }
                         else
                         {
-                            AddNested(project.Decl.Guid, EngineRuntimeFilterGuid);
-                            AddNested(project.Decl.ScriptGuid, EngineRuntimeFilterGuid);
+                            AddNested(mp.Decl.Guid, EngineRuntimeFilterGuid);
+                            AddNested(mp.Decl.ScriptGuid, EngineRuntimeFilterGuid);
                         }
                     }
                     else
                     {
-                        AddNested(project.Decl.Guid, GameFilterGuid);
-                        AddNested(project.Decl.ScriptGuid, GameFilterGuid);
+                        AddNested(mp.Decl.Guid, GameFilterGuid);
+                        AddNested(mp.Decl.ScriptGuid, GameFilterGuid);
                     }
                 }
             }
