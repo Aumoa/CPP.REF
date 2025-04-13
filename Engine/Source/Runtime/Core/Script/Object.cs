@@ -8,9 +8,7 @@ namespace Ayla;
 
 public class Object : IDisposable
 {
-    private nint m_InstancePtr;
-
-    public long InstancePtr => m_InstancePtr;
+    internal nint m_InstancePtr;
 
     public Object()
     {

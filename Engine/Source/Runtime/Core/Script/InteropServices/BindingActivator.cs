@@ -29,7 +29,7 @@ public static class BindingActivator
             return 0;
         }
 
-        return (nint)instance.InstancePtr;
+        return (nint)Marshal.GetInstancePointer(instance);
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]

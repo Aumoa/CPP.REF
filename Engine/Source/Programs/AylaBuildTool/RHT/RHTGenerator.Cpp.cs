@@ -14,7 +14,7 @@ internal partial class RHTGenerator
                 if (collection.FindMatch(property.TypeName, aclass, out var generator, out _) == false)
                 {
                     var context = property.Context;
-                    throw new ParsingErrorException(context.FilePath, context.LineNumber, context.ColumnNumber, $"The requested class \"{property.TypeName.Cpp}\"'s defining header file could not be found in the Reflection header file list.");
+                    throw new ParsingErrorException(context.FilePath, context.LineNumber, context.ColumnNumber, $"The requested class \"{property.TypeName.CSharp}\"'s defining header file could not be found in the Reflection header file list.");
                 }
 
                 headers.Add(generator.SourceCode.FilePath);
@@ -88,15 +88,15 @@ internal partial class RHTGenerator
                         IEnumerable<string> parametersWithSelf = parameters;
                         IEnumerable<string> argumentsWithSelf = arguments;
 
-                        foreach (var parameter in function.ParameterInfos)
-                        {
-                            parameters.Add($"{parameter.TypeName.Cpp} {parameter.Name}");
-                            arguments.Add(parameter.Name);
-                        }
-
                         if (function.Static == false)
                         {
                             parameters.Add("::Ayla::ssize_t self_");
+                        }
+
+                        foreach (var parameter in function.ParameterInfos)
+                        {
+                            parameters.Add($"{parameter.TypeName.CppBindingsParameter} {parameter.Name}");
+                            arguments.Add(parameter.TypeName.CppBindingsArgument(aclass, parameter.Name));
                         }
 
                         sourceCodeText += $"\tPLATFORM_SHARED_EXPORT {function.Return.Cpp} {FunctionName1(function.Name)}({string.Join(", ", parameters)})\n";
