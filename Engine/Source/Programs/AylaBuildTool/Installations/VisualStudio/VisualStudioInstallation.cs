@@ -133,7 +133,7 @@ internal class VisualStudioInstallation : Installation
         }
     }
 
-    public override ValueTask<Compiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
+    public override ValueTask<CppCompiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
     {
         if (targetInfo.Platform.Group != PlatformGroup.Windows)
         {
@@ -142,7 +142,7 @@ internal class VisualStudioInstallation : Installation
         }
 
         var product = s_Products[0];
-        return ValueTask.FromResult<Compiler>(new ClCompiler(targetInfo, product));
+        return ValueTask.FromResult<CppCompiler>(new ClCompiler(targetInfo, product));
     }
 
     public override ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)

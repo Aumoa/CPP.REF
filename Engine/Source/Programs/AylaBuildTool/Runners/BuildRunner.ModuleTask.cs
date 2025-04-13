@@ -1,4 +1,4 @@
-﻿using static AylaEngine.Compiler;
+﻿using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
 
@@ -19,7 +19,7 @@ internal static partial class BuildRunner
             m_AllCompiles = allCompiles;
         }
 
-        public async Task<Terminal.Output> LinkAsync(SemaphoreSlim access, IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> LinkAsync(IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             await Task.WhenAll(NeedCompileTasks.Select(p => p.Task));
 
@@ -28,7 +28,6 @@ internal static partial class BuildRunner
                 await moduleTasks.Where(p => p.Resolver.Name == name).First().Task;
             }
 
-            await access.WaitAsync(cancellationToken);
             try
             {
                 var linker = await installation.SpawnLinkerAsync(targetInfo, cancellationToken);
@@ -45,10 +44,6 @@ internal static partial class BuildRunner
             {
                 m_CompletionSource.SetException(e);
                 throw;
-            }
-            finally
-            {
-                access.Release();
             }
         }
 

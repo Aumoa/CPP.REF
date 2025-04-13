@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Spectre.Console;
-using static AylaEngine.Compiler;
+using static AylaEngine.CppCompiler;
 using static AylaEngine.Terminal;
 
 namespace AylaEngine;
@@ -122,7 +122,7 @@ internal static partial class BuildRunner
             {
                 if (sourceCode.Type == SourceCodeType.SourceCode)
                 {
-                    var item = new Compiler.CompileItem
+                    var item = new CppCompiler.CompileItem
                     {
                         Resolver = resolver,
                         SourceCode = sourceCode,
@@ -153,8 +153,6 @@ internal static partial class BuildRunner
             moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray()));
         }
 
-        int hardwareConcurrency = Process.GetCurrentProcess().Threads.Count;
-        SemaphoreSlim semaphore = new(hardwareConcurrency);
         const int LinkTasks = 1;
         totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length + LinkTasks);
         log = totalActions switch
@@ -426,7 +424,7 @@ internal static partial class BuildRunner
         {
             foreach (var moduleTask in moduleTasks)
             {
-                moduleTask.LinkAsync(semaphore, moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
+                moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
                     try
                     {
@@ -467,7 +465,7 @@ internal static partial class BuildRunner
             var allCompiles = moduleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
             foreach (var compileTask in allCompiles)
             {
-                compileTask.CompileAsync(semaphore, installation, buildTarget, cancellationToken).ContinueWith(r =>
+                compileTask.CompileAsync(installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
                     try
                     {
