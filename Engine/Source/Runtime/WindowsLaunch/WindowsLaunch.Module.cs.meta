@@ -1,3 +1,4 @@
-ScriptGuid: 826bfa37-51a5-459b-9c55-ac29bffa85b3
-BindingGuid: d50c315a-efb3-4d11-8843-d02d9a7fe33c
-Guid: f26f3dcd-9942-42a3-8be8-3e5ec816eafe
+ModuleDeclaration:
+  ScriptGuid: 41feba05-7078-4803-a43a-75687602ce4f
+  BindingGuid: b3039a26-c426-4c7d-a293-4cdfef4cdb71
+  Guid: f936e683-507a-48fe-9536-d6cb7f4c0764

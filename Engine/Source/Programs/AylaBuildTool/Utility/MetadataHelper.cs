@@ -19,7 +19,9 @@ internal static class MetadataHelper
 
     public static async Task SerializeToFileAsync<T>(T instance, string filePath, CancellationToken cancellationToken = default)
     {
-        var yaml = Serialize(instance);
+        Dictionary<string, T> remap = [];
+        remap.Add(typeof(T).Name, instance);
+        var yaml = Serialize(remap);
         await File.WriteAllTextAsync(filePath, yaml, cancellationToken);
     }
 
@@ -27,7 +29,8 @@ internal static class MetadataHelper
     {
         try
         {
-            return s_Deserializer.Deserialize<T>(yaml);
+            var remap = s_Deserializer.Deserialize<Dictionary<string, T>>(yaml);
+            return remap[typeof(T).Name];
         }
         catch (YamlException)
         {
