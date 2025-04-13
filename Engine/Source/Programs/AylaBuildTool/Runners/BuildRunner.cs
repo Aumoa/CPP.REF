@@ -220,7 +220,7 @@ internal static partial class BuildRunner
                     if (sourceCode.Type == SourceCodeType.Header)
                     {
                         var ght = new GenerateReflectionHeaderTask(project, sourceCode);
-                        tasks.Add(ght.GenerateAsync(buildTarget, cancellationToken));
+                        tasks.Add(ght.ParseAsync(cancellationToken));
                     }
                 }
             }
@@ -246,6 +246,11 @@ internal static partial class BuildRunner
             Dictionary<ModuleProject, List<string>> generatedBindingsCodes = [];
             foreach (var result in results)
             {
+                if (await result.TryGenerateAsync(buildTarget, cancellationToken) == false)
+                {
+                    continue;
+                }
+
                 var gsc = result.GeneratedSourceCode;
                 if (gsc.HasValue)
                 {
