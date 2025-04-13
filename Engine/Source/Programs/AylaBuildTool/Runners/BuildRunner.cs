@@ -391,12 +391,8 @@ internal static partial class BuildRunner
                         }
 
                         Directory.CreateDirectory(outputPath);
-                        return await Terminal.ExecuteCommandAsync($"publish {projectFile} -c \"{VSUtility.GetConfigName(buildTarget)}\" /p:Platform={VSUtility.GetArchitectureName(buildTarget)} --nologo -o {outputPath}", new Options
-                        {
-                            Executable = "dotnet",
-                            WorkingDirectory = outputPath,
-                            Logging = Logging.None,
-                        }, cancellationToken);
+                        var compiler = new DotNETCompiler();
+                        return await compiler.PublishAsync(projectFile, VSUtility.GetConfigName(buildTarget), VSUtility.GetArchitectureName(buildTarget), outputPath, cancellationToken);
                     }
                 }
                 else
