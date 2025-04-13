@@ -43,10 +43,10 @@ using System.Runtime.InteropServices;
                 sourceCodeText += "\t\t{\n";
                 sourceCodeText += "\t\t}\n";
                 sourceCodeText += "\t\t\n";
-                sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\")]\n";
+                sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\", CharSet = CharSet.Unicode)]\n";
                 sourceCodeText += $"\t\tprivate static extern nint {FunctionName1("New")}();\n";
                 sourceCodeText += "\t\t\n";
-                sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\")]\n";
+                sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\", CharSet = CharSet.Unicode)]\n";
                 sourceCodeText += $"\t\tprivate static extern void {FunctionName1("Finalize")}(nint self_);\n";
                 foreach (var function in aclass.Functions)
                 {
@@ -87,7 +87,7 @@ using System.Runtime.InteropServices;
                     sourceCodeText += "\t\t}\n";
                     sourceCodeText += "\t\t\n";
                     sourceCodeText += "\t\t\n";
-                    sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\")]\n";
+                    sourceCodeText += $"\t\t[DllImport(\"{SourceCode.ModuleName}\", CharSet = CharSet.Unicode)]\n";
                     sourceCodeText += $"\t\tprivate static extern {function.Return.CSharp} {FunctionName1(function.Name)}({string.Join(", ", parametersWithSelf)});\n";
 
                     string ReturnSyntax() => function.Return.IsVoid ? string.Empty : "return ";

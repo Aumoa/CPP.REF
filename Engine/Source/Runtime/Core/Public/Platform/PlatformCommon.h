@@ -3,9 +3,3 @@
 #pragma once
 
 #include "Platform/Windows/WindowsPlatformCommon.h"
-#include "Diagnostics/LogCategory.h"
-
-namespace Ayla
-{
-	constexpr LogCategory LogPlatform{ TEXT("LogPlatform") };
-}

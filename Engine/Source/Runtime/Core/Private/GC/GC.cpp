@@ -32,8 +32,6 @@ namespace Ayla
 		}
 	};
 
-	constexpr LogCategory LogGC{ TEXT("LogGC") };
-
 	int32 GC::s_Interlocked;
 	int32 GC::s_Version;
 	std::thread::id GC::s_ThreadId;
@@ -275,7 +273,7 @@ namespace Ayla
 			}
 		}
 
-		Debug::LogVerboseFormat(LogGC, TEXT("GC::InternalCollect({})) called. NumCollect: {}, Live: {}(Gen: {}, {}, {}), CriticalSection: {:.2f} secs (Mark: {:.2f} secs, Unmark: {:.2f} secs, FinalizeQueue: {:.2f} secs), Finalize: {:.2f} secs"), generation, finalizedObjects.size(), lo, g1, g2, g3, criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs, finalizeSecs);
+		Debug::LogVerboseFormat(TEXT("LogGC"), TEXT("GC::InternalCollect({})) called. NumCollect: {}, Live: {}(Gen: {}, {}, {}), CriticalSection: {:.2f} secs (Mark: {:.2f} secs, Unmark: {:.2f} secs, FinalizeQueue: {:.2f} secs), Finalize: {:.2f} secs"), generation, finalizedObjects.size(), lo, g1, g2, g3, criticalSectionSecs, markObjectsSecs, unmarkPropertyObjectsSecs, finalizeQueueSecs, finalizeSecs);
 
 		auto lock = std::unique_lock(s_NotifyMtx);
 		PlatformAtomics::InterlockedDecrement(&s_DuringFinalize);
