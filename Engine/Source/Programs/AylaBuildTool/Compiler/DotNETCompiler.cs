@@ -15,7 +15,7 @@ internal class DotNETCompiler
         {
             var config = VSUtility.GetConfigName(targetInfo);
             var platform = VSUtility.GetArchitectureName(targetInfo);
-            var output = await Terminal.ExecuteCommandAsync($"publish {projectFile} -c \"{config}\" /p:Platform=\"{platform}\" --nologo -o \"{outputDir}\"", new Terminal.Options
+            var output = await Terminal.ExecuteCommandAsync($"build {projectFile} -c \"{config}\" /p:Platform=\"{platform}\" --nologo", new Terminal.Options
             {
                 Executable = "dotnet",
                 Logging = Terminal.Logging.None,

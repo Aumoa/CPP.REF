@@ -341,11 +341,12 @@ internal static partial class BuildRunner
                     return SourceCodeCache.LoadCached(cacheFileName).IsModified(SourceCodeCache.MakeCachedSimple(p, project.RuleFilePath));
                 });
 
-                if (isNewer)
+                var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
+                var assemblyName = $"{project.Name}.Bindings";
+                var dllName = assemblyName + ".dll";
+
+                if (isNewer || File.Exists(Path.Combine(outputPath, dllName)) == false)
                 {
-                    var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
-                    var assemblyName = $"{project.Name}.Bindings";
-                    var dllName = assemblyName + ".dll";
                     var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
                     await TextFileHelper.WriteIfChangedAsync(projectFile, csproj, cancellationToken);
 
