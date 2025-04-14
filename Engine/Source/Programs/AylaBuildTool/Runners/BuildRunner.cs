@@ -153,8 +153,7 @@ internal static partial class BuildRunner
             moduleTasks.Add(new ModuleTask(resolver, allCompiles.ToArray(), needCompiles.ToArray()));
         }
 
-        const int LinkTasks = 1;
-        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length + LinkTasks);
+        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length) + moduleTasks.Count(p => p.NeedLink(buildTarget));
         log = totalActions switch
         {
             >= 0 and < 10 => 1,
@@ -446,39 +445,46 @@ internal static partial class BuildRunner
         {
             foreach (var moduleTask in moduleTasks)
             {
-                moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
+                if (moduleTask.NeedLink(buildTarget))
                 {
-                    try
+                    moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                     {
-                        var output = r.Result;
-                        if (ConsoleEnvironment.IsDynamic)
+                        try
                         {
-                            lock (moduleTasks)
+                            var output = r.Result;
+                            if (ConsoleEnvironment.IsDynamic)
                             {
-                                for (int i = 0; i < output.Logs.Length; i++)
+                                lock (moduleTasks)
                                 {
-                                    Terminal.Log log = output.Logs[i];
-                                    if (i == 0)
+                                    for (int i = 0; i < output.Logs.Length; i++)
                                     {
-                                        AnsiConsole.MarkupLine("{0} {1}", MakeOutputPrefix().EscapeMarkup(), Terminal.SimpleMarkupOutputLine(log.Value));
-                                    }
-                                    else
-                                    {
-                                        AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
+                                        Terminal.Log log = output.Logs[i];
+                                        if (i == 0)
+                                        {
+                                            AnsiConsole.MarkupLine("{0} {1}", MakeOutputPrefix().EscapeMarkup(), Terminal.SimpleMarkupOutputLine(log.Value));
+                                        }
+                                        else
+                                        {
+                                            AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
+                                        }
                                     }
                                 }
                             }
+                            else
+                            {
+                                Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                            }
                         }
-                        else
+                        finally
                         {
-                            Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                            pulse?.Invoke(moduleTask);
                         }
-                    }
-                    finally
-                    {
-                        pulse?.Invoke(moduleTask);
-                    }
-                });
+                    });
+                }
+                else
+                {
+                    moduleTask.SetComplete();
+                }
             }
         }
 
