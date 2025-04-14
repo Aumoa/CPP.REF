@@ -14,7 +14,7 @@ internal class MSLinker : Linker
         m_Product = product;
     }
 
-    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, Compiler.CompileItem[] sourceObjects, CancellationToken cancellationToken)
+    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompiler.CompileItem[] sourceObjects, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {

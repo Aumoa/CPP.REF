@@ -6,22 +6,26 @@ namespace AylaEngine;
 
 internal class Solution
 {
-    public readonly IReadOnlyList<Project> EngineProjects;
-    public readonly IReadOnlyList<Project> GameProjects;
-    public readonly IReadOnlyList<Project> AllProjects;
-    public readonly GroupDescriptor PrimaryGroup;
+    public IReadOnlyList<Project> Projects { get; private set; } = null!;
 
-    private Solution(List<Project> engineProjects, List<Project> gameProjects, GroupDescriptor primaryGroup)
+    public GroupDescriptor EngineGroup { get; private set; } = null!;
+
+    public GroupDescriptor PrimaryGroup { get; private set; } = null!;
+
+    private Solution()
     {
-        EngineProjects = engineProjects;
-        GameProjects = gameProjects;
-        AllProjects = gameProjects.Concat(engineProjects).ToArray();
+    }
+
+    private void Assign(IEnumerable<Project> projects, GroupDescriptor engineGroup, GroupDescriptor primaryGroup)
+    {
+        Projects = projects.ToArray();
+        EngineGroup = engineGroup;
         PrimaryGroup = primaryGroup;
     }
 
     public Project? FindProject(string name)
     {
-        return AllProjects.FirstOrDefault(p => p.Name == name);
+        return Projects.FirstOrDefault(p => p.Name == name);
     }
 
     public Project[] FindDepends(params IEnumerable<string> names)
@@ -45,8 +49,11 @@ internal class Solution
 
     public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? gameFolder, CancellationToken cancellationToken = default)
     {
+        var solution = new Solution();
+
         List<Task> tasks = new();
-        GroupDescriptor primaryGroup = GroupDescriptor.FromRoot(engineFolder, true);
+        GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
+        GroupDescriptor primaryGroup = engineGroup;
 
         List<Project> engineProjects = new();;
         tasks.Add(ScanDirectoryRecursive(engineProjects, primaryGroup, Path.Combine(engineFolder, "Source")));
@@ -60,7 +67,9 @@ internal class Solution
         await Task.WhenAll(tasks);
         engineProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
         gameProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
-        return new Solution(engineProjects, gameProjects, primaryGroup);
+
+        solution.Assign(engineProjects.Concat(gameProjects), engineGroup, primaryGroup);
+        return solution;
 
         async Task ScanDirectoryRecursive(IList<Project> results, GroupDescriptor descriptor, string currentDir)
         {
@@ -89,11 +98,11 @@ internal class Solution
                 }
 
                 var ruleType = assembly.GetTypes().First(p => p.Name == directoryName);
-                Project.Declaration declaration = await ConfigureDeclarationAsync(ruleFileName);
+                ModuleProject.ModuleDeclaration declaration = await ConfigureModuleDeclarationAsync(ruleFileName);
 
                 lock (results)
                 {
-                    results.Add(new ModuleProject(directoryName, descriptor, currentDir, ruleType, ruleFileName, declaration));
+                    results.Add(new ModuleProject(solution, directoryName, descriptor, currentDir, ruleType, ruleFileName, declaration));
                 }
                 return;
             }
@@ -151,6 +160,25 @@ internal class Solution
             if (declaration is not { IsValid: true })
             {
                 declaration = Project.Declaration.New();
+                await MetadataHelper.SerializeToFileAsync(declaration, fileName, cancellationToken);
+            }
+
+            return declaration;
+        }
+
+        async Task<ModuleProject.ModuleDeclaration> ConfigureModuleDeclarationAsync(string fileName)
+        {
+            fileName += ".meta";
+
+            ModuleProject.ModuleDeclaration? declaration = null;
+            if (File.Exists(fileName))
+            {
+                declaration = await MetadataHelper.DeserializeFromFileAsync<ModuleProject.ModuleDeclaration>(fileName, cancellationToken);
+            }
+
+            if (declaration is not { IsValid: true })
+            {
+                declaration = ModuleProject.ModuleDeclaration.New();
                 await MetadataHelper.SerializeToFileAsync(declaration, fileName, cancellationToken);
             }
 

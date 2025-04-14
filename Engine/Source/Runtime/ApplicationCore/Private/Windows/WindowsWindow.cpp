@@ -10,7 +10,48 @@ namespace Ayla
 {
     std::map<uint64, String> WindowsWindow::RegisteredClasses;
 
-    WindowsWindow::WindowsWindow(HINSTANCE hInstance, const GenericWindowDefinition& InDefinition)
+    WindowsWindow::WindowsWindow()
+    {
+    }
+
+    WindowsWindow::~WindowsWindow() noexcept
+    {
+        if (hWnd != NULL)
+        {
+            // Ignore errors.
+            SetWindowLongPtrW(hWnd, 0, (LONG_PTR)NULL);
+            hWnd = NULL;
+        }
+    }
+
+    GenericWindowDefinition WindowsWindow::GetDefinition() const
+    {
+        return CachedDefinition;
+    }
+
+    void* WindowsWindow::GetOSWindowHandle() const
+    {
+        return hWnd;
+    }
+
+    void WindowsWindow::Show()
+    {
+        ShowWindow(hWnd, SW_SHOW);
+    }
+
+    void WindowsWindow::Hide()
+    {
+        ShowWindow(hWnd, SW_HIDE);
+    }
+
+    Vector2N WindowsWindow::GetSize() const
+    {
+        RECT Rc;
+        ::GetClientRect(hWnd, &Rc);
+        return Vector2N(Rc.right - Rc.left, Rc.bottom - Rc.top);
+    }
+
+    RPtr<WindowsWindow> WindowsWindow::Create(HINSTANCE hInstance, const GenericWindowDefinition& InDefinition)
     {
         char PackedBuffer[1] = { (char)InDefinition.bPopup };
         uint64 HashVal = CrcHash::Hash64(PackedBuffer, sizeof(PackedBuffer));
@@ -86,45 +127,11 @@ namespace Ayla
             nHeight = CW_USEDEFAULT;
         }
 
-        CachedDefinition = InDefinition;
-        hWnd = CreateWindowExW(WndStyleEx, It->second.c_str(), NULL, WndStyle, nX, nY, nWidth, nHeight, NULL, NULL, hInstance, this);
-    }
+        auto ptr = New<WindowsWindow>();
+        ptr->CachedDefinition = InDefinition;
+        ptr->hWnd = CreateWindowExW(WndStyleEx, It->second.c_str(), NULL, WndStyle, nX, nY, nWidth, nHeight, NULL, NULL, hInstance, ptr.Get());
 
-    WindowsWindow::~WindowsWindow() noexcept
-    {
-        if (hWnd != NULL)
-        {
-            // Ignore errors.
-            SetWindowLongPtrW(hWnd, 0, (LONG_PTR)NULL);
-            hWnd = NULL;
-        }
-    }
-
-    GenericWindowDefinition WindowsWindow::GetDefinition() const
-    {
-        return CachedDefinition;
-    }
-
-    void* WindowsWindow::GetOSWindowHandle() const
-    {
-        return hWnd;
-    }
-
-    void WindowsWindow::Show()
-    {
-        ShowWindow(hWnd, SW_SHOW);
-    }
-
-    void WindowsWindow::Hide()
-    {
-        ShowWindow(hWnd, SW_HIDE);
-    }
-
-    Vector2N WindowsWindow::GetSize() const
-    {
-        RECT Rc;
-        ::GetClientRect(hWnd, &Rc);
-        return Vector2N(Rc.right - Rc.left, Rc.bottom - Rc.top);
+        return ptr;
     }
 }
 

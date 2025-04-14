@@ -23,7 +23,7 @@ internal static class CSGenerator
         AppendFormatLine("""    <TargetFramework>net9.0</TargetFramework>""");
         AppendFormatLine("""    <ImplictUsings>enable</ImplictUsings>""");
         AppendFormatLine("""    <Nullable>enable</Nullable>""");
-        AppendFormatLine("""    <RootNamespace>{0}</RootNamespace>""", project.Descriptor.IsEngine ? "Ayla" : "Game");
+        AppendFormatLine("""    <RootNamespace>{0}</RootNamespace>""", project.Group.IsEngine ? "Ayla" : "Game");
         AppendFormatLine("""    <Platforms>{0}</Platforms>""", platforms);
         AppendFormatLine("""    <Configurations>{0}</Configurations>""", configurations);
         AppendFormatLine("""    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>""", configurations);
@@ -34,7 +34,7 @@ internal static class CSGenerator
             AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
             AppendFormatLine("""    <PropertyTarget>{0}</PropertyTarget>""", VSUtility.GetArchitectureName(buildConfig));
             AppendFormatLine("""    <Optimize>{0}</Optimize>""", buildConfig.Config.IsOptimized());
-            AppendFormatLine("""    <OutputPath>{0}</OutputPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows));
+            AppendFormatLine("""    <OutputPath>{0}</OutputPath>""", project.Group.Output(buildConfig, FolderPolicy.PathType.Windows));
             AppendFormatLine("""  </PropertyGroup>""");
         }
         AppendFormatLine("""  """);
@@ -43,12 +43,15 @@ internal static class CSGenerator
             AppendFormatLine("""  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
             if (includeSelfBindings)
             {
-                AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
-                AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
-                AppendFormatLine("""    </Reference>""");
+                if (project.GetRule(buildConfig).DisableGenerateBindings == false)
+                {
+                    AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
+                    AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Group.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
+                    AppendFormatLine("""    </Reference>""");
+                }
             }
             var rules = project.GetRule(buildConfig);
-            var resolver = new ModuleRulesResolver(buildConfig, solution, rules, project.Descriptor);
+            var resolver = project.GetResolver(buildConfig);
             foreach (var depend in resolver.DependencyModuleNames)
             {
                 var dependProject = solution.FindProject(depend);
@@ -63,7 +66,7 @@ internal static class CSGenerator
                     if (dependProjectRule.DisableGenerateBindings == false)
                     {
                         AppendFormatLine("""    <Reference Include="{0}.Bindings">""", dependProject.Name);
-                        AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Descriptor.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
+                        AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Group.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
                         AppendFormatLine("""    </Reference>""");
                     }
                 }

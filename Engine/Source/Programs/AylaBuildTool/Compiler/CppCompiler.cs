@@ -1,6 +1,6 @@
 ﻿namespace AylaEngine;
 
-internal abstract class Compiler
+internal abstract class CppCompiler
 {
     public readonly struct CompileItem
     {

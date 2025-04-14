@@ -1,13 +1,22 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using Spectre.Console;
 
 namespace AylaEngine;
 
-internal class ClCompiler : Compiler
+internal class ClCompiler : CppCompiler
 {
+    private static SemaphoreSlim m_Access;
+
     private readonly TargetInfo m_TargetInfo;
     private readonly VisualStudioInstallation.Product m_Product;
     private readonly StringBuilder m_CommandBuilder = new();
+
+    static ClCompiler()
+    {
+        int hardwareConcurrency = Environment.ProcessorCount;
+        m_Access = new SemaphoreSlim(hardwareConcurrency);
+    }
 
     public ClCompiler(TargetInfo targetInfo, VisualStudioInstallation.Product product)
     {
@@ -158,7 +167,16 @@ internal class ClCompiler : Compiler
         );
 
         m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
-        var output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+        Terminal.Output output;
+        await m_Access.WaitAsync(cancellationToken);
+        try
+        {
+            output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+        }
+        finally
+        {
+            m_Access.Release();
+        }
         if (output.ExitCode == 0)
         {
             var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);

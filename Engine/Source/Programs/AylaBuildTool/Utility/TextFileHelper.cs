@@ -4,7 +4,7 @@ namespace AylaEngine;
 
 internal static class TextFileHelper
 {
-    public static async Task WriteIfChangedAsync(string filePath, string content, CancellationToken cancellationToken)
+    public static async Task<bool> WriteIfChangedAsync(string filePath, string content, CancellationToken cancellationToken)
     {
         var directory = Path.GetDirectoryName(filePath);
         bool directoryExist = Directory.Exists(directory);
@@ -13,7 +13,7 @@ internal static class TextFileHelper
             var previousContent = await File.ReadAllTextAsync(filePath, cancellationToken);
             if (previousContent.Trim().Replace("\r\n", "\n") == content.Trim())
             {
-                return;
+                return false;
             }
         }
 
@@ -23,5 +23,6 @@ internal static class TextFileHelper
         }
 
         await File.WriteAllTextAsync(filePath, content.Replace("\n", Environment.NewLine), cancellationToken);
+        return true;
     }
 }

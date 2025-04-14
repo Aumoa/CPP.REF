@@ -68,6 +68,12 @@ namespace Ayla
 		inline RPtr<T>& operator =(RPtr<T>&& rhs) noexcept;
 		inline RPtr<T>& operator =(std::nullptr_t) noexcept;
 
+		template<std::derived_from<T> U>
+		inline operator RPtr<U>() const noexcept;
+
+		template<class U> requires (!std::derived_from<U, T>)
+		inline explicit operator RPtr<U>() const noexcept;
+
 		inline T* operator ->() const noexcept
 		{
 			return m_Ptr;

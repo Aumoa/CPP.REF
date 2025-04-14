@@ -67,7 +67,7 @@ namespace Ayla
 			HANDLE hThreadSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
 			if (hThreadSnapshot == INVALID_HANDLE_VALUE)
 			{
-				Debug::LogCritical(LogPlatform, TEXT("Failed to create snapshot of threads."));
+				Debug::LogCritical(TEXT("LogPlatform"), TEXT("Failed to create snapshot of threads."));
 				return;
 			}
 
@@ -90,7 +90,7 @@ namespace Ayla
 			}
 			else
 			{
-				Debug::LogCritical(LogPlatform, TEXT("Failed to retrieve thread information."));
+				Debug::LogCritical(TEXT("LogPlatform"), TEXT("Failed to retrieve thread information."));
 			}
 
 			auto lock = std::unique_lock(m_Mtx);
