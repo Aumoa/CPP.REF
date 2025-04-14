@@ -10,10 +10,8 @@ internal class ModuleRulesResolver
     {
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
         m_TargetInfo = targetInfo;
+        Project = targetProject;
         Rules = rules;
-        RuleFilePath = targetProject.RuleFilePath;
-        Name = rules.Name;
-        Group = group;
         EngineGroup = solution.EngineGroup;
         PrimaryGroup = solution.PrimaryGroup;
 
@@ -121,10 +119,11 @@ internal class ModuleRulesResolver
         return Path.Combine(targetProject.SourceDirectory, relativeIncludePath);
     }
 
+    public readonly ModuleProject Project;
     public readonly ModuleRules Rules;
-    public readonly string RuleFilePath;
-    public readonly string Name;
-    public readonly GroupDescriptor Group;
+    public string RuleFilePath => Project.RuleFilePath;
+    public string Name => Project.Name;
+    public GroupDescriptor Group => Project.Group;
     public readonly GroupDescriptor EngineGroup;
     public readonly GroupDescriptor PrimaryGroup;
     public readonly string[] DependRuleFilePaths;

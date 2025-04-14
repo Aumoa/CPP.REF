@@ -42,6 +42,12 @@ internal readonly struct SourceCodeCache
             File.Delete(cacheFileName);
         }
 
+        var dir = Path.GetDirectoryName(cacheFileName);
+        if (dir != null)
+        {
+            Directory.CreateDirectory(dir);
+        }
+
         using var writer = new BinaryWriter(File.OpenWrite(cacheFileName));
         writer.Write(m_SourceCodeWriteTime.ToBinary());
         writer.Write(m_BuildToolWriteTime.ToBinary());
@@ -122,11 +128,19 @@ internal readonly struct SourceCodeCache
         return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, dependRuleFilesWriteTime, depsWriteTimes);
     }
 
-    public static SourceCodeCache MakeCachedSimple(string sourceCode, string ruleFilePath)
+    public static SourceCodeCache MakeCachedSimple(string sourceCode, string? ruleFilePath)
     {
         var sourceCodeWriteTime = File.GetLastWriteTimeUtc(sourceCode);
         var buildToolWriteTime = File.GetLastWriteTimeUtc(Global.AssemblyLocation);
-        var ruleFileWriteTime = File.GetLastWriteTimeUtc(ruleFilePath);
+        DateTime ruleFileWriteTime;
+        if (ruleFilePath == null)
+        {
+            ruleFileWriteTime = DateTime.FromBinary(0);
+        }
+        else
+        {
+            ruleFileWriteTime = File.GetLastWriteTimeUtc(ruleFilePath);
+        }
         return new SourceCodeCache(sourceCodeWriteTime, buildToolWriteTime, ruleFileWriteTime, Array.Empty<DateTime>(), Array.Empty<DateTime>());
     }
 }

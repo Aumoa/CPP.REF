@@ -218,7 +218,10 @@ internal static partial class BuildRunner
                 {
                     var scriptProjectFileName = project.GetScriptProjectFileName();
                     var compiler = new DotNETCompiler();
-                    tasks.Add(compiler.PublishAsync(scriptProjectFileName, buildTarget, project.Group.Output(buildTarget, FolderPolicy.PathType.Windows), cancellationToken));
+                    if (DotNETCompiler.NeedCompile(scriptProjectFileName, project.Group, buildTarget))
+                    {
+                        tasks.Add(compiler.CompileAsync(scriptProjectFileName, project.Group, buildTarget, cancellationToken));
+                    }
                 }
             }
 
@@ -330,26 +333,15 @@ internal static partial class BuildRunner
             {
                 var projectFile = Path.Combine(project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
 
-                bool isNewer = list.Append(projectFile).Any(p =>
-                {
-                    string cacheFileName = p + ".cache";
-                    if (File.Exists(cacheFileName) == false)
-                    {
-                        return true;
-                    }
-
-                    return SourceCodeCache.LoadCached(cacheFileName).IsModified(SourceCodeCache.MakeCachedSimple(p, project.RuleFilePath));
-                });
-
                 var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
                 var assemblyName = $"{project.Name}.Bindings";
                 var dllName = assemblyName + ".dll";
 
-                if (isNewer || File.Exists(Path.Combine(outputPath, dllName)) == false)
-                {
-                    var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
-                    await TextFileHelper.WriteIfChangedAsync(projectFile, csproj, cancellationToken);
+                var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
+                await TextFileHelper.WriteIfChangedAsync(projectFile, csproj, cancellationToken);
 
+                if (DotNETCompiler.NeedCompile(projectFile, project.Group, buildTarget))
+                {
                     _ = PublishAsync().ContinueWith(r =>
                     {
                         try
@@ -357,18 +349,6 @@ internal static partial class BuildRunner
                             var output = r.Result;
                             if (output.IsCompletedSuccessfully)
                             {
-                                SourceCodeCache cache;
-
-                                foreach (var bindingsCode in list)
-                                {
-                                    string cacheFileName = bindingsCode + ".cache";
-                                    cache = SourceCodeCache.MakeCachedSimple(bindingsCode, project.RuleFilePath);
-                                    cache.SaveCached(cacheFileName);
-                                }
-
-                                cache = SourceCodeCache.MakeCachedSimple(projectFile, project.RuleFilePath);
-                                cache.SaveCached(projectFile + ".cache");
-
                                 lock (publishBindingsTasks)
                                 {
                                     publishBindingsTasks[project.Name].SetResult();
@@ -418,7 +398,7 @@ internal static partial class BuildRunner
 
                         Directory.CreateDirectory(outputPath);
                         var compiler = new DotNETCompiler();
-                        return await compiler.PublishAsync(projectFile, buildTarget, outputPath, cancellationToken);
+                        return await compiler.CompileAsync(projectFile, project.Group, buildTarget, cancellationToken);
                     }
                 }
                 else
