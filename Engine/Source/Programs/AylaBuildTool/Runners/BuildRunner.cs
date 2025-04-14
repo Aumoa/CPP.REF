@@ -108,6 +108,7 @@ internal static partial class BuildRunner
         }
 
         await DispatchGenerateHeaderWorkers();
+        await DispatchScriptBuild();
         List<ModuleTask> moduleTasks = [];
 
         foreach (var project in targetProjects)
@@ -206,6 +207,23 @@ internal static partial class BuildRunner
         string MakeOutputPrefix()
         {
             return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
+        }
+
+        async Task DispatchScriptBuild()
+        {
+            List<Task> tasks = [];
+
+            foreach (var project in targetProjects)
+            {
+                if (project.GetRule(buildTarget).EnableScript)
+                {
+                    var scriptProjectFileName = project.GetScriptProjectFileName();
+                    var compiler = new DotNETCompiler();
+                    tasks.Add(compiler.PublishAsync(scriptProjectFileName, buildTarget, project.Group.Output(buildTarget, FolderPolicy.PathType.Windows), cancellationToken));
+                }
+            }
+
+            await Task.WhenAll(tasks);
         }
 
         async Task DispatchGenerateHeaderWorkers()
@@ -351,16 +369,6 @@ internal static partial class BuildRunner
                                 cache = SourceCodeCache.MakeCachedSimple(projectFile, project.RuleFilePath);
                                 cache.SaveCached(projectFile + ".cache");
 
-                                var outputDll = Path.Combine(outputPath, dllName);
-                                if (ConsoleEnvironment.IsDynamic)
-                                {
-                                    AnsiConsole.MarkupLine("[green]{0} generated.[/]", outputDll);
-                                }
-                                else
-                                {
-                                    Console.WriteLine("{0} generated.", outputDll);
-                                }
-
                                 lock (publishBindingsTasks)
                                 {
                                     publishBindingsTasks[project.Name].SetResult();
@@ -368,16 +376,6 @@ internal static partial class BuildRunner
                             }
                             else
                             {
-                                var outputDll = Path.Combine(outputPath, dllName);
-                                if (ConsoleEnvironment.IsDynamic)
-                                {
-                                    AnsiConsole.MarkupLine("[red]{0} failed.[/]\n{1}", outputDll, string.Join('\n', output.Logs.Select(p => p.Value)).EscapeMarkup());
-                                }
-                                else
-                                {
-                                    Console.WriteLine("{0} failed.\n{1}", outputDll, string.Join('\n', output.Logs.Select(p => p.Value)));
-                                }
-
                                 throw TerminateException.User();
                             }
                         }
@@ -420,7 +418,7 @@ internal static partial class BuildRunner
 
                         Directory.CreateDirectory(outputPath);
                         var compiler = new DotNETCompiler();
-                        return await compiler.PublishAsync(projectFile, VSUtility.GetConfigName(buildTarget), VSUtility.GetArchitectureName(buildTarget), outputPath, cancellationToken);
+                        return await compiler.PublishAsync(projectFile, buildTarget, outputPath, cancellationToken);
                     }
                 }
                 else
