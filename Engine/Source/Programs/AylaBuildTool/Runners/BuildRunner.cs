@@ -109,6 +109,7 @@ internal static partial class BuildRunner
 
         await DispatchGenerateHeaderWorkers();
         await DispatchScriptBuild();
+        await Task.Delay(10000);
         List<ModuleTask> moduleTasks = [];
 
         foreach (var project in targetProjects)
@@ -346,17 +347,11 @@ internal static partial class BuildRunner
                     {
                         try
                         {
-                            var output = r.Result;
-                            if (output.IsCompletedSuccessfully)
+                            r.GetAwaiter().GetResult();
+
+                            lock (publishBindingsTasks)
                             {
-                                lock (publishBindingsTasks)
-                                {
-                                    publishBindingsTasks[project.Name].SetResult();
-                                }
-                            }
-                            else
-                            {
-                                throw TerminateException.User();
+                                publishBindingsTasks[project.Name].SetResult();
                             }
                         }
                         catch (OperationCanceledException)
@@ -375,7 +370,7 @@ internal static partial class BuildRunner
                         }
                     });
 
-                    async Task<Terminal.Output> PublishAsync()
+                    async Task PublishAsync()
                     {
                         var resolver = project.GetResolver(buildTarget);
                         foreach (var depend in resolver.DependencyModuleNames)
@@ -398,7 +393,7 @@ internal static partial class BuildRunner
 
                         Directory.CreateDirectory(outputPath);
                         var compiler = new DotNETCompiler();
-                        return await compiler.CompileAsync(projectFile, project.Group, buildTarget, cancellationToken);
+                        await compiler.CompileAsync(projectFile, project.Group, buildTarget, cancellationToken);
                     }
                 }
                 else

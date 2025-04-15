@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using System.Text.RegularExpressions;
 using Spectre.Console;
 
 namespace AylaEngine;
@@ -86,48 +87,71 @@ internal class DotNETCompiler
         return false;
     }
 
-    public async Task<Terminal.Output> CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+    public async Task CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
     {
         await m_Access.WaitAsync(cancellationToken);
         try
         {
+            var sourceDirectory = Path.GetDirectoryName(projectFile);
+            if (sourceDirectory == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            var sourceFiles = Directory
+                .GetFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories)
+                .Select(CSCompiler.SourceCodeProvider.FromFile);
+
             var config = VSUtility.GetConfigName(targetInfo);
             var platform = VSUtility.GetArchitectureName(targetInfo);
-            var output = await Terminal.ExecuteCommandAsync($"build {projectFile} -c \"{config}\" /p:Platform=\"{platform}\" --nologo", new Terminal.Options
-            {
-                Executable = "dotnet",
-                Logging = Terminal.Logging.None,
-                WorkingDirectory = Path.GetDirectoryName(projectFile) ?? string.Empty,
-            }, cancellationToken);
 
-            if (output.IsCompletedSuccessfully)
+            // This is a simple example of project parsing, which should later be replaced with formal parsing.
+            Console.WriteLine(projectFile);
+            var csproj = await File.ReadAllTextAsync(projectFile, cancellationToken);
+            var csprojLines = csproj.Split(["\n", "\r\n"], StringSplitOptions.None);
+            var itemGroupIndex = Array.FindIndex(csprojLines, p => p.Contains($"<ItemGroup Condition=\"'$(Configuration)|$(Platform)'=='{config}|{platform}'\">"));
+            List<string> referencedAssemblies = [];
+            if (itemGroupIndex != -1)
             {
-                var outputDir = group.Output(targetInfo, FolderPolicy.PathType.Current);
-                var outputDll = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(projectFile) + ".dll");
-                if (ConsoleEnvironment.IsDynamic)
+                var endIndex = Array.FindIndex(csprojLines, itemGroupIndex, p => p.Contains("</ItemGroup>"));
+                var imports = csprojLines[itemGroupIndex..endIndex];
+                foreach (var line in imports)
                 {
-                    AnsiConsole.MarkupLine("[green]{0} generated.[/]", outputDll);
-                }
-                else
-                {
-                    Console.WriteLine("{0} generated.", outputDll);
-                }
+                    var match = Regex.Match(line, @"<HintPath>(.*?)<\/HintPath>");
+                    if (match.Success)
+                    {
+                        referencedAssemblies.Add(match.Groups[1].Value);
+                    }
 
-                GenerateCache(projectFile, group, targetInfo);
+                    match = Regex.Match(line, @"<ProjectReference Include=""(.*?)"" \/>");
+                    if (match.Success)
+                    {
+                        if (match.Success)
+                        {
+                            var referencedProject = match.Groups[1].Value;
+                            var referencedAssemblyName = Path.GetFileNameWithoutExtension(referencedProject);
+                            var referencedAssembly = group.OutputFileName(targetInfo, referencedAssemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
+                            referencedAssemblies.Add(referencedAssembly);
+                        }
+                    }
+                }
+            }
+
+            var outputDir = group.Output(targetInfo, FolderPolicy.PathType.Current);
+            var assemblyName = Path.GetFileNameWithoutExtension(projectFile);
+            var outputDll = Path.Combine(outputDir, assemblyName + ".dll");
+            await CSCompiler.CompileToAsync(assemblyName, outputDll, sourceFiles, CSCompiler.GetDefaultAssemblies().Concat(referencedAssemblies), cancellationToken);
+
+            if (ConsoleEnvironment.IsDynamic)
+            {
+                AnsiConsole.MarkupLine("[green]{0} generated.[/]", outputDll);
             }
             else
             {
-                if (ConsoleEnvironment.IsDynamic)
-                {
-                    AnsiConsole.MarkupLine("[red]{0}[/]", string.Join('\n', output.Logs.Select(p => p.Value)).EscapeMarkup());
-                }
-                else
-                {
-                    Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
-                }
+                Console.WriteLine("{0} generated.", outputDll);
             }
 
-            return output;
+            GenerateCache(projectFile, group, targetInfo);
         }
         finally
         {

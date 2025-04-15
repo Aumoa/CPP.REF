@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
 using System.Text;
+using Microsoft.CodeAnalysis;
 
 namespace AylaEngine;
 
@@ -8,79 +9,92 @@ internal static class CSGenerator
 {
     public static string GenerateModule(Solution solution, ModuleProject project, bool includeSelfBindings, params IEnumerable<TargetInfo> targets)
     {
-        var platforms = string.Join(';', targets
+        var platforms = targets
             .Select(p => VSUtility.GetArchitectureName(p))
-            .Distinct());
+            .Distinct();
 
-        var configurations = string.Join(';', targets
+        var configurations = targets
             .Select(p => VSUtility.GetConfigName(p))
-            .Distinct());
+            .Distinct();
 
-        var builder = new StringBuilder();
-        AppendFormatLine("""<Project Sdk="Microsoft.NET.Sdk">""");
-        AppendFormatLine("""  """);
-        AppendFormatLine("""  <PropertyGroup>""");
-        AppendFormatLine("""    <TargetFramework>net9.0</TargetFramework>""");
-        AppendFormatLine("""    <ImplictUsings>enable</ImplictUsings>""");
-        AppendFormatLine("""    <Nullable>enable</Nullable>""");
-        AppendFormatLine("""    <RootNamespace>{0}</RootNamespace>""", project.Group.IsEngine ? "Ayla" : "Game");
-        AppendFormatLine("""    <Platforms>{0}</Platforms>""", platforms);
-        AppendFormatLine("""    <Configurations>{0}</Configurations>""", configurations);
-        AppendFormatLine("""    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>""", configurations);
-        AppendFormatLine("""  </PropertyGroup>""");
-        AppendFormatLine("""  """);
-        foreach (var buildConfig in targets)
-        {
-            AppendFormatLine("""  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-            AppendFormatLine("""    <PropertyTarget>{0}</PropertyTarget>""", VSUtility.GetArchitectureName(buildConfig));
-            AppendFormatLine("""    <Optimize>{0}</Optimize>""", buildConfig.Config.IsOptimized());
-            AppendFormatLine("""    <OutputPath>{0}</OutputPath>""", project.Group.Output(buildConfig, FolderPolicy.PathType.Windows));
-            AppendFormatLine("""  </PropertyGroup>""");
-        }
-        AppendFormatLine("""  """);
-        foreach (var buildConfig in targets)
-        {
-            AppendFormatLine("""  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-            if (includeSelfBindings)
-            {
-                if (project.GetRule(buildConfig).DisableGenerateBindings == false)
+        var csproj = new CSharpProject(
+            [
+                new CSharpProject.PropertyGroup
                 {
-                    AppendFormatLine("""    <Reference Include="{0}.Bindings">""", project.Name);
-                    AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", project.Group.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
-                    AppendFormatLine("""    </Reference>""");
-                }
-            }
-            var rules = project.GetRule(buildConfig);
-            var resolver = project.GetResolver(buildConfig);
-            foreach (var depend in resolver.DependencyModuleNames)
-            {
-                var dependProject = solution.FindProject(depend);
-                if (dependProject is ModuleProject mp)
+                    TargetFramework = "net9.0",
+                    Nullable = NullableContextOptions.Enable,
+                    RootNamespace = project.Group.IsEngine ? "Ayla" : "Game",
+                    Platforms = platforms,
+                    Configurations = configurations,
+                    AppendTargetFrameworkToOutputPath = false
+                },
+                ..targets.Select(buildConfig => new CSharpProject.PropertyGroup
                 {
-                    var dependProjectRule = mp.GetRule(buildConfig);
-                    if (dependProjectRule.EnableScript)
+                    Condition = new CSharpProject.Condition
                     {
-                        AppendFormatLine("""    <ProjectReference Include="{0}" />""", Path.Combine(mp.SourceDirectory, "Script", mp.Name + ".Script.csproj"));
-                    }
+                        Configuration = VSUtility.GetConfigName(buildConfig),
+                        Platform = VSUtility.GetArchitectureName(buildConfig)
+                    },
+                    PropertyTarget = VSUtility.GetArchitectureName(buildConfig),
+                    Optimize = buildConfig.Config.IsOptimized(),
+                    OutputPath = project.Group.Output(buildConfig, FolderPolicy.PathType.Windows)
+                })
+            ],
+            targets.Select(buildConfig =>
+            {
+                var rules = project.GetRule(buildConfig);
+                var resolver = project.GetResolver(buildConfig);
 
-                    if (dependProjectRule.DisableGenerateBindings == false)
+                List<CSharpProject.ReferenceBase> references = [];
+                if (includeSelfBindings)
+                {
+                    if (rules.DisableGenerateBindings == false)
                     {
-                        AppendFormatLine("""    <Reference Include="{0}.Bindings">""", dependProject.Name);
-                        AppendFormatLine("""      <HintPath>{0}\{1}.Bindings.dll</HintPath>""", dependProject.Group.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name);
-                        AppendFormatLine("""    </Reference>""");
+                        references.Add(new CSharpProject.Reference
+                        {
+                            Include = project.Name + ".Bindings",
+                            HintPath = Path.Combine(project.Group.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name + ".Bindings.dll")
+                        });
                     }
                 }
-            }
-            AppendFormatLine("""  </ItemGroup>""");
-        }
-        AppendFormatLine("""  """);
-        AppendFormatLine("""</Project>""");
 
-        return builder.ToString();
+                foreach (var depend in resolver.DependencyModuleNames)
+                {
+                    var dependProject = solution.FindProject(depend);
+                    if (dependProject is ModuleProject mp)
+                    {
+                        var dependProjectRule = mp.GetRule(buildConfig);
+                        if (dependProjectRule.EnableScript)
+                        {
+                            references.Add(new CSharpProject.ProjectReference
+                            {
+                                Include = Path.Combine(mp.SourceDirectory, "Script", mp.Name + ".Script.csproj")
+                            });
+                        }
 
-        void AppendFormatLine(string format, params ReadOnlySpan<object?> args)
-        {
-            builder.AppendFormat(format + '\n', args);
-        }
+                        if (dependProjectRule.DisableGenerateBindings == false)
+                        {
+                            references.Add(new CSharpProject.Reference
+                            {
+                                Include = dependProject.Name + ".Bindings",
+                                HintPath = Path.Combine(dependProject.Group.Output(buildConfig, FolderPolicy.PathType.Windows), dependProject.Name + ".Bindings.dll")
+                            });
+                        }
+                    }
+                }
+
+                return new CSharpProject.ItemGroup
+                {
+                    Condition = new CSharpProject.Condition
+                    {
+                        Configuration = VSUtility.GetConfigName(buildConfig),
+                        Platform = VSUtility.GetArchitectureName(buildConfig)
+                    },
+                    References = references
+                };
+            })
+        );
+
+        return csproj.GenerateXml();
     }
 }
