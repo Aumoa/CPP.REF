@@ -21,9 +21,15 @@ internal class DotNETCompiler
         var fileName = Path.GetFileNameWithoutExtension(projectFile);
         string intDir = group.Intermediate(fileName, targetInfo, FolderPolicy.PathType.Current);
         var outputFile = group.OutputFileName(targetInfo, fileName, ModuleType.Library, FolderPolicy.PathType.Current);
+        var objDir = Path.GetFullPath(Path.Combine(projectDir, "obj"));
 
         foreach (var sourceFile in allSourceFiles)
         {
+            if (sourceFile.StartsWith(objDir))
+            {
+                continue;
+            }
+
             var ext = Path.GetExtension(sourceFile);
             if (ext.Equals(".csproj", StringComparison.OrdinalIgnoreCase) == false && ext.Equals(".cs", StringComparison.OrdinalIgnoreCase) == false)
             {

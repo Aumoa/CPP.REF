@@ -63,32 +63,35 @@ internal static partial class BuildRunner
             foreach (var project in targetProjects.OfType<ModuleProject>())
             {
                 var intDir = project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
-                foreach (var sourceCode in project.GetSourceCodes())
+                if (Directory.Exists(intDir))
                 {
-                    if (sourceCode.Type == SourceCodeType.SourceCode)
+                    foreach (var sourceCode in project.GetSourceCodes())
                     {
-                        var fileName = Path.GetFileName(sourceCode.FilePath);
-                        var cacheFileName = Path.Combine(intDir, fileName + ".cache");
-                        File.Delete(cacheFileName);
-                        var outputFileName = Path.Combine(intDir, fileName + ".o");
-                        File.Delete(outputFileName);
-                        var pdbFileName = Path.Combine(intDir, fileName + ".pdb");
-                        File.Delete(pdbFileName);
-                        var depsFileName = Path.Combine(intDir, fileName + ".deps");
-                        File.Delete(depsFileName);
-                        fileName = Path.ChangeExtension(fileName, null);
-                        var genSourceFileName = Path.Combine(intDir, fileName + ".gen.cpp");
-                        File.Delete(genSourceFileName);
-                        var genHeaderFileName = Path.Combine(intDir, fileName + ".gen.h");
-                        File.Delete(genHeaderFileName);
-                        var genDepsFileName = Path.Combine(intDir, fileName + ".gen.cpp.deps");
-                        File.Delete(genDepsFileName);
-                        var genCacheFileName = Path.Combine(intDir, fileName + ".gen.cpp.cache");
-                        File.Delete(genCacheFileName);
-                        var genPdbFileName = Path.Combine(intDir, fileName + ".gen.cpp.pdb");
-                        File.Delete(genPdbFileName);
-                        var genOutputFileName = Path.Combine(intDir, fileName + ".gen.cpp.o");
-                        File.Delete(genOutputFileName);
+                        if (sourceCode.Type == SourceCodeType.SourceCode)
+                        {
+                            var fileName = Path.GetFileName(sourceCode.FilePath);
+                            var cacheFileName = Path.Combine(intDir, fileName + ".cache");
+                            File.Delete(cacheFileName);
+                            var outputFileName = Path.Combine(intDir, fileName + ".o");
+                            File.Delete(outputFileName);
+                            var pdbFileName = Path.Combine(intDir, fileName + ".pdb");
+                            File.Delete(pdbFileName);
+                            var depsFileName = Path.Combine(intDir, fileName + ".deps");
+                            File.Delete(depsFileName);
+                            fileName = Path.ChangeExtension(fileName, null);
+                            var genSourceFileName = Path.Combine(intDir, fileName + ".gen.cpp");
+                            File.Delete(genSourceFileName);
+                            var genHeaderFileName = Path.Combine(intDir, fileName + ".gen.h");
+                            File.Delete(genHeaderFileName);
+                            var genDepsFileName = Path.Combine(intDir, fileName + ".gen.cpp.deps");
+                            File.Delete(genDepsFileName);
+                            var genCacheFileName = Path.Combine(intDir, fileName + ".gen.cpp.cache");
+                            File.Delete(genCacheFileName);
+                            var genPdbFileName = Path.Combine(intDir, fileName + ".gen.cpp.pdb");
+                            File.Delete(genPdbFileName);
+                            var genOutputFileName = Path.Combine(intDir, fileName + ".gen.cpp.o");
+                            File.Delete(genOutputFileName);
+                        }
                     }
                 }
 
