@@ -2,6 +2,7 @@
 
 using System;
 using System.Text;
+using System.Xml;
 
 namespace AylaEngine;
 
@@ -91,5 +92,55 @@ $"""
     {
         return string.Join("\n\n", m_PropertyGroups.Select(p => GenerateXml(p, indent))
             .Concat(m_ItemGroups.Where(p => p.IsEmpty == false).Select(p => GenerateXml(p, indent))));
+    }
+
+    public static CSharpProject Parse(string project)
+    {
+        XmlDocument document = new();
+        document.LoadXml(project);
+
+        foreach (XmlElement item in document)
+        {
+            if (item.Name == "Project")
+            {
+                var sdk = (XmlAttribute?)item.Attributes?.GetNamedItem("Sdk");
+                if (sdk == null)
+                {
+                    throw new FormatException("Invalid project file format.");
+                }
+
+                if (sdk.Value != "Microsoft.NET.Sdk")
+                {
+                    throw new FormatException("Invalid project file format.");
+                }
+
+                return ParseProject(item);
+            }
+        }
+
+        throw new FormatException("Invalid project file format.");
+
+        CSharpProject ParseProject(XmlElement project)
+        {
+            List<PropertyGroup> propertyGroups = [];
+            List<ItemGroup> itemGroups = [];
+
+            foreach (XmlElement child in project)
+            {
+                switch (child.Name)
+                {
+                    case "PropertyGroup":
+                        propertyGroups.Add(PropertyGroup.Parse(child));
+                        break;
+                    case "ItemGroup":
+                        itemGroups.Add(ItemGroup.Parse(child));
+                        break;
+                    default:
+                        throw new FormatException($"Unknown element '{child.Name}' in project file.");
+                }
+            }
+
+            return new CSharpProject(propertyGroups, itemGroups);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using System.Xml;
 using Microsoft.CodeAnalysis;
 
 namespace AylaEngine;
@@ -27,6 +28,74 @@ public partial class CSharpProject
         public bool? Optimize { get; init; }
 
         public string? OutputPath { get; init; }
+
+        public static PropertyGroup Parse(XmlElement xml)
+        {
+            var conditionAttr = xml.Attributes.GetNamedItem("Condition");
+            Condition? condition = null;
+            if (conditionAttr != null)
+            {
+                condition = Condition.Parse(conditionAttr.Value ?? string.Empty);
+            }
+
+            string? targetFramework = null;
+            NullableContextOptions? nullable = null;
+            string? rootNamespace = null;
+            string? platforms = null;
+            string? configurations = null;
+            bool? appendTargetFrameworkToOutputPath = null;
+            string? propertyTarget = null;
+            bool? optimize = null;
+            string? outputPath = null;
+
+            foreach (XmlElement item in xml)
+            {
+                switch (item.Name)
+                {
+                    case "TargetFramework":
+                        targetFramework = item.InnerText;
+                        break;
+                    case "Nullable":
+                        nullable = Enum.Parse<NullableContextOptions>(item.InnerText, true);
+                        break;
+                    case "RootNamespace":
+                        rootNamespace = item.InnerText;
+                        break;
+                    case "Platforms":
+                        platforms = item.InnerText;
+                        break;
+                    case "Configurations":
+                        configurations = item.InnerText;
+                        break;
+                    case "AppendTargetFrameworkToOutputPath":
+                        appendTargetFrameworkToOutputPath = bool.Parse(item.InnerText);
+                        break;
+                    case "PropertyTarget":
+                        propertyTarget = item.InnerText;
+                        break;
+                    case "Optimize":
+                        optimize = bool.Parse(item.InnerText);
+                        break;
+                    case "OutputPath":
+                        outputPath = item.InnerText;
+                        break;
+                }
+            }
+
+            return new PropertyGroup
+            {
+                Condition = condition,
+                TargetFramework = targetFramework,
+                Nullable = nullable,
+                RootNamespace = rootNamespace,
+                Platforms = platforms?.Split(';'),
+                Configurations = configurations?.Split(';'),
+                AppendTargetFrameworkToOutputPath = appendTargetFrameworkToOutputPath,
+                PropertyTarget = propertyTarget,
+                Optimize = optimize,
+                OutputPath = outputPath
+            };
+        }
     }
 
     private string GenerateXml(PropertyGroup value, IndentResolver indent)

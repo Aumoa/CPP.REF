@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using System.Text.RegularExpressions;
+
 namespace AylaEngine;
 
 public partial class CSharpProject
@@ -28,6 +30,46 @@ public partial class CSharpProject
             }
 
             return $"'{string.Join('|', left.Select(p => $"$({p})"))}'=='{string.Join('|', right)}'";
+        }
+
+        public static Condition Parse(string content)
+        {
+            var items = content.Split("==").Select(p => p.Trim('\'').Split('|')).ToArray();
+            if (items.Length != 2)
+            {
+                throw new FormatException("Invalid condition format.");
+            }
+
+            var left = items[0];
+            var right = items[1];
+            if (left.Length != right.Length)
+            {
+                throw new FormatException("Invalid condition format.");
+            }
+
+            string? configuration = null;
+            string? platform = null;
+
+            for (int i = 0; i < left.Length; ++i)
+            {
+                switch (left[i])
+                {
+                    case "$(Configuration)":
+                        configuration = right[i];
+                        break;
+                    case "$(Platform)":
+                        platform = right[i];
+                        break;
+                    default:
+                        throw new FormatException("Invalid condition format.");
+                }
+            }
+
+            return new Condition
+            {
+                Configuration = configuration,
+                Platform = platform
+            };
         }
     }
 }

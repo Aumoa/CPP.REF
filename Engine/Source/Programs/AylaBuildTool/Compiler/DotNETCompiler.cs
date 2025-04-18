@@ -111,6 +111,8 @@ internal class DotNETCompiler
             var config = VSUtility.GetConfigName(targetInfo);
             var platform = VSUtility.GetArchitectureName(targetInfo);
 
+            CSharpProject.Parse(File.ReadAllText(projectFile));
+
             // This is a simple example of project parsing, which should later be replaced with formal parsing.
             Console.WriteLine(projectFile);
             var csproj = await File.ReadAllTextAsync(projectFile, cancellationToken);

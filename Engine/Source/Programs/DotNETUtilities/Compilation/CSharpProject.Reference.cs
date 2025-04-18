@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using System.Xml;
+
 namespace AylaEngine;
 
 public partial class CSharpProject
@@ -25,12 +27,31 @@ public partial class CSharpProject
             else
             {
                 return
-                $"""
+$"""
 <Reference Include="{Include}">
   <HintPath>{HintPath}</HintPath>
 </Reference>
 """;
             }
+        }
+
+        public static Reference Parse(XmlElement xml)
+        {
+            var include = xml.GetAttributeNode("Include") ?? throw new FormatException("Missing 'Include' attribute.");
+            string? hintPath = null;
+            foreach (XmlElement inner in xml)
+            {
+                if (inner.Name == "HintPath")
+                {
+                    hintPath = inner.Value;
+                }
+            }
+
+            return new Reference
+            {
+                Include = include.Value,
+                HintPath = hintPath,
+            };
         }
     }
 
@@ -42,6 +63,15 @@ public partial class CSharpProject
 $"""
 <ProjectReference Include="{Include}" />
 """;
+        }
+
+        public static ProjectReference Parse(XmlElement xml)
+        {
+            var include = xml.GetAttributeNode("Include") ?? throw new FormatException("Missing 'Include' attribute.");
+            return new ProjectReference
+            {
+                Include = include.Value,
+            };
         }
     }
 }
