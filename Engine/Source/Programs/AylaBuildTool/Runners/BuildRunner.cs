@@ -102,6 +102,15 @@ internal static partial class BuildRunner
                 }
             }
 
+            var engineOutput = solution.EngineGroup.Output(buildTarget, FolderPolicy.PathType.Current);
+            Directory.Delete(engineOutput, true);
+
+            if (solution.PrimaryGroup != null && solution.PrimaryGroup != solution.EngineGroup)
+            {
+                var primaryOutput = solution.PrimaryGroup.Output(buildTarget, FolderPolicy.PathType.Current);
+                Directory.Delete(primaryOutput, true);
+            }
+
             await DispatchGenerateHeaderWorkers();
             await GenerateRunner.RunAsync(new GenerateOptions
             {
@@ -111,7 +120,6 @@ internal static partial class BuildRunner
         }
 
         await DispatchGenerateHeaderWorkers();
-        await DispatchScriptBuild();
         await Task.Delay(10000);
         List<ModuleTask> moduleTasks = [];
 
@@ -212,26 +220,6 @@ internal static partial class BuildRunner
             return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
         }
 
-        async Task DispatchScriptBuild()
-        {
-            List<Task> tasks = [];
-
-            foreach (var project in targetProjects)
-            {
-                if (project.GetRule(buildTarget).EnableScript)
-                {
-                    var scriptProjectFileName = project.GetScriptProjectFileName();
-                    var compiler = new DotNETCompiler();
-                    if (DotNETCompiler.NeedCompile(scriptProjectFileName, project.Group, buildTarget))
-                    {
-                        tasks.Add(compiler.CompileAsync(scriptProjectFileName, project.Group, buildTarget, cancellationToken));
-                    }
-                }
-            }
-
-            await Task.WhenAll(tasks);
-        }
-
         async Task DispatchGenerateHeaderWorkers()
         {
             List<Task<GenerateReflectionHeaderTask>> tasks = [];
@@ -290,7 +278,7 @@ internal static partial class BuildRunner
                 generators = new RHTGenerator.Collection(dict);
             }
 
-            Dictionary<ModuleProject, List<string>> generatedBindingsCodes = [];
+            HashSet<ModuleProject> scriptableProjects = [];
             foreach (var result in results)
             {
                 if (await result.TryGenerateAsync(generators, buildTarget, cancellationToken) == false)
@@ -313,28 +301,28 @@ internal static partial class BuildRunner
                 var gbc = result.GeneratedBindingCode;
                 if (gbc != null)
                 {
-                    if (generatedBindingsCodes.TryGetValue(result.Project, out var list) == false)
-                    {
-                        list = [];
-                        generatedBindingsCodes.Add(result.Project, list);
-                    }
-
-                    list.Add(gbc);
+                    scriptableProjects.Add(result.Project);
+                }
+                else if (result.Project.GetRule(buildTarget).EnableScript)
+                {
+                    scriptableProjects.Add(result.Project);
                 }
             }
 
             Dictionary<string, TaskCompletionSource> publishBindingsTasks = [];
-            foreach (var (project, list) in generatedBindingsCodes)
+            foreach (var project in scriptableProjects)
             {
                 var rule = project.GetRule(buildTarget);
-                if (rule.DisableGenerateBindings == false)
+                if (rule.DisableGenerateBindings == false || rule.EnableScript)
                 {
                     publishBindingsTasks.Add(project.Name, new TaskCompletionSource());
                 }
             }
 
-            foreach (var (project, list) in generatedBindingsCodes)
+            foreach (var project in scriptableProjects)
             {
+                var rule = project.GetRule(buildTarget);
+
                 var projectFile = Path.Combine(project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
 
                 var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
@@ -396,7 +384,25 @@ internal static partial class BuildRunner
 
                         Directory.CreateDirectory(outputPath);
                         var compiler = new DotNETCompiler();
-                        await compiler.CompileAsync(projectFile, project.Group, buildTarget, cancellationToken);
+                        var outputDll = await compiler.CompileAsync(projectFile, project.Group, buildTarget, cancellationToken);
+                        if (ConsoleEnvironment.IsDynamic)
+                        {
+                            AnsiConsole.MarkupLine("[green]{0} -> {1}[/]", projectFile.EscapeMarkup(), outputDll.EscapeMarkup());
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0} -> {1}.", projectFile, outputDll);
+                        }
+
+                        if (rule.EnableScript)
+                        {
+                            var scriptProjectFileName = project.GetScriptProjectFileName();
+                            compiler = new DotNETCompiler();
+                            if (DotNETCompiler.NeedCompile(scriptProjectFileName, project.Group, buildTarget))
+                            {
+                                await compiler.CompileAsync(scriptProjectFileName, project.Group, buildTarget, cancellationToken);
+                            }
+                        }
                     }
                 }
                 else

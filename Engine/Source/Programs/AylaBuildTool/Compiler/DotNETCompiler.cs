@@ -93,7 +93,7 @@ internal class DotNETCompiler
         return false;
     }
 
-    public async Task CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+    public async Task<string> CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
     {
         await m_Access.WaitAsync(cancellationToken);
         try
@@ -114,7 +114,6 @@ internal class DotNETCompiler
             CSharpProject.Parse(File.ReadAllText(projectFile));
 
             // This is a simple example of project parsing, which should later be replaced with formal parsing.
-            Console.WriteLine(projectFile);
             var csproj = await File.ReadAllTextAsync(projectFile, cancellationToken);
             var csprojLines = csproj.Split(["\n", "\r\n"], StringSplitOptions.None);
             var itemGroupIndex = Array.FindIndex(csprojLines, p => p.Contains($"<ItemGroup Condition=\"'$(Configuration)|$(Platform)'=='{config}|{platform}'\">"));
@@ -150,16 +149,8 @@ internal class DotNETCompiler
             var outputDll = Path.Combine(outputDir, assemblyName + ".dll");
             await CSCompiler.CompileToAsync(assemblyName, outputDll, sourceFiles, CSCompiler.GetDefaultAssemblies().Concat(referencedAssemblies), cancellationToken);
 
-            if (ConsoleEnvironment.IsDynamic)
-            {
-                AnsiConsole.MarkupLine("[green]{0} generated.[/]", outputDll);
-            }
-            else
-            {
-                Console.WriteLine("{0} generated.", outputDll);
-            }
-
             GenerateCache(projectFile, group, targetInfo);
+            return outputDll;
         }
         finally
         {
