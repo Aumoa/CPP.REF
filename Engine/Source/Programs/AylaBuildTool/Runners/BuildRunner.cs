@@ -348,12 +348,14 @@ internal static partial class BuildRunner
 
                         if (rule.EnableScript)
                         {
-                            var scriptProjectFileName = project.GetScriptProjectFileName();
                             compiler = new DotNETCompiler();
-                            if (DotNETCompiler.NeedCompile(scriptProjectFileName, project.Group, buildTarget))
+                            sourceDirectory = project.ScriptSourceDirectory;
+                            assemblyName = project.ScriptAssemblyName;
+                            if (DotNETCompiler.NeedCompile(sourceDirectory, assemblyName, project.Group, buildTarget))
                             {
-                                outputDll = await compiler.CompileAsync(scriptProjectFileName, project.Group, buildTarget, cancellationToken);
-                                Console.WriteLine("{0} -> {1}.", scriptProjectFileName, outputDll);
+                                var csproj = CSGenerator.GenerateModule(solution, project, true, buildTarget);
+                                outputDll = await compiler.CompileAsync(sourceDirectory, assemblyName, csproj, project.Group, buildTarget, cancellationToken);
+                                Console.WriteLine("{0} -> {1}.", assemblyName, outputDll);
                             }
                         }
                     }

@@ -7,7 +7,7 @@ internal static class ScriptProjectGenerator
 {
     public static async Task GenerateAsync(Solution solution, Dictionary<ModuleProject, string> scriptProjectPaths, ModuleProject project, CancellationToken cancellationToken)
     {
-        var fileName = project.GetScriptProjectFileName();
+        var fileName = project.ScriptProjectFileName;
 
         var platforms = string.Join(';', TargetInfo.GetAllTargets()
             .Select(p => VSUtility.GetArchitectureName(p))

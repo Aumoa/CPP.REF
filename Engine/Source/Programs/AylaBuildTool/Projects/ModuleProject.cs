@@ -90,8 +90,9 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
         }
     }
 
-    public string GetScriptProjectFileName()
-    {
-        return Path.Combine(SourceDirectory, "Script", Name + ".Script.csproj");
-    }
+    public string ScriptSourceDirectory => Path.Combine(SourceDirectory, "Script");
+
+    public string ScriptAssemblyName => Name + ".Script";
+
+    public string ScriptProjectFileName => Path.Combine(ScriptSourceDirectory, ScriptAssemblyName + ".csproj");
 }
