@@ -120,7 +120,6 @@ internal static partial class BuildRunner
         }
 
         await DispatchGenerateHeaderWorkers();
-        await Task.Delay(10000);
         List<ModuleTask> moduleTasks = [];
 
         foreach (var project in targetProjects)
@@ -222,6 +221,8 @@ internal static partial class BuildRunner
 
         async Task DispatchGenerateHeaderWorkers()
         {
+            Console.Write("Generating reflection header files...");
+
             List<Task<GenerateReflectionHeaderTask>> tasks = [];
 
             foreach (var project in targetProjects)
@@ -309,6 +310,8 @@ internal static partial class BuildRunner
                 }
             }
 
+            Console.WriteLine(" Done.");
+
             Dictionary<string, TaskCompletionSource> publishBindingsTasks = [];
             foreach (var project in scriptableProjects)
             {
@@ -317,6 +320,11 @@ internal static partial class BuildRunner
                 {
                     publishBindingsTasks.Add(project.Name, new TaskCompletionSource());
                 }
+            }
+
+            if (scriptableProjects.Count > 0)
+            {
+                Console.WriteLine("Compiling scripting projects...");
             }
 
             foreach (var project in scriptableProjects)
@@ -416,14 +424,7 @@ internal static partial class BuildRunner
 
             await Task.WhenAll(publishBindingsTasks.Values.Select(p => p.Task));
 
-            if (ConsoleEnvironment.IsDynamic)
-            {
-                AnsiConsole.MarkupLine("Reflection header files has been generated.");
-            }
-            else
-            {
-                Console.WriteLine("Reflection header files has been generated.");
-            }
+            Console.WriteLine("Reflection header files has been generated.");
         }
 
         void DispatchLinkWorkers(Action<ITask>? pulse)

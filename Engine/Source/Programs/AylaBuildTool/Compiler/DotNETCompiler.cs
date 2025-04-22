@@ -9,19 +9,15 @@ internal class DotNETCompiler
 {
     private static SemaphoreSlim m_Access = new(1);
 
-    private static void GenerateCache(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
+    private static IEnumerable<string> GatherSourceCodes(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
     {
-        var projectDir = Path.GetDirectoryName(projectFile);
-        if (projectDir == null)
-        {
-            return;
-        }
-
+        var projectDir = Path.GetDirectoryName(projectFile)!;
         var allSourceFiles = Directory.GetFiles(projectDir, "*.*", SearchOption.AllDirectories);
         var fileName = Path.GetFileNameWithoutExtension(projectFile);
         string intDir = group.Intermediate(fileName, targetInfo, FolderPolicy.PathType.Current);
         var outputFile = group.OutputFileName(targetInfo, fileName, ModuleType.Library, FolderPolicy.PathType.Current);
         var objDir = Path.GetFullPath(Path.Combine(projectDir, "obj"));
+        var binDir = Path.GetFullPath(Path.Combine(projectDir, "bin"));
 
         foreach (var sourceFile in allSourceFiles)
         {
@@ -30,12 +26,39 @@ internal class DotNETCompiler
                 continue;
             }
 
-            var ext = Path.GetExtension(sourceFile);
-            if (ext.Equals(".csproj", StringComparison.OrdinalIgnoreCase) == false && ext.Equals(".cs", StringComparison.OrdinalIgnoreCase) == false)
+            if (sourceFile.StartsWith(binDir))
             {
                 continue;
             }
 
+            var ext = Path.GetExtension(sourceFile);
+            if (ext.Equals(".cs", StringComparison.OrdinalIgnoreCase))
+            {
+                yield return sourceFile;
+            }
+        }
+    }
+
+    private static void GenerateCache(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
+    {
+        var projectDir = Path.GetDirectoryName(projectFile);
+        if (projectDir == null)
+        {
+            return;
+        }
+
+        var fileName = Path.GetFileNameWithoutExtension(projectFile);
+        string intDir = group.Intermediate(fileName, targetInfo, FolderPolicy.PathType.Current);
+
+        if (Directory.Exists(intDir))
+        {
+            Directory.Delete(intDir, true);
+        }
+
+        Directory.CreateDirectory(intDir);
+
+        foreach (var sourceFile in GatherSourceCodes(projectFile, group, targetInfo))
+        {
             var relativeFileName = Path.GetRelativePath(projectDir, sourceFile);
             var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
             var cacheFileName = Path.Combine(intDir, fileId + ".cache");
@@ -46,18 +69,12 @@ internal class DotNETCompiler
 
     public static bool NeedCompile(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
     {
-        if (File.Exists(projectFile) == false)
-        {
-            return true;
-        }
-
         var projectDir = Path.GetDirectoryName(projectFile);
         if (projectDir == null)
         {
             return true;
         }
 
-        var allSourceFiles = Directory.GetFiles(projectDir, "*.*", SearchOption.AllDirectories);
         var fileName = Path.GetFileNameWithoutExtension(projectFile);
         string intDir = group.Intermediate(fileName, targetInfo, FolderPolicy.PathType.Current);
         var outputFile = group.OutputFileName(targetInfo, fileName, ModuleType.Library, FolderPolicy.PathType.Current);
@@ -66,14 +83,16 @@ internal class DotNETCompiler
             return true;
         }
 
-        foreach (var sourceFile in allSourceFiles)
+        if (Directory.Exists(intDir) == false)
         {
-            var ext = Path.GetExtension(sourceFile);
-            if (ext.Equals(".csproj", StringComparison.OrdinalIgnoreCase) == false && ext.Equals(".cs", StringComparison.OrdinalIgnoreCase) == false)
-            {
-                continue;
-            }
+            return true;
+        }
 
+        HashSet<string> cacheFiles = [];
+        cacheFiles.AddRange(Directory.GetFiles(intDir, "*.cache", SearchOption.TopDirectoryOnly));
+
+        foreach (var sourceFile in GatherSourceCodes(projectFile, group, targetInfo))
+        {
             var relativeFileName = Path.GetRelativePath(projectDir, sourceFile);
             var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
             var cacheFileName = Path.Combine(intDir, fileId + ".cache");
@@ -88,9 +107,11 @@ internal class DotNETCompiler
             {
                 return true;
             }
+
+            cacheFiles.Remove(cacheFileName);
         }
 
-        return false;
+        return cacheFiles.Count > 0;
     }
 
     public async Task<string> CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
@@ -104,8 +125,7 @@ internal class DotNETCompiler
                 throw new InvalidOperationException();
             }
 
-            var sourceFiles = Directory
-                .GetFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories)
+            var sourceFiles = GatherSourceCodes(projectFile, group, targetInfo)
                 .Select(CSCompiler.SourceCodeProvider.FromFile);
 
             var config = VSUtility.GetConfigName(targetInfo);
@@ -151,6 +171,11 @@ internal class DotNETCompiler
 
             GenerateCache(projectFile, group, targetInfo);
             return outputDll;
+        }
+        catch (CSCompilerError error)
+        {
+            Console.Error.WriteLine(error.Message);
+            throw TerminateException.User();
         }
         finally
         {

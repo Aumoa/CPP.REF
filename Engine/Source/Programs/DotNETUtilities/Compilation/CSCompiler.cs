@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
-
+using Spectre.Console;
 using System.Reflection;
 
 namespace AylaEngine;
@@ -88,7 +88,7 @@ public static class CSCompiler
             throw new CSCompilerError(compileErrors);
         }
 
-        var metadataReferences = referencedAssemblies.Select(AssemblyPath => MetadataReference.CreateFromFile(AssemblyPath));
+        var metadataReferences = referencedAssemblies.Select(LoadReferenceOrThrowError);
         var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, true, optimizationLevel: OptimizationLevel.Release, nullableContextOptions: NullableContextOptions.Enable);
         var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, metadataReferences, compilerOptions);
 
@@ -101,6 +101,17 @@ public static class CSCompiler
         }
 
         return compiledBinary;
+
+        PortableExecutableReference LoadReferenceOrThrowError(string assemblyPath)
+        {
+            if (File.Exists(assemblyPath) == false)
+            {
+                Console.WriteLine("{0} -> Required assembly not found: {1}", assemblyName, assemblyPath.EscapeMarkup());
+                throw TerminateException.User();
+            }
+
+            return MetadataReference.CreateFromFile(assemblyPath);
+        }
     }
 
     public static async Task<Assembly> CompileAsync(string assemblyName, IEnumerable<SourceCodeProvider> sourceFiles, IEnumerable<string> referencedAssemblies, CancellationToken cancellationToken = default)
