@@ -81,8 +81,18 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
 
     public IEnumerable<SourceCodeDescriptor> GetSourceCodes()
     {
+        List<string> blacklist =
+        [
+            Path.Combine(SourceDirectory, "Script")
+        ];
+
         foreach (var source in Directory.GetFiles(SourceDirectory, "*", SearchOption.AllDirectories))
         {
+            if (blacklist.Any(p => source.StartsWith(p, StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
             if (SourceCodeDescriptor.TryGet(Group, Name, source, SourceDirectory, out var descriptor))
             {
                 yield return descriptor;
@@ -90,8 +100,9 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
         }
     }
 
-    public string GetScriptProjectFileName()
-    {
-        return Path.Combine(SourceDirectory, "Script", Name + ".Script.csproj");
-    }
+    public string ScriptSourceDirectory => Path.Combine(SourceDirectory, "Script");
+
+    public string ScriptAssemblyName => Name + ".Script";
+
+    public string ScriptProjectFileName => Path.Combine(ScriptSourceDirectory, ScriptAssemblyName + ".csproj");
 }
