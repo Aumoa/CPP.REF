@@ -14,5 +14,8 @@ namespace Ayla
 
 	protected:
 		Graphics();
+
+	public:
+		virtual void Initialize() = 0;
 	};
 }

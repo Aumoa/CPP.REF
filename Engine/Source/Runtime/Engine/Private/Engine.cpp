@@ -3,10 +3,15 @@
 #include "Engine.h"
 #include "InitializationContext.h"
 #include "HAL/PlatformRenderFeature.h"
+#include "HAL/Graphics.h"
 
 namespace Ayla
 {
 	Engine::Engine()
+	{
+	}
+
+	Engine::~Engine() noexcept
 	{
 	}
 
@@ -17,7 +22,8 @@ namespace Ayla
 
 	void Engine::Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context)
 	{
-		context->Progress(TEXT("Initializing engine..."));
-		std::this_thread::sleep_for(3s);
+		context->Progress(TEXT("Initializing graphics..."));
+		m_Graphics = prf->CreateGraphics(RenderAPI::D3D12);
+		m_Graphics->Initialize();
 	}
 }
