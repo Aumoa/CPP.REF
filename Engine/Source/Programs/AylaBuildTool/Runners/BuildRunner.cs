@@ -284,16 +284,14 @@ internal static partial class BuildRunner
             {
                 var rule = project.GetRule(buildTarget);
 
-                var projectFile = Path.Combine(project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings", project.Name + ".Bindings.csproj");
+                var sourceDirectory = Path.Combine(project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings");
 
                 var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
                 var assemblyName = $"{project.Name}.Bindings";
                 var dllName = assemblyName + ".dll";
 
                 var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
-                await TextFileHelper.WriteIfChangedAsync(projectFile, csproj, cancellationToken);
-
-                if (DotNETCompiler.NeedCompile(projectFile, project.Group, buildTarget))
+                if (DotNETCompiler.NeedCompile(sourceDirectory, assemblyName, project.Group, buildTarget))
                 {
                     _ = PublishAsync().ContinueWith(r =>
                     {
@@ -345,8 +343,8 @@ internal static partial class BuildRunner
 
                         Directory.CreateDirectory(outputPath);
                         var compiler = new DotNETCompiler();
-                        var outputDll = await compiler.CompileAsync(projectFile, project.Group, buildTarget, cancellationToken);
-                        Console.WriteLine("{0} -> {1}.", projectFile, outputDll);
+                        var outputDll = await compiler.CompileAsync(sourceDirectory, assemblyName, csproj, project.Group, buildTarget, cancellationToken);
+                        Console.WriteLine("{0} -> {1}.", assemblyName, outputDll);
 
                         if (rule.EnableScript)
                         {
@@ -354,7 +352,8 @@ internal static partial class BuildRunner
                             compiler = new DotNETCompiler();
                             if (DotNETCompiler.NeedCompile(scriptProjectFileName, project.Group, buildTarget))
                             {
-                                await compiler.CompileAsync(scriptProjectFileName, project.Group, buildTarget, cancellationToken);
+                                outputDll = await compiler.CompileAsync(scriptProjectFileName, project.Group, buildTarget, cancellationToken);
+                                Console.WriteLine("{0} -> {1}.", scriptProjectFileName, outputDll);
                             }
                         }
                     }

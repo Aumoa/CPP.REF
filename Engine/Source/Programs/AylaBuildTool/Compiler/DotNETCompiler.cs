@@ -60,16 +60,21 @@ internal class DotNETCompiler
 
     public static bool NeedCompile(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
     {
-        var projectDir = Path.GetDirectoryName(projectFile);
-        if (projectDir == null)
+        string? sourceDirectory = Path.GetDirectoryName(projectFile);
+        if (sourceDirectory == null)
         {
             return true;
         }
 
-        var assemblyName = Path.GetFileNameWithoutExtension(projectFile);
+        string assemblyName = Path.GetFileNameWithoutExtension(projectFile);
+        return NeedCompile(sourceDirectory, assemblyName, group, targetInfo);
+    }
+
+    public static bool NeedCompile(string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
+    {
         string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
         var outputFile = group.OutputFileName(targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
-        var objDir = Path.GetFullPath(Path.Combine(projectDir, "obj"));
+        var objDir = Path.GetFullPath(Path.Combine(sourceDirectory, "obj"));
         if (File.Exists(outputFile) == false)
         {
             return true;
@@ -83,9 +88,9 @@ internal class DotNETCompiler
         HashSet<string> cacheFiles = [];
         cacheFiles.AddRange(Directory.GetFiles(intDir, "*.cache", SearchOption.TopDirectoryOnly));
 
-        foreach (var sourceFile in GatherSourceCodes(projectDir, assemblyName, group, targetInfo))
+        foreach (var sourceFile in GatherSourceCodes(sourceDirectory, assemblyName, group, targetInfo))
         {
-            var relativeFileName = Path.GetRelativePath(projectDir, sourceFile);
+            var relativeFileName = Path.GetRelativePath(sourceDirectory, sourceFile);
             var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
             var cacheFileName = Path.Combine(intDir, fileId + ".cache");
             if (File.Exists(cacheFileName) == false)
