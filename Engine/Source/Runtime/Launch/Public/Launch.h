@@ -9,6 +9,7 @@ namespace Ayla
 {
 	class GenericApplication;
 	class Engine;
+	class PlatformRenderFeature;
 
 	ACLASS()
 	class LAUNCH_API Launch : public Object
@@ -31,5 +32,6 @@ namespace Ayla
 		virtual int32 StartApplication();
 
 		virtual void* GetApplicationPointer() = 0;
+		virtual RPtr<PlatformRenderFeature> CreatePlatformRenderFeature() = 0;
 	};
 }

@@ -17,6 +17,6 @@ namespace Ayla
 		EditorEngine();
 
 		virtual RPtr<InitializationContext> PreInitialize() override;
-		virtual void Initialize(RPtr<InitializationContext> context) override;
+		virtual void Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context) override;
 	};
 }

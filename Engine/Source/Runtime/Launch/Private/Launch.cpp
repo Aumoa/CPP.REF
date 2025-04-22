@@ -7,6 +7,7 @@
 #include "GenericPlatform/GenericWindow.h"
 #include "Localizational/Name.h"
 #include "InitializationContext.h"
+#include "HAL/PlatformRenderFeature.h"
 #if WITH_EDITOR
 #include "EditorEngine.h"
 #endif
@@ -42,24 +43,16 @@ namespace Ayla
 #endif
 
         auto initializationContext = Engine->PreInitialize();
-        Engine->Initialize(initializationContext);
+        Engine->Initialize(CreatePlatformRenderFeature(), initializationContext);
 
         auto window = GenericApp->MakeWindow(wDef);
         window->Show();
 
         std::vector<GenericPlatformInputEvent> InputEvents;
 
-        try
+        while (!GenericApp->IsQuitRequested())
         {
-            while (!GenericApp->IsQuitRequested())
-            {
-                GenericApp->PumpMessages(InputEvents);
-            }
-        }
-        catch (Exception* e)
-        {
-            delete e;
-            throw;
+            GenericApp->PumpMessages(InputEvents);
         }
 
         return GenericApp->GetExitCode();

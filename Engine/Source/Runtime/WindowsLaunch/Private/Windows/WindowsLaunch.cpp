@@ -6,6 +6,7 @@
 
 #include "Windows/WindowsLaunch.h"
 #include "Platform/PlatformCommon.h"
+#include "D3D12/WindowsPlatformRenderFeature.h"
 
 namespace Ayla
 {
@@ -17,6 +18,11 @@ namespace Ayla
 	void* WindowsLaunch::GetApplicationPointer()
 	{
 		return ApplicationPointer;
+	}
+
+	RPtr<PlatformRenderFeature> WindowsLaunch::CreatePlatformRenderFeature()
+	{
+		return New<WindowsPlatformRenderFeature>();
 	}
 }
 

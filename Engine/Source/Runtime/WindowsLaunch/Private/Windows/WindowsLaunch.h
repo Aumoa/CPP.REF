@@ -24,6 +24,7 @@ namespace Ayla
 		WindowsLaunch();
 
 		void* GetApplicationPointer() override;
+		RPtr<PlatformRenderFeature> CreatePlatformRenderFeature() override;
 	};
 }
 

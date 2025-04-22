@@ -8,6 +8,7 @@
 namespace Ayla
 {
 	class InitializationContext;
+	class PlatformRenderFeature;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -18,6 +19,6 @@ namespace Ayla
 		Engine();
 
 		virtual RPtr<InitializationContext> PreInitialize();
-		virtual void Initialize(RPtr<InitializationContext> context);
+		virtual void Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context);
 	};
 }

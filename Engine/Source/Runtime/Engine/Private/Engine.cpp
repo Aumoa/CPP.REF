@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 #include "InitializationContext.h"
+#include "HAL/PlatformRenderFeature.h"
 
 namespace Ayla
 {
@@ -14,7 +15,7 @@ namespace Ayla
 		return New<InitializationContext>();
 	}
 
-	void Engine::Initialize(RPtr<InitializationContext> context)
+	void Engine::Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context)
 	{
 		context->Progress(TEXT("Initializing engine..."));
 		std::this_thread::sleep_for(3s);

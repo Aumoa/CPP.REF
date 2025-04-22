@@ -9,6 +9,6 @@ public class WindowsLaunch : ModuleRules
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
-        AddPublicDependencyModuleNames("Launch");
+        AddPublicDependencyModuleNames("Launch", "RenderCore");
     }
 }

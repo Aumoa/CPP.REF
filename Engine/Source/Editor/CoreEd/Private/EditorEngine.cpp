@@ -3,6 +3,7 @@
 #include "EditorEngine.h"
 #include "EditorInitializationContext.h"
 #include "GenericPlatform/GenericSplash.h"
+#include "HAL/PlatformRenderFeature.h"
 
 namespace Ayla
 {
@@ -16,9 +17,9 @@ namespace Ayla
 		return New<EditorInitializationContext>();
 	}
 
-	void EditorEngine::Initialize(RPtr<InitializationContext> context)
+	void EditorEngine::Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context)
 	{
-		Super::Initialize(context);
+		Super::Initialize(prf, context);
 		GenericSplash::Hide();
 	}
 }
