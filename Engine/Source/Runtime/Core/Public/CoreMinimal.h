@@ -82,3 +82,8 @@
 // additional standard libraries.
 #include <set>
 #include <variant>
+
+namespace Game
+{
+	using namespace ::Ayla;
+}

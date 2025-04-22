@@ -1,5 +1,4 @@
-﻿using Spectre.Console;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace AylaEngine;
@@ -93,7 +92,7 @@ public static class Terminal
 
                     if ((options.Logging & Logging.StdOut) != 0)
                     {
-                        AnsiConsole.MarkupLine(SimpleMarkupOutputLine(e.Data.EscapeMarkup()));
+                        Console.WriteLine(e.Data);
                     }
                 }
             }
@@ -116,7 +115,7 @@ public static class Terminal
 
                     if ((options.Logging & Logging.StdErr) != 0)
                     {
-                        AnsiConsole.MarkupLine("[red]{0}[/]", e.Data.EscapeMarkup());
+                        Console.Error.WriteLine(e.Data);
                     }
                 }
             }
@@ -138,45 +137,6 @@ public static class Terminal
             StdOut = stdout.ToArray(),
             StdErr = stderr.ToArray()
         };
-    }
-
-    public static string SimpleMarkupOutputLine(string line)
-    {
-        if (WholeContent("warning") || WholeContent("warn"))
-        {
-            return $"[yellow]{line.EscapeMarkup()}[/]";
-        }
-        else if (WholeContent("success") || WholeContent("successfully"))
-        {
-            return $"[green]{line.EscapeMarkup()}[/]";
-        }
-        else if (WholeContent("error") || WholeContent("err"))
-        {
-            return $"[red]{line.EscapeMarkup()}[/]";
-        }
-        else if (WholeContent("crit") || WholeContent("critical") || WholeContent("fatal"))
-        {
-            return $"[red][b]{line.EscapeMarkup()}[/][/]";
-        }
-
-        return line.EscapeMarkup();
-
-        bool WholeContent(string content)
-        {
-            int indexOf = line.IndexOf(content, StringComparison.OrdinalIgnoreCase);
-            if (indexOf == -1)
-            {
-                return false;
-            }
-
-            if ((indexOf != 0 && MarkupSeparator.Contains(line[indexOf - 1])) ||
-                (indexOf != line.Length - 1) && MarkupSeparator.Contains(line[indexOf + 1]))
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 
     private static Process StartProcess(string? executable, string command, string workingDirectory = ".")
@@ -204,7 +164,7 @@ public static class Terminal
         var process = Process.Start(processInfo);
         if (process == null)
         {
-            AnsiConsole.MarkupLine("[red]Internal error: Cannot start [b]{0}[.] process.[/]", processInfo.FileName);
+            Console.WriteLine("Internal error: Cannot start {0} process.", processInfo.FileName);
             throw TerminateException.Internal();
         }
 

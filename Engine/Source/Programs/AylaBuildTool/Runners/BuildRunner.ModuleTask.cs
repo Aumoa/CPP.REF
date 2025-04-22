@@ -19,6 +19,22 @@ internal static partial class BuildRunner
             m_AllCompiles = allCompiles;
         }
 
+        public bool NeedLink(ITargetInfo targetInfo)
+        {
+            if (NeedCompileTasks.Length > 0)
+            {
+                return true;
+            }
+
+            var outputFileName = Resolver.Group.OutputFileName(targetInfo, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
+            if (File.Exists(outputFileName) == false)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public async Task<Terminal.Output> LinkAsync(IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             await Task.WhenAll(NeedCompileTasks.Select(p => p.Task));
@@ -45,6 +61,11 @@ internal static partial class BuildRunner
                 m_CompletionSource.SetException(e);
                 throw;
             }
+        }
+
+        public void SetComplete()
+        {
+            m_CompletionSource.SetResult();
         }
 
         public Task Task => m_CompletionSource.Task;
