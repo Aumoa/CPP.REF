@@ -88,10 +88,74 @@ $"""
 """.Replace("\r\n", "\n");
     }
 
+    public FrozenCSharpProject Freeze(Condition? condition)
+    {
+        PropertyGroup propertyGroup = new PropertyGroup();
+        ItemGroup itemGroup = new ItemGroup();
+
+        foreach (var item in m_PropertyGroups)
+        {
+            if (item.Condition == null || (condition == null || item.Condition.Contains(condition)))
+            {
+                propertyGroup = item with
+                {
+                    TargetFramework = item.TargetFramework != null ? item.TargetFramework : propertyGroup.TargetFramework,
+                    Nullable = item.Nullable != null ? item.Nullable : propertyGroup.Nullable,
+                    RootNamespace = item.RootNamespace != null ? item.RootNamespace : propertyGroup.RootNamespace,
+                    Platforms = item.Platforms != null ? item.Platforms : propertyGroup.Platforms,
+                    Configurations = item.Configurations != null ? item.Configurations : propertyGroup.Configurations,
+                    AppendTargetFrameworkToOutputPath = item.AppendTargetFrameworkToOutputPath != null ? item.AppendTargetFrameworkToOutputPath : propertyGroup.AppendTargetFrameworkToOutputPath,
+                    PropertyTarget = item.PropertyTarget != null ? item.PropertyTarget : propertyGroup.PropertyTarget,
+                    Optimize = item.Optimize != null ? item.Optimize : propertyGroup.Optimize,
+                    OutputPath = item.OutputPath != null ? item.OutputPath : propertyGroup.OutputPath
+                };
+            }
+        }
+
+        foreach (var item in m_ItemGroups)
+        {
+            if (item.Condition == null || (condition == null || item.Condition.Contains(condition)))
+            {
+                itemGroup = item with
+                {
+                    References = itemGroup.References != null ? itemGroup.References.Concat(item.References ?? []) : item.References
+                };
+            }
+        }
+
+        itemGroup = itemGroup with
+        {
+            References = itemGroup.References?.Distinct()
+        };
+
+        return new FrozenCSharpProject { PropertyGroup = propertyGroup, ItemGroup = itemGroup };
+    }
+
     private string GenerateInnerXml(IndentResolver indent)
     {
         return string.Join("\n\n", m_PropertyGroups.Select(p => GenerateXml(p, indent))
             .Concat(m_ItemGroups.Where(p => p.IsEmpty == false).Select(p => GenerateXml(p, indent))));
+    }
+
+    public static CSCompiler.SourceCodeProvider GenerateAssemblyAttribute(Version dotNETVersion)
+    {
+        var assemblyAttribute = new AssemblyAttribute { DotNETVersion = dotNETVersion };
+        var script = assemblyAttribute.GenerateScript();
+        return CSCompiler.SourceCodeProvider.FromSourceCode(".AssemblyAttribute.cs", script);
+    }
+
+    public static CSCompiler.SourceCodeProvider GenerateAssemblyInfo(string? company, string? configuration, string? product, string? title, Version? version)
+    {
+        var assemblyInfo = new AssemblyInfo
+        {
+            Company = company,
+            Configuration = configuration,
+            Product = product,
+            Title = title,
+            Version = version
+        };
+        var script = assemblyInfo.GenerateScript();
+        return CSCompiler.SourceCodeProvider.FromSourceCode(".AssemblyInfo.cs", script);
     }
 
     public static CSharpProject Parse(string project)

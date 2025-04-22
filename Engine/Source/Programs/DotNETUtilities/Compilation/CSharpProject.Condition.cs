@@ -32,6 +32,21 @@ public partial class CSharpProject
             return $"'{string.Join('|', left.Select(p => $"$({p})"))}'=='{string.Join('|', right)}'";
         }
 
+        public bool Contains(Condition condition)
+        {
+            if (Configuration != null && condition.Configuration != Configuration)
+            {
+                return false;
+            }
+
+            if (Platform != null && condition.Platform != Platform)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static Condition Parse(string content)
         {
             var items = content.Split("==").Select(p => p.Trim('\'').Split('|')).ToArray();

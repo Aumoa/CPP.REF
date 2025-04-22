@@ -370,7 +370,7 @@ internal static partial class BuildRunner
 
             await Task.WhenAll(publishBindingsTasks.Values.Select(p => p.Task));
 
-            Console.WriteLine("Reflection header files has been generated.");
+            Console.WriteLine("Reflection header files and scripting DLLs has been generated.");
         }
 
         void DispatchLinkWorkers()

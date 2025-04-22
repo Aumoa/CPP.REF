@@ -6,9 +6,11 @@ namespace AylaEngine;
 
 public partial class CSharpProject
 {
-    public record ReferenceBase
+    public abstract record ReferenceBase
     {
         public required string Include { get; init; }
+
+        public abstract string ReferencedAssemblyPath(Condition? condition, string sourceDirectory);
     }
 
     public record Reference : ReferenceBase
@@ -35,6 +37,11 @@ $"""
             }
         }
 
+        public override string ReferencedAssemblyPath(Condition? condition, string sourceDirectory)
+        {
+            return HintPath ?? throw new InvalidOperationException($"HintPath is not provided for {Include} assembly.");
+        }
+
         public static Reference Parse(XmlElement xml)
         {
             var include = xml.GetAttributeNode("Include") ?? throw new FormatException("Missing 'Include' attribute.");
@@ -43,7 +50,7 @@ $"""
             {
                 if (inner.Name == "HintPath")
                 {
-                    hintPath = inner.Value;
+                    hintPath = inner.InnerText;
                 }
             }
 
@@ -63,6 +70,13 @@ $"""
 $"""
 <ProjectReference Include="{Include}" />
 """;
+        }
+
+        public override string ReferencedAssemblyPath(Condition? condition, string sourceDirectory)
+        {
+            var depend = CSharpProject.Parse(File.ReadAllText(Include)).Freeze(condition);
+            var projectName = Path.GetFileNameWithoutExtension(Include);
+            return Path.Combine(depend.PropertyGroup.OutputPath ?? depend.PropertyGroup.GetOutputPath(sourceDirectory, condition?.Configuration ?? "Shipping"), projectName + ".dll");
         }
 
         public static ProjectReference Parse(XmlElement xml)

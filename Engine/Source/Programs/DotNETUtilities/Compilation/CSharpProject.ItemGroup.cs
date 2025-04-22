@@ -59,7 +59,7 @@ public partial class CSharpProject
         return
 $"""
 <ItemGroup{conditionString}>
-  {GenerateInnerXml(indent)}
+{indent.Indent(GenerateInnerXml)}
 </ItemGroup>
 """;
 

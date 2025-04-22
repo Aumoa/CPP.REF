@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace AylaEngine;
@@ -8,15 +9,13 @@ internal class DotNETCompiler
 {
     private static SemaphoreSlim m_Access = new(1);
 
-    private static IEnumerable<string> GatherSourceCodes(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
+    private static IEnumerable<string> GatherSourceCodes(string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
     {
-        var projectDir = Path.GetDirectoryName(projectFile)!;
-        var allSourceFiles = Directory.GetFiles(projectDir, "*.*", SearchOption.AllDirectories);
-        var fileName = Path.GetFileNameWithoutExtension(projectFile);
-        string intDir = group.Intermediate(fileName, targetInfo, FolderPolicy.PathType.Current);
-        var outputFile = group.OutputFileName(targetInfo, fileName, ModuleType.Library, FolderPolicy.PathType.Current);
-        var objDir = Path.GetFullPath(Path.Combine(projectDir, "obj"));
-        var binDir = Path.GetFullPath(Path.Combine(projectDir, "bin"));
+        var allSourceFiles = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
+        string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
+        var outputFile = group.OutputFileName(targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
+        var objDir = Path.GetFullPath(Path.Combine(sourceDirectory, "obj"));
+        var binDir = Path.GetFullPath(Path.Combine(sourceDirectory, "bin"));
 
         foreach (var sourceFile in allSourceFiles)
         {
@@ -38,16 +37,9 @@ internal class DotNETCompiler
         }
     }
 
-    private static void GenerateCache(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
+    private static void GenerateCache(string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
     {
-        var projectDir = Path.GetDirectoryName(projectFile);
-        if (projectDir == null)
-        {
-            return;
-        }
-
-        var fileName = Path.GetFileNameWithoutExtension(projectFile);
-        string intDir = group.Intermediate(fileName, targetInfo, FolderPolicy.PathType.Current);
+        string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
 
         if (Directory.Exists(intDir))
         {
@@ -56,9 +48,9 @@ internal class DotNETCompiler
 
         Directory.CreateDirectory(intDir);
 
-        foreach (var sourceFile in GatherSourceCodes(projectFile, group, targetInfo))
+        foreach (var sourceFile in GatherSourceCodes(sourceDirectory, assemblyName, group, targetInfo))
         {
-            var relativeFileName = Path.GetRelativePath(projectDir, sourceFile);
+            var relativeFileName = Path.GetRelativePath(sourceDirectory, sourceFile);
             var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
             var cacheFileName = Path.Combine(intDir, fileId + ".cache");
             var current = SourceCodeCache.MakeCachedSimple(sourceFile, null);
@@ -74,9 +66,10 @@ internal class DotNETCompiler
             return true;
         }
 
-        var fileName = Path.GetFileNameWithoutExtension(projectFile);
-        string intDir = group.Intermediate(fileName, targetInfo, FolderPolicy.PathType.Current);
-        var outputFile = group.OutputFileName(targetInfo, fileName, ModuleType.Library, FolderPolicy.PathType.Current);
+        var assemblyName = Path.GetFileNameWithoutExtension(projectFile);
+        string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
+        var outputFile = group.OutputFileName(targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
+        var objDir = Path.GetFullPath(Path.Combine(projectDir, "obj"));
         if (File.Exists(outputFile) == false)
         {
             return true;
@@ -90,7 +83,7 @@ internal class DotNETCompiler
         HashSet<string> cacheFiles = [];
         cacheFiles.AddRange(Directory.GetFiles(intDir, "*.cache", SearchOption.TopDirectoryOnly));
 
-        foreach (var sourceFile in GatherSourceCodes(projectFile, group, targetInfo))
+        foreach (var sourceFile in GatherSourceCodes(projectDir, assemblyName, group, targetInfo))
         {
             var relativeFileName = Path.GetRelativePath(projectDir, sourceFile);
             var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
@@ -113,72 +106,63 @@ internal class DotNETCompiler
         return cacheFiles.Count > 0;
     }
 
-    public async Task<string> CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+    public async Task<string> CompileAsync(string sourceDirectory, string assemblyName, string projectDescription, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
     {
         await m_Access.WaitAsync(cancellationToken);
         try
         {
-            var sourceDirectory = Path.GetDirectoryName(projectFile);
-            if (sourceDirectory == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var sourceFiles = GatherSourceCodes(projectFile, group, targetInfo)
+            var sourceFiles = GatherSourceCodes(sourceDirectory, assemblyName, group, targetInfo)
                 .Select(CSCompiler.SourceCodeProvider.FromFile);
 
             var config = VSUtility.GetConfigName(targetInfo);
             var platform = VSUtility.GetArchitectureName(targetInfo);
 
-            CSharpProject.Parse(File.ReadAllText(projectFile));
+            sourceFiles = sourceFiles
+                .Append(CSharpProject.GenerateAssemblyAttribute(new Version(9, 0)))
+                .Append(CSharpProject.GenerateAssemblyInfo(null, config, null, assemblyName, new Version(1, 0, 0, 0)));
 
-            // This is a simple example of project parsing, which should later be replaced with formal parsing.
-            var csproj = await File.ReadAllTextAsync(projectFile, cancellationToken);
-            var csprojLines = csproj.Split(["\n", "\r\n"], StringSplitOptions.None);
-            var itemGroupIndex = Array.FindIndex(csprojLines, p => p.Contains($"<ItemGroup Condition=\"'$(Configuration)|$(Platform)'=='{config}|{platform}'\">"));
+            var condition = CSharpProject.Condition.Parse($"$(Configuration)|$(Platform)=='{config}|{platform}'");
+            var csproj = CSharpProject.Parse(projectDescription).Freeze(condition);
+
             List<string> referencedAssemblies = [];
-            if (itemGroupIndex != -1)
+            foreach (var referenceBase in csproj.ItemGroup.References ?? [])
             {
-                var endIndex = Array.FindIndex(csprojLines, itemGroupIndex, p => p.Contains("</ItemGroup>"));
-                var imports = csprojLines[itemGroupIndex..endIndex];
-                foreach (var line in imports)
-                {
-                    var match = Regex.Match(line, @"<HintPath>(.*?)<\/HintPath>");
-                    if (match.Success)
-                    {
-                        referencedAssemblies.Add(match.Groups[1].Value);
-                    }
-
-                    match = Regex.Match(line, @"<ProjectReference Include=""(.*?)"" \/>");
-                    if (match.Success)
-                    {
-                        if (match.Success)
-                        {
-                            var referencedProject = match.Groups[1].Value;
-                            var referencedAssemblyName = Path.GetFileNameWithoutExtension(referencedProject);
-                            var referencedAssembly = group.OutputFileName(targetInfo, referencedAssemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
-                            referencedAssemblies.Add(referencedAssembly);
-                        }
-                    }
-                }
+                referencedAssemblies.Add(referenceBase.ReferencedAssemblyPath(csproj.ItemGroup.Condition, sourceDirectory));
             }
 
             var outputDir = group.Output(targetInfo, FolderPolicy.PathType.Current);
-            var assemblyName = Path.GetFileNameWithoutExtension(projectFile);
             var outputDll = Path.Combine(outputDir, assemblyName + ".dll");
             await CSCompiler.CompileToAsync(assemblyName, outputDll, sourceFiles, CSCompiler.GetDefaultAssemblies().Concat(referencedAssemblies), cancellationToken);
 
-            GenerateCache(projectFile, group, targetInfo);
+            GenerateCache(sourceDirectory, assemblyName, group, targetInfo);
             return outputDll;
         }
         catch (CSCompilerError error)
         {
-            Console.Error.WriteLine(error.Message);
+            Console.Error.WriteLine("{0}: {1}", assemblyName, error.Message);
             throw TerminateException.User();
+        }
+        catch (Exception error)
+        {
+            Console.Error.WriteLine("{0}: {1}", assemblyName, error);
+            throw TerminateException.Internal();
         }
         finally
         {
             m_Access.Release();
         }
+    }
+
+    public async Task<string> CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+    {
+        var sourceDirectory = Path.GetDirectoryName(projectFile);
+        if (sourceDirectory == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var assemblyName = Path.GetFileNameWithoutExtension(projectFile);
+        string csproj = await File.ReadAllTextAsync(projectFile);
+        return await CompileAsync(sourceDirectory, assemblyName, csproj, group, targetInfo, cancellationToken);
     }
 }

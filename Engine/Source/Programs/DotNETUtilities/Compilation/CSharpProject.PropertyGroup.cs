@@ -29,6 +29,18 @@ public partial class CSharpProject
 
         public string? OutputPath { get; init; }
 
+        public string GetOutputPath(string sourceDirectory, string config)
+        {
+            if (OutputPath == null)
+            {
+                return Path.Combine(sourceDirectory, "bin", config, TargetFramework ?? string.Empty);
+            }
+            else
+            {
+                return OutputPath;
+            }
+        }
+
         public static PropertyGroup Parse(XmlElement xml)
         {
             var conditionAttr = xml.Attributes.GetNamedItem("Condition");
