@@ -1,6 +1,4 @@
-﻿using Spectre.Console;
-
-namespace AylaEngine;
+﻿namespace AylaEngine;
 
 internal class ModuleRulesResolver
 {
@@ -57,7 +55,7 @@ internal class ModuleRulesResolver
                     source = source.Append("WindowsLaunch");
                     break;
                 default:
-                    AnsiConsole.MarkupLine("[red]Target platform not supported yet.[/]");
+                    Console.Error.WriteLine("Target platform not supported yet.");
                     throw TerminateException.Internal();
             }
         }
@@ -95,13 +93,13 @@ internal class ModuleRulesResolver
             var dependTargetProject = solution.FindProject(dep);
             if (dependTargetProject == null)
             {
-                AnsiConsole.MarkupLine("[red]Project [b]{0}[/], referenced by Project [b]{1}[/], is not included in this solution.[/]", dep, targetProject.Name);
+                Console.Error.WriteLine("Project {0}, referenced by Project {1}, is not included in this solution.", dep, targetProject.Name);
                 throw TerminateException.User();
             }
 
             if (dependTargetProject is not ModuleProject mp)
             {
-                AnsiConsole.MarkupLine("[red]Project [b]{0}[/], referenced by Project [b]{1}[/], is not a valid C++ project.[/]", dep, targetProject.Name);
+                Console.Error.WriteLine("Project {0}, referenced by Project {1}, is not a valid C++ project.", dep, targetProject.Name);
                 throw TerminateException.User();
             }
 

@@ -1,11 +1,10 @@
 ﻿// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
-using Spectre.Console;
-using System.Reflection;
 
 namespace AylaEngine;
 
@@ -106,7 +105,7 @@ public static class CSCompiler
         {
             if (File.Exists(assemblyPath) == false)
             {
-                Console.WriteLine("{0} -> Required assembly not found: {1}", assemblyName, assemblyPath.EscapeMarkup());
+                Console.Error.WriteLine("{0} -> Required assembly not found: {1}", assemblyName, assemblyPath);
                 throw TerminateException.User();
             }
 

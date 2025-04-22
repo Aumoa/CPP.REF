@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using System.Threading.Tasks;
-using Spectre.Console;
 
 namespace AylaEngine;
 
@@ -37,7 +35,7 @@ internal class Solution
             var p = FindProject(namesArr[i]);
             if (p == null)
             {
-                AnsiConsole.MarkupLine("[red]Solution not contains depend project '{0}'.[/]", namesArr[i]);
+                Console.Error.WriteLine("Solution not contains depend project '{0}'.", namesArr[i]);
                 throw TerminateException.User();
             }
 

@@ -1,6 +1,4 @@
-﻿using Spectre.Console;
-
-namespace AylaEngine;
+﻿namespace AylaEngine;
 
 internal class VisualStudioInstallation : Installation
 {
@@ -137,7 +135,7 @@ internal class VisualStudioInstallation : Installation
     {
         if (targetInfo.Platform.Group != PlatformGroup.Windows)
         {
-            AnsiConsole.MarkupLine("[red]Non-windows build target not supported.[/]");
+            Console.Error.WriteLine("Non-windows build target not supported.");
             throw TerminateException.User();
         }
 
@@ -149,7 +147,7 @@ internal class VisualStudioInstallation : Installation
     {
         if (targetInfo.Platform.Group != PlatformGroup.Windows)
         {
-            AnsiConsole.MarkupLine("[red]Non-windows build target not supported.[/]");
+            Console.Error.WriteLine("Non-windows build target not supported.");
             throw TerminateException.User();
         }
 
@@ -161,7 +159,7 @@ internal class VisualStudioInstallation : Installation
     {
         if (s_WindowsKitVersion == null)
         {
-            AnsiConsole.MarkupLine("[red]Non-windows build target not supported.[/]");
+            Console.Error.WriteLine("Non-windows build target not supported.");
             throw TerminateException.User();
         }
 
@@ -177,7 +175,7 @@ internal class VisualStudioInstallation : Installation
     {
         if (s_WindowsKitVersion == null)
         {
-            AnsiConsole.MarkupLine("[red]Non-windows build target not supported.[/]");
+            Console.Error.WriteLine("Non-windows build target not supported.");
             throw TerminateException.User();
         }
 

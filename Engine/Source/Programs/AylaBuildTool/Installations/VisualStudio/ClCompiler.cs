@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
-using Spectre.Console;
+﻿using System.Text;
 
 namespace AylaEngine;
 

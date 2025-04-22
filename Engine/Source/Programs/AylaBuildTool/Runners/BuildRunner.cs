@@ -1,9 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Spectre.Console;
-using static AylaEngine.CppCompiler;
-using static AylaEngine.Terminal;
+﻿using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
 
@@ -36,13 +31,13 @@ internal static partial class BuildRunner
             var targetProject = (ModuleProject?)solution.FindProject(options.Target);
             if (targetProject == null)
             {
-                AnsiConsole.MarkupLine("[red]Target '{0}' is not found in solution.[/]", options.Target);
+                Console.Error.WriteLine("Target '{0}' is not found in solution.", options.Target);
                 throw TerminateException.User();
             }
 
             if (targetProject is not ModuleProject mp)
             {
-                AnsiConsole.MarkupLine("[red]Target '{0}' is not module project. Non module project must be build with specified build program.[/]", options.Target);
+                Console.Error.WriteLine("Target '{0}' is not module project. Non module project must be build with specified build program.", options.Target);
                 throw TerminateException.User();
             }
 
@@ -175,42 +170,9 @@ internal static partial class BuildRunner
             _ => 6
         };
 
-        if (ConsoleEnvironment.IsDynamic)
-        {
-            await AnsiConsole.Progress()
-                .Columns([new SpinnerColumn(), new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn()])
-                .StartAsync(async ctx =>
-                {
-                    Dictionary<GroupDescriptor, ProgressTask> compilationTasks = [];
-
-                    foreach (var result in moduleTasks.GroupBy(p => p.Group))
-                    {
-                        var task = ctx.AddTask($"Compile {result.Key.Name}", maxValue: result.Sum(p => p.NeedCompileTasks.Length + 1));
-                        compilationTasks.Add(result.Key, task);
-                    }
-
-                    DispatchCompileWorkers(PulseCounter);
-                    DispatchLinkWorkers(PulseCounter);
-
-                    await Task.WhenAll(moduleTasks.Select(p => p.Task));
-                    return;
-
-                    void PulseCounter(ITask task)
-                    {
-                        lock (compilationTasks)
-                        {
-                            compilationTasks[task.Group].Increment(1);
-                            ctx.Refresh();
-                        }
-                    }
-                });
-        }
-        else
-        {
-            DispatchCompileWorkers(null);
-            DispatchLinkWorkers(null);
-            await Task.WhenAll(moduleTasks.Select(p => p.Task));
-        }
+        DispatchCompileWorkers();
+        DispatchLinkWorkers();
+        await Task.WhenAll(moduleTasks.Select(p => p.Task));
 
         return;
 
@@ -242,16 +204,7 @@ internal static partial class BuildRunner
             if (results.Any(p => p.ErrorText != null))
             {
                 var errorMessages = results.Where(p => p.ErrorText != null).Select(p => p.ErrorText);
-
-                if (ConsoleEnvironment.IsDynamic)
-                {
-                    AnsiConsole.MarkupLine("[red]{0}[/]", string.Join('\n', errorMessages).EscapeMarkup());
-                }
-                else
-                {
-                    Console.WriteLine(string.Join('\n', errorMessages));
-                }
-
+                Console.Error.WriteLine(string.Join('\n', errorMessages));
                 throw TerminateException.User();
             }
 
@@ -393,14 +346,7 @@ internal static partial class BuildRunner
                         Directory.CreateDirectory(outputPath);
                         var compiler = new DotNETCompiler();
                         var outputDll = await compiler.CompileAsync(projectFile, project.Group, buildTarget, cancellationToken);
-                        if (ConsoleEnvironment.IsDynamic)
-                        {
-                            AnsiConsole.MarkupLine("[green]{0} -> {1}[/]", projectFile.EscapeMarkup(), outputDll.EscapeMarkup());
-                        }
-                        else
-                        {
-                            Console.WriteLine("{0} -> {1}.", projectFile, outputDll);
-                        }
+                        Console.WriteLine("{0} -> {1}.", projectFile, outputDll);
 
                         if (rule.EnableScript)
                         {
@@ -427,7 +373,7 @@ internal static partial class BuildRunner
             Console.WriteLine("Reflection header files has been generated.");
         }
 
-        void DispatchLinkWorkers(Action<ITask>? pulse)
+        void DispatchLinkWorkers()
         {
             foreach (var moduleTask in moduleTasks)
             {
@@ -435,36 +381,8 @@ internal static partial class BuildRunner
                 {
                     moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                     {
-                        try
-                        {
-                            var output = r.Result;
-                            if (ConsoleEnvironment.IsDynamic)
-                            {
-                                lock (moduleTasks)
-                                {
-                                    for (int i = 0; i < output.Logs.Length; i++)
-                                    {
-                                        Terminal.Log log = output.Logs[i];
-                                        if (i == 0)
-                                        {
-                                            AnsiConsole.MarkupLine("{0} {1}", MakeOutputPrefix().EscapeMarkup(), Terminal.SimpleMarkupOutputLine(log.Value));
-                                        }
-                                        else
-                                        {
-                                            AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
-                            }
-                        }
-                        finally
-                        {
-                            pulse?.Invoke(moduleTask);
-                        }
+                        var output = r.Result;
+                        Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
                     });
                 }
                 else
@@ -474,43 +392,23 @@ internal static partial class BuildRunner
             }
         }
 
-        void DispatchCompileWorkers(Action<ITask>? pulse)
+        void DispatchCompileWorkers()
         {
             var allCompiles = moduleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
             foreach (var compileTask in allCompiles)
             {
                 compileTask.CompileAsync(installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
-                    try
+                    var output = r.Result;
+                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(), compileTask.Item.SourceCode.FilePath);
+
+                    string[] outputs = new string[output.Logs.Length];
+                    outputs[0] = fileText;
+                    for (int i = 1; i < output.Logs.Length; ++i)
                     {
-                        var output = r.Result;
-                        string fileText = string.Format("{0} {1}", MakeOutputPrefix(), compileTask.Item.SourceCode.FilePath);
-                        if (ConsoleEnvironment.IsDynamic)
-                        {
-                            lock (moduleTasks)
-                            {
-                                AnsiConsole.WriteLine(fileText);
-                                foreach (var log in output.Logs.Skip(1))
-                                {
-                                    AnsiConsole.MarkupLine(Terminal.SimpleMarkupOutputLine(log.Value));
-                                }
-                            }
-                        }
-                        else
-                        {
-                            string[] outputs = new string[output.Logs.Length];
-                            outputs[0] = fileText;
-                            for (int i = 1; i < output.Logs.Length; ++i)
-                            {
-                                outputs[i] = output.Logs[i].Value;
-                            }
-                            Console.WriteLine(string.Join('\n', outputs));
-                        }
+                        outputs[i] = output.Logs[i].Value;
                     }
-                    finally
-                    {
-                        pulse?.Invoke(compileTask);
-                    }
+                    Console.WriteLine(string.Join('\n', outputs));
                 });
             }
         }
