@@ -316,38 +316,6 @@ internal static class VSCppProjectGenerator
                 });
                 AppendFormatLine("""</ItemGroup>""");
 
-                foreach (var buildTarget in TargetInfo.GetAllTargets())
-                {
-                    // Visual Studio only support Windows platform.
-                    if (buildTarget.Platform.Group != PlatformGroup.Windows)
-                    {
-                        continue;
-                    }
-
-                    var configName = VSUtility.GetConfigName(buildTarget);
-                    var archName = VSUtility.GetArchitectureName(buildTarget);
-                    var resolver = project.GetResolver(buildTarget);
-                    var depends = solution.FindDepends(resolver.DependencyModuleNames);
-                    foreach (var depend in depends.OfType<ModuleProject>())
-                    {
-                        var rules = depend.GetRule(buildTarget);
-                        if (rules.EnableScript)
-                        {
-                            AppendFormatLine("""<ItemGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
-                            Indent(() =>
-                            {
-                                AppendFormatLine("""<ProjectReference Include="{0}">""", depend.GetScriptProjectName());
-                                Indent(() =>
-                                {
-                                    AppendFormatLine("""<Project>{0}</Project>""", depend.Decl.ScriptGuid.ToString("B").ToUpper());
-                                });
-                                AppendFormatLine("""</ProjectReference>""");
-                            });
-                            AppendFormatLine("""</ItemGroup>""");
-                        }
-                    }
-                }
-
                 AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />""");
                 AppendFormatLine("""<ImportGroup Label="ExtensionTargets">""");
                 AppendFormatLine("""</ImportGroup>""");

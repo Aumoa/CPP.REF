@@ -34,7 +34,7 @@ internal static class FolderPolicy
 
     public static string OutputFileName(this GroupDescriptor descriptor, ITargetInfo targetInfo, string projectName, ModuleType moduleType, PathType pathType)
     {
-        var result = Path.Combine(descriptor.BinariesDirectory, targetInfo.Platform.Name, targetInfo.Config.ToString() + (targetInfo.Editor ? "-Editor" : string.Empty), OutputFileName(projectName, moduleType));
+        var result = Path.Combine(Output(descriptor, targetInfo, pathType), OutputFileName(projectName, moduleType));
         return PathPolicy(result, pathType);
     }
 
