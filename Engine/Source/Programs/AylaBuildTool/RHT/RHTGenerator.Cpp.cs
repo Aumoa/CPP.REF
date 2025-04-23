@@ -43,7 +43,7 @@ internal partial class RHTGenerator
             {
                 var lineNumber = aclass.LineNumber;
 
-                string @namespace = aclass.Class.Namespace;
+                string @namespace = aclass.Class.NamespaceCpp;
                 string @class = aclass.Class.Name;
 
                 sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {@class});\n";

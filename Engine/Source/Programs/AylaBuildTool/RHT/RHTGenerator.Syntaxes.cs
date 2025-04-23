@@ -163,7 +163,25 @@ internal partial class RHTGenerator
 
         public override char? EscapeBracket => m_EscapeBracket;
 
-        public string Namespace => string.Join("::", m_Namespaces.Select(p => p.Name));
+        public string NamespaceCpp => string.Join("::", m_Namespaces.Select(p => p.Name));
+
+        public string NamespaceCSharp => string.Join('.', m_Namespaces.Select(p => p.Name));
+
+        public string FullNameCSharp
+        {
+            get
+            {
+                var @namespace = NamespaceCSharp;
+                if (string.IsNullOrEmpty(@namespace))
+                {
+                    return "global::" + Name;
+                }
+                else
+                {
+                    return "global::" + string.Join('.', NamespaceCSharp, Name);
+                }
+            }
+        }
 
         public static bool TryAccept(Context context, List<Syntax> bracketStack, [NotNullWhen(true)] out Class? @class)
         {

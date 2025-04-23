@@ -26,7 +26,7 @@ internal partial class RHTGenerator
                 // If a namespace is specified along with the class declaration, the explicit namespace is prioritized.
                 if (typeName.Namespace != null)
                 {
-                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.Namespace == typeName.Namespace);
+                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.NamespaceCpp == typeName.Namespace);
                     if (match.a != null)
                     {
                         generator = match.a;
@@ -37,7 +37,7 @@ internal partial class RHTGenerator
                 else
                 {
                     // Otherwise, it is initially assumed to be the same as the current class's namespace.
-                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.Namespace == current.Class.Namespace);
+                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.NamespaceCpp == current.Class.NamespaceCpp);
                     if (match.a != null)
                     {
                         generator = match.a;
@@ -46,7 +46,7 @@ internal partial class RHTGenerator
                     }
 
                     // Finally, it is assumed to be the engine namespace(Ayla).
-                    match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.Namespace == "Ayla");
+                    match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.NamespaceCpp == "Ayla");
                     if (match.a != null)
                     {
                         generator = match.a;

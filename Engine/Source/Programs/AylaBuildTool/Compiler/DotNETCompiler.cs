@@ -133,6 +133,7 @@ internal class DotNETCompiler
             foreach (var referenceBase in csproj.ItemGroup.References ?? [])
             {
                 referencedAssemblies.Add(referenceBase.ReferencedAssemblyPath(csproj.ItemGroup.Condition, sourceDirectory));
+                Console.WriteLine(referenceBase.ReferencedAssemblyPath(csproj.ItemGroup.Condition, sourceDirectory));
             }
 
             var outputDir = group.Output(targetInfo, FolderPolicy.PathType.Current);
@@ -144,7 +145,7 @@ internal class DotNETCompiler
         }
         catch (CSCompilerError error)
         {
-            Console.Error.WriteLine("{0}: {1}", assemblyName, error.Message);
+            Console.Error.WriteLine("{0}\n{1}", assemblyName, error.Message);
             throw TerminateException.User();
         }
         catch (Exception error)

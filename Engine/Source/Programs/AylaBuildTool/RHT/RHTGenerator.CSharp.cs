@@ -4,7 +4,7 @@ namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
-    public string GenerateBindings()
+    public string GenerateBindings(Collection collection)
     {
         string sourceCodeText = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
@@ -19,17 +19,16 @@ using System.Runtime.InteropServices;
         {
             if (syntax is AClass aclass)
             {
-                string @namespace = aclass.Class.Namespace;
+                string @namespace = aclass.Class.NamespaceCpp;
                 string @class = aclass.Class.Name;
-                string inherit;
-                if (string.IsNullOrEmpty(aclass.Class.BaseClass) == false)
+
+                if (collection.FindMatch(TypeName.FromInherit(aclass.Context, aclass.Class.BaseClass), aclass, out _, out var baseClass) == false)
                 {
-                    inherit = $" : {aclass.Class.BaseClass}";
+                    var context = aclass.Context;
+                    throw new ParsingErrorException(context.FilePath, context.LineNumber, context.ColumnNumber, $"The requested class \"{aclass.Class.BaseClass}\"'s defining header file could not be found in the Reflection header file list.");
                 }
-                else
-                {
-                    inherit = " : global::System.IDisposable";
-                }
+
+                string inherit = $" : {baseClass.Class.FullNameCSharp}";
 
                 sourceCodeText += $"namespace {@namespace}\n";
                 sourceCodeText += "{\n";

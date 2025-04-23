@@ -46,9 +46,9 @@ internal partial class RHTGenerator
                 return "::" + Namespace + "::" + Cpp;
             }
             // Otherwise, it is initially assumed to be the same as the current class's namespace.
-            else if (fromClass.Class.Namespace != "Ayla")
+            else if (fromClass.Class.NamespaceCpp != "Ayla")
             {
-                return "::" + fromClass.Class.Namespace + "::" + Cpp;
+                return "::" + fromClass.Class.NamespaceCpp + "::" + Cpp;
             }
             // Finally, it is assumed to be the engine namespace(Ayla).
             else
@@ -65,9 +65,9 @@ internal partial class RHTGenerator
                 return "global::" + Namespace + "." + Cpp;
             }
             // Otherwise, it is initially assumed to be the same as the current class's namespace.
-            else if (fromClass.Class.Namespace != "Ayla")
+            else if (fromClass.Class.NamespaceCpp != "Ayla")
             {
-                return "global::" + fromClass.Class.Namespace + "." + Cpp;
+                return "global::" + fromClass.Class.NamespaceCpp + "." + Cpp;
             }
             // Finally, it is assumed to be the engine namespace(Ayla).
             else
@@ -102,6 +102,19 @@ internal partial class RHTGenerator
 
         public string Injected
             => ByRef ? "nint" : CSharp;
+
+        public static TypeName FromInherit(Context context, string typeName)
+        {
+            var scope = typeName.Split("::", StringSplitOptions.RemoveEmptyEntries);
+            if (scope.Length == 1)
+            {
+                return new TypeName(scope[0], scope[0], null, true);
+            }
+            else
+            {
+                return new TypeName(scope[0], scope[1], null, true);
+            }
+        }
 
         public static TypeName FromNative(Context context, string typeName)
         {

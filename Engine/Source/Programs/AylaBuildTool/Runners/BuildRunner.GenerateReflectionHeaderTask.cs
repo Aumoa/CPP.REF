@@ -62,7 +62,7 @@ internal static partial class BuildRunner
 
             if (Project.GetRule(targetInfo).DisableGenerateBindings == false)
             {
-                var bindingCodeText = Generator.GenerateBindings().Replace("\r\n", "\n").Trim();
+                var bindingCodeText = Generator.GenerateBindings(collection).Replace("\r\n", "\n").Trim();
                 await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
 
                 GeneratedBindingCode = generatedBindingCode;
