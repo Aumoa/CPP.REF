@@ -7,15 +7,15 @@
 
 namespace Ayla
 {
-	template<size_t N = 0>
+	template<class T, size_t N = 0>
 	struct Line
 	{
-		Vector<float, N> Start;
-		Vector<float, N> End;
+		Vector<T, N> Start;
+		Vector<T, N> End;
 
 	public:
-		using Type = float;
-		using VectorType = Vector<float, N>;
+		using Type = T;
+		using VectorType = Vector<T, N>;
 
 		constexpr Line(const VectorType& S = VectorType{}) : Start(S), End(S)
 		{
@@ -46,7 +46,7 @@ namespace Ayla
 			return I == 0 ? Start : End;
 		}
 
-		template<TIsMatrix<float, 2, N> IMatrix>
+		template<TIsMatrix<T, 2, N> IMatrix>
 		constexpr Line& operator =(const IMatrix& M)
 		{
 			Start = M[0];
@@ -56,11 +56,11 @@ namespace Ayla
 
 		static constexpr Line Identity()
 		{
-			Line R(0.0f);
-			R[0][0] = 1.0f;
+			Line R(0.0);
+			R[0][0] = 1.0;
 			if constexpr (N > 1)
 			{
-				R[1][1] = 1.0f;
+				R[1][1] = 1.0;
 			}
 			return R;
 		}
@@ -76,7 +76,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsMatrixTyped<float> IMatrix>
+		template<TIsMatrixTyped<T> IMatrix>
 		constexpr Line(const IMatrix& M) requires (IMatrix::Row() >= 2)
 			: Start(M[0]), End(M[1])
 		{
@@ -91,10 +91,10 @@ namespace Ayla
 	};
 
 	template<class TLine>
-	concept TIsLine = TIsMatrixTyped<TLine, float> && (TLine::Row() >= 2);
+	concept TIsLine = TIsMatrixTyped<TLine, typename TLine::Type> && (TLine::Row() >= 2);
 
 	template<>
-	struct Line<0>
+	struct Line<void, 0>
 	{
 		template<TIsLine IMatrix>
 		static String ToString(const IMatrix& M, String FormatArgs = TEXT(""))
@@ -102,8 +102,8 @@ namespace Ayla
 			return String::Format(L"Start: {}, End: {}", Vector<>::ToString(M[0], FormatArgs), Vector<>::ToString(M[1], FormatArgs));
 		}
 
-		template<TIsLine IMatrix>
-		static constexpr auto GetPoint(const IMatrix& L, float D)
+		template<TIsLine IMatrix, class T>
+		static constexpr auto GetPoint(const IMatrix& L, T D)
 		{
 			return L[0] + GetVector(L) * D;
 		}
@@ -114,4 +114,9 @@ namespace Ayla
 			return L[1] - L[0];
 		}
 	};
+
+	using Line2F = Line<float, 2>;
+	using Line2D = Line<double, 2>;
+	using Line3F = Line<float, 3>;
+	using Line3D = Line<double, 3>;
 }

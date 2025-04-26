@@ -8,17 +8,18 @@
 
 namespace Ayla
 {
+    template<class T>
     struct Transform
     {
-        Translate3D Translation;
-        Scale3D Scale = Scale3D(1.0f);
-        Quaternion Rotation = Quaternion::Identity();
+        Translate3D<T> Translation;
+        Scale3D<T> Scale = Scale3D<T>(1.0);
+        Quaternion<T> Rotation = Quaternion<T>::Identity();
 
         constexpr Transform()
         {
         }
 
-        constexpr Transform(const Translate3D& T, const Scale3D& S, const Quaternion& Q)
+        constexpr Transform(const Translate3D<T>& T, const Scale3D<T>& S, const Quaternion<T>& Q)
             : Translation(T)
             , Scale(S)
             , Rotation(Q)
@@ -85,7 +86,7 @@ namespace Ayla
 
         static constexpr Transform Identity()
         {
-            return Transform(Translate3D::Identity(), Scale3D::Identity(), Quaternion::Identity());
+            return Transform(Translate3D<T>::Identity(), Scale3D<T>::Identity(), Quaternion<T>::Identity());
         }
 
         template<TIsVector<float, 3> IVector>
@@ -118,8 +119,8 @@ namespace Ayla
     public:
         static constexpr Transform GetRelativeTransform(const Transform& LT, const Transform& RT)
         {
-            Scale3D RS = RT.Scale.Inverse();
-            Quaternion InvR = RT.Rotation.Inverse();
+            Scale3D<T> RS = RT.Scale.Inverse();
+            Quaternion<T> InvR = RT.Rotation.Inverse();
 
             return Transform
             {

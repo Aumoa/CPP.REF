@@ -12,9 +12,10 @@ namespace Ayla
 	/// <summary>
 	/// Represents the degrees value.
 	/// </summary>
+	template<std::floating_point T>
 	struct Degrees
 	{
-		float Value = 0;
+		T Value = T{};
 
 		/// <summary>
 		/// Initialize new <see cref="Degrees"/> instance.
@@ -26,8 +27,17 @@ namespace Ayla
 		/// <summary>
 		/// Initialize new <see cref="Degrees"/> instance.
 		/// </summary>
+		inline constexpr Degrees(const Degrees& rhs)
+			: Value(rhs.Value)
+		{
+		}
+
+		/// <summary>
+		/// Initialize new <see cref="Degrees"/> instance.
+		/// </summary>
 		/// <param name="Value"> The initial value. </param>
-		inline constexpr Degrees(float Value) : Value(Value)
+		inline constexpr Degrees(const T& Value)
+			: Value(Value)
 		{
 		}
 
@@ -46,19 +56,13 @@ namespace Ayla
 		/// <param name="Rhs"> The target degrees. </param>
 		/// <param name="Epsilon"> The epsilon value. If different of two components is lower than this values, is nearly equals. </param>
 		/// <returns> Indicate two degrees is nearly equals. </returns>
-		inline constexpr bool NearlyEquals(const Degrees& Rhs, float Epsilon) const
-		{
-			return Math::Abs(Value - Rhs.Value) <= Epsilon;
-		}
+		inline constexpr bool NearlyEquals(const Degrees& Rhs, const T& Epsilon) const;
 
 		/// <summary>
 		/// Get clamped angle.
 		/// </summary>
 		/// <returns> The clamped value. </returns>
-		inline constexpr Degrees GetClamped() const
-		{
-			return Math::Mod(Value, AngleMax);
-		}
+		inline constexpr Degrees GetClamped() const;
 
 		/// <summary>
 		/// Get normalized angle.
@@ -81,10 +85,7 @@ namespace Ayla
 		/// Convert degrees to radians.
 		/// </summary>
 		/// <returns> The degrees value. </returns>
-		inline constexpr Radians ToRadians() const
-		{
-			return Radians(Value * PI180);
-		}
+		inline constexpr Radians<T> ToRadians() const;
 
 		inline constexpr bool operator ==(const Degrees& Rhs) const
 		{
@@ -172,13 +173,11 @@ namespace Ayla
 		}
 
 	private:
-		static constexpr float AngleHalf = 180.0f;
-		static constexpr float AngleMax = AngleHalf * 2.0f;
-		static constexpr float PI180 = std::numbers::pi_v<float> / 180.0f;
+		static constexpr T AngleHalf = 180.0f;
+		static constexpr T AngleMax = AngleHalf * 2.0f;
+		static constexpr T PI180 = std::numbers::pi_v<T> / 180.0f;
 	};
 
-	inline constexpr Degrees Radians::ToDegrees() const
-	{
-		return Value * _180PI;
-	}
+	using DegreesF = Degrees<float>;
+	using DegreesD = Degrees<double>;
 }

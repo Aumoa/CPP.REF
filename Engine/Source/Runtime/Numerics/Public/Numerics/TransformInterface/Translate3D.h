@@ -7,13 +7,14 @@
 
 namespace Ayla
 {
+	template<class T>
 	struct Translate3D
 	{
-		float X;
-		float Y;
-		float Z;
+		T X;
+		T Y;
+		T Z;
 
-		constexpr Translate3D(float X, float Y, float Z) : X(X), Y(Y), Z(Z)
+		constexpr Translate3D(T X, T Y, T Z) : X(X), Y(Y), Z(Z)
 		{
 		}
 
@@ -21,7 +22,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> IVector>
 		constexpr Translate3D(const IVector& V) : X(V[0]), Y(V[1]), Z(V[2])
 		{
 		}
@@ -35,9 +36,9 @@ namespace Ayla
 		}
 
 	public:
-		using Type = float;
+		using Type = T;
 
-		constexpr Translate3D(float Uniform = 0) : X(Uniform), Y(Uniform), Z(Uniform)
+		constexpr Translate3D(T Uniform = 0) : X(Uniform), Y(Uniform), Z(Uniform)
 		{
 		}
 
@@ -51,7 +52,7 @@ namespace Ayla
 			return Translate3D(-X, -Y, -Z);
 		}
 
-		constexpr const float& operator [](size_t N) const
+		constexpr const T& operator [](size_t N) const
 		{
 			switch (N)
 			{
@@ -65,7 +66,7 @@ namespace Ayla
 			}
 		}
 
-		constexpr float& operator [](size_t N)
+		constexpr T& operator [](size_t N)
 		{
 			switch (N)
 			{
@@ -79,7 +80,7 @@ namespace Ayla
 			}
 		}
 
-		template<TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> IVector>
 		constexpr Translate3D& operator =(const IVector& V)
 		{
 			X = V[0];
@@ -89,7 +90,7 @@ namespace Ayla
 		}
 
 	public:
-		template<TIsVector<float, 3> ITranslate>
+		template<TIsVector<T, 3> ITranslate>
 		static constexpr Translate3D Inverse(const ITranslate& T)
 		{
 			return -T;
@@ -100,13 +101,13 @@ namespace Ayla
 			return Inverse(*this);
 		}
 
-		template<TIsVector<float, 3> ITranslateL, TIsVector<float, 3> ITranslateR>
+		template<TIsVector<T, 3> ITranslateL, TIsVector<T, 3> ITranslateR>
 		static constexpr Translate3D Concatenate(const ITranslateL& TL, const ITranslateR& TR)
 		{
 			return TL + TR;
 		}
 
-		template<TIsVector<float, 3> ITranslate>
+		template<TIsVector<T, 3> ITranslate>
 		constexpr Translate3D Concatenate(const ITranslate& T) const
 		{
 			return Concatenate(*this, T);
@@ -117,25 +118,25 @@ namespace Ayla
 			return Translate3D(0);
 		}
 
-		template<TIsVector<float, 3> ITranslate, TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> ITranslate, TIsVector<T, 3> IVector>
 		constexpr static IVector TransformPoint(const ITranslate& T, const IVector& P)
 		{
 			return P + T;
 		}
 
-		template<TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> IVector>
 		constexpr IVector TransformPoint(const IVector& P) const
 		{
 			return TransformPoint(*this, P);
 		}
 
-		template<TIsVector<float, 3> ITranslate, TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> ITranslate, TIsVector<T, 3> IVector>
 		constexpr static IVector TransformVector(const ITranslate& T, const IVector& V)
 		{
 			return V;
 		}
 
-		template<TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> IVector>
 		constexpr IVector TransformVector(const IVector& V) const
 		{
 			return TransformVector(*this, V);
@@ -147,9 +148,12 @@ namespace Ayla
 			return Vector<>::ToString(*this);
 		}
 
-		constexpr bool NearlyEquals(const Translate3D& T, float Epsilon) const
+		constexpr bool NearlyEquals(const Translate3D& t, const T& Epsilon) const
 		{
-			return Vector<>::NearlyEquals(*this, T, Epsilon);
+			return Vector<>::NearlyEquals(*this, t, Epsilon);
 		}
 	};
+
+	using Translate3DF = Translate3D<float>;
+	using Translate3DD = Translate3D<double>;
 }

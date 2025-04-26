@@ -11,6 +11,7 @@
 
 namespace Ayla
 {
+	template<std::floating_point T>
 	struct Radians;
 
 	/// <summary>
@@ -26,42 +27,48 @@ namespace Ayla
 		/// </summary>
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static float Sin(const Radians& x);
+		template<std::floating_point T>
+		inline static T Sin(const Radians<T>& x);
 
 		/// <summary>
 		/// Get cosine value.
 		/// </summary>
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static float Cos(const Radians& x);
+		template<std::floating_point T>
+		inline static T Cos(const Radians<T>& x);
 
 		/// <summary>
 		/// Get tangent value.
 		/// </summary>
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static float Tan(const Radians& x);
+		template<std::floating_point T>
+		inline static T Tan(const Radians<T>& x);
 
 		/// <summary>
 		/// Get arc sine value.
 		/// </summary>
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static Radians Asin(float x);
+		template<std::floating_point T>
+		inline static Radians<T> Asin(const T& x);
 
 		/// <summary>
 		/// Get arc cosine value.
 		/// </summary>
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static Radians Acos(float x);
+		template<std::floating_point T>
+		inline static Radians<T> Acos(const T& x);
 
 		/// <summary>
 		/// Get arc tangent value.
 		/// </summary>
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static float Atan(float x);
+		template<std::floating_point T>
+		inline static T Atan(const T& x);
 
 		/// <summary>
 		/// Get principal value of arc tangent of y/x.
@@ -69,15 +76,17 @@ namespace Ayla
 		/// <param name="y"> The argument value. </param>
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static float Atan2(float y, float x);
+		template<std::floating_point T>
+		inline static T Atan2(const T& y, const T& x);
 
 		/// <summary>
 		/// Get sine and cosine values.
 		/// </summary>
 		/// <param name="y"> The argument value. </param>
 		/// <param name="osin"> The return parameter of sine value. </param>
-		/// <param name="ocos"> The return parameter of cosine value.  </param>
-		static void SinCos(const Radians& x, float& osin, float& ocos);
+		/// <param name="ocos"> The return parameter of cosine value. </param>
+		template<std::floating_point T>
+		static constexpr void SinCos(const Radians<T>& x, T& osin, T& ocos);
 
 		/// <summary>
 		/// Get absolute value.
@@ -85,7 +94,7 @@ namespace Ayla
 		/// <param name="x"> The argument value. </param>
 		/// <returns> The computed value. </returns>
 		template<class T>
-		static inline constexpr T Abs(const T& lhs)
+		inline static constexpr T Abs(const T& lhs)
 		{
 			return lhs < (T)0 ? -lhs : lhs;
 		}
@@ -93,9 +102,59 @@ namespace Ayla
 		/// <summary>
 		/// Get squared root value.
 		/// </summary>
-		/// <param name="x"> The argument value. </param>
+		/// <param name="value"> The argument value. </param>
 		/// <returns> The computed value. </returns>
-		static float Sqrt(float x);
+		template<std::floating_point T>
+		inline static constexpr T Sqrt(const T& value, const T& guess = (T)1)
+		{
+			if constexpr (std::is_constant_evaluated())
+			{
+				return (guess * guess - value) < 1e-10 && (value - guess * guess) < 1e-10
+					? guess
+					: Sqrt(value, (guess + value / guess) / 2.0);
+
+			}
+			else
+			{
+				return sqrt(value);
+			}
+		}
+
+		/// <summary>
+		//  Returns an estimate of the reciprocal square root of a specified number.
+		/// </summary>
+		/// <param name="x"> The number whose reciprocal square root is to be estimated. </param>
+		/// <returns> An estimate of the reciprocal square root x. </returns>
+		template<std::floating_point T>
+		inline static constexpr T ReciprocalSqrtEstimate(const T& x)
+		{
+			if constexpr (std::same_as<T, float>)
+			{
+				union SingleToInt32
+				{
+					float v1;
+					int32 v2;
+				};
+
+				int32 i = 0x5F3759DF - (SingleToInt32{ .v1 = x }.v2 >> 1);
+				float ret = SingleToInt32{ .v2 = i }.v1;
+				ret *= 1.5f - (x * 0.5f * ret * ret);
+				return ret;
+			}
+			else
+			{
+				union DoubleToInt64
+				{
+					double v1;
+					int64 v2;
+				};
+
+				int64 i = 0x5FE6EB50C7B537A9 - (DoubleToInt64{ .v1 = x }.v2 >> 1);
+				double ret = DoubleToInt64{ .v2 = i }.v1;
+				ret *= 1.5 - (x * 0.5 * ret * ret);
+				return (T)ret;
+			}
+		}
 
 		/// <summary>
 		/// Get mod value.
@@ -105,7 +164,7 @@ namespace Ayla
 		/// <param name="divisor"> The divisor. </param>
 		/// <returns> The computed value. </returns>
 		template<std::floating_point T>
-		static inline constexpr T Mod(const T& x, const T& divisor)
+		inline static constexpr T Mod(const T& x, const T& divisor)
 		{
 			T exp = x / divisor;
 			int64 exp_n = (int64)exp;
@@ -121,20 +180,13 @@ namespace Ayla
 		/// <param name="divisor"> The divisor. </param>
 		/// <returns> The computed value. </returns>
 		template<class T>
-		static inline constexpr T Mod(const T& x, const T& divisor) requires requires
+		inline static constexpr T Mod(const T& x, const T& divisor) requires requires
 		{
 			{ x% divisor };
 		}
 		{
 			return x % divisor;
 		}
-
-		/// <summary>
-		/// Get inverted squared root value equals to 1.0 / Sqrt(x).
-		/// </summary>
-		/// <param name="x"> The argument value. </param>
-		/// <returns> The computed value. </returns>
-		static float InvSqrt(float x);
 
 		template<class TL, class TR>
 		static FORCEINLINE constexpr auto Min(const TL& Lhs, const TR& Rhs) noexcept
@@ -149,7 +201,7 @@ namespace Ayla
 		}
 
 		template<class TL, class TR, class... T>
-		static inline constexpr auto Min(const TL& Lhs, const TR& Rhs, const T&... Values)
+		inline static constexpr auto Min(const TL& Lhs, const TR& Rhs, const T&... Values)
 		{
 			if constexpr (sizeof...(T) > 0)
 			{
@@ -162,7 +214,7 @@ namespace Ayla
 		}
 
 		template<class TL, class TR, class... T>
-		static inline constexpr auto Max(const TL& Lhs, const TR& Rhs, const T&... Values)
+		inline static constexpr auto Max(const TL& Lhs, const TR& Rhs, const T&... Values)
 		{
 			if constexpr (sizeof...(T) > 0)
 			{
@@ -178,32 +230,67 @@ namespace Ayla
 		/// Clamp value between lhs and rhs.
 		/// </summary>
 		template<class T>
-		static inline constexpr T Clamp(const T& value, const T& lhs, const T& rhs)
+		inline static constexpr T Clamp(const T& value, const T& lhs, const T& rhs)
 		{
 			return Max(Min(value, rhs), lhs);
 		}
 
-		static inline constexpr bool IsWithinInclusive(float v, float minv, float maxv)
+		/// <summary>
+		/// Determines whether a given floating-point value is within a specified inclusive range.
+		/// </summary>
+		/// <typeparam name="T">
+		/// A floating-point type, such as float or double, used for comparison.
+		/// </typeparam>
+		/// <param name="v">
+		/// The value to check if it falls within the range.
+		/// </param>
+		/// <param name="minv">
+		/// The minimum value of the range, inclusive.
+		/// </param>
+		/// <param name="maxv">
+		/// The maximum value of the range, inclusive.
+		/// </param>
+		/// <returns>
+		/// Returns <c>true</c> if the value <paramref name="v"/> is greater than or equal to <paramref name="minv"/>
+		/// and less than or equal to <paramref name="maxv"/>. Otherwise, returns <c>false</c>.
+		/// </returns>
+		template<std::floating_point T>
+		inline static constexpr bool IsWithinInclusive(T v, T minv, T maxv)
 		{
 			return v >= minv && v <= maxv;
 		}
 
-		static constexpr float Round(float v)
+		/// <summary>
+		/// Rounds a given floating-point value to the nearest integer value.
+		/// </summary>
+		/// <typeparam name="T">
+		/// A floating-point type, such as float or double, used for the rounding operation.
+		/// </typeparam>
+		/// <param name="v">
+		/// The value to be rounded to the nearest integer.
+		/// </param>
+		/// <returns>
+		/// Returns the rounded value of the input <paramref name="v"/> as a floating-point number of type <typeparamref name="T"/>.
+		/// If the fractional part of <paramref name="v"/> is 0.5 or greater, it rounds up (away from zero). 
+		/// Otherwise, it rounds down (toward zero).
+		/// </returns>
+		template<std::floating_point T>
+		static constexpr T Round(const T& v)
 		{
-			if (v >= 0.0f)
+			if (v >= 0.0)
 			{
-				return (float)(int32)(v + 0.5f);
+				return (T)(int32)(v + 0.5);
 			}
 			else
 			{
-				return (float)(int32)(v - 0.5f);
+				return (T)(int32)(v - 0.5);
 			}
 		}
 
 		/// <summary>
 		/// Represents small number.
 		/// </summary>
-		static inline constexpr float SmallNumber = 0.0001f;
+		inline static constexpr float SmallNumber = 0.0001f;
 
 		template<EaseFunction Function>
 		static double EaseFunction(double t) requires (Function == EaseFunction::InSine)
@@ -494,9 +581,9 @@ namespace Ayla
 #undef EASE_CASE
 		}
 
-		static inline float Floor(float InValue) noexcept { return std::floor(InValue); }
-		static inline double Floor(double InValue) noexcept { return std::floor(InValue); }
-		static inline float Ceil(float InValue) noexcept { return std::ceil(InValue); }
-		static inline double Ceil(double InValue) noexcept { return std::ceil(InValue); }
+		inline static float Floor(float InValue) noexcept { return std::floor(InValue); }
+		inline static double Floor(double InValue) noexcept { return std::floor(InValue); }
+		inline static float Ceil(float InValue) noexcept { return std::ceil(InValue); }
+		inline static double Ceil(double InValue) noexcept { return std::ceil(InValue); }
 	};
 }

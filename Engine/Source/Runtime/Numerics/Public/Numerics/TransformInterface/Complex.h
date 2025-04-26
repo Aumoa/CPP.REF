@@ -8,13 +8,14 @@
 
 namespace Ayla
 {
+	template<class T>
 	struct Complex
 	{
-		float X;
-		float Y;
+		T X;
+		T Y;
 
 	public:
-		constexpr Complex(float X, float Y) : X(X), Y(Y)
+		constexpr Complex(T X, T Y) : X(X), Y(Y)
 		{
 		}
 
@@ -22,7 +23,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IVector>
 		constexpr Complex(const IVector& V) : X(V[0]), Y(V[1])
 		{
 		}
@@ -34,7 +35,7 @@ namespace Ayla
 			return *this;
 		}
 
-		template<TIsVector<float, 2> IComplex, TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IComplex, TIsVector<T, 2> IVector>
 		static constexpr IVector RotateVector(const IComplex& C, const IVector& V)
 		{
 			IVector R;
@@ -44,9 +45,9 @@ namespace Ayla
 		}
 
 	public:
-		using Type = float;
+		using Type = T;
 
-		constexpr Complex(float S = 0) : X(S), Y(S)
+		constexpr Complex(T S = 0) : X(S), Y(S)
 		{
 		}
 
@@ -60,7 +61,7 @@ namespace Ayla
 			return Complex(-X, -Y);
 		}
 
-		constexpr const float& operator [](size_t N) const
+		constexpr const T& operator [](size_t N) const
 		{
 			switch (N)
 			{
@@ -72,7 +73,7 @@ namespace Ayla
 			}
 		}
 
-		constexpr float& operator [](size_t N)
+		constexpr T& operator [](size_t N)
 		{
 			switch (N)
 			{
@@ -84,7 +85,7 @@ namespace Ayla
 			}
 		}
 
-		template<TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IVector>
 		constexpr Complex& operator =(const IVector& V)
 		{
 			X = V[0];
@@ -93,7 +94,7 @@ namespace Ayla
 		}
 
 	public:
-		template<TIsVector<float, 2> IComplex>
+		template<TIsVector<T, 2> IComplex>
 		static constexpr Complex Inverse(const IComplex& C)
 		{
 			return Complex(C[0], -C[1]);
@@ -104,13 +105,13 @@ namespace Ayla
 			return Inverse(*this);
 		}
 
-		template<TIsVector<float, 2> IComplexL, TIsVector<float, 2> IComplexR>
+		template<TIsVector<T, 2> IComplexL, TIsVector<T, 2> IComplexR>
 		static constexpr Complex Concatenate(const IComplexL& CL, const IComplexR& CR)
 		{
 			return TransformPoint(CL, CR);
 		}
 
-		template<TIsVector<float, 2> IComplex>
+		template<TIsVector<T, 2> IComplex>
 		constexpr Complex Concatenate(const IComplex& C) const
 		{
 			return Concatenate(*this, C);
@@ -118,28 +119,28 @@ namespace Ayla
 
 		static constexpr Complex Identity()
 		{
-			return Complex(1.0f, 0.0f);
+			return Complex(1.0, 0.0);
 		}
 
-		template<TIsVector<float, 2> IComplex, TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IComplex, TIsVector<T, 2> IVector>
 		static constexpr IVector TransformPoint(const IComplex& C, const IVector& V)
 		{
 			return RotateVector(C, V);
 		}
 
-		template<TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IVector>
 		constexpr IVector TransformPoint(const IVector& V) const
 		{
 			return TransformPoint(*this, V);
 		}
 
-		template<TIsVector<float, 2> IComplex, TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IComplex, TIsVector<T, 2> IVector>
 		static constexpr IVector TransformVector(const IComplex& C, const IVector& V)
 		{
 			return RotateVector(C, V);
 		}
 
-		template<TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IVector>
 		constexpr IVector TransformVector(const IVector& V) const
 		{
 			return TransformVector(*this, V);
@@ -151,12 +152,12 @@ namespace Ayla
 			return Vector<>::ToString(*this);
 		}
 
-		constexpr bool NearlyEquals(const Complex& C, float Epsilon) const
+		constexpr bool NearlyEquals(const Complex& C, T Epsilon) const
 		{
 			return Vector<>::NearlyEquals(*this, C, Epsilon);
 		}
 
-		template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, 2> IComplex>
+		template<TIsMatrix<T, 2, 2> IMatrix = Matrix3x2, TIsVector<T, 2> IComplex>
 		static constexpr IMatrix GetMatrix(const IComplex& C)
 		{
 			IMatrix M = IMatrix::Identity();
@@ -167,13 +168,13 @@ namespace Ayla
 			return M;
 		}
 
-		template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2>
+		template<TIsMatrix<T, 2, 2> IMatrix = Matrix3x2>
 		constexpr Matrix2x2 GetMatrix() const
 		{
 			return GetMatrix<IMatrix>(*this);
 		}
 
-		template<TIsVector<float, 2> IComplexL, TIsVector<float, 2> IComplexR>
+		template<TIsVector<T, 2> IComplexL, TIsVector<T, 2> IComplexR>
 		static constexpr Complex Multiply(const IComplexL& CL, const IComplexR& CR)
 		{
 			return Complex
@@ -183,19 +184,24 @@ namespace Ayla
 			};
 		}
 
-		template<TIsVector<float, 2> IComplex>
+		template<TIsVector<T, 2> IComplex>
 		constexpr Complex Multiply(const IComplex& C) const
 		{
 			return Multiply(*this, C);
 		}
 
-		static Complex Rotation(Radians R)
+		static Complex Rotation(Radians<T> R)
 		{
+			T sin, cos;
+			Math::SinCos(R, sin, cos);
 			return Complex
 			{
-				Math::Cos(R),
-				Math::Sin(R)
+				sin,
+				cos
 			};
 		}
 	};
+
+	using ComplexF = Complex<float>;
+	using ComplexD = Complex<double>;
 }

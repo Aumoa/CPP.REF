@@ -260,6 +260,19 @@ namespace Ayla
 			return R;
 		}
 
+		template<TIsMatrixBase IMatrixL, TIsMatrixBase IMatrixR, TIsMatrixBase... IMatrixRest>
+		static constexpr auto Multiply(const IMatrixL& ML, const IMatrixR& MR, const IMatrixRest&... MRest)
+		{
+			if constexpr (sizeof...(IMatrixRest) > 0)
+			{
+				return Multiply(Multiply(ML, MR), MRest...);
+			}
+			else
+			{
+				return Multiply(ML, MR);
+			}
+		}
+
 		template<TIsMatrixBase IMatrix, TIsVectorBase IVector>
 		static constexpr auto TransformVector(const IMatrix& M, const IVector& V) requires
 			std::same_as<typename IMatrix::Type, typename IVector::Type> &&
@@ -274,6 +287,27 @@ namespace Ayla
 				{
 					R[j] += M[i][j] * V[i];
 				}
+			}
+
+			return R;
+		}
+
+		template<TIsMatrixBase IMatrix, TIsVectorBase IVector>
+		static constexpr auto TransformPoint(const IMatrix& M, const IVector& V) requires
+			std::same_as<typename IMatrix::Type, typename IVector::Type> &&
+			(IMatrix::Row() == IVector::Size())
+		{
+			using T = typename IMatrix::Type;
+			Vector<T, IMatrix::Column()> R;
+
+			for (size_t j = 0; j < IMatrix::Column(); ++j)
+			{
+				for (size_t i = 0; i < IMatrix::Row(); ++i)
+				{
+					R[j] += M[i][j] * V[i];
+				}
+
+				R[j] += M[j][IMatrix::Column() - 1];
 			}
 
 			return R;
@@ -311,7 +345,7 @@ namespace Ayla
 				float Result = 0;
 				for (size_t i = 0; i < IMatrix::Column(); ++i)
 				{
-					float Mul = (i % 2) == 0 ? +1.0f : -1.0f;
+					float Mul = (i % 2) == 0 ? +1.0 : -1.0;
 					Result += Mul * M[0][i] * Determinant(Minor(M, 0, i));
 				}
 				return Result;
@@ -321,12 +355,12 @@ namespace Ayla
 		template<TIsMatrixBase IMatrix>
 		static constexpr auto Cofactor(const IMatrix& M)
 		{
-			Matrix<float, IMatrix::Row(), IMatrix::Column()> R(0.0f);
+			Matrix<float, IMatrix::Row(), IMatrix::Column()> R(0.0);
 			for (size_t i = 0; i < IMatrix::Row(); ++i)
 			{
 				for (size_t j = 0; j < IMatrix::Column(); ++j)
 				{
-					float Mul = ((i + j) % 2) == 0 ? +1.0f : -1.0f;
+					float Mul = ((i + j) % 2) == 0 ? +1.0 : -1.0;
 					R[i][j] = Mul * Determinant(Minor(M, i, j));
 				}
 			}
@@ -612,4 +646,10 @@ namespace Ayla
 	{
 		return Matrix<>::ToString(*this, formatArgs);
 	}
+
+	template<size_t NRow = 0, size_t NCol = 0>
+	using MatrixF = Matrix<float, NRow, NCol>;
+	
+	template<size_t NRow = 0, size_t NCol = 0>
+	using MatrixD = Matrix<double, NRow, NCol>;
 }

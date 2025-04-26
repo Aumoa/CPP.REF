@@ -7,15 +7,16 @@
 
 namespace Ayla
 {
+	template<class T>
 	struct Scale3D
 	{
 		using IsScale = int;
 
-		float X;
-		float Y;
-		float Z;
+		T X;
+		T Y;
+		T Z;
 
-		constexpr Scale3D(float X, float Y, float Z) : X(X), Y(Y), Z(Z)
+		constexpr Scale3D(T X, T Y, T Z) : X(X), Y(Y), Z(Z)
 		{
 		}
 
@@ -23,7 +24,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsVector<float, 3> IScale>
+		template<TIsVector<T, 3> IScale>
 		constexpr Scale3D(const IScale& S) : X(S[0]), Y(S[1]), Z(S[2])
 		{
 		}
@@ -37,9 +38,9 @@ namespace Ayla
 		}
 
 	public:
-		using Type = float;
+		using Type = T;
 
-		constexpr Scale3D(float Uniform = 0) : X(Uniform), Y(Uniform), Z(Uniform)
+		constexpr Scale3D(T Uniform = 0) : X(Uniform), Y(Uniform), Z(Uniform)
 		{
 		}
 
@@ -53,7 +54,7 @@ namespace Ayla
 			return Scale3D(-X, -Y, -Z);
 		}
 
-		constexpr const float& operator [](size_t N) const
+		constexpr const T& operator [](size_t N) const
 		{
 			switch (N)
 			{
@@ -67,7 +68,7 @@ namespace Ayla
 			}
 		}
 
-		constexpr float& operator [](size_t N)
+		constexpr T& operator [](size_t N)
 		{
 			switch (N)
 			{
@@ -81,7 +82,7 @@ namespace Ayla
 			}
 		}
 
-		template<TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> IVector>
 		constexpr Scale3D& operator =(const IVector& V)
 		{
 			X = V[0];
@@ -91,10 +92,10 @@ namespace Ayla
 		}
 
 	public:
-		template<TIsVector<float, 3> IScale>
+		template<TIsVector<T, 3> IScale>
 		static constexpr Scale3D Inverse(const IScale& S)
 		{
-			return 1.0f / S;
+			return 1.0 / S;
 		}
 
 		constexpr Scale3D Inverse() const
@@ -102,13 +103,13 @@ namespace Ayla
 			return Inverse(*this);
 		}
 
-		template<TIsVector<float, 3> IScaleL, TIsVector<float, 3> IScaleR>
+		template<TIsVector<T, 3> IScaleL, TIsVector<T, 3> IScaleR>
 		static constexpr Scale3D Concatenate(const IScaleL& SL, const IScaleR& SR)
 		{
 			return SL * SR;
 		}
 
-		template<TIsVector<float, 3> IScale>
+		template<TIsVector<T, 3> IScale>
 		constexpr Scale3D Concatenate(const IScale& S) const
 		{
 			return Concatenate(*this, S);
@@ -116,28 +117,28 @@ namespace Ayla
 
 		static constexpr Scale3D Identity()
 		{
-			return Scale3D(1.0f);
+			return Scale3D(1.0);
 		}
 
-		template<TIsVector<float, 3> IScale, TIsVector<float, 3> IPoint>
+		template<TIsVector<T, 3> IScale, TIsVector<T, 3> IPoint>
 		static constexpr IPoint TransformPoint(const IScale& S, const IPoint& P)
 		{
 			return S * P;
 		}
 
-		template<TIsVector<float, 3> IPoint>
+		template<TIsVector<T, 3> IPoint>
 		constexpr IPoint TransformPoint(const IPoint& P) const
 		{
 			return TransformPoint(*this, P);
 		}
 
-		template<TIsVector<float, 3> IScale, TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> IScale, TIsVector<T, 3> IVector>
 		static constexpr IVector TransformVector(const IScale& S, const IVector& V)
 		{
 			return S * V;
 		}
 
-		template<TIsVector<float, 3> IVector>
+		template<TIsVector<T, 3> IVector>
 		constexpr IVector TransformVector(const IVector& V) const
 		{
 			return TransformVector(*this, V);
@@ -149,9 +150,12 @@ namespace Ayla
 			return Vector<>::ToString(*this);
 		}
 
-		constexpr bool NearlyEquals(const Scale3D& S, float Epsilon) const
+		constexpr bool NearlyEquals(const Scale3D& S, T Epsilon) const
 		{
 			return Vector<>::NearlyEquals(*this, S, Epsilon);
 		}
 	};
+
+	using Scale3DF = Scale3D<float>;
+	using Scale3DD = Scale3D<double>;
 }

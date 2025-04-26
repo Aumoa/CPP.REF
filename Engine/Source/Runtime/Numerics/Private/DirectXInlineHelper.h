@@ -21,28 +21,28 @@ namespace Ayla
 		return ::DirectX::XMLoadFloat3(float3);
 	}
 
-	inline Vector3 XMStoreVector3(::DirectX::FXMVECTOR V)
+	inline Vector3F XMStoreVector3(::DirectX::FXMVECTOR V)
 	{
-		Vector3 float3;
+		Vector3F float3;
 		::DirectX::XMStoreFloat3((::DirectX::XMFLOAT3*)&float3, V);
 		return float3;
 	}
 
-	inline Quaternion XMStoreQuaternion(::DirectX::FXMVECTOR V)
+	inline QuaternionF XMStoreQuaternion(::DirectX::FXMVECTOR V)
 	{
-		Quaternion q;
+		QuaternionF q;
 		::DirectX::XMStoreFloat4((::DirectX::XMFLOAT4*)&q, V);
 		return q;
 	}
 
-	inline ::DirectX::XMMATRIX XMLoadMatrix4x4(const Matrix4x4* m)
+	inline ::DirectX::XMMATRIX XMLoadMatrix4x4(const Matrix4x4F* m)
 	{
 		return ::DirectX::XMLoadFloat4x4((const ::DirectX::XMFLOAT4X4*)m);
 	}
 
-	inline Matrix4x4 XMStoreMatrix4x4(::DirectX::FXMMATRIX M)
+	inline Matrix4x4F XMStoreMatrix4x4(::DirectX::FXMMATRIX M)
 	{
-		Matrix4x4 m;
+		Matrix4x4F m;
 		::DirectX::XMStoreFloat4x4((::DirectX::XMFLOAT4X4*)&m, M);
 		return m;
 	}

@@ -10,17 +10,18 @@
 
 namespace Ayla
 {
+    template<class T>
     struct Transform2D
     {
-        Translate2D Translation;
-        Scale2D Scale = Scale2D(1.0f);
-        Complex Rotation = Complex::Identity();
+        Translate2D<T> Translation;
+        Scale2D<T> Scale = Scale2D<T>(1.0f);
+        Complex<T> Rotation = Complex<T>::Identity();
 
         constexpr Transform2D()
         {
         }
 
-        constexpr Transform2D(const Translate2D& T, const Scale2D& S, const Complex& C)
+        constexpr Transform2D(const Translate2D<T>& T, const Scale2D<T>& S, const Complex<T>& C)
             : Translation(T)
             , Scale(S)
             , Rotation(C)
@@ -65,7 +66,7 @@ namespace Ayla
             return
             {
                 -T.Translation,
-                1.0f / T.Scale,
+                1.0 / T.Scale,
                 T.Rotation.Inverse()
             };
         }
@@ -87,7 +88,7 @@ namespace Ayla
 
         static constexpr Transform2D Identity()
         {
-            return Transform2D(Translate2D::Identity(), Scale2D::Identity(), Complex::Identity());
+            return Transform2D(Translate2D<T>::Identity(), Scale2D<T>::Identity(), Complex<T>::Identity());
         }
 
         template<TIsVector<float, 2> IVector>
@@ -120,8 +121,8 @@ namespace Ayla
     public:
         static constexpr Transform2D GetRelativeTransform(const Transform2D& LT, const Transform2D& RT)
         {
-            Scale2D RS = RT.Scale.Inverse();
-            Complex InvR = RT.Rotation.Inverse();
+            Scale2D<T> RS = RT.Scale.Inverse();
+            Complex<T> InvR = RT.Rotation.Inverse();
 
             return Transform2D
             {

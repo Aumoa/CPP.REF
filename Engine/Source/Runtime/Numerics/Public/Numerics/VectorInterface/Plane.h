@@ -7,18 +7,19 @@
 
 namespace Ayla
 {
+	template<class T>
 	struct Plane
 	{
-		Vector3 Normal;
-		float Distance;
+		Vector3<T> Normal;
+		T Distance;
 
-		constexpr Plane(float NormalX, float NormalY, float NormalZ, float Distance)
+		constexpr Plane(T NormalX, T NormalY, T NormalZ, T Distance)
 			: Normal(NormalX, NormalY, NormalZ)
 			, Distance(Distance)
 		{
 		}
 
-		constexpr Plane(const Vector3 Normal, float Distance = 0) : Normal(Normal), Distance(Distance)
+		constexpr Plane(const Vector3<T> Normal, T Distance = 0) : Normal(Normal), Distance(Distance)
 		{
 		}
 
@@ -26,12 +27,12 @@ namespace Ayla
 		{
 		}
 
-		template<TIsVector<float, 3> INormal>
-		constexpr Plane(const INormal& Normal, float Distance = 0) : Normal(Normal), Distance(Distance)
+		template<TIsVector<T, 3> INormal>
+		constexpr Plane(const INormal& Normal, T Distance = 0) : Normal(Normal), Distance(Distance)
 		{
 		}
 
-		template<TIsVector<float, 4> IVector>
+		template<TIsVector<T, 4> IVector>
 		constexpr Plane(const IVector& V) : Normal(V), Distance(V[4])
 		{
 		}
@@ -44,9 +45,9 @@ namespace Ayla
 		}
 
 	public:
-		using Type = float;
+		using Type = T;
 
-		constexpr Plane(float S = 0) : Normal(S), Distance(S)
+		constexpr Plane(T S = 0) : Normal(S), Distance(S)
 		{
 		}
 
@@ -60,7 +61,7 @@ namespace Ayla
 			return Plane(-Normal, -Distance);
 		}
 
-		constexpr const float& operator [](size_t N) const
+		constexpr const T& operator [](size_t N) const
 		{
 			switch (N)
 			{
@@ -74,7 +75,7 @@ namespace Ayla
 			}
 		}
 
-		constexpr float& operator [](size_t N)
+		constexpr T& operator [](size_t N)
 		{
 			switch (N)
 			{
@@ -88,7 +89,7 @@ namespace Ayla
 			}
 		}
 
-		template<TIsVector<float, 4> IVector>
+		template<TIsVector<T, 4> IVector>
 		constexpr Plane& operator =(const IVector& V)
 		{
 			Normal = { V[0], V[1], V[2] };
@@ -104,14 +105,17 @@ namespace Ayla
 
 		Plane GetNormal() const
 		{
-			float S = Math::InvSqrt(Vector<>::LengthSq(Normal));
+			T S = Math::InvSqrt(Vector<>::LengthSq(Normal));
 			return Plane(Normal * S, Distance * S);
 		}
 
-		template<TIsVector<float, 4> IPlane, TIsVector<float, 3> ICoord>
-		static float DotCoord(const IPlane& Plane, const ICoord& Coord)
+		template<TIsVector<T, 4> IPlane, TIsVector<T, 3> ICoord>
+		static T DotCoord(const IPlane& Plane, const ICoord& Coord)
 		{
-			return Plane[0] * Coord[0] + Plane[1] * Coord[1] + Plane[2] * Coord[2] + Plane[3] * 1.0f;
+			return Plane[0] * Coord[0] + Plane[1] * Coord[1] + Plane[2] * Coord[2] + Plane[3] * 1.0;
 		}
 	};
+
+	using PlaneF = Plane<float>;
+	using PlaneD = Plane<double>;
 }

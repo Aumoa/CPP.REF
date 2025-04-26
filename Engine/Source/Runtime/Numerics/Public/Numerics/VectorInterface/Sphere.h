@@ -7,13 +7,13 @@
 
 namespace Ayla
 {
-	template<size_t N = 0>
+	template<class T, size_t N>
 	struct Sphere
 	{
-		Vector<float, N> Center;
-		float Radius;
+		Vector<T, N> Center;
+		T Radius;
 
-		constexpr Sphere(const Vector<float, N>& Center, float Radius = 0) : Center(Center), Radius(Radius)
+		constexpr Sphere(const Vector<T, N>& Center, T Radius = 0) : Center(Center), Radius(Radius)
 		{
 		}
 
@@ -21,15 +21,15 @@ namespace Ayla
 		{
 		}
 
-		template<TIsVector<float, N + 1> IVector>
+		template<TIsVector<T, N + 1> IVector>
 		constexpr Sphere(const IVector& Rhs) : Center(Rhs), Radius(Rhs[N])
 		{
 		}
 
 	public:
-		using Type = float;
+		using Type = T;
 
-		constexpr Sphere(float S = 0) : Center(S), Radius(S)
+		constexpr Sphere(T S = 0) : Center(S), Radius(S)
 		{
 		}
 
@@ -43,7 +43,7 @@ namespace Ayla
 			return Sphere(-Center, -Radius);
 		}
 
-		constexpr const float& operator [](size_t Index) const
+		constexpr const T& operator [](size_t Index) const
 		{
 			if (Index < N)
 			{
@@ -55,7 +55,7 @@ namespace Ayla
 			}
 		}
 
-		constexpr float& operator [](size_t Index)
+		constexpr T& operator [](size_t Index)
 		{
 			if (Index < N)
 			{
@@ -67,7 +67,7 @@ namespace Ayla
 			}
 		}
 
-		template<TIsVector<float, N + 1> IVector>
+		template<TIsVector<T, N + 1> IVector>
 		constexpr Sphere& operator =(const IVector& V)
 		{
 			Center = V;
@@ -79,21 +79,14 @@ namespace Ayla
 		String ToString() const;
 	};
 
-	template<>
-	struct Sphere<0>
+	template<class T, size_t N>
+	String Sphere<T, N>::ToString() const
 	{
-		template<TIsVectorTyped<float> IVector>
-		static String ToString(const IVector& S)
-		{
-			auto Center = Vector<>::Minor(S, S.Size() - 1);
-			auto Radius = S[S.Size() - 1];
-			return String::Format(TEXT("Center: {}, Radius: {}"), Center, Radius);
-		}
-	};
-
-	template<size_t N>
-	String Sphere<N>::ToString() const
-	{
-		return Sphere<>::ToString(*this);
+		return String::Format(TEXT("Center: {}, Radius: {}"), Center, Radius);
 	}
+
+	using Sphere2DF = Sphere<float, 2>;
+	using Sphere2DD = Sphere<double, 2>;
+	using Sphere3DF = Sphere<float, 3>;
+	using Sphere3DD = Sphere<double, 3>;
 }

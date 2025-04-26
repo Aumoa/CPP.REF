@@ -7,15 +7,15 @@
 
 namespace Ayla
 {
-	template<size_t N = 0>
+	template<class T, size_t N = 0>
 	struct AxisAlignedCube
 	{
-		Vector<float, N> Min;
-		Vector<float, N> Max;
+		Vector<T, N> Min;
+		Vector<T, N> Max;
 
 	public:
-		using Type = float;
-		using VectorType = Vector<float, N>;
+		using Type = T;
+		using VectorType = Vector<T, N>;
 
 		constexpr AxisAlignedCube(const VectorType& S = VectorType{}) : Min(S), Max(S)
 		{
@@ -46,7 +46,7 @@ namespace Ayla
 			return I == 0 ? Min : Max;
 		}
 
-		template<TIsMatrix<float, 2, N> IMatrix>
+		template<TIsMatrix<T, 2, N> IMatrix>
 		constexpr AxisAlignedCube& operator =(const IMatrix& M)
 		{
 			Min = M[0];
@@ -60,7 +60,7 @@ namespace Ayla
 			R[0][0] = 1.0f;
 			if constexpr (N > 1)
 			{
-				R[1][1] = 1.0f;
+				R[1][1] = 1.0;
 			}
 			return R;
 		}
@@ -74,7 +74,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsMatrixTyped<float> IMatrix>
+		template<TIsMatrixTyped<T> IMatrix>
 		constexpr AxisAlignedCube(const IMatrix& M) requires (IMatrix::Row() >= 2)
 			: Min(M[0]), Max(M[1])
 		{
@@ -89,10 +89,10 @@ namespace Ayla
 	};
 
 	template<class TAxisAlignedCube>
-	concept TIsAxisAlignedCube = TIsMatrixTyped<TAxisAlignedCube, float> && (TAxisAlignedCube::Row() >= 2);
+	concept TIsAxisAlignedCube = TIsMatrixTyped<TAxisAlignedCube, T> && (TAxisAlignedCube::Row() >= 2);
 
 	template<>
-	struct AxisAlignedCube<0>
+	struct AxisAlignedCube<void, 0>
 	{
 		template<TIsAxisAlignedCube IMatrix>
 		static String ToString(const IMatrix& M, String FormatArgs = TEXT(""))
@@ -112,4 +112,9 @@ namespace Ayla
 			return (M[1] - M[0]) * 0.5f;
 		}
 	};
+
+	using AxisAlignedCubeF = AxisAlignedCube<float, 2>;
+	using AxisAlignedCubeD = AxisAlignedCube<double, 2>;
+	using BoundingBoxF = AxisAlignedCube<float, 3>;
+	using BoundingBoxD = AxisAlignedCube<double, 3>;
 }

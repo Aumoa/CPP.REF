@@ -7,11 +7,12 @@
 
 namespace Ayla
 {
+	template<class T>
 	struct Frustum
 	{
-		Plane Planes[6];
+		Plane<T> Planes[6];
 
-		constexpr Frustum(const Plane& P0, const Plane& P1, const Plane& P2, const Plane& P3, const Plane& P4, const Plane& P5)
+		constexpr Frustum(const Plane<T>& P0, const Plane<T>& P1, const Plane<T>& P2, const Plane<T>& P3, const Plane<T>& P4, const Plane<T>& P5)
 			: Planes{ P0, P1, P2, P3, P4, P5 }
 		{
 		}
@@ -40,7 +41,7 @@ namespace Ayla
 
 	public:
 		using Type = float;
-		using VectorType = Plane;
+		using VectorType = Plane<T>;
 
 		constexpr Frustum(const VectorType& S)
 			: Planes{ S, S, S, S, S, S }
@@ -88,13 +89,16 @@ namespace Ayla
 		{
 			return Frustum
 			{
-				{ 1.0f, 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 1.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 1.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f, 1.0f },
-				{ 0.0f, 0.0f, 0.0f, 0.0f },
-				{ 0.0f, 0.0f, 0.0f, 0.0f }
+				{ 1.0, 0.0, 0.0, 0.0 },
+				{ 0.0, 1.0, 0.0, 0.0 },
+				{ 0.0, 0.0, 1.0, 0.0 },
+				{ 0.0, 0.0, 0.0, 1.0 },
+				{ 0.0, 0.0, 0.0, 0.0 },
+				{ 0.0, 0.0, 0.0, 0.0 }
 			};
 		}
 	};
+
+	using FrustumF = Frustum<float>;
+	using FrustumD = Frustum<double>;
 }

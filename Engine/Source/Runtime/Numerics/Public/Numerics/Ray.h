@@ -7,20 +7,20 @@
 
 namespace Ayla
 {
-	template<size_t N = 0>
+	template<class T = void, size_t N = 0>
 	struct Ray
 	{
-		using VectorType = Vector<float, N>;
+		using VectorType = Vector<T, N>;
 
 		VectorType Origin;
 		VectorType Direction;
-		std::optional<float> Distance;
+		std::optional<T> Distance;
 
 		constexpr Ray()
 		{
 		}
 
-		constexpr Ray(const VectorType& Origin, const VectorType& Dir, std::optional<float> Distance = std::nullopt)
+		constexpr Ray(const VectorType& Origin, const VectorType& Dir, std::optional<T> Distance = std::nullopt)
 			: Origin(Origin)
 			, Direction(Dir)
 			, Distance(Distance)
@@ -46,20 +46,25 @@ namespace Ayla
 	};
 
 	template<>
-	struct Ray<0>
+	struct Ray<void, 0>
 	{
-		template<size_t N>
-		static bool NearlyEquals(const Ray<N>& RL, const Ray<N>& RR, float Epsilon)
+		template<class T, size_t N>
+		static bool NearlyEquals(const Ray<T, N>& RL, const Ray<T, N>& RR, T Epsilon)
 		{
 			return RL.Origin.NearlyEquals(RR.Origin, Epsilon)
 				&& RL.Direction.NearlyEquals(RR.Direction, Epsilon)
 				&& Math::Abs(RL.Distance.value_or(-1.0f) - RR.Distance.value_or(-1.0f)) <= Epsilon;
 		}
 
-		template<size_t N>
-		static String ToString(const Ray<N>& R, String FormatArgs = TEXT(""))
+		template<class T, size_t N>
+		static String ToString(const Ray<T, N>& R, String FormatArgs = TEXT(""))
 		{
 			return String::Format(L"Origin: {}, Direction: {}", R.Origin.ToString(FormatArgs), R.Direction.ToString(FormatArgs));
 		}
 	};
+
+	template<size_t N>
+	using RayF = Ray<float, N>;
+	template<size_t N>
+	using RayD = Ray<double, N>;
 }

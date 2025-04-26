@@ -188,9 +188,9 @@ namespace Ayla
 		}
 
 		template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>
-		static inline IVectorResult Normalize(const IVector& V) requires TIsCompatibleVector<IVector, IVectorResult>
+		static inline constexpr IVectorResult Normalize(const IVector& V) requires TIsCompatibleVector<IVector, IVectorResult>
 		{
-			float InvSqrt = Math::InvSqrt(LengthSq(V));
+			float InvSqrt = Math::ReciprocalSqrtEstimate(LengthSq(V));
 			IVectorResult R;
 			for (size_t i = 0; i < V.Size(); ++i)
 			{
@@ -624,13 +624,24 @@ namespace Ayla
 		return operator <=>(VL, VR) != 0;
 	}
 
-	using Vector2 = Vector<float, 2>;
-	using Vector3 = Vector<float, 3>;
-	using Vector4 = Vector<float, 4>;
+	template<class T>
+	using Vector2 = Vector<T, 2>;
+	template<class T>
+	using Vector3 = Vector<T, 3>;
+	template<class T>
+	using Vector4 = Vector<T, 4>;
 
-	using Vector2N = Vector<int32, 2>;
-	using Vector3N = Vector<int32, 3>;
-	using Vector4N = Vector<int32, 4>;
+	using Vector2F = Vector2<float>;
+	using Vector3F = Vector3<float>;
+	using Vector4F = Vector4<float>;
+
+	using Vector2D = Vector2<double>;
+	using Vector3D = Vector3<double>;
+	using Vector4D = Vector4<double>;
+
+	using Vector2N = Vector2<int32>;
+	using Vector3N = Vector3<int32>;
+	using Vector4N = Vector4<int32>;
 
 	template<class T, size_t N>
 	String Vector<T, N>::ToString() const

@@ -46,8 +46,8 @@ namespace Ayla
 		{
 			.X = InCopyRect.Left,
 			.Y = InCopyRect.Top,
-			.Width = Rect::Width(InCopyRect),
-			.Height = Rect::Height(InCopyRect)
+			.Width = Rect<>::Width(InCopyRect),
+			.Height = Rect<>::Height(InCopyRect)
 		};
 		HR(IMPLV.CopyPixels(&WRect, (UINT)Stride, (UINT)BufferSize, (BYTE*)DestBuf));
 	}
@@ -61,8 +61,8 @@ namespace Ayla
 				{
 					.X = InCopyRect.Left,
 					.Y = InCopyRect.Top,
-					.Width = Rect::Width(InCopyRect),
-					.Height = Rect::Height(InCopyRect)
+					.Width = Rect<>::Width(InCopyRect),
+					.Height = Rect<>::Height(InCopyRect)
 				};
 				HR(Ptr->CopyPixels(&WRect, (UINT)Stride, (UINT)BufferSize, (BYTE*)DestBuf));
 			});

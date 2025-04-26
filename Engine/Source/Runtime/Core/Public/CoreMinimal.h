@@ -22,6 +22,7 @@
 #include "AssertionMacros.h"
 #include "Radians.h"
 #include "Degrees.h"
+#include "Math.Impl.h"
 #include "TimeSpan.h"
 #include "Path.h"
 #include "RealTypes.h"

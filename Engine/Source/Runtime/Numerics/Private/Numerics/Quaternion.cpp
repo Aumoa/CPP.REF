@@ -7,21 +7,21 @@
 
 namespace Ayla
 {
-	Quaternion Quaternion::FromAxisAngle(const Vector3& Axis, Degrees Angle)
+	QuaternionF SIMDQuaternion::FromAxisAngle(const Vector3F& Axis, DegreesF Angle)
 	{
-		Radians Rad = Angle.ToRadians();
+		RadiansF Rad = Angle.ToRadians();
 		DirectX::XMVECTOR XAxis = XMLoadVector3(&Axis);
 		DirectX::XMVECTOR XQ = DirectX::XMQuaternionRotationNormal(XAxis, Rad.Value);
 		return XMStoreQuaternion(XQ);
 	}
 
-	Quaternion Quaternion::LookTo(const Vector3& Forward, const Vector3& Up)
+	QuaternionF SIMDQuaternion::LookTo(const Vector3F& Forward, const Vector3F& Up)
 	{
-		Quaternion T;
+		QuaternionF T;
 
-		Vector3 XF = Vector<>::Normalize(Forward);
-		Vector3 XU = Vector<>::Normalize(Up);
-		Vector3 XR = Vector<>::Normalize(Vector<>::Cross(Up, Forward));
+		Vector3F XF = Vector<>::Normalize(Forward);
+		Vector3F XU = Vector<>::Normalize(Up);
+		Vector3F XR = Vector<>::Normalize(Vector<>::Cross(Up, Forward));
 		XU = Vector<>::Cross(XF, XR);
 
 		DirectX::XMMATRIX XM = DirectX::XMMatrixSet(

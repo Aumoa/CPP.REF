@@ -8,15 +8,15 @@
 
 namespace Ayla
 {
-	template<class T>
-	struct RectT
+	template<class T = void>
+	struct Rect
 	{
 		T Left;
 		T Top;
 		T Right;
 		T Bottom;
 
-		constexpr RectT(const T& Left, const T& Top, const T& Right, const T& Bottom)
+		constexpr Rect(const T& Left, const T& Top, const T& Right, const T& Bottom)
 			: Left(Left)
 			, Top(Top)
 			, Right(Right)
@@ -24,7 +24,7 @@ namespace Ayla
 		{
 		}
 
-		constexpr RectT(const RectT& Rhs)
+		constexpr Rect(const Rect& Rhs)
 			: Left(Rhs.Left)
 			, Top(Rhs.Top)
 			, Right(Rhs.Right)
@@ -33,21 +33,21 @@ namespace Ayla
 		}
 
 		template<TIsVector<T, 2> IVectorLT, TIsVector<T, 2> IVectorRB>
-		constexpr RectT(const IVectorLT& LT, const IVectorRB& RB)
+		constexpr Rect(const IVectorLT& LT, const IVectorRB& RB)
 			: Left(LT[0]), Top(LT[1])
 			, Right(RB[0]), Bottom(RB[1])
 		{
 		}
 
 		template<TIsVector<T, 4> IVector>
-		constexpr RectT(const IVector& V) : RectT(V[0], V[1], V[2], V[3])
+		constexpr Rect(const IVector& V) : Rect(V[0], V[1], V[2], V[3])
 		{
 		}
 
 	public:
 		using Type = T;
 
-		constexpr RectT(const T& S = T{}) : Left(S), Top(S), Right(S), Bottom(S)
+		constexpr Rect(const T& S = T{}) : Left(S), Top(S), Right(S), Bottom(S)
 		{
 		}
 
@@ -56,9 +56,37 @@ namespace Ayla
 			return 4;
 		}
 
-		constexpr RectT operator -() const
+	public:
+		template<TIsVector<Type, 2> IPoint>
+		constexpr bool PtInRect(const IPoint& P)
 		{
-			return RectT(-Left, -Top, -Right, -Bottom);
+			return PtInRect(*this, P);
+		}
+
+		template<TIsVector<Type, 2> IExtent>
+		constexpr Rect Extend(const IExtent& E) const
+		{
+			return Extend(*this, E);
+		}
+
+		template<TIsVector<float, 4> IRectResult = Rect, TIsTransform<Vector2<T>> ITransform2D, TIsVector<float, 4> IRect>
+		static constexpr IRectResult TransformRect(const ITransform2D& Transform, const IRect& InRect)
+		{
+			const auto TL = Transform.TransformPoint(Rect::LeftTop(InRect));
+			const auto RB = Transform.TransformPoint(Rect::RightBottom(InRect));
+
+			IRectResult R;
+			R[0] = Math::Min(TL.X, RB.X);
+			R[1] = Math::Min(TL.Y, RB.Y);
+			R[2] = Math::Max(TL.X, RB.X);
+			R[3] = Math::Max(TL.Y, RB.Y);
+			return R;
+		}
+
+	public:
+		constexpr Rect operator -() const
+		{
+			return Rect(-Left, -Top, -Right, -Bottom);
 		}
 
 		constexpr const T& operator [](size_t N) const
@@ -94,7 +122,7 @@ namespace Ayla
 		}
 
 		template<TIsVector<T, 4> IRect>
-		constexpr RectT& operator =(const IRect& R)
+		constexpr Rect& operator =(const IRect& R)
 		{
 			Left = R[0];
 			Top = R[1];
@@ -107,14 +135,9 @@ namespace Ayla
 		String ToString(String formatArgs) const;
 	};
 
-	struct Rect : public RectT<float>
+	template<>
+	struct Rect<void>
 	{
-		template<class... TArgs>
-		constexpr Rect(TArgs&&... Args) requires std::constructible_from<RectT<float>, TArgs...>
-			: RectT<float>(std::forward<TArgs>(Args)...)
-		{
-		}
-
 		template<TIsVectorSized<4> IRectL, TIsVectorSized<4> IRectR>
 		static constexpr auto NearlyEquals(const IRectL& RL, const IRectR& RR, const typename IRectL::Type& Epsilon) requires TIsCompatibleVector<IRectL, IRectR>
 		{
@@ -153,12 +176,12 @@ namespace Ayla
 			using TIntVector = Vector<double, 2>;
 
 			return Vector<>::Cast<TVector>
+			(
 				(
-					(
-						Vector<>::Cast<TIntVector>(RightBottom(R)) +
-						Vector<>::Cast<TIntVector>(LeftTop(R))
-						) * 0.5
-				);
+					Vector<>::Cast<TIntVector>(RightBottom(R)) +
+					Vector<>::Cast<TIntVector>(LeftTop(R))
+				) * 0.5
+			);
 		}
 
 		template<TIsVectorSized<4> IRect>
@@ -179,19 +202,13 @@ namespace Ayla
 				&& R[1] <= P[1] && P[1] <= R[3];
 		}
 
-		template<TIsVector<Type, 2> IPoint>
-		constexpr bool PtInRect(const IPoint& P)
-		{
-			return PtInRect(*this, P);
-		}
-
 		template<TIsVectorSized<4> IRectL, TIsVectorSized<4> IRectR>
 		static constexpr bool IsIntersect(const IRectL& RL, const IRectR& RR) requires std::same_as<typename IRectL::Type, typename IRectR::Type>
 		{
-			const float L = Math::Max(RL[0], RR[0]);
-			const float T = Math::Max(RL[1], RR[1]);
-			const float R = Math::Min(RL[2], RR[2]);
-			const float B = Math::Min(RL[3], RR[3]);
+			const auto L = Math::Max(RL[0], RR[0]);
+			const auto T = Math::Max(RL[1], RR[1]);
+			const auto R = Math::Min(RL[2], RR[2]);
+			const auto B = Math::Min(RL[3], RR[3]);
 
 			if (R >= L && B >= T)
 			{
@@ -206,10 +223,10 @@ namespace Ayla
 		template<TIsVectorSized<4> IRectL, TIsVectorSized<4> IRectR>
 		static constexpr std::optional<IRectL> Intersect(const IRectL& RL, const IRectR& RR) requires std::same_as<typename IRectL::Type, typename IRectR::Type>
 		{
-			const float L = Math::Max(RL[0], RR[0]);
-			const float T = Math::Max(RL[1], RR[1]);
-			const float R = Math::Min(RL[2], RR[2]);
-			const float B = Math::Min(RL[3], RR[3]);
+			const auto L = Math::Max(RL[0], RR[0]);
+			const auto T = Math::Max(RL[1], RR[1]);
+			const auto R = Math::Min(RL[2], RR[2]);
+			const auto B = Math::Min(RL[3], RR[3]);
 
 			if (R >= L && B >= T)
 			{
@@ -254,33 +271,9 @@ namespace Ayla
 			V[3] += E[3];
 			return V;
 		}
-
-		template<TIsVector<Type, 2> IExtent>
-		constexpr Rect Extend(const IExtent& E) const
-		{
-			return Extend(*this, E);
-		}
-
-		template<TIsVector<float, 4> IRectResult = Rect, TIsTransform<Vector2> ITransform2D, TIsVector<float, 4> IRect>
-		static constexpr IRectResult TransformRect(const ITransform2D& Transform, const IRect& InRect)
-		{
-			const auto TL = Transform.TransformPoint(Rect::LeftTop(InRect));
-			const auto RB = Transform.TransformPoint(Rect::RightBottom(InRect));
-
-			IRectResult R;
-			R[0] = Math::Min(TL.X, RB.X);
-			R[1] = Math::Min(TL.Y, RB.Y);
-			R[2] = Math::Max(TL.X, RB.X);
-			R[3] = Math::Max(TL.Y, RB.Y);
-			return R;
-		}
 	};
 
-	using RectN = RectT<int32>;
-
-	template<class T>
-	String RectT<T>::ToString(String InFormatArgs) const
-	{
-		return Rect::ToString(*this, InFormatArgs);
-	}
+	using RectF = Rect<float>;
+	using RectD = Rect<double>;
+	using RectN = Rect<int32>;
 }

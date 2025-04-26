@@ -9,13 +9,14 @@
 
 namespace Ayla
 {
+	template<class T>
 	struct RotatedRect
 	{
-		Vector2 TopLeft;
-		Vector2 ExtentX;
-		Vector2 ExtentY;
+		Vector2<T> TopLeft;
+		Vector2<T> ExtentX;
+		Vector2<T> ExtentY;
 
-		constexpr RotatedRect(const Vector2& TopLeft, const Vector2& ExtentX, const Vector2& ExtentY)
+		constexpr RotatedRect(const Vector2<T>& TopLeft, const Vector2<T>& ExtentX, const Vector2<T>& ExtentY)
 			: TopLeft(TopLeft)
 			, ExtentX(ExtentX)
 			, ExtentY(ExtentY)
@@ -36,7 +37,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix>
+		template<TIsMatrix<T, 3, 2> IMatrix>
 		constexpr RotatedRect(const IMatrix& M)
 			: TopLeft(M[0])
 			, ExtentX(M[1])
@@ -53,14 +54,14 @@ namespace Ayla
 		}
 
 	public:
-		using Type = float;
-		using VectorType = Vector2;
+		using Type = T;
+		using VectorType = Vector2<T>;
 
-		constexpr RotatedRect(float S) : RotatedRect(Vector2(S))
+		constexpr RotatedRect(T S) : RotatedRect(Vector2<T>(S))
 		{
 		}
 
-		constexpr RotatedRect(const Vector2& S = 0)
+		constexpr RotatedRect(const Vector2<T>& S = 0)
 			: TopLeft(S)
 			, ExtentX(S)
 			, ExtentY(S)
@@ -110,7 +111,7 @@ namespace Ayla
 			}
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix>
+		template<TIsMatrix<T, 3, 2> IMatrix>
 		constexpr RotatedRect& operator =(const IMatrix& M)
 		{
 			TopLeft = M[0];
@@ -121,14 +122,14 @@ namespace Ayla
 
 		static constexpr RotatedRect Identity()
 		{
-			return { Vector2::Zero() };
+			return { Vector2<T>::Zero() };
 		}
 
 	public:
-		template<TIsMatrix<float, 3, 2> IMatrix>
+		template<TIsMatrix<T, 3, 2> IMatrix>
 		static constexpr Rect ToBoundingRect(const IMatrix& M)
 		{
-			const Vector2 Points[] =
+			const Vector2<T> Points[] =
 			{
 				M[0],
 				M[0] + M[1],
@@ -150,7 +151,7 @@ namespace Ayla
 			return ToBoundingRect(*this);
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IVector>
+		template<TIsMatrix<T, 3, 2> IMatrix, TIsVector<T, 2> IVector>
 		static constexpr bool IsUnderLocation(const IMatrix& M, const IVector& V)
 		{
 			const IVector Offset = V - M[0];
@@ -158,27 +159,27 @@ namespace Ayla
 			const auto InvDet = (decltype(Det))1.0 / Det;
 
 			const auto S = -Vector<>::Cross(Offset, M[1]) * InvDet;
-			if (Math::IsWithinInclusive(S, 0.0f, 1.0f))
+			if (Math::IsWithinInclusive(S, 0.0, 1.0))
 			{
 				const auto T = Vector<>::Cross(Offset, M[2]) * InvDet;
-				return Math::IsWithinInclusive(T, 0.0f, 1.0f);
+				return Math::IsWithinInclusive(T, 0.0, 1.0);
 			}
 			return false;
 		}
 
-		template<TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IVector>
 		constexpr bool IsUnderLocation(const IVector& V) const
 		{
 			return IsUnderLocation(*this, V);
 		}
 
-		template<TIsVector<float, 4> IRect, TIsTransform<Rect> ITransform>
+		template<TIsVector<T, 4> IRect, TIsTransform<Rect> ITransform>
 		static constexpr RotatedRect MakeRotatedRect(const ITransform& T, const IRect& R)
 		{
 			const RotatedRect RRect = Rect::TransformRect<Rect>(T, R);
 
-			const Vector2 TopRight = RRect.TopLeft + RRect.ExtentX;
-			const Vector2 BottomLeft = RRect.TopLeft + RRect.ExtentY;
+			const Vector2<T> TopRight = RRect.TopLeft + RRect.ExtentX;
+			const Vector2<T> BottomLeft = RRect.TopLeft + RRect.ExtentY;
 
 			return RotatedRect
 			{
@@ -188,9 +189,9 @@ namespace Ayla
 			};
 		}
 
-		template<TIsMatrix<float, 3, 2> IRotatedRectResult = RotatedRect
-			, TIsMatrix<float, 3, 2> IRotatedRect
-			, TIsTransform<Vector2> ITransform>
+		template<TIsMatrix<T, 3, 2> IRotatedRectResult = RotatedRect
+			, TIsMatrix<T, 3, 2> IRotatedRect
+			, TIsTransform<Vector2<T>> ITransform>
 		static constexpr IRotatedRectResult TransformRect(const ITransform& T, const IRotatedRect& R)
 		{
 			IRotatedRectResult Result;
@@ -200,4 +201,7 @@ namespace Ayla
 			return Result;
 		}
 	};
+
+	using RotatedRectF = RotatedRect<float>;
+	using RotatedRectD = RotatedRect<double>;
 }

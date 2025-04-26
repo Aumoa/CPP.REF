@@ -7,20 +7,21 @@
 
 namespace Ayla
 {
+	template<class T>
 	struct Matrix3x2
 	{
 		union
 		{
 			struct
 			{
-				float _11, _12;
-				float _21, _22;
-				float _31, _32;
+				T _11, _12;
+				T _21, _22;
+				T _31, _32;
 			};
-			Vector<float, 2> V[3];
+			Vector<T, 2> V[3];
 		};
 
-		constexpr Matrix3x2(float _11, float _12, float _21, float _22, float _31, float _32)
+		constexpr Matrix3x2(T _11, T _12, T _21, T _22, T _31, T _32)
 			: V
 			{
 				{ _11, _12 },
@@ -30,7 +31,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsVector<float, 2> IVector0, TIsVector<float, 2> IVector1, TIsVector<float, 2> IVector2>
+		template<TIsVector<T, 2> IVector0, TIsVector<T, 2> IVector1, TIsVector<T, 2> IVector2>
 		constexpr Matrix3x2(const IVector0& V0, const IVector1& V1, const IVector2& V2)
 			: V{ V0, V1, V2 }
 		{
@@ -41,7 +42,7 @@ namespace Ayla
 		{
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix>
+		template<TIsMatrix<T, 3, 2> IMatrix>
 		constexpr Matrix3x2(const IMatrix& Rhs)
 			: V{ Rhs[0], Rhs[1], Rhs[2] }
 		{
@@ -56,11 +57,11 @@ namespace Ayla
 		}
 
 	public:
-		using Type = float;
-		using VectorType = Vector<float, 2>;
+		using Type = T;
+		using VectorType = Vector<T, 2>;
 
-		constexpr Matrix3x2(float S = 0)
-			: V{ Vector<float, 2>(S), Vector<float, 2>(S), Vector<float, 2>(S) }
+		constexpr Matrix3x2(T S = 0)
+			: V{ Vector<T, 2>(S), Vector<T, 2>(S), Vector<T, 2>(S) }
 		{
 		}
 
@@ -89,7 +90,7 @@ namespace Ayla
 			return V[N];
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix>
+		template<TIsMatrix<T, 3, 2> IMatrix>
 		constexpr Matrix3x2& operator =(const IMatrix& M)
 		{
 			for (size_t i = 0; i < Row(); ++i)
@@ -109,13 +110,13 @@ namespace Ayla
 			return Matrix<>::ToString(*this);
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix>
-		inline constexpr bool NearlyEquals(const IMatrix& M, float Epsilon) const
+		template<TIsMatrix<T, 3, 2> IMatrix>
+		inline constexpr bool NearlyEquals(const IMatrix& M, T Epsilon) const
 		{
 			return Matrix<>::NearlyEquals(*this, M, Epsilon);
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix = Matrix3x2, TIsVector<float, 2> ITranslation>
+		template<TIsMatrix<T, 3, 2> IMatrix = Matrix3x2, TIsVector<T, 2> ITranslation>
 		static constexpr IMatrix Translation(const ITranslation& T)
 		{
 			IMatrix R = IMatrix::Identity();
@@ -124,7 +125,7 @@ namespace Ayla
 			return R;
 		}
 
-		template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, 2> IScale>
+		template<TIsMatrix<T, 2, 2> IMatrix = Matrix3x2, TIsVector<T, 2> IScale>
 		static constexpr IMatrix Scale(const IScale& S)
 		{
 			IMatrix R = IMatrix::Identity();
@@ -133,10 +134,10 @@ namespace Ayla
 			return R;
 		}
 
-		template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2>
+		template<TIsMatrix<T, 2, 2> IMatrix = Matrix3x2>
 		static IMatrix Rotation(const Radians& Rad)
 		{
-			float S, C;
+			T S, C;
 			Math::SinCos(Rad.Value, S, C);
 
 			IMatrix R = IMatrix::Identity();
@@ -147,7 +148,7 @@ namespace Ayla
 			return R;
 		}
 
-		template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, 2> IComplex>
+		template<TIsMatrix<T, 2, 2> IMatrix = Matrix3x2, TIsVector<T, 2> IComplex>
 		static constexpr IMatrix Rotation(const IComplex& C)
 		{
 			IMatrix R = IMatrix::Identity();
@@ -158,7 +159,7 @@ namespace Ayla
 			return R;
 		}
 
-		template<TIsMatrix<float, 2, 2> IMatrix = Matrix3x2, TIsVector<float, 2> IShear>
+		template<TIsMatrix<T, 2, 2> IMatrix = Matrix3x2, TIsVector<T, 2> IShear>
 		static constexpr IMatrix Shear(const IShear& S)
 		{
 			IMatrix R = IMatrix::Identity();
@@ -167,7 +168,7 @@ namespace Ayla
 			return R;
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IPoint>
+		template<TIsMatrix<T, 3, 2> IMatrix, TIsVector<T, 2> IPoint>
 		static constexpr IPoint TransformPoint(const IMatrix& M, const IPoint& P)
 		{
 			IPoint R;
@@ -176,7 +177,7 @@ namespace Ayla
 			return R;
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> IVector>
+		template<TIsMatrix<T, 3, 2> IMatrix, TIsVector<T, 2> IVector>
 		static constexpr IVector TransformVector(const IMatrix& M, const IVector& V)
 		{
 			IVector R;
@@ -185,7 +186,7 @@ namespace Ayla
 			return R;
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix, TIsVector<float, 2> ITranslate, TIsVector<float, 2> IScale, TIsVector<float, 2> IComplex>
+		template<TIsMatrix<T, 3, 2> IMatrix, TIsVector<T, 2> ITranslate, TIsVector<T, 2> IScale, TIsVector<T, 2> IComplex>
 		static constexpr bool Decompose(const IMatrix& M, ITranslate& OutT, IScale& OutS, IComplex& OutR)
 		{
 			// Translation is just simply!
@@ -193,25 +194,25 @@ namespace Ayla
 
 			// Extract scale.
 			OutS = Vector2(Vector<>::Length(M[0]), Vector<>::Length(M[1]));
-			if (Math::Abs(OutS[0]) < 0.001f || Math::Abs(OutS[1]) < 0.001f)
+			if (Math::Abs(OutS[0]) < 0.001 || Math::Abs(OutS[1]) < 0.001)
 			{
 				return false;
 			}
 
 			// Extract rotation.
-			float CosT = M[0][0] / OutS[0];
-			float SinT = M[1][0];
+			T CosT = M[0][0] / OutS[0];
+			T SinT = M[1][0];
 			OutR = Vector2(CosT, SinT);
 			return true;
 		}
 
-		template<TIsVector<float, 2> ITranslate, TIsVector<float, 2> IScale, TIsVector<float, 2> IComplex>
+		template<TIsVector<T, 2> ITranslate, TIsVector<T, 2> IScale, TIsVector<T, 2> IComplex>
 		constexpr bool Decompose(ITranslate& OutT, IScale& OutS, IComplex& OutR) const
 		{
 			return Decompose(*this, OutT, OutS, OutR);
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix = Matrix3x2, TIsVector<float, 2> ITranslate, TIsVector<float, 2> IScale, TIsVector<float, 2> IComplex>
+		template<TIsMatrix<T, 3, 2> IMatrix = Matrix3x2, TIsVector<T, 2> ITranslate, TIsVector<T, 2> IScale, TIsVector<T, 2> IComplex>
 		static constexpr IMatrix AffineTransformation(const ITranslate& T, const IScale& S, const IComplex& C)
 		{
 			auto SM = Scale<Matrix2x2>(S);
@@ -239,12 +240,12 @@ namespace Ayla
 		}
 
 	public:
-		template<TIsMatrix<float, 3, 2> IMatrix>
+		template<TIsMatrix<T, 3, 2> IMatrix>
 		static constexpr Matrix3x2 Inverse(const IMatrix& M)
 		{
-			float A = M[0][0], B = M[0][1], C = M[1][0], D = M[1][1];
-			float Det = A * D - B * C;
-			float InvDet = 1.0f / Det;
+			T A = M[0][0], B = M[0][1], C = M[1][0], D = M[1][1];
+			T Det = A * D - B * C;
+			T InvDet = 1.0 / Det;
 			return
 			{
 				D * InvDet, -B * InvDet,
@@ -258,16 +259,16 @@ namespace Ayla
 			return Inverse(*this);
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrixL, TIsMatrix<float, 3, 2> IMatrixR>
+		template<TIsMatrix<T, 3, 2> IMatrixL, TIsMatrix<T, 3, 2> IMatrixR>
 		static constexpr Matrix3x2 Concatenate(const IMatrixL& ML, const IMatrixR& MR)
 		{
-			Matrix<float, 3, 3> ML33 = ToMatrix3x3(ML);
-			Matrix<float, 3, 3> MR33 = ToMatrix3x3(MR);
+			Matrix<T, 3, 3> ML33 = ToMatrix3x3(ML);
+			Matrix<T, 3, 3> MR33 = ToMatrix3x3(MR);
 
 			return Matrix<>::Multiply(ML33, MR33);
 		}
 
-		template<TIsMatrix<float, 3, 2> IMatrix>
+		template<TIsMatrix<T, 3, 2> IMatrix>
 		constexpr Matrix3x2 Concatenate(const IMatrix& M) const
 		{
 			return Concatenate(*this, M);
@@ -277,29 +278,29 @@ namespace Ayla
 		{
 			return Matrix3x2
 			{
-				1.0f, 0.0f,
-				0.0f, 1.0f,
-				0.0f, 0.0f
+				1.0, 0.0,
+				0.0, 1.0,
+				0.0, 0.0
 			};
 		}
 
-		template<TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IVector>
 		constexpr IVector TransformVector(const IVector& V) const
 		{
 			return TransformVector(*this, V);
 		}
 
-		template<TIsVector<float, 2> IVector>
+		template<TIsVector<T, 2> IVector>
 		constexpr IVector TransformPoint(const IVector& V) const
 		{
 			return TransformPoint(*this, V);
 		}
 
 	private:
-		template<TIsMatrix<float, 3, 2> IMatrix>
-		static constexpr Matrix<float, 3, 3> ToMatrix3x3(const IMatrix& M)
+		template<TIsMatrix<T, 3, 2> IMatrix>
+		static constexpr Matrix<T, 3, 3> ToMatrix3x3(const IMatrix& M)
 		{
-			Matrix<float, 3, 3> M33;
+			Matrix<T, 3, 3> M33;
 			if constexpr (IMatrix::Column() >= 3)
 			{
 				M33[0] = M[0];
@@ -315,4 +316,7 @@ namespace Ayla
 			return M33;
 		}
 	};
+
+	using Matrix3x2F = Matrix3x2<float>;
+	using Matrix3x2D = Matrix3x2<double>;
 }
