@@ -15,5 +15,6 @@ public class Numerics : ModuleRules
         AddPublicDisableWarnings(4201);
 
         DisableGenerateBindings = true;
+        EnableScript = true;
     }
 }
