@@ -3,9 +3,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Ayla;
 
+[StructLayout(LayoutKind.Sequential)]
 public struct Vector4D
     : IAdditionOperators<Vector4D, Vector4D, Vector4D>
     , ISubtractionOperators<Vector4D, Vector4D, Vector4D>
