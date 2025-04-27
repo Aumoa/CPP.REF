@@ -74,7 +74,7 @@ namespace Ayla
 			m_Ptr = rhs.m_Ptr;
 			rhs.m_Ptr = nullptr;
 			// Since the target is an RPtr, the root reference of the target must be removed.
-			GC::Release(m_Ptr);
+			GC::Release(m_Object);
 		}
 	}
 
@@ -155,7 +155,7 @@ namespace Ayla
 		m_Ptr = ptr;
 		if (m_Ptr != nullptr)
 		{
-			GC::AddRef(m_Ptr);
+			GC::AddRef(m_Object);
 		}
 	}
 
@@ -166,7 +166,7 @@ namespace Ayla
 		m_Ptr = rhs.m_Ptr;
 		if (m_Ptr != nullptr)
 		{
-			GC::AddRef(m_Ptr);
+			GC::AddRef(m_Object);
 		}
 	}
 
@@ -178,7 +178,7 @@ namespace Ayla
 		m_Ptr = rhs.m_Ptr;
 		if (m_Ptr != nullptr)
 		{
-			GC::AddRef(m_Ptr);
+			GC::AddRef(m_Object);
 		}
 	}
 
@@ -190,7 +190,7 @@ namespace Ayla
 		m_Ptr = rhs.m_Ptr;
 		if (m_Ptr != nullptr)
 		{
-			GC::AddRef(m_Ptr);
+			GC::AddRef(m_Object);
 		}
 	}
 
@@ -202,7 +202,7 @@ namespace Ayla
 		{
 			m_Object = rhs.m_Object;
 			m_Ptr = rhs.m_Ptr;
-			GC::AddRef(m_Ptr);
+			GC::AddRef(m_Object);
 			rhs.m_Object = nullptr;
 			rhs.m_Ptr = nullptr;
 		}
@@ -213,7 +213,7 @@ namespace Ayla
 	{
 		if (m_Ptr != nullptr)
 		{
-			GC::Release(m_Ptr);
+			GC::Release(m_Object);
 			m_Ptr = nullptr;
 			m_Object = nullptr;
 		}

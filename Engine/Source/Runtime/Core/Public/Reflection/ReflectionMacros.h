@@ -47,3 +47,5 @@ protected: \
 #define APROPERTY(...)
 
 #define AFUNCTION(...)
+
+#define rthis (::Ayla::RPtr{ this })

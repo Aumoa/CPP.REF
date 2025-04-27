@@ -100,11 +100,13 @@ namespace Ayla
 	public:
 		Object();
 		Object(const Object&) = delete;
+		Object(Object&&) = delete;
 		virtual ~Object() noexcept;
 
 		String ToString();
 
 		Object& operator =(const Object&) = delete;
+		Object& operator =(Object&&) = delete;
 
 	public:
 		template<std::derived_from<Object> T>
