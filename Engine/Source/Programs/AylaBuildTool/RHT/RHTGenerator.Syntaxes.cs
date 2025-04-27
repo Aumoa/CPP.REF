@@ -358,7 +358,7 @@ internal partial class RHTGenerator
                 throw capture.ParsingError("Syntax Error: Expected 'Type Name[ = DefaultValue];' but found an unexpected character.");
             }
 
-            aproperty = new AProperty(capture, TypeName.FromNative(capture, declare[0]), declare[1]);
+            aproperty = new AProperty(capture, TypeName.FromNative(capture, declare[0], true), declare[1]);
             return true;
         }
     }
@@ -437,12 +437,12 @@ internal partial class RHTGenerator
                 var declare = defaultValueSplit[0].Split(' ', '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 parameterInfos.Add(new ParameterInfo
                 {
-                    TypeName = TypeName.FromNative(capture, declare[0]),
+                    TypeName = TypeName.FromNative(capture, declare[0], false),
                     Name = declare[1],
                     DefaultValue = defaultValue
                 });
             }
-            afunction = new AFunction(capture, name, TypeName.FromNative(capture, returnType), @static, @virtual, parameterInfos);
+            afunction = new AFunction(capture, name, TypeName.FromNative(capture, returnType, false), @static, @virtual, parameterInfos);
             return true;
 
             bool TryAcceptStaticOrVirtual()

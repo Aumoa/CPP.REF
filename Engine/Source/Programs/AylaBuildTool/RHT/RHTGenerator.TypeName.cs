@@ -116,10 +116,17 @@ internal partial class RHTGenerator
             }
         }
 
-        public static TypeName FromNative(Context context, string typeName)
+        public static TypeName FromNative(Context context, string typeName, bool denyRptr)
         {
-            if (typeName.Contains("RPtr<") || typeName.Contains("PPtr<"))
+            bool isRptr = typeName.Contains("RPtr<");
+            bool isPptr = typeName.Contains("PPtr<");
+            if (isRptr || isPptr)
             {
+                if (denyRptr && isRptr)
+                {
+                    throw context.ParsingError("The use of \"RPtr\" is not permitted in this context.");
+                }
+
                 var items = typeName.Split(['<', '>'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 var rptrTypeName = items[1];
                 var scope = rptrTypeName.Split("::", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
