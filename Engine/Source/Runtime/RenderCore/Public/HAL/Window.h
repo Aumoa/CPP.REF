@@ -13,6 +13,8 @@ namespace Ayla
 		GENERATED_BODY()
 
 	public:
+		virtual void OnPreRender() = 0;
+		virtual void OnGUI() = 0;
 		virtual void Present() = 0;
 	};
 }

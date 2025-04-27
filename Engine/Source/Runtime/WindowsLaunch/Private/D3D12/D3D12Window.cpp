@@ -9,6 +9,9 @@ namespace Ayla
 	void D3D12Window::Initialize(RPtr<D3D12Graphics> graphics, RPtr<GenericWindow> targetWindow)
 	{
 		auto targetWindowSize = targetWindow->GetSize();
+		m_CommandQueue = graphics->m_PrimaryCommandQueue;
+		m_Device11On12 = graphics->m_Device11On12;
+		m_DeviceContext11 = graphics->m_DeviceContext11;
 
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc =
 		{
@@ -23,27 +26,88 @@ namespace Ayla
 			},
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER,
 			.BufferCount = 2,
-			.Scaling = DXGI_SCALING_STRETCH,
+			.Scaling = DXGI_SCALING_NONE,
 			.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
 			.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED,
-			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
+			.Flags = 0
 		};
-		HR(graphics->m_DXGI->CreateSwapChainForHwnd(graphics->m_PrimaryCommandQueue.Get(), (HWND)targetWindow->GetOSWindowHandle(), &swapChainDesc, NULL, NULL, &m_SwapChain));
+		ComPtr<IDXGISwapChain1> swapChain;
+		HR(graphics->m_DXGI->CreateSwapChainForHwnd(graphics->m_PrimaryCommandQueue.Get(), (HWND)targetWindow->GetOSWindowHandle(), &swapChainDesc, NULL, NULL, &swapChain));
+		HR(swapChain.As(&m_SwapChain));
 		HR(graphics->m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence)));
 		m_FenceEvent = CreateEventExW(NULL, NULL, 0, GENERIC_ALL);
+		HR(graphics->m_Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_GUIContext));
+
+		D3D11_RESOURCE_FLAGS flags =
+		{
+			.BindFlags = D3D11_BIND_RENDER_TARGET
+		};
+
+		for (size_t i = 0; i < AE_ARRAYSIZE(m_BackBuffers); ++i)
+		{
+			HR(m_SwapChain->GetBuffer((UINT)i, IID_PPV_ARGS(&m_BackBuffers[i])));
+			HR(graphics->m_Device11On12->CreateWrappedResource(m_BackBuffers[i].Get(), &flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&m_BackBuffersInt[i])));
+			HR(graphics->m_Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_Allocator[i])));
+			ComPtr<IDXGISurface1> dxgiSurface;
+			HR(m_BackBuffersInt[i].As(&dxgiSurface));
+			auto bitmapPropes = D2D1::BitmapProperties1(
+				D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW,
+				D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+				96.0f,
+				96.0f,
+				NULL
+			);
+			HR(m_GUIContext->CreateBitmapFromDxgiSurface(dxgiSurface.Get(), bitmapPropes, &m_Bitmaps[i]));
+		}
+
+		HR(graphics->m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_Allocator[0].Get(), NULL, IID_PPV_ARGS(&m_CommandList)));
+		HR(m_CommandList->Close());
+	}
+
+	void D3D12Window::OnPreRender()
+	{
+		if (m_Fence->GetCompletedValue() < m_FenceValue)
+		{
+			HR(m_Fence->SetEventOnCompletion(m_FenceValue, m_FenceEvent));
+			WaitForSingleObject(m_FenceEvent, INFINITE);
+		}
+	}
+
+	void D3D12Window::OnGUI()
+	{
+		size_t index = (size_t)m_SwapChain->GetCurrentBackBufferIndex();
+		HR(m_Allocator[index]->Reset());
+		HR(m_CommandList->Reset(m_Allocator[index].Get(), NULL));
+
+		D3D12_RESOURCE_BARRIER barrier =
+		{
+			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+			.Transition =
+			{
+				.pResource = m_BackBuffers[index].Get(),
+				.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
+				.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
+			}
+		};
+
+		m_CommandList->ResourceBarrier(1, &barrier);
+		HR(m_CommandList->Close());
+
+		m_CommandQueue->ExecuteCommandLists(1, (ID3D12CommandList**)m_CommandList.GetAddressOf());
+
+		ID3D11Resource** targetResources = m_BackBuffersInt[index].GetAddressOf();
+		m_Device11On12->AcquireWrappedResources(targetResources, 1);
+		m_GUIContext->BeginDraw();
+		m_GUIContext->SetTarget(m_Bitmaps[index].Get());
+		m_GUIContext->Clear(D2D1::ColorF(0.5f, 0, 0));
+		m_GUIContext->SetTarget(nullptr);
+		HR(m_GUIContext->EndDraw());
+		m_Device11On12->ReleaseWrappedResources(targetResources, 1);
+		m_DeviceContext11->Flush();
 	}
 
 	void D3D12Window::Present()
 	{
-		if (m_FenceValue != 0)
-		{
-			if (m_Fence->GetCompletedValue() < m_FenceValue)
-			{
-				HR(m_Fence->SetEventOnCompletion(m_FenceValue, m_FenceEvent));
-				WaitForSingleObject(m_FenceEvent, INFINITE);
-			}
-		}
-
 		HR(m_SwapChain->Present(0, 0));
 		HR(m_Fence->Signal(++m_FenceValue));
 	}

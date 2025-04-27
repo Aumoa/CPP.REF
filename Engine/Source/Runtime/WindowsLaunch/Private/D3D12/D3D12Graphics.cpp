@@ -24,6 +24,23 @@ namespace Ayla
 			.NodeMask = 0
 		};
 		HR(m_Device->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_PrimaryCommandQueue)));
+
+		UINT d3d11CreateDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#if DO_CHECK
+		d3d11CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+		HR(::D3D11On12CreateDevice(m_Device.Get(), d3d11CreateDeviceFlags, NULL, 0, (IUnknown**)m_PrimaryCommandQueue.GetAddressOf(), 1, 0, &m_Device11, &m_DeviceContext11, NULL));
+		HR(m_Device11.As(&m_Device11On12));
+		ComPtr<IDXGIDevice> dxgiDevice;
+		HR(m_Device11.As(&dxgiDevice));
+
+		D2D1_DEBUG_LEVEL d2d1DebugLevel = D2D1_DEBUG_LEVEL_NONE;
+#if DO_CHECK
+		d2d1DebugLevel = D2D1_DEBUG_LEVEL_WARNING;
+#endif
+
+		HR(::D2D1CreateDevice(dxgiDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_SINGLE_THREADED, d2d1DebugLevel, D2D1_DEVICE_CONTEXT_OPTIONS_NONE), &m_Device2D));
 	}
 
 	RPtr<Window> D3D12Graphics::ConfigureWindow(RPtr<GenericWindow> platformWindow)

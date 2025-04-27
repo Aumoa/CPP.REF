@@ -18,15 +18,27 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		ComPtr<IDXGISwapChain1> m_SwapChain;
+		ComPtr<ID3D12CommandQueue> m_CommandQueue;
+		ComPtr<ID3D11On12Device> m_Device11On12;
+		ComPtr<ID3D11DeviceContext> m_DeviceContext11;
+
+		ComPtr<IDXGISwapChain4> m_SwapChain;
 		ComPtr<ID3D12Fence> m_Fence;
 		UINT64 m_FenceValue = 0;
 		HANDLE m_FenceEvent = NULL;
+		ComPtr<ID3D12Resource> m_BackBuffers[2];
+		ComPtr<ID3D11Resource> m_BackBuffersInt[2];
+		ComPtr<ID2D1Bitmap1> m_Bitmaps[2];
+		ComPtr<ID2D1DeviceContext> m_GUIContext;
+		ComPtr<ID3D12CommandAllocator> m_Allocator[2];
+		ComPtr<ID3D12GraphicsCommandList> m_CommandList;
 
 	public:
 		void Initialize(RPtr<D3D12Graphics> graphics, RPtr<GenericWindow> targetWindow);
 
 	public:
+		virtual void OnPreRender() override;
+		virtual void OnGUI() override;
 		virtual void Present() override;
 	};
 }

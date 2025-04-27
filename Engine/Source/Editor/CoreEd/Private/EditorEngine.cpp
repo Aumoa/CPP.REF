@@ -48,6 +48,8 @@ namespace Ayla
 	void EditorEngine::Tick()
 	{
 		Super::Tick();
+		m_EditorWindow->OnPreRender();
+		m_EditorWindow->OnGUI();
 		m_EditorWindow->Present();
 	}
 }
