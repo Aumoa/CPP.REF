@@ -19,6 +19,9 @@ namespace Ayla
 
 	private:
 		ComPtr<IDXGISwapChain1> m_SwapChain;
+		ComPtr<ID3D12Fence> m_Fence;
+		UINT64 m_FenceValue = 0;
+		HANDLE m_FenceEvent = NULL;
 
 	public:
 		void Initialize(RPtr<D3D12Graphics> graphics, RPtr<GenericWindow> targetWindow);

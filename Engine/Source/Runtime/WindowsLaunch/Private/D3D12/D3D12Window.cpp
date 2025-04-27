@@ -29,10 +29,22 @@ namespace Ayla
 			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
 		};
 		HR(graphics->m_DXGI->CreateSwapChainForHwnd(graphics->m_PrimaryCommandQueue.Get(), (HWND)targetWindow->GetOSWindowHandle(), &swapChainDesc, NULL, NULL, &m_SwapChain));
+		HR(graphics->m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence)));
+		m_FenceEvent = CreateEventExW(NULL, NULL, 0, GENERIC_ALL);
 	}
 
 	void D3D12Window::Present()
 	{
+		if (m_FenceValue != 0)
+		{
+			if (m_Fence->GetCompletedValue() < m_FenceValue)
+			{
+				HR(m_Fence->SetEventOnCompletion(m_FenceValue, m_FenceEvent));
+				WaitForSingleObject(m_FenceEvent, INFINITE);
+			}
+		}
+
 		HR(m_SwapChain->Present(0, 0));
+		HR(m_Fence->Signal(++m_FenceValue));
 	}
 }
