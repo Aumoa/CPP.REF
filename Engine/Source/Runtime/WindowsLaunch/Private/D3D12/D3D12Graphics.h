@@ -14,10 +14,14 @@ namespace Ayla
 	{
 		GENERATED_BODY()
 
-	private:
+	public:  // internal
+		ComPtr<IDXGIFactory7> m_DXGI;
 		ComPtr<ID3D12Device> m_Device;
+		ComPtr<ID3D12CommandQueue> m_PrimaryCommandQueue;
 
 	public:
 		virtual void Initialize() override;
+		
+		virtual RPtr<Window> ConfigureWindow(RPtr<GenericWindow> platformWindow) override;
 	};
 }

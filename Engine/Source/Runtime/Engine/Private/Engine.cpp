@@ -4,6 +4,7 @@
 #include "InitializationContext.h"
 #include "HAL/PlatformRenderFeature.h"
 #include "HAL/Graphics.h"
+#include "GenericPlatform/GenericApplication.h"
 
 namespace Ayla
 {
@@ -20,10 +21,16 @@ namespace Ayla
 		return New<InitializationContext>();
 	}
 
-	void Engine::Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context)
+	void Engine::Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app)
 	{
+		m_App = app;
+
 		context->Progress(TEXT("Initializing graphics..."));
 		m_Graphics = prf->CreateGraphics(RenderAPI::D3D12);
 		m_Graphics->Initialize();
+	}
+
+	void Engine::Tick()
+	{
 	}
 }

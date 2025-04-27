@@ -18,9 +18,9 @@ namespace Ayla
 
 	private:
 		APROPERTY()
-		PPtr<GenericApplication> GenericApp;
+		PPtr<GenericApplication> m_GenericApp;
 		APROPERTY()
-		PPtr<Engine> Engine;
+		PPtr<Engine> m_Engine;
 
 	protected:
 		Launch();
@@ -30,6 +30,7 @@ namespace Ayla
 
 		AFUNCTION()
 		virtual int32 StartApplication();
+		RPtr<GenericApplication> GetApplication();
 
 		virtual void* GetApplicationPointer() = 0;
 		virtual RPtr<PlatformRenderFeature> CreatePlatformRenderFeature() = 0;

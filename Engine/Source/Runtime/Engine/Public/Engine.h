@@ -10,6 +10,7 @@ namespace Ayla
 	class InitializationContext;
 	class PlatformRenderFeature;
 	class Graphics;
+	class GenericApplication;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -17,13 +18,21 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		RPtr<Graphics> m_Graphics;
+		APROPERTY()
+		PPtr<GenericApplication> m_App;
+		APROPERTY()
+		PPtr<Graphics> m_Graphics;
 
 	public:
 		Engine();
 		virtual ~Engine() noexcept override;
 
 		virtual RPtr<InitializationContext> PreInitialize();
-		virtual void Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context);
+		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app);
+
+		virtual void Tick();
+
+	protected:
+		RPtr<Graphics> GetGraphics() { return m_Graphics; }
 	};
 }

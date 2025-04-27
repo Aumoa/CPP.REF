@@ -16,7 +16,7 @@ namespace Ayla
 {
     Launch::Launch()
     {
-        GenericApp = GenericApplication::CreateApplication();
+        m_GenericApp = GenericApplication::CreateApplication();
     }
 
     Launch::~Launch() noexcept
@@ -25,36 +25,29 @@ namespace Ayla
 
     int32 Launch::StartApplication()
     {
-        GenericApp->SetApplicationPointer(GetApplicationPointer());
-
-        GenericWindowDefinition wDef =
-        {
-            .bPrimaryWindow = true,
-            .bSystemMenu = true,
-            .bThickframe = true,
-            .bSizebox = true,
-            .bCaption = true
-        };
+        m_GenericApp->SetApplicationPointer(GetApplicationPointer());
         
 #if WITH_EDITOR
-        Engine = New<EditorEngine>();
+        m_Engine = New<EditorEngine>();
 #else
-        Engine = New<::Ayla::Engine>();
+        m_Engine = New<::Ayla::Engine>();
 #endif
 
-        auto initializationContext = Engine->PreInitialize();
-        Engine->Initialize(CreatePlatformRenderFeature(), initializationContext);
+        auto initializationContext = m_Engine->PreInitialize();
+        m_Engine->Initialize(initializationContext, CreatePlatformRenderFeature(), m_GenericApp);
 
-        auto window = GenericApp->MakeWindow(wDef);
-        window->Show();
-
-        std::vector<GenericPlatformInputEvent> InputEvents;
-
-        while (!GenericApp->IsQuitRequested())
+        std::vector<GenericPlatformInputEvent> inputEvents;
+        while (!m_GenericApp->IsQuitRequested())
         {
-            GenericApp->PumpMessages(InputEvents);
+            m_GenericApp->PumpMessages(inputEvents);
+            m_Engine->Tick();
         }
 
-        return GenericApp->GetExitCode();
+        return m_GenericApp->GetExitCode();
+    }
+
+    RPtr<GenericApplication> Launch::GetApplication()
+    {
+        return m_GenericApp;
     }
 }

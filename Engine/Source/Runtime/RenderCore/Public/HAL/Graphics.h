@@ -7,6 +7,9 @@
 
 namespace Ayla
 {
+	class Window;
+	class GenericWindow;
+
 	ACLASS()
 	class RENDERCORE_API Graphics : public Object
 	{
@@ -16,6 +19,10 @@ namespace Ayla
 		Graphics();
 
 	public:
+		virtual ~Graphics() noexcept override;
+
 		virtual void Initialize() = 0;
+
+		virtual RPtr<Window> ConfigureWindow(RPtr<GenericWindow> platformWindow) = 0;
 	};
 }

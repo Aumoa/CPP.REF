@@ -8,15 +8,24 @@
 
 namespace Ayla
 {
+	class Window;
+
 	ACLASS()
 	class COREED_API EditorEngine : public Engine
 	{
 		GENERATED_BODY()
 
+	private:
+		APROPERTY()
+		PPtr<Window> m_EditorWindow;
+
 	public:
 		EditorEngine();
+		virtual ~EditorEngine() noexcept override;
 
 		virtual RPtr<InitializationContext> PreInitialize() override;
-		virtual void Initialize(RPtr<PlatformRenderFeature> prf, RPtr<InitializationContext> context) override;
+		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app) override;
+
+		virtual void Tick() override;
 	};
 }

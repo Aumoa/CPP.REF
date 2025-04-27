@@ -7,5 +7,6 @@
 #include "CoreMinimal.h"
 #include "Platform/PlatformCommon.h"
 #include <d3d12.h>
+#include <dxgi1_6.h>
 
 #undef __ALLOW_PLATFORM_COMMON_H__

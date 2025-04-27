@@ -10,6 +10,6 @@ public class WindowsLaunch : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Launch", "RenderCore");
-        AddPrivateAdditionalLibraries("d3d12.lib");
+        AddPrivateAdditionalLibraries("d3d12.lib", "dxgi.lib");
     }
 }
