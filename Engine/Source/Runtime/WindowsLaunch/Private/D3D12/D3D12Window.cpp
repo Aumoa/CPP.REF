@@ -3,6 +3,7 @@
 #include "D3D12/D3D12Window.h"
 #include "D3D12/D3D12Graphics.h"
 #include "GenericPlatform/GenericWindow.h"
+#include "D2D1/IMGUI/D2D1GUI.h"
 
 namespace Ayla
 {
@@ -34,8 +35,6 @@ namespace Ayla
 		ComPtr<IDXGISwapChain1> swapChain;
 		HR(graphics->m_DXGI->CreateSwapChainForHwnd(graphics->m_PrimaryCommandQueue.Get(), (HWND)targetWindow->GetOSWindowHandle(), &swapChainDesc, NULL, NULL, &swapChain));
 		HR(swapChain.As(&m_SwapChain));
-		HR(graphics->m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence)));
-		m_FenceEvent = CreateEventExW(NULL, NULL, 0, GENERIC_ALL);
 		HR(graphics->m_Device2D->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_GUIContext));
 
 		D3D11_RESOURCE_FLAGS flags =
@@ -62,18 +61,18 @@ namespace Ayla
 
 		HR(graphics->m_Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_Allocator[0].Get(), NULL, IID_PPV_ARGS(&m_CommandList)));
 		HR(m_CommandList->Close());
+
+		m_TargetWindow = targetWindow;
+		m_Graphics = graphics;
+		m_GUI = New<D2D1GUI>();
 	}
 
-	void D3D12Window::OnPreRender()
+	Vector2F D3D12Window::GetSize()
 	{
-		if (m_Fence->GetCompletedValue() < m_FenceValue)
-		{
-			HR(m_Fence->SetEventOnCompletion(m_FenceValue, m_FenceEvent));
-			WaitForSingleObject(m_FenceEvent, INFINITE);
-		}
+		return Vector<>::Cast<Vector2F>(m_TargetWindow->GetSize());
 	}
 
-	void D3D12Window::OnGUI()
+	RPtr<GUI> D3D12Window::BeginGUI()
 	{
 		size_t index = (size_t)m_SwapChain->GetCurrentBackBufferIndex();
 		HR(m_Allocator[index]->Reset());
@@ -97,18 +96,26 @@ namespace Ayla
 
 		ID3D11Resource** targetResources = m_BackBuffersInt[index].GetAddressOf();
 		m_Device11On12->AcquireWrappedResources(targetResources, 1);
-		m_GUIContext->BeginDraw();
 		m_GUIContext->SetTarget(m_Bitmaps[index].Get());
-		m_GUIContext->Clear(D2D1::ColorF(0.5f, 0, 0));
-		m_GUIContext->SetTarget(nullptr);
-		HR(m_GUIContext->EndDraw());
-		m_Device11On12->ReleaseWrappedResources(targetResources, 1);
-		m_DeviceContext11->Flush();
+		m_GUIContext->BeginDraw();
+		m_GUIContext->Clear(D2D1::ColorF(0, 0, 0, 0));
+
+		m_GUI->BeginRender();
+		return m_GUI;
 	}
 
-	void D3D12Window::Present()
+	void D3D12Window::EndGUI()
 	{
+		m_GUI->EndRender(m_GUIContext.Get(), m_Graphics);
+
+		size_t index = (size_t)m_SwapChain->GetCurrentBackBufferIndex();
+		ID3D11Resource** targetResources = m_BackBuffersInt[index].GetAddressOf();
+
+		HR(m_GUIContext->EndDraw());
+		m_GUIContext->SetTarget(nullptr);
+		m_Device11On12->ReleaseWrappedResources(targetResources, 1);
+		m_DeviceContext11->Flush();
+
 		HR(m_SwapChain->Present(0, 0));
-		HR(m_Fence->Signal(++m_FenceValue));
 	}
 }

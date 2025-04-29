@@ -11,6 +11,7 @@ namespace Ayla
 {
 	class GenericWindow;
 	class D3D12Graphics;
+	class D2D1GUI;
 
 	ACLASS()
 	class WINDOWSLAUNCH_API D3D12Window : public Window
@@ -23,9 +24,6 @@ namespace Ayla
 		ComPtr<ID3D11DeviceContext> m_DeviceContext11;
 
 		ComPtr<IDXGISwapChain4> m_SwapChain;
-		ComPtr<ID3D12Fence> m_Fence;
-		UINT64 m_FenceValue = 0;
-		HANDLE m_FenceEvent = NULL;
 		ComPtr<ID3D12Resource> m_BackBuffers[2];
 		ComPtr<ID3D11Resource> m_BackBuffersInt[2];
 		ComPtr<ID2D1Bitmap1> m_Bitmaps[2];
@@ -33,12 +31,20 @@ namespace Ayla
 		ComPtr<ID3D12CommandAllocator> m_Allocator[2];
 		ComPtr<ID3D12GraphicsCommandList> m_CommandList;
 
+		APROPERTY()
+		PPtr<GenericWindow> m_TargetWindow;
+		APROPERTY()
+		PPtr<D3D12Graphics> m_Graphics;
+		APROPERTY()
+		PPtr<D2D1GUI> m_GUI;
+
 	public:
 		void Initialize(RPtr<D3D12Graphics> graphics, RPtr<GenericWindow> targetWindow);
 
 	public:
-		virtual void OnPreRender() override;
-		virtual void OnGUI() override;
-		virtual void Present() override;
+		virtual Vector2F GetSize() override;
+
+		virtual RPtr<GUI> BeginGUI() override;
+		virtual void EndGUI() override;
 	};
 }

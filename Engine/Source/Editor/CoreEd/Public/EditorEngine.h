@@ -8,7 +8,7 @@
 
 namespace Ayla
 {
-	class Window;
+	class EditorMainWindowContainer;
 
 	ACLASS()
 	class COREED_API EditorEngine : public Engine
@@ -17,7 +17,7 @@ namespace Ayla
 
 	private:
 		APROPERTY()
-		PPtr<Window> m_EditorWindow;
+		PPtr<EditorMainWindowContainer> m_EditorWindow;
 
 	public:
 		EditorEngine();
@@ -27,5 +27,8 @@ namespace Ayla
 		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app) override;
 
 		virtual void Tick() override;
+
+	protected:
+		virtual void RenderWindows() override;
 	};
 }

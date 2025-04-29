@@ -11,6 +11,8 @@ namespace Ayla
 	class PlatformRenderFeature;
 	class Graphics;
 	class GenericApplication;
+	class Window;
+	class GenericWindow;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -32,7 +34,13 @@ namespace Ayla
 
 		virtual void Tick();
 
+	public:
+		RPtr<Window> ConfigureWindow(RPtr<GenericWindow> targetWindow);
+
 	protected:
-		RPtr<Graphics> GetGraphics() { return m_Graphics; }
+		virtual void RenderWindows();
+
+	protected:
+		RPtr<Graphics> GetGraphics();
 	};
 }

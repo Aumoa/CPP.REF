@@ -6,6 +6,15 @@
 
 namespace Ayla
 {
+	D3D12Graphics::~D3D12Graphics() noexcept
+	{
+		if (m_FrameSyncEvent != NULL)
+		{
+			CloseHandle(m_FrameSyncEvent);
+			m_FrameSyncEvent = NULL;
+		}
+	}
+
 	void D3D12Graphics::Initialize()
 	{
 		UINT dxgiCreateFlags = 0;
@@ -41,6 +50,10 @@ namespace Ayla
 #endif
 
 		HR(::D2D1CreateDevice(dxgiDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_SINGLE_THREADED, d2d1DebugLevel, D2D1_DEVICE_CONTEXT_OPTIONS_NONE), &m_Device2D));
+		HR(::DWriteCreateFactory(DWRITE_FACTORY_TYPE_ISOLATED, __uuidof(decltype(*m_DWrite.Get())), (IUnknown**)&m_DWrite));
+
+		HR(m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_FrameSync)));
+		m_FrameSyncEvent = CreateEventExW(NULL, NULL, 0, GENERIC_ALL);
 	}
 
 	RPtr<Window> D3D12Graphics::ConfigureWindow(RPtr<GenericWindow> platformWindow)
@@ -48,5 +61,22 @@ namespace Ayla
 		auto window = New<D3D12Window>();
 		window->Initialize(rthis, platformWindow);
 		return window;
+	}
+
+	void D3D12Graphics::BeginRender()
+	{
+		if ((int64)m_FrameSync->GetCompletedValue() < m_FrameIndex - 1)
+		{
+			m_FrameSync->SetEventOnCompletion((uint64)(m_FrameIndex - 1), m_FrameSyncEvent);
+			auto waitResult = ::WaitForSingleObject(m_FrameSyncEvent, 10000);
+			check(waitResult == WAIT_OBJECT_0);
+		}
+
+		++m_FrameIndex;
+	}
+
+	void D3D12Graphics::EndRender()
+	{
+		HR(m_PrimaryCommandQueue->Signal(m_FrameSync.Get(), m_FrameIndex));
 	}
 }

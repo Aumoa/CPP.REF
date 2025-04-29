@@ -32,5 +32,22 @@ namespace Ayla
 
 	void Engine::Tick()
 	{
+		m_Graphics->BeginRender();
+		RenderWindows();
+		m_Graphics->EndRender();
+	}
+
+	RPtr<Window> Engine::ConfigureWindow(RPtr<GenericWindow> targetWindow)
+	{
+		return m_Graphics->ConfigureWindow(targetWindow);
+	}
+
+	void Engine::RenderWindows()
+	{
+	}
+
+	RPtr<Graphics> Engine::GetGraphics()
+	{
+		return m_Graphics;
 	}
 }

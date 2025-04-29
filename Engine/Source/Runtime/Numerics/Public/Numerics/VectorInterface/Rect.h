@@ -271,6 +271,81 @@ namespace Ayla
 			V[3] += E[3];
 			return V;
 		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect Margin(const IRect& v, typename IRect::Type left, typename IRect::Type top, typename IRect::Type right, typename IRect::Type bottom)
+		{
+			auto r = v;
+			r[0] += left;
+			r[1] += top;
+			r[2] -= right;
+			r[3] -= bottom;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect MarginLeft(const IRect& v, typename IRect::Type left)
+		{
+			auto r = v;
+			r[0] += left;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect MarginTop(const IRect& v, typename IRect::Type top)
+		{
+			auto r = v;
+			r[1] += top;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect MarginRight(const IRect& v, typename IRect::Type right)
+		{
+			auto r = v;
+			r[2] -= right;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect MarginBottom(const IRect& v, typename IRect::Type bottom)
+		{
+			auto r = v;
+			r[3] -= bottom;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect FillLeft(const IRect& v, typename IRect::Type left)
+		{
+			auto r = v;
+			r[2] = r[0] + left;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect FillTop(const IRect& v, typename IRect::Type top)
+		{
+			auto r = v;
+			r[3] = r[1] + top;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect FillRight(const IRect& v, typename IRect::Type right)
+		{
+			auto r = v;
+			r[0] = r[2] - right;
+			return r;
+		}
+
+		template<TIsVectorSized<4> IRect>
+		static constexpr IRect FillBottom(const IRect& v, typename IRect::Type bottom)
+		{
+			auto r = v;
+			r[1] = r[3] - bottom;
+			return r;
+		}
 	};
 
 	using RectF = Rect<float>;

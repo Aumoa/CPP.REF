@@ -22,10 +22,22 @@ namespace Ayla
 		ComPtr<ID3D11DeviceContext> m_DeviceContext11;
 		ComPtr<ID3D11On12Device> m_Device11On12;
 		ComPtr<ID2D1Device> m_Device2D;
+		ComPtr<IDWriteFactory7> m_DWrite;
+
+	private:
+		int64 m_FrameIndex = 0;
+		ComPtr<ID3D12Fence> m_FrameSync;
+		HANDLE m_FrameSyncEvent = NULL;
 
 	public:
+		virtual ~D3D12Graphics() noexcept override;
+
 		virtual void Initialize() override;
 		
 		virtual RPtr<Window> ConfigureWindow(RPtr<GenericWindow> platformWindow) override;
+
+		virtual void BeginRender() override;
+		virtual void EndRender() override;
+		virtual int64 FrameIndex() override { return m_FrameIndex; }
 	};
 }
