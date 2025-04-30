@@ -2,6 +2,7 @@
 
 #include "D3D12/D3D12Graphics.h"
 #include "D3D12/D3D12Window.h"
+#include "D3D12/D3D12TextureImporter.h"
 #include "GenericPlatform/GenericWindow.h"
 
 namespace Ayla
@@ -51,6 +52,8 @@ namespace Ayla
 
 		HR(::D2D1CreateDevice(dxgiDevice.Get(), D2D1::CreationProperties(D2D1_THREADING_MODE_SINGLE_THREADED, d2d1DebugLevel, D2D1_DEVICE_CONTEXT_OPTIONS_NONE), &m_Device2D));
 		HR(::DWriteCreateFactory(DWRITE_FACTORY_TYPE_ISOLATED, __uuidof(decltype(*m_DWrite.Get())), (IUnknown**)&m_DWrite));
+		HR(::CoInitializeEx(NULL, ::COINIT_MULTITHREADED));
+		HR(::CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_WIC)));
 
 		HR(m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_FrameSync)));
 		m_FrameSyncEvent = CreateEventExW(NULL, NULL, 0, GENERIC_ALL);
@@ -61,6 +64,11 @@ namespace Ayla
 		auto window = New<D3D12Window>();
 		window->Initialize(rthis, platformWindow);
 		return window;
+	}
+
+	RPtr<TextureImporter> D3D12Graphics::CreateTextureImporter()
+	{
+		return New<D3D12TextureImporter>();
 	}
 
 	void D3D12Graphics::BeginRender()

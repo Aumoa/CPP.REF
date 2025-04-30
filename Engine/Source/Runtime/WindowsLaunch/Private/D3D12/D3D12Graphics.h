@@ -23,6 +23,7 @@ namespace Ayla
 		ComPtr<ID3D11On12Device> m_Device11On12;
 		ComPtr<ID2D1Device> m_Device2D;
 		ComPtr<IDWriteFactory7> m_DWrite;
+		ComPtr<IWICImagingFactory> m_WIC;
 
 	private:
 		int64 m_FrameIndex = 0;
@@ -35,6 +36,7 @@ namespace Ayla
 		virtual void Initialize() override;
 		
 		virtual RPtr<Window> ConfigureWindow(RPtr<GenericWindow> platformWindow) override;
+		virtual RPtr<TextureImporter> CreateTextureImporter() override;
 
 		virtual void BeginRender() override;
 		virtual void EndRender() override;
