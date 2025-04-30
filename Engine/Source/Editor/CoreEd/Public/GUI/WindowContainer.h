@@ -29,6 +29,6 @@ namespace Ayla
 		virtual void DrawGUI();
 
 	protected:
-		virtual void OnGUI(const RectF& position, RPtr<GUI> gui);
+		virtual void OnGUI(const RectF& position);
 	};
 }

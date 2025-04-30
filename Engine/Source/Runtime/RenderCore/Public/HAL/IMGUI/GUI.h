@@ -18,18 +18,35 @@ namespace Ayla
 		GENERATED_BODY()
 
 	public:
-		virtual Color GetColor() = 0;
-		virtual void SetColor(const Color& value) = 0;
+		static Color GetColor();
+		static void SetColor(const Color& value);
 
-		virtual Color GetBackgroundColor() = 0;
-		virtual void SetBackgroundColor(const Color& value) = 0;
+		static Color GetBackgroundColor();
+		static void SetBackgroundColor(const Color& value);
 
-		virtual Color GetForegroundColor() = 0;
-		virtual void SetForegroundColor(const Color& value) = 0;
+		static Color GetForegroundColor();
+		static void SetForegroundColor(const Color& value);
 
-		virtual RPtr<GUISkin> GetSkin() = 0;
-		virtual void SetSkin(RPtr<GUISkin> value) = 0;
+		static RPtr<GUISkin> GetSkin();
+		static void SetSkin(RPtr<GUISkin> value);
 
-		virtual void Label(const RectF& position, String text) = 0;
+		static void Label(const RectF& position, String text);
+
+	protected:
+		static void SetCurrent(RPtr<GUI> instance);
+
+		virtual Color DoGetColor() = 0;
+		virtual void DoSetColor(const Color& value) = 0;
+
+		virtual Color DoGetBackgroundColor() = 0;
+		virtual void DoSetBackgroundColor(const Color& value) = 0;
+
+		virtual Color DoGetForegroundColor() = 0;
+		virtual void DoSetForegroundColor(const Color& value) = 0;
+
+		virtual RPtr<GUISkin> DoGetSkin() = 0;
+		virtual void DoSetSkin(RPtr<GUISkin> value) = 0;
+
+		virtual void DoLabel(const RectF& position, String text) = 0;
 	};
 }

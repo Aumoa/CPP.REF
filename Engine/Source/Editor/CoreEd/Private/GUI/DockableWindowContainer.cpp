@@ -1,19 +1,19 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "DockableWindowContainer.h"
+#include "GUI/DockableWindowContainer.h"
 #include "HAL/IMGUI/GUI.h"
 
 namespace Ayla
 {
-	void DockableWindowContainer::OnGUI(const RectF& position, RPtr<GUI> gui)
+	void DockableWindowContainer::OnGUI(const RectF& position)
 	{
 		auto position_ = position;
 
 		// tab layout
 		auto tabLayout = Rect<>::FillTop(position_, 18.0f);
 		position_ = Rect<>::MarginTop(position_, 18.0f);
-		gui->Label(tabLayout, TEXT("Tab Layout"));
+		GUI::Label(tabLayout, TEXT("Tab Layout"));
 
-		Super::OnGUI(position_, gui);
+		Super::OnGUI(position_);
 	}
 }

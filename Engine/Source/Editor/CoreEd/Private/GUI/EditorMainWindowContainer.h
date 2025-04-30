@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DockableWindowContainer.h"
+#include "GUI/DockableWindowContainer.h"
 #include "EditorMainWindowContainer.gen.h"
 
 namespace Ayla
@@ -14,6 +14,6 @@ namespace Ayla
 		GENERATED_BODY()
 
 	protected:
-		virtual void OnGUI(const RectF& position, RPtr<GUI> gui) override;
+		virtual void OnGUI(const RectF& position) override;
 	};
 }

@@ -44,7 +44,7 @@ namespace Ayla
 	public:
 		virtual Vector2F GetSize() override;
 
-		virtual RPtr<GUI> BeginGUI() override;
+		virtual void BeginGUI() override;
 		virtual void EndGUI() override;
 	};
 }

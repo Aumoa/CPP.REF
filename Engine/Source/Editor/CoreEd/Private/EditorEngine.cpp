@@ -2,7 +2,7 @@
 
 #include "EditorEngine.h"
 #include "EditorInitializationContext.h"
-#include "EditorMainWindowContainer.h"
+#include "GUI/EditorMainWindowContainer.h"
 #include "GenericPlatform/GenericSplash.h"
 #include "GenericPlatform/GenericWindow.h"
 #include "GenericPlatform/GenericApplication.h"

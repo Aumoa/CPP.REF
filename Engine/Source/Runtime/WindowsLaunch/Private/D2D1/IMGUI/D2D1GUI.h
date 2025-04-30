@@ -35,19 +35,20 @@ namespace Ayla
 		void BeginRender();
 		void EndRender(ID2D1DeviceContext* deviceContext, RPtr<Graphics> graphics);
 
-		virtual Color GetColor() override;
-		virtual void SetColor(const Color& value) override;
+	protected:
+		virtual Color DoGetColor() override;
+		virtual void DoSetColor(const Color& value) override;
 
-		virtual Color GetBackgroundColor() override;
-		virtual void SetBackgroundColor(const Color& value) override;
+		virtual Color DoGetBackgroundColor() override;
+		virtual void DoSetBackgroundColor(const Color& value) override;
 
-		virtual Color GetForegroundColor() override;
-		virtual void SetForegroundColor(const Color& value) override;
+		virtual Color DoGetForegroundColor() override;
+		virtual void DoSetForegroundColor(const Color& value) override;
 
-		virtual RPtr<GUISkin> GetSkin() override;
-		virtual void SetSkin(RPtr<GUISkin> value) override;
+		virtual RPtr<GUISkin> DoGetSkin() override;
+		virtual void DoSetSkin(RPtr<GUISkin> value) override;
 
-		virtual void Label(const RectF& position, String text) override;
+		virtual void DoLabel(const RectF& position, String text) override;
 
 	private:
 		void UpdateColor(ID2D1DeviceContext* deviceContext, ComPtr<ID2D1SolidColorBrush>& brush, const Color& color);

@@ -13,6 +13,6 @@ namespace Ayla
 		GENERATED_BODY()
 
 	protected:
-		virtual void OnGUI(const RectF& position, RPtr<GUI> gui) override;
+		virtual void OnGUI(const RectF& position) override;
 	};
 }

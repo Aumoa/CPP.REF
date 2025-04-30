@@ -72,7 +72,7 @@ namespace Ayla
 		return Vector<>::Cast<Vector2F>(m_TargetWindow->GetSize());
 	}
 
-	RPtr<GUI> D3D12Window::BeginGUI()
+	void D3D12Window::BeginGUI()
 	{
 		size_t index = (size_t)m_SwapChain->GetCurrentBackBufferIndex();
 		HR(m_Allocator[index]->Reset());
@@ -101,7 +101,6 @@ namespace Ayla
 		m_GUIContext->Clear(D2D1::ColorF(0, 0, 0, 0));
 
 		m_GUI->BeginRender();
-		return m_GUI;
 	}
 
 	void D3D12Window::EndGUI()

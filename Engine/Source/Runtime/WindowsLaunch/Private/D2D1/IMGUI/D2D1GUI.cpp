@@ -14,6 +14,8 @@ namespace Ayla
 			m_Skin = New<GUISkin>();
 			m_Skin->SetLabel(New<D2D1GUIStyle>());
 		}
+
+		SetCurrent(rthis);
 	}
 
 	void D2D1GUI::EndRender(ID2D1DeviceContext* deviceContext, RPtr<Graphics> graphics)
@@ -30,48 +32,50 @@ namespace Ayla
 
 		m_RenderCommands.clear();
 		m_Styles.clear();
+
+		SetCurrent({});
 	}
 
-	Color D2D1GUI::GetColor()
+	Color D2D1GUI::DoGetColor()
 	{
 		return m_Color;
 	}
 
-	void D2D1GUI::SetColor(const Color& value)
+	void D2D1GUI::DoSetColor(const Color& value)
 	{
 		m_Color = value;
 		m_NeedUpdateBackgroundColor = true;
 		m_NeedUpdateForegroundColor = true;
 	}
 
-	Color D2D1GUI::GetBackgroundColor()
+	Color D2D1GUI::DoGetBackgroundColor()
 	{
 		return m_BackgroundColor;
 	}
 
-	void D2D1GUI::SetBackgroundColor(const Color& value)
+	void D2D1GUI::DoSetBackgroundColor(const Color& value)
 	{
 		m_BackgroundColor = value;
 		m_NeedUpdateBackgroundColor = true;
 	}
 
-	Color D2D1GUI::GetForegroundColor()
+	Color D2D1GUI::DoGetForegroundColor()
 	{
 		return m_ForegroundColor;
 	}
 
-	void D2D1GUI::SetForegroundColor(const Color& value)
+	void D2D1GUI::DoSetForegroundColor(const Color& value)
 	{
 		m_ForegroundColor = value;
 		m_NeedUpdateForegroundColor = true;
 	}
 
-	RPtr<GUISkin> D2D1GUI::GetSkin()
+	RPtr<GUISkin> D2D1GUI::DoGetSkin()
 	{
 		return m_Skin;
 	}
 
-	void D2D1GUI::SetSkin(RPtr<GUISkin> value)
+	void D2D1GUI::DoSetSkin(RPtr<GUISkin> value)
 	{
 		m_Skin = value;
 	}
@@ -79,7 +83,7 @@ namespace Ayla
 #define ASRECT(x) reinterpret_cast<const D2D1_RECT_F&>(x)
 #define ASCOLOR(x) reinterpret_cast<const D2D1_COLOR_F&>(x)
 
-	void D2D1GUI::Label(const RectF& position, String text)
+	void D2D1GUI::DoLabel(const RectF& position, String text)
 	{
 		auto style = m_Skin->GetLabel();
 		m_Styles.emplace_back(style);

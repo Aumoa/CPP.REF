@@ -1,6 +1,6 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "WindowContainer.h"
+#include "GUI/WindowContainer.h"
 #include "Engine.h"
 #include "GenericPlatform/GenericApplication.h"
 #include "HAL/Window.h"
@@ -28,14 +28,14 @@ namespace Ayla
 
 	void WindowContainer::DrawGUI()
 	{
-		auto gui = m_GraphicsWindow->BeginGUI();
+		m_GraphicsWindow->BeginGUI();
 		auto size = m_GraphicsWindow->GetSize();
-		OnGUI(RectF(0, 0, size.X, size.Y), gui);
+		OnGUI(RectF(0, 0, size.X, size.Y));
 		m_GraphicsWindow->EndGUI();
 	}
 
-	void WindowContainer::OnGUI(const RectF& position, RPtr<GUI> gui)
+	void WindowContainer::OnGUI(const RectF& position)
 	{
-		gui->Label(position, TEXT("Window Container"));
+		GUI::Label(position, TEXT("Window Container"));
 	}
 }
