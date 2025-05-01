@@ -65,6 +65,7 @@ namespace Ayla
 		m_TargetWindow = targetWindow;
 		m_Graphics = graphics;
 		m_GUI = New<D2D1GUI>();
+		m_GUI->m_Graphics = m_Graphics;
 	}
 
 	Vector2F D3D12Window::GetSize()

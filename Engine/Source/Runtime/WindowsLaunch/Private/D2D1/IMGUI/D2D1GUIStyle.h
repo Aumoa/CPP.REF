@@ -9,6 +9,8 @@
 
 namespace Ayla
 {
+	class GUIContent;
+
 	ACLASS()
 	class D2D1GUIStyle : public GUIStyle
 	{
@@ -19,6 +21,8 @@ namespace Ayla
 		float m_FontSize = 14.0f;
 
 	public:
+		APROPERTY()
+		PPtr<Graphics> m_Graphics;
 		ComPtr<IDWriteTextFormat3> m_TextFormat;
 
 	public:
@@ -28,6 +32,9 @@ namespace Ayla
 		virtual float GetFontSize() override;
 		virtual void SetFontSize(float value) override;
 
-		virtual void ApplyModifiedProperties(RPtr<Graphics> graphics) override;
+		virtual Vector2F CalcSize(RPtr<GUIContent> content) override;
+
+	public:
+		void ApplyModifiedProperties();
 	};
 }

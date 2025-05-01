@@ -47,9 +47,34 @@ namespace Ayla
 		s_Current->DoSetSkin(value);
 	}
 
+	RPtr<GUIStyle> GUI::CreateStyle()
+	{
+		return s_Current->DoCreateStyle();
+	}
+
+	RPtr<GUIContent> GUI::CreateContent(String text)
+	{
+		return s_Current->DoCreateContent(text);
+	}
+
 	void GUI::Label(const RectF& position, String text)
 	{
 		s_Current->DoLabel(position, text);
+	}
+
+	void GUI::Label(const RectF& position, RPtr<GUIContent> content)
+	{
+		s_Current->DoLabel(position, content);
+	}
+
+	void GUI::DrawRect(const RectF& position, float strokeWidth)
+	{
+		s_Current->DoDrawRect(position, strokeWidth);
+	}
+
+	void GUI::FillRect(const RectF& position)
+	{
+		s_Current->DoFillRect(position);
 	}
 
 	void GUI::SetCurrent(RPtr<GUI> instance)

@@ -32,6 +32,10 @@ namespace Ayla
 		ComPtr<ID2D1SolidColorBrush> m_ForegroundColorBrush;
 
 	public:
+		APROPERTY()
+		PPtr<Graphics> m_Graphics;
+
+	public:
 		void BeginRender();
 		void EndRender(ID2D1DeviceContext* deviceContext, RPtr<Graphics> graphics);
 
@@ -48,7 +52,15 @@ namespace Ayla
 		virtual RPtr<GUISkin> DoGetSkin() override;
 		virtual void DoSetSkin(RPtr<GUISkin> value) override;
 
+		virtual RPtr<GUIStyle> DoCreateStyle() override;
+		virtual RPtr<GUIContent> DoCreateContent(String text) override;
+
 		virtual void DoLabel(const RectF& position, String text) override;
+		virtual void DoLabel(const RectF& position, RPtr<GUIContent> content) override;
+
+		virtual void DoDrawRect(const RectF& position, float strokeWidth = 1.0f) override;
+
+		virtual void DoFillRect(const RectF& position) override;
 
 	private:
 		void UpdateColor(ID2D1DeviceContext* deviceContext, ComPtr<ID2D1SolidColorBrush>& brush, const Color& color);
