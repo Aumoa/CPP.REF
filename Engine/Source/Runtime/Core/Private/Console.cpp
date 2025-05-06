@@ -18,7 +18,7 @@ namespace Ayla
 
 		void BroadcastSignalInterrupt(int)
 		{
-			Console::CancelKeyPressed.Broadcast();
+			Console::CancelKeyPressed.InvokeIfBound();
 		}
 
 		int SignalInit = +[]()

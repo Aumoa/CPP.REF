@@ -16,4 +16,4 @@ namespace Ayla
 	};
 }
 
-#define DECLARE_MULTICAST_EVENT(EventName, ...) using EventName = ::Ayla::MulticastEvent<void(__VA_ARGS__)>
+#define DECLARE_MULTICAST_EVENT(EventName, ...) using EventName = ::Ayla::MulticastEvent<This, void(__VA_ARGS__)>
