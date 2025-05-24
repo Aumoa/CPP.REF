@@ -2,10 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "HAL/IMGUI/GUI.h"
+#include "HAL/IMGUI/GUIEvent.h"
 
 namespace Ayla
 {
 	thread_local RPtr<GUI> s_Current;
+	thread_local const GUIEvent* s_Event;
 
 	Color GUI::GetColor()
 	{
@@ -47,6 +49,16 @@ namespace Ayla
 		s_Current->DoSetSkin(value);
 	}
 
+	const GUIEvent* GUI::GetEvent()
+	{
+		return s_Event;
+	}
+
+	void GUI::SetEvent(const GUIEvent* event)
+	{
+		s_Event = event;
+	}
+
 	RPtr<GUIStyle> GUI::CreateStyle()
 	{
 		return s_Current->DoCreateStyle();
@@ -59,22 +71,34 @@ namespace Ayla
 
 	void GUI::Label(const RectF& position, String text)
 	{
-		s_Current->DoLabel(position, text);
+		if (s_Event->Type == GUIEvent::Types::Repaint)
+		{
+			s_Current->DoLabel(position, text);
+		}
 	}
 
 	void GUI::Label(const RectF& position, RPtr<GUIContent> content)
 	{
-		s_Current->DoLabel(position, content);
+		if (s_Event->Type == GUIEvent::Types::Repaint)
+		{
+			s_Current->DoLabel(position, content);
+		}
 	}
 
 	void GUI::DrawRect(const RectF& position, float strokeWidth)
 	{
-		s_Current->DoDrawRect(position, strokeWidth);
+		if (s_Event->Type == GUIEvent::Types::Repaint)
+		{
+			s_Current->DoDrawRect(position, strokeWidth);
+		}
 	}
 
 	void GUI::FillRect(const RectF& position)
 	{
-		s_Current->DoFillRect(position);
+		if (s_Event->Type == GUIEvent::Types::Repaint)
+		{
+			s_Current->DoFillRect(position);
+		}
 	}
 
 	void GUI::SetCurrent(RPtr<GUI> instance)

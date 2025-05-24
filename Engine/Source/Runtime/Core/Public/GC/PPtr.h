@@ -31,6 +31,12 @@ namespace Ayla
 			m_Ptr = nullptr;
 		}
 
+		inline PPtr(std::nullptr_t) noexcept
+		{
+			m_Object = nullptr;
+			m_Ptr = nullptr;
+		}
+
 		inline explicit PPtr(T* ptr) noexcept requires std::derived_from<T, Object>;
 		template<class U>
 		inline PPtr(const PPtr<U>& rhs) noexcept requires std::derived_from<U, T>;

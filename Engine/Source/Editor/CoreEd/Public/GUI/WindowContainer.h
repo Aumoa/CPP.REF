@@ -26,7 +26,7 @@ namespace Ayla
 		virtual void ConfigureWindow(RPtr<Engine> engine, RPtr<GenericApplication> app);
 
 	public:
-		virtual void DrawGUI();
+		virtual void RenderWindow();
 
 	protected:
 		virtual void OnGUI(const RectF& position);

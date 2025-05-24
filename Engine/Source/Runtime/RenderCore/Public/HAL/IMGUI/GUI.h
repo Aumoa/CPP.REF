@@ -13,6 +13,7 @@ namespace Ayla
 	class GUIStyle;
 	class GUIContent;
 	class Graphics;
+	struct GUIEvent;
 
 	ACLASS()
 	class RENDERCORE_API GUI : public Object
@@ -31,6 +32,9 @@ namespace Ayla
 
 		static RPtr<GUISkin> GetSkin();
 		static void SetSkin(RPtr<GUISkin> value);
+
+		static const GUIEvent* GetEvent();
+		static void SetEvent(const GUIEvent* event);
 
 		static RPtr<GUIStyle> CreateStyle();
 		static RPtr<GUIContent> CreateContent(String text);

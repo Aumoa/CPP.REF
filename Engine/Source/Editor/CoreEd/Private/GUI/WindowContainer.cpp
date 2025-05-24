@@ -6,6 +6,7 @@
 #include "HAL/Window.h"
 #include "HAL/Graphics.h"
 #include "HAL/IMGUI/GUI.h"
+#include "HAL/IMGUI/GUIEvent.h"
 
 namespace Ayla
 {
@@ -26,11 +27,14 @@ namespace Ayla
 		genericWindow->Show();
 	}
 
-	void WindowContainer::DrawGUI()
+	void WindowContainer::RenderWindow()
 	{
 		m_GraphicsWindow->BeginGUI();
 		auto size = m_GraphicsWindow->GetSize();
+		GUIEvent e = GUIEvent::Repaint();
+		GUI::SetEvent(&e);
 		OnGUI(RectF(0, 0, size.X, size.Y));
+		GUI::SetEvent(nullptr);
 		m_GraphicsWindow->EndGUI();
 	}
 

@@ -176,7 +176,7 @@ namespace Ayla
 			deviceContext->DrawRectangle(ASRECT(position), m_ForegroundColorBrush.Get(), strokeWidth, nullptr);
 		});
 
-		m_NeedUpdateBackgroundColor = false;
+		m_NeedUpdateForegroundColor = false;
 	}
 
 	void D2D1GUI::DoFillRect(const RectF& position)
@@ -197,7 +197,7 @@ namespace Ayla
 			deviceContext->FillRectangle(ASRECT(position), m_ForegroundColorBrush.Get());
 		});
 
-		m_NeedUpdateBackgroundColor = false;
+		m_NeedUpdateForegroundColor = false;
 	}
 
 	void D2D1GUI::UpdateColor(ID2D1DeviceContext* deviceContext, ComPtr<ID2D1SolidColorBrush>& brush, const Color& color)

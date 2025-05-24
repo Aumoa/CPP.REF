@@ -31,6 +31,12 @@ namespace Ayla
 			m_Ptr = nullptr;
 		}
 
+		inline RPtr(std::nullptr_t) noexcept
+		{
+			m_Object = nullptr;
+			m_Ptr = nullptr;
+		}
+
 		inline explicit RPtr(T* ptr) noexcept requires std::derived_from<T, Object>;
 
 		inline RPtr(const RPtr& rhs) noexcept;

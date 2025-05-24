@@ -37,6 +37,7 @@ namespace Ayla
         virtual void Hide() override;
         virtual Vector2N GetSize() const override;
 
+    public:
         static RPtr<WindowsWindow> Create(HINSTANCE hInstance, const GenericWindowDefinition& InDefinition);
     };
 }

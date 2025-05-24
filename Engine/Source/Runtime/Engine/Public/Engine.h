@@ -13,6 +13,7 @@ namespace Ayla
 	class GenericApplication;
 	class Window;
 	class GenericWindow;
+	struct GenericPlatformInputEvent;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -32,7 +33,7 @@ namespace Ayla
 		virtual RPtr<InitializationContext> PreInitialize();
 		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app);
 
-		virtual void Tick();
+		virtual void Tick(const std::vector<GenericPlatformInputEvent>& inputEvents);
 
 	public:
 		RPtr<Window> ConfigureWindow(RPtr<GenericWindow> targetWindow);

@@ -12,7 +12,8 @@ namespace Ayla
 		friend T;
 
 	private:
-		using MulticastDelegate<F>::Broadcast;
+		using MulticastDelegate<F>::Invoke;
+		using MulticastDelegate<F>::InvokeIfBound;
 	};
 }
 

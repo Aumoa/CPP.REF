@@ -40,7 +40,7 @@ namespace Ayla
         while (!m_GenericApp->IsQuitRequested())
         {
             m_GenericApp->PumpMessages(inputEvents);
-            m_Engine->Tick();
+            m_Engine->Tick(inputEvents);
         }
 
         return m_GenericApp->GetExitCode();

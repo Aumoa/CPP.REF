@@ -33,13 +33,13 @@ namespace Ayla
 		GenericSplash::Hide();
 	}
 
-	void EditorEngine::Tick()
+	void EditorEngine::Tick(const std::vector<GenericPlatformInputEvent>& inputEvents)
 	{
-		Super::Tick();
+		Super::Tick(inputEvents);
 	}
 
 	void EditorEngine::RenderWindows()
 	{
-		m_EditorWindow->DrawGUI();
+		m_EditorWindow->RenderWindow();
 	}
 }

@@ -30,7 +30,7 @@ namespace Ayla
 		m_Graphics->Initialize();
 	}
 
-	void Engine::Tick()
+	void Engine::Tick(const std::vector<GenericPlatformInputEvent>& inputEvents)
 	{
 		m_Graphics->BeginRender();
 		RenderWindows();

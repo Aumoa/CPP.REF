@@ -26,7 +26,7 @@ namespace Ayla
 		virtual RPtr<InitializationContext> PreInitialize() override;
 		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app) override;
 
-		virtual void Tick() override;
+		virtual void Tick(const std::vector<GenericPlatformInputEvent>& inputEvents) override;
 
 	protected:
 		virtual void RenderWindows() override;

@@ -116,7 +116,7 @@ namespace Ayla
 			}
 			else
 			{
-				return sqrt(value);
+				return std::sqrt(value);
 			}
 		}
 
