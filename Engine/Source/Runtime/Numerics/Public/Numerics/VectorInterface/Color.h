@@ -117,6 +117,16 @@ namespace Ayla
 			return String::Format(TEXT("#{:0>8X}"), ToUInt());
 		}
 
+		inline constexpr Color WithAlpha(float a) const
+		{
+			return Color(R, G, B, a);
+		}
+
+		inline constexpr Color BlendAlpha(float a) const
+		{
+			return Color(R, G, B, A * a);
+		}
+
 		template<TIsVector<float, 4> IVectorL, TIsVector<float, 4> IVectorR>
 		static constexpr Color AlphaBlend(const IVectorL& VL, const IVectorR& VR, float A = 1.0f)
 		{

@@ -73,7 +73,7 @@ namespace Ayla
 		return Vector<>::Cast<Vector2F>(m_TargetWindow->GetSize());
 	}
 
-	void D3D12Window::BeginGUI()
+	void D3D12Window::BeginRenderGUI()
 	{
 		size_t index = (size_t)m_SwapChain->GetCurrentBackBufferIndex();
 		HR(m_Allocator[index]->Reset());
@@ -104,7 +104,7 @@ namespace Ayla
 		m_GUI->BeginRender();
 	}
 
-	void D3D12Window::EndGUI()
+	void D3D12Window::EndRenderGUI()
 	{
 		m_GUI->EndRender(m_GUIContext.Get(), m_Graphics);
 
@@ -117,5 +117,15 @@ namespace Ayla
 		m_DeviceContext11->Flush();
 
 		HR(m_SwapChain->Present(0, 0));
+	}
+
+	void D3D12Window::BeginNonRenderGUI()
+	{
+		m_GUI->BeginNonRender();
+	}
+
+	void D3D12Window::EndNonRenderGUI()
+	{
+		m_GUI->EndNonRender();
 	}
 }

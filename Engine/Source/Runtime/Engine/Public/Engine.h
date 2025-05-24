@@ -39,6 +39,7 @@ namespace Ayla
 		RPtr<Window> ConfigureWindow(RPtr<GenericWindow> targetWindow);
 
 	protected:
+		virtual void HandleEventsForWindows(const std::vector<GenericPlatformInputEvent>& inputEvents);
 		virtual void RenderWindows();
 
 	protected:

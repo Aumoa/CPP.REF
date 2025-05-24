@@ -18,7 +18,10 @@ namespace Ayla
 	public:
 		virtual Vector2F GetSize() = 0;
 
-		virtual void BeginGUI() = 0;
-		virtual void EndGUI() = 0;
+		virtual void BeginRenderGUI() = 0;
+		virtual void EndRenderGUI() = 0;
+
+		virtual void BeginNonRenderGUI() = 0;
+		virtual void EndNonRenderGUI() = 0;
 	};
 }

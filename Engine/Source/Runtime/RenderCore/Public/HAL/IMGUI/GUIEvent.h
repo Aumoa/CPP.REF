@@ -10,15 +10,55 @@ namespace Ayla
 	{
 		enum class Types
 		{
-			Repaint
+			Repaint,
+			MouseMove,
+			MouseDown,
+			MouseUp
 		};
 
-		const Types Type;
+		Types Type;
+		Vector2F MousePosition;
+		int32 Button;
 
 	public:
 		static constexpr GUIEvent Repaint()
 		{
-			return GUIEvent{ .Type = Types::Repaint };
+			return GUIEvent
+			{
+				.Type = Types::Repaint,
+				.MousePosition = Vector2N::Zero(),
+				.Button = 0
+			};
+		}
+
+		static constexpr GUIEvent MouseMove(const Vector2N& mousePosition)
+		{
+			return GUIEvent
+			{
+				.Type = Types::MouseMove,
+				.MousePosition = Vector<>::Cast<Vector2F>(mousePosition),
+				.Button = 0
+			};
+		}
+
+		static constexpr GUIEvent MouseDown(const Vector2N& mousePosition, int32 button)
+		{
+			return GUIEvent
+			{
+				.Type = Types::MouseDown,
+				.MousePosition = Vector<>::Cast<Vector2F>(mousePosition),
+				.Button = button
+			};
+		}
+
+		static constexpr GUIEvent MouseUp(const Vector2N& mousePosition, int32 button)
+		{
+			return GUIEvent
+			{
+				.Type = Types::MouseUp,
+				.MousePosition = Vector<>::Cast<Vector2F>(mousePosition),
+				.Button = button
+			};
 		}
 	};
 }

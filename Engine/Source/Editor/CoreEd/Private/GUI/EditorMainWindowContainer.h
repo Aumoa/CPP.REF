@@ -9,6 +9,7 @@
 namespace Ayla
 {
 	class GUIContent;
+	class MenuItem;
 
 	ACLASS()
 	class EditorMainWindowContainer : public DockableWindowContainer
@@ -17,11 +18,9 @@ namespace Ayla
 
 	private:
 		APROPERTY()
-		PPtr<GUIContent> m_MenuFileContent;
-		Vector2F m_MenuFileContentSize;
+		PPtr<MenuItem> m_MenuFile;
 		APROPERTY()
-		PPtr<GUIContent> m_MenuEditContent;
-		Vector2F m_MenuEditContentSize;
+		PPtr<MenuItem> m_MenuEdit;
 
 	protected:
 		virtual void OnGUI(const RectF& position) override;

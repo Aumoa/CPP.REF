@@ -57,11 +57,8 @@ namespace Ayla
 		}
 
 	public:
-		template<TIsVector<Type, 2> IPoint>
-		constexpr bool PtInRect(const IPoint& P)
-		{
-			return PtInRect(*this, P);
-		}
+		template<TIsVector<T, 2> IPoint>
+		constexpr bool Contains(const IPoint& P) const;
 
 		template<TIsVector<Type, 2> IExtent>
 		constexpr Rect Extend(const IExtent& E) const
@@ -196,7 +193,7 @@ namespace Ayla
 		}
 
 		template<TIsVectorSized<4> IRect, TIsVectorSized<2> IPoint>
-		static constexpr bool PtInRect(const IRect& R, const IPoint& P) requires std::same_as<typename IRect::Type, typename IPoint::Type>
+		static constexpr bool Contains(const IRect& R, const IPoint& P) requires std::same_as<typename IRect::Type, typename IPoint::Type>
 		{
 			return R[0] <= P[0] && P[0] <= R[2]
 				&& R[1] <= P[1] && P[1] <= R[3];
@@ -347,6 +344,13 @@ namespace Ayla
 			return r;
 		}
 	};
+
+	template<class T>
+	template<TIsVector<T, 2> IPoint>
+	constexpr bool Rect<T>::Contains(const IPoint& P) const
+	{
+		return Rect<void>::Contains(*this, P);
+	}
 
 	using RectF = Rect<float>;
 	using RectD = Rect<double>;

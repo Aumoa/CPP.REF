@@ -44,7 +44,10 @@ namespace Ayla
 	public:
 		virtual Vector2F GetSize() override;
 
-		virtual void BeginGUI() override;
-		virtual void EndGUI() override;
+		virtual void BeginRenderGUI() override;
+		virtual void EndRenderGUI() override;
+
+		virtual void BeginNonRenderGUI() override;
+		virtual void EndNonRenderGUI() override;
 	};
 }

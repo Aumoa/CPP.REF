@@ -33,9 +33,25 @@ namespace Ayla
 		GenericSplash::Hide();
 	}
 
-	void EditorEngine::Tick(const std::vector<GenericPlatformInputEvent>& inputEvents)
+	void EditorEngine::HandleEventsForWindows(const std::vector<GenericPlatformInputEvent>& inputEvents)
 	{
-		Super::Tick(inputEvents);
+		if (inputEvents.size() > 0)
+		{
+			for (size_t i = 0; i < inputEvents.size(); ++i)
+			{
+				switch (inputEvents[i].Idx)
+				{
+				case GenericPlatformInputEvent::IDX_MouseMove:
+					m_EditorWindow->DispatchMouseMove(inputEvents[i].MouseMove());
+					break;
+				case GenericPlatformInputEvent::IDX_MouseButton:
+					m_EditorWindow->DispatchMouseMove(inputEvents[i].MouseMove());
+					break;
+				}
+			}
+
+			m_EditorWindow->Repaint();
+		}
 	}
 
 	void EditorEngine::RenderWindows()

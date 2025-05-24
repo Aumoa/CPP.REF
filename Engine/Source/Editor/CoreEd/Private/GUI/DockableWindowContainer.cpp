@@ -7,7 +7,7 @@ namespace Ayla
 {
 	void DockableWindowContainer::OnGUI(const RectF& position)
 	{
-		auto position_ = position;
+		RectF position_ = position;
 
 		// tab layout
 		auto tabLayout = Rect<>::FillTop(position_, 18.0f);

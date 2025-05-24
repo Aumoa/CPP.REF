@@ -1,11 +1,13 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "GUI/EditorMainWindowContainer.h"
+#include "GUI/Menu/MenuItem.h"
 #include "HAL/IMGUI/GUI.h"
 #include "HAL/IMGUI/GUISkin.h"
 #include "HAL/IMGUI/GUIStyle.h"
 #include "HAL/IMGUI/GUIContent.h"
 #include "HAL/IMGUI/GUIColorScope.h"
+#include "HAL/IMGUI/GUIEvent.h"
 
 namespace Ayla
 {
@@ -28,35 +30,58 @@ namespace Ayla
 
 	void EditorMainWindowContainer::DrawMenu(const RectF& position)
 	{
-		GUI::SetColor(NamedColors::White);
-		GUI::FillRect(position);
-
-		if (m_MenuFileContent == nullptr)
 		{
-			m_MenuFileContent = GUI::CreateContent(TEXT("File"));
-			auto label = GUI::GetSkin()->GetLabel();
-			m_MenuFileContentSize = label->CalcSize(m_MenuFileContent);
+			GUIColorScope s{ NamedColors::White };
+			GUI::FillRect(position);
 		}
 
-		if (m_MenuEditContent == nullptr)
+		if (m_MenuFile == nullptr)
 		{
-			m_MenuEditContent = GUI::CreateContent(TEXT("Edit"));
-			auto label = GUI::GetSkin()->GetLabel();
-			m_MenuEditContentSize = label->CalcSize(m_MenuEditContent);
+			m_MenuFile = New<MenuItem>();
+			m_MenuFile->SetText(TEXT("File"));
+		}
+
+		if (m_MenuEdit == nullptr)
+		{
+			m_MenuEdit = New<MenuItem>();
+			m_MenuEdit->SetText(TEXT("Edit"));
 		}
 
 		auto position_ = position;
 		const float Margin = 8;
+		auto e = GUI::GetEvent();
 
-		auto scope1 = GUIColorScope(NamedColors::Black);
+		auto DrawMenuButton = [this, &e, &Margin](const RectF& position, RPtr<GUIContent> content, bool& hover)
 		{
-			auto item1 = Rect<>::FillLeft(Rect<>::MarginLeft(position_, Margin), m_MenuFileContentSize.X);
-			position_ = Rect<>::MarginLeft(position_, Margin + m_MenuFileContentSize.X + Margin);
-			GUI::Label(item1, m_MenuFileContent);
+			if (e->Type == GUIEvent::Types::MouseMove)
+			{
+				bool newHover = position.Contains(e->MousePosition);
+				if (hover != newHover)
+				{
+					hover = newHover;
+					Repaint();
+				}
+			}
+			else if (e->Type == GUIEvent::Types::Repaint)
+			{
+				if (hover)
+				{
+					GUIColorScope s1{ NamedColors::AliceBlue };
+					GUI::FillRect(position);
+					GUIColorScope s2{ NamedColors::MediumAquamarine };
+					GUI::DrawRect(position);
+				}
 
-			auto item2 = Rect<>::FillLeft(Rect<>::MarginLeft(position_, Margin), m_MenuEditContentSize.X);
-			position_ = Rect<>::MarginLeft(position_, Margin + m_MenuEditContentSize.X + Margin);
-			GUI::Label(item2, m_MenuEditContent);
-		}
+				GUI::Label(Rect<>::Margin(position, Margin, 0, Margin, 0), content);
+			}
+		};
+
+		auto item1 = m_MenuFile->GetCachedItemSize();
+		m_MenuFile->OnGUI(Rect<>::FillLeft(position_, item1.X));
+		position_ = Rect<>::MarginLeft(position_, item1.X);
+
+		auto item2 = m_MenuEdit->GetCachedItemSize();
+		m_MenuEdit->OnGUI(Rect<>::FillLeft(position_, item2.X));
+		position_ = Rect<>::MarginLeft(position_, item2.X);
 	}
 }

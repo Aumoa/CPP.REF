@@ -12,6 +12,8 @@ namespace Ayla
 	class GenericApplication;
 	class Engine;
 	class GUI;
+	struct GenericPlatformInputMouseMoveEvent;
+	struct GenericPlatformInputMouseButtonEvent;
 
 	ACLASS()
 	class COREED_API WindowContainer : public Object
@@ -21,12 +23,18 @@ namespace Ayla
 	private:
 		APROPERTY()
 		PPtr<Window> m_GraphicsWindow;
+		bool m_NeedRepaint = true;
 
 	public:
 		virtual void ConfigureWindow(RPtr<Engine> engine, RPtr<GenericApplication> app);
 
 	public:
+		virtual void DispatchMouseMove(const GenericPlatformInputMouseMoveEvent& event);
+		virtual void DispatchMouseButton(const GenericPlatformInputMouseButtonEvent& event);
 		virtual void RenderWindow();
+
+	public:
+		void Repaint();
 
 	protected:
 		virtual void OnGUI(const RectF& position);

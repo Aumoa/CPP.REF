@@ -37,6 +37,25 @@ namespace Ayla
 		SetCurrent({});
 	}
 
+	void D2D1GUI::BeginNonRender()
+	{
+		SetCurrent(rthis);
+
+		if (m_Skin == nullptr)
+		{
+			m_Skin = New<GUISkin>();
+			m_Skin->SetLabel(CreateStyle());
+		}
+	}
+
+	void D2D1GUI::EndNonRender()
+	{
+		m_RenderCommands.clear();
+		m_Styles.clear();
+
+		SetCurrent({});
+	}
+
 	Color D2D1GUI::DoGetColor()
 	{
 		return m_Color;

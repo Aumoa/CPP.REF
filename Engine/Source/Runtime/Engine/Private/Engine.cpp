@@ -32,6 +32,8 @@ namespace Ayla
 
 	void Engine::Tick(const std::vector<GenericPlatformInputEvent>& inputEvents)
 	{
+		HandleEventsForWindows(inputEvents);
+
 		m_Graphics->BeginRender();
 		RenderWindows();
 		m_Graphics->EndRender();
@@ -40,6 +42,10 @@ namespace Ayla
 	RPtr<Window> Engine::ConfigureWindow(RPtr<GenericWindow> targetWindow)
 	{
 		return m_Graphics->ConfigureWindow(targetWindow);
+	}
+
+	void Engine::HandleEventsForWindows(const std::vector<GenericPlatformInputEvent>& inputEvents)
+	{
 	}
 
 	void Engine::RenderWindows()

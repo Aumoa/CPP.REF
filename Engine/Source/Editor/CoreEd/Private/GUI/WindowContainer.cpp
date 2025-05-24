@@ -27,15 +27,44 @@ namespace Ayla
 		genericWindow->Show();
 	}
 
+	void WindowContainer::DispatchMouseMove(const GenericPlatformInputMouseMoveEvent& event)
+	{
+		m_GraphicsWindow->BeginNonRenderGUI();
+		GUIEvent e = GUIEvent::MouseMove(event.Location);
+		GUI::SetEvent(&e);
+		OnGUI(RectF(Vector2F::Zero(), Vector<>::Cast<Vector2F>(m_GraphicsWindow->GetSize())));
+		GUI::SetEvent(nullptr);
+		m_GraphicsWindow->EndNonRenderGUI();
+	}
+
+	void WindowContainer::DispatchMouseButton(const GenericPlatformInputMouseButtonEvent& event)
+	{
+		m_GraphicsWindow->BeginNonRenderGUI();
+		GUIEvent e = (event.bUp ? GUIEvent::MouseUp : GUIEvent::MouseDown)(event.Location, (int32)event.ButtonType);
+		GUI::SetEvent(&e);
+		OnGUI(RectF(Vector2F::Zero(), Vector<>::Cast<Vector2F>(m_GraphicsWindow->GetSize())));
+		GUI::SetEvent(nullptr);
+		m_GraphicsWindow->EndNonRenderGUI();
+	}
+
 	void WindowContainer::RenderWindow()
 	{
-		m_GraphicsWindow->BeginGUI();
-		auto size = m_GraphicsWindow->GetSize();
-		GUIEvent e = GUIEvent::Repaint();
-		GUI::SetEvent(&e);
-		OnGUI(RectF(0, 0, size.X, size.Y));
-		GUI::SetEvent(nullptr);
-		m_GraphicsWindow->EndGUI();
+		if (m_NeedRepaint)
+		{
+			m_NeedRepaint = false;
+
+			m_GraphicsWindow->BeginRenderGUI();
+			GUIEvent e = GUIEvent::Repaint();
+			GUI::SetEvent(&e);
+			OnGUI(RectF(Vector2F::Zero(), Vector<>::Cast<Vector2F>(m_GraphicsWindow->GetSize())));
+			GUI::SetEvent(nullptr);
+			m_GraphicsWindow->EndRenderGUI();
+		}
+	}
+
+	void WindowContainer::Repaint()
+	{
+		m_NeedRepaint = true;
 	}
 
 	void WindowContainer::OnGUI(const RectF& position)

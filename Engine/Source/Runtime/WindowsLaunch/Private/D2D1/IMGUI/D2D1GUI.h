@@ -39,6 +39,9 @@ namespace Ayla
 		void BeginRender();
 		void EndRender(ID2D1DeviceContext* deviceContext, RPtr<Graphics> graphics);
 
+		void BeginNonRender();
+		void EndNonRender();
+
 	protected:
 		virtual Color DoGetColor() override;
 		virtual void DoSetColor(const Color& value) override;
