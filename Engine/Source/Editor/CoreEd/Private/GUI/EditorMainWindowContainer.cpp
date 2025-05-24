@@ -61,6 +61,11 @@ namespace Ayla
 					hover = newHover;
 					Repaint();
 				}
+
+				if (newHover)
+				{
+					e->Use();
+				}
 			}
 			else if (e->Type == GUIEvent::Types::Repaint)
 			{

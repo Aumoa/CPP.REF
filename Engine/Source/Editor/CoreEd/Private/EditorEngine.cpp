@@ -45,7 +45,7 @@ namespace Ayla
 					m_EditorWindow->DispatchMouseMove(inputEvents[i].MouseMove());
 					break;
 				case GenericPlatformInputEvent::IDX_MouseButton:
-					m_EditorWindow->DispatchMouseMove(inputEvents[i].MouseMove());
+					m_EditorWindow->DispatchMouseButton(inputEvents[i].MouseButton());
 					break;
 				}
 			}

@@ -13,12 +13,19 @@ namespace Ayla
 			Repaint,
 			MouseMove,
 			MouseDown,
-			MouseUp
+			MouseUp,
+			Used
 		};
 
 		Types Type;
 		Vector2F MousePosition;
 		int32 Button;
+
+		void Use() const
+		{
+			// Use const_cast to represent event consumption.
+			const_cast<GUIEvent*>(this)->Type = Types::Used;
+		}
 
 	public:
 		static constexpr GUIEvent Repaint()
