@@ -13,8 +13,5 @@ public class Numerics : ModuleRules
 
         // In C11, unnamed union structure is allowed actually.
         AddPublicDisableWarnings(4201);
-
-        DisableGenerateBindings = true;
-        EnableScript = true;
     }
 }

@@ -19,7 +19,7 @@ internal readonly struct SourceCodeDescriptor(GroupDescriptor Group, string Modu
             case ".cpp":
                 type = SourceCodeType.SourceCode;
                 break;
-            case ".h":
+            case ".h" or ".inl":
                 type = SourceCodeType.Header;
                 break;
             case ".cs":

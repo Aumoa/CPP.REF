@@ -21,21 +21,6 @@
 #endif
 
 
-// intrinsic functions.
-#if PLATFORM_CPU_X86_FAMILY
-#include <emmintrin.h>
-#endif
-
-#if !defined(__clang__) && !defined(__GNUC__)
-#	include <intrin.h>
-#	if defined(_M_ARM)
-#		include <armintr.h>
-#	elif defined(_M_ARM64)
-#		include <arm64intr.h>
-#	endif
-#endif
-
-
 #if PLATFORM_CPU_X86_FAMILY
 #	define PLATFORM_YIELD() _mm_pause()
 #elif PLATFORM_CPU_ARM_FAMILY

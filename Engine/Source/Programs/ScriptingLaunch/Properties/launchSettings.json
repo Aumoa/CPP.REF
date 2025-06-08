@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "ScriptingLaunch": {
-      "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)Binaries\\Win64\\$(Configuration)",
-      "nativeDebugging": true
-    }
-  }
-}

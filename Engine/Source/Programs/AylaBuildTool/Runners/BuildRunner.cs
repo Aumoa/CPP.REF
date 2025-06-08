@@ -232,7 +232,6 @@ internal static partial class BuildRunner
                 generators = new RHTGenerator.Collection(dict);
             }
 
-            HashSet<ModuleProject> scriptableProjects = [];
             foreach (var result in results)
             {
                 if (await result.TryGenerateAsync(generators, buildTarget, cancellationToken) == false)
@@ -251,127 +250,9 @@ internal static partial class BuildRunner
 
                     list.Add(gsc.Value);
                 }
-
-                var gbc = result.GeneratedBindingCode;
-                if (gbc != null)
-                {
-                    scriptableProjects.Add(result.Project);
-                }
-                else if (result.Project.GetRule(buildTarget).EnableScript)
-                {
-                    scriptableProjects.Add(result.Project);
-                }
             }
 
             Console.WriteLine(" Done.");
-
-            Dictionary<string, TaskCompletionSource> publishBindingsTasks = [];
-            foreach (var project in scriptableProjects)
-            {
-                var rule = project.GetRule(buildTarget);
-                if (rule.DisableGenerateBindings == false || rule.EnableScript)
-                {
-                    publishBindingsTasks.Add(project.Name, new TaskCompletionSource());
-                }
-            }
-
-            if (scriptableProjects.Count > 0)
-            {
-                Console.WriteLine("Compiling scripting projects...");
-            }
-
-            foreach (var project in scriptableProjects)
-            {
-                var rule = project.GetRule(buildTarget);
-
-                var sourceDirectory = Path.Combine(project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current), "Bindings");
-
-                var outputPath = project.Group.Output(buildTarget, FolderPolicy.PathType.Current);
-                var assemblyName = $"{project.Name}.Bindings";
-                var dllName = assemblyName + ".dll";
-
-                var csproj = CSGenerator.GenerateModule(solution, project, false, buildTarget);
-                if (DotNETCompiler.NeedCompile(sourceDirectory, assemblyName, project.Group, buildTarget))
-                {
-                    _ = PublishAsync().ContinueWith(r =>
-                    {
-                        try
-                        {
-                            r.GetAwaiter().GetResult();
-
-                            lock (publishBindingsTasks)
-                            {
-                                publishBindingsTasks[project.Name].SetResult();
-                            }
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            lock (publishBindingsTasks)
-                            {
-                                publishBindingsTasks[project.Name].SetCanceled();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            lock (publishBindingsTasks)
-                            {
-                                publishBindingsTasks[project.Name].SetException(e);
-                            }
-                        }
-                    });
-
-                    async Task PublishAsync()
-                    {
-                        var resolver = project.GetResolver(buildTarget);
-                        foreach (var depend in resolver.DependencyModuleNames)
-                        {
-                            Task dependTask;
-                            lock (publishBindingsTasks)
-                            {
-                                if (publishBindingsTasks.TryGetValue(depend, out var tcs))
-                                {
-                                    dependTask = tcs.Task;
-                                }
-                                else
-                                {
-                                    dependTask = Task.CompletedTask;
-                                }
-                            }
-
-                            await dependTask;
-                        }
-
-                        Directory.CreateDirectory(outputPath);
-                        var compiler = new DotNETCompiler();
-                        var outputDll = await compiler.CompileAsync(sourceDirectory, assemblyName, csproj, project.Group, buildTarget, cancellationToken);
-                        Console.WriteLine("{0} -> {1}.", assemblyName, outputDll);
-
-                        if (rule.EnableScript)
-                        {
-                            compiler = new DotNETCompiler();
-                            sourceDirectory = project.ScriptSourceDirectory;
-                            assemblyName = project.ScriptAssemblyName;
-                            if (DotNETCompiler.NeedCompile(sourceDirectory, assemblyName, project.Group, buildTarget))
-                            {
-                                var csproj = CSGenerator.GenerateModule(solution, project, true, buildTarget);
-                                outputDll = await compiler.CompileAsync(sourceDirectory, assemblyName, csproj, project.Group, buildTarget, cancellationToken);
-                                Console.WriteLine("{0} -> {1}.", assemblyName, outputDll);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    lock (publishBindingsTasks)
-                    {
-                        publishBindingsTasks[project.Name].SetResult();
-                    }
-                }
-            }
-
-            await Task.WhenAll(publishBindingsTasks.Values.Select(p => p.Task));
-
-            Console.WriteLine("Reflection header files and scripting DLLs has been generated.");
         }
 
         void DispatchLinkWorkers()

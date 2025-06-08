@@ -50,6 +50,7 @@
 #include "ConstructorNotFoundException.h"
 #include "Object.h"
 #include "Type.h"
+#include "try_finally.h"
 
 #include "GC/GC.h"
 #include "GC/RPtr.h"

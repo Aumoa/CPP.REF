@@ -6,6 +6,23 @@
 
 #include "Platform/Generic/GenericPlatformMacros.h"
 
+// intrinsic functions.
+#if PLATFORM_CPU_X86_FAMILY
+#include <emmintrin.h>
+#endif
+
+#if !defined(__clang__) && !defined(__GNUC__)
+#	include <intrin.h>
+#	if defined(_M_ARM)
+#		include <armintr.h>
+#	elif defined(_M_ARM64)
+#		include <arm64intr.h>
+#	endif
+#endif
+
+#undef Yield
+#undef OutputDebugString
+
 #define FORCEINLINE __forceinline
 #define FORCEINLINE_LAMBDA [[msvc::forceinline]]
 #define FORCENOINLINE __declspec(noinline)

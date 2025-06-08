@@ -23,5 +23,14 @@ namespace Ayla
 		{
 			return reinterpret_cast<ssize_t>(&ptr);
 		}
+
+		template<class T = Object>
+		static inline RPtr<T> IntPtrToRPtrDeleteCopy(ssize_t intptr)
+		{
+			auto ptr = reinterpret_cast<RPtr<Object>*>(intptr);
+			auto copy = static_cast<RPtr<T>>(*ptr);
+			delete ptr;
+			return copy;
+		}
 	};
 }

@@ -17,8 +17,6 @@ internal static partial class BuildRunner
         }
 
         public SourceCodeDescriptor? GeneratedSourceCode { get; private set; }
-        
-        public string? GeneratedBindingCode { get; private set; }
 
         public string? ErrorText { get; private set; }
 
@@ -59,15 +57,6 @@ internal static partial class BuildRunner
             await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
             GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Group, Project.Name, generatedSourceCode, Project.Group.IntermediateDirectory);
-
-            if (Project.GetRule(targetInfo).DisableGenerateBindings == false)
-            {
-                var bindingCodeText = Generator.GenerateBindings(collection).Replace("\r\n", "\n").Trim();
-                await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, bindingCodeText, cancellationToken);
-
-                GeneratedBindingCode = generatedBindingCode;
-            }
-
             return true;
         }
     }
