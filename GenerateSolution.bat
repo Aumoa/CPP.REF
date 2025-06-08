@@ -13,5 +13,5 @@ PUSHD "%~dp0"
     )
   )
 
-  dotnet "%BUILDTOOL%" ProjectFiles
+  dotnet "%BUILDTOOL%" generate
 POPD
