@@ -1,7 +1,9 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include <Windows.h>
+#define __ALLOW_PLATFORM_COMMON_H__
+
 #include "CoreMinimal.h"
+#include "Platform/PlatformCommon.h"
 #include "Launch.h"
 
 extern "C"

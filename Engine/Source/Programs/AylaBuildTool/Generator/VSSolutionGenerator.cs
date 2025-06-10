@@ -255,11 +255,6 @@ internal class VSSolutionGenerator : Generator
 
             builder.AppendFormat("Project(\"{0}\") = \"{1}\", \"{2}\", \"{3}\"\n", CppProjectGuid.ToString("B").ToUpper(), project.Name, projectFilePath.Replace('/', '\\'), project.Decl.Guid.ToString("B").ToUpper());
             List<string> projectDependencies = [];
-            if (project.Name == "Launch")
-            {
-                var scriptingLaunch = solution.Projects.First(p => p.Name == "ScriptingLaunch");
-                projectDependencies.Add(scriptingLaunch.Decl.Guid.ToString("B").ToUpper());
-            }
             if (projectDependencies.Count > 0)
             {
                 builder.AppendFormat("  ProjectSection(ProjectDependencies) = postProject\n");

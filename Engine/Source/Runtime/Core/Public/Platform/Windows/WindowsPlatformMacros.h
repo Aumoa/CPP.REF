@@ -20,8 +20,7 @@
 #	endif
 #endif
 
-#undef Yield
-#undef OutputDebugString
+#include "Platform/Windows/UndefWindowsPlatformMacros.h"
 
 #define FORCEINLINE __forceinline
 #define FORCEINLINE_LAMBDA [[msvc::forceinline]]

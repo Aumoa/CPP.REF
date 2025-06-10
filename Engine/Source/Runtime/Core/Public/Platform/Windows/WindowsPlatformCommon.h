@@ -31,21 +31,7 @@
 #include <dxcapi.h>
 #include <TlHelp32.h>
 
-#undef YieldProcessor
-#undef OutputDebugString
-#undef GetMessage
-#undef GetCurrentDirectory
-#undef SetCurrentDirectory
-#undef Yield
-#undef min
-#undef max
-#undef CreateProcess
-#undef InterlockedIncrement
-#undef InterlockedDecrement
-#undef byte
-#undef FormatMessage
-#undef SetEnvironmentVariable
-#undef GetEnvironmentVariable
+#include "Platform/Windows/UndefWindowsPlatformMacros.h"
 
 #pragma warning(pop)
 #pragma pop_macro("TEXT")
