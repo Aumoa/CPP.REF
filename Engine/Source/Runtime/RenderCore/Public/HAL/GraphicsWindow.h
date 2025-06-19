@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Vector.h"
-#include "Window.gen.h"
+#include "GraphicsWindow.gen.h"
 
 namespace Ayla
 {
 	class GUI;
 
 	ACLASS()
-	class RENDERCORE_API Window : public Object
+	class RENDERCORE_API GraphicsWindow : public Object
 	{
 		GENERATED_BODY()
 

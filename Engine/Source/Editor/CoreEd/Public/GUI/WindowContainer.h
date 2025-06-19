@@ -8,7 +8,7 @@
 
 namespace Ayla
 {
-	class Window;
+	class GraphicsWindow;
 	class GenericApplication;
 	class Engine;
 	class GUI;
@@ -22,7 +22,7 @@ namespace Ayla
 
 	private:
 		APROPERTY()
-		PPtr<Window> m_GraphicsWindow;
+		PPtr<GraphicsWindow> m_GraphicsWindow;
 		bool m_NeedRepaint = true;
 
 	public:

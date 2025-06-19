@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HAL/Window.h"
+#include "HAL/GraphicsWindow.h"
 #include "D3D12/D3D12Common.h"
 #include "D3D12Window.gen.h"
 
@@ -14,7 +14,7 @@ namespace Ayla
 	class D2D1GUI;
 
 	ACLASS()
-	class WINDOWSAPI_API D3D12Window : public Window
+	class WINDOWSAPI_API D3D12Window : public GraphicsWindow
 	{
 		GENERATED_BODY()
 

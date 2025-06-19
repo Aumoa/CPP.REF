@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-	class Window;
+	class GraphicsWindow;
 	class GenericWindow;
 	class TextureImporter;
 
@@ -24,7 +24,7 @@ namespace Ayla
 
 		virtual void Initialize() = 0;
 
-		virtual RPtr<Window> ConfigureWindow(RPtr<GenericWindow> platformWindow) = 0;
+		virtual RPtr<GraphicsWindow> ConfigureWindow(RPtr<GenericWindow> platformWindow) = 0;
 		virtual RPtr<TextureImporter> CreateTextureImporter() = 0;
 
 		virtual void BeginRender() = 0;

@@ -11,7 +11,7 @@ namespace Ayla
 	class PlatformRenderFeature;
 	class Graphics;
 	class GenericApplication;
-	class Window;
+	class GraphicsWindow;
 	class GenericWindow;
 	struct GenericPlatformInputEvent;
 
@@ -36,13 +36,10 @@ namespace Ayla
 		virtual void Tick(const std::vector<GenericPlatformInputEvent>& inputEvents);
 
 	public:
-		RPtr<Window> ConfigureWindow(RPtr<GenericWindow> targetWindow);
+		RPtr<Graphics> GetGraphics();
 
 	protected:
 		virtual void HandleEventsForWindows(const std::vector<GenericPlatformInputEvent>& inputEvents);
 		virtual void RenderWindows();
-
-	protected:
-		RPtr<Graphics> GetGraphics();
 	};
 }

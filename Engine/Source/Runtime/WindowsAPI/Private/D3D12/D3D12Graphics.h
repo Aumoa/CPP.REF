@@ -35,7 +35,7 @@ namespace Ayla
 
 		virtual void Initialize() override;
 		
-		virtual RPtr<Window> ConfigureWindow(RPtr<GenericWindow> platformWindow) override;
+		virtual RPtr<GraphicsWindow> ConfigureWindow(RPtr<GenericWindow> platformWindow) override;
 		virtual RPtr<TextureImporter> CreateTextureImporter() override;
 
 		virtual void BeginRender() override;

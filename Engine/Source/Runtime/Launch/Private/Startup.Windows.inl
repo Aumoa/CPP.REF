@@ -12,16 +12,16 @@ INT APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 	try_([]()
 	{
-		HMODULE hWindowsLaunch = LoadLibraryW(L"WindowsLaunch.dll");
-		if (hWindowsLaunch == nullptr)
+		HMODULE hWindowsAPI = LoadLibraryW(L"WindowsAPI.dll");
+		if (hWindowsAPI == nullptr)
 		{
-			throw std::runtime_error("Failed to load WindowsLaunch.dll");
+			throw std::runtime_error("Failed to load WindowsAPI.dll");
 		}
 
-		auto allocator = (::Ayla::ssize_t(*)())GetProcAddress(hWindowsLaunch, ACLASS__NAMEOF_NEW_CLASS_INJECTED(Ayla, WindowsLaunch));
+		auto allocator = (::Ayla::ssize_t(*)())GetProcAddress(hWindowsAPI, ACLASS__NAMEOF_NEW_CLASS_INJECTED(Ayla, WindowsLaunch));
 		if (allocator == nullptr)
 		{
-			throw std::runtime_error("Failed to find generated function for create Launch instance in WindowsLaunch.dll");
+			throw std::runtime_error("Failed to find generated function for create Launch instance in WindowsAPI.dll");
 		}
 
 		auto launch = Marshal::IntPtrToRPtrDeleteCopy<Launch>(allocator());

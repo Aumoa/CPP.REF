@@ -59,7 +59,7 @@ namespace Ayla
 		m_FrameSyncEvent = CreateEventExW(NULL, NULL, 0, GENERIC_ALL);
 	}
 
-	RPtr<Window> D3D12Graphics::ConfigureWindow(RPtr<GenericWindow> platformWindow)
+	RPtr<GraphicsWindow> D3D12Graphics::ConfigureWindow(RPtr<GenericWindow> platformWindow)
 	{
 		auto window = New<D3D12Window>();
 		window->Initialize(rthis, platformWindow);

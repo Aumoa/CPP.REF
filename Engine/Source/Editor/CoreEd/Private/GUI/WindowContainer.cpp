@@ -3,7 +3,7 @@
 #include "GUI/WindowContainer.h"
 #include "Engine.h"
 #include "GenericPlatform/GenericApplication.h"
-#include "HAL/Window.h"
+#include "HAL/GraphicsWindow.h"
 #include "HAL/Graphics.h"
 #include "HAL/IMGUI/GUI.h"
 #include "HAL/IMGUI/GUIEvent.h"
@@ -22,7 +22,7 @@ namespace Ayla
 		};
 
 		auto genericWindow = app->MakeWindow(wDef);
-		m_GraphicsWindow = engine->ConfigureWindow(genericWindow);
+		m_GraphicsWindow = engine->GetGraphics()->ConfigureWindow(genericWindow);
 
 		genericWindow->Show();
 	}

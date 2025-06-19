@@ -39,9 +39,9 @@ namespace Ayla
 		m_Graphics->EndRender();
 	}
 
-	RPtr<Window> Engine::ConfigureWindow(RPtr<GenericWindow> targetWindow)
+	RPtr<Graphics> Engine::GetGraphics()
 	{
-		return m_Graphics->ConfigureWindow(targetWindow);
+		return m_Graphics;
 	}
 
 	void Engine::HandleEventsForWindows(const std::vector<GenericPlatformInputEvent>& inputEvents)
@@ -50,10 +50,5 @@ namespace Ayla
 
 	void Engine::RenderWindows()
 	{
-	}
-
-	RPtr<Graphics> Engine::GetGraphics()
-	{
-		return m_Graphics;
 	}
 }
