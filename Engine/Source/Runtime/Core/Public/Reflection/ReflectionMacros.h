@@ -5,6 +5,18 @@
 #define AYLA__COMBINE_1_MACROS(V1) V1
 #define AYLA__COMBINE_3_MACROS(V1, V2, V3) V1 ## __ ## V2 ## __ ## V3
 
+#define ACLASS__NEW_CLASS_INJECTED(NamespaceName, ClassName) \
+extern "C" \
+{ \
+	PLATFORM_SHARED_EXPORT::Ayla::ssize_t Injected__ ## NamespaceName ## __ ## ClassName ## __New() \
+	{ \
+		return (::Ayla::size_t)new ::Ayla::RPtr<::Ayla::Object>(::Ayla::Object::New<::NamespaceName::ClassName>()); \
+	} \
+}
+
+#define ACLASS__NAMEOF_NEW_CLASS_INJECTED(NamespaceName, ClassName) \
+"Injected__" #NamespaceName "__" #ClassName "__New"
+
 #define ACLASS__IMPL_CLASS_REGISTER(NamespaceName, ClassName) \
 namespace Ayla \
 { \

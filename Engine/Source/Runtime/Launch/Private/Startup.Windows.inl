@@ -6,11 +6,6 @@
 #include "Platform/PlatformCommon.h"
 #include "Launch.h"
 
-extern "C"
-{
-	PLATFORM_SHARED_EXPORT::Ayla::ssize_t Injected__Ayla__WindowsApplication__New();
-}
-
 INT APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	using namespace ::Ayla;
@@ -23,7 +18,7 @@ INT APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 			throw std::runtime_error("Failed to load WindowsLaunch.dll");
 		}
 
-		auto allocator = (::Ayla::ssize_t(*)())GetProcAddress(hWindowsLaunch, "Injected__Ayla__WindowsLaunch__New");
+		auto allocator = (::Ayla::ssize_t(*)())GetProcAddress(hWindowsLaunch, ACLASS__NAMEOF_NEW_CLASS_INJECTED(Ayla, WindowsLaunch));
 		if (allocator == nullptr)
 		{
 			throw std::runtime_error("Failed to find generated function for create Launch instance in WindowsLaunch.dll");

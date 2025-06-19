@@ -7,6 +7,7 @@
 #include "Windows/WindowsLaunch.h"
 #include "Platform/PlatformCommon.h"
 #include "D3D12/WindowsPlatformRenderFeature.h"
+#include "InteropServices/Marshal.h"
 
 namespace Ayla
 {
@@ -25,6 +26,8 @@ namespace Ayla
 		return New<WindowsPlatformRenderFeature>();
 	}
 }
+
+ACLASS__NEW_CLASS_INJECTED(Ayla, WindowsLaunch);
 
 #undef __ALLOW_PLATFORM_COMMON_H__
 
