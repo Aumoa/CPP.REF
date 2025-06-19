@@ -52,7 +52,7 @@ internal class ModuleRulesResolver
             switch (m_TargetInfo.Platform.Group)
             {
                 case PlatformGroup.Windows:
-                    source = source.Append("WindowsLaunch");
+                    source = source.Append("WindowsAPI");
                     break;
                 default:
                     Console.Error.WriteLine("Target platform not supported yet.");

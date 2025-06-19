@@ -3,9 +3,9 @@
 using System;
 using AylaEngine;
 
-public class WindowsLaunch : ModuleRules
+public class WindowsAPI : ModuleRules
 {
-    public WindowsLaunch()
+    public WindowsAPI()
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");

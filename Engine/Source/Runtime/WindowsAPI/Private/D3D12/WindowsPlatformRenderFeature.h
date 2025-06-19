@@ -9,7 +9,7 @@
 namespace Ayla
 {
 	ACLASS()
-	class WINDOWSLAUNCH_API WindowsPlatformRenderFeature : public PlatformRenderFeature
+	class WINDOWSAPI_API WindowsPlatformRenderFeature : public PlatformRenderFeature
 	{
 		GENERATED_BODY()
 

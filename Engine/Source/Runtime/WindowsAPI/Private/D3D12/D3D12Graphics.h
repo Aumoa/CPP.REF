@@ -10,7 +10,7 @@
 namespace Ayla
 {
 	ACLASS()
-	class WINDOWSLAUNCH_API D3D12Graphics : public Graphics
+	class WINDOWSAPI_API D3D12Graphics : public Graphics
 	{
 		GENERATED_BODY()
 

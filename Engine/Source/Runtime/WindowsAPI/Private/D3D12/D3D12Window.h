@@ -14,7 +14,7 @@ namespace Ayla
 	class D2D1GUI;
 
 	ACLASS()
-	class WINDOWSLAUNCH_API D3D12Window : public Window
+	class WINDOWSAPI_API D3D12Window : public Window
 	{
 		GENERATED_BODY()
 

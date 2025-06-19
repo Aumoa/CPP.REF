@@ -12,7 +12,7 @@ namespace Ayla
 	class D3D12Graphics;
 
 	ACLASS()
-	class WINDOWSLAUNCH_API D3D12TextureImporter : public TextureImporter
+	class WINDOWSAPI_API D3D12TextureImporter : public TextureImporter
 	{
 		GENERATED_BODY()
 
