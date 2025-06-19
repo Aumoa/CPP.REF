@@ -72,8 +72,7 @@ namespace Ayla
 	private:
 		enum class CreationFlags
 		{
-			FromNative,
-			FromScript
+			FromNative
 		};
 
 		GENERATE_BITMASK_ENUM_OPERATORS_FRIEND(::Ayla::Object::CreationFlags);
@@ -109,34 +108,16 @@ namespace Ayla
 		Object& operator =(Object&&) = delete;
 
 	public:
-		template<std::derived_from<Object> T>
-		static RPtr<T> New()
+		template<std::derived_from<Object> T, class... TArgs>
+		static RPtr<T> New(TArgs&&... args)
 		{
 			std::optional<RPtr<T>> ptr;
 			ConfigureNew(typeid(T), CreationFlags::FromNative, [&]()
 			{
-				ptr.emplace(new T());
+				ptr.emplace(new T(std::forward<TArgs>(args)...));
 				return ptr->Get();
 			});
 			return std::move(ptr).value();
-		}
-
-		template<std::derived_from<Object> T>
-		static RPtr<T> ScriptNew(int) requires std::is_constructible_v<T>
-		{
-			std::optional<RPtr<T>> ptr;
-			ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
-			{
-				ptr.emplace(new T());
-				return ptr->Get();
-			});
-			return std::move(ptr).value();
-		}
-
-		template<std::derived_from<Object> T>
-		static RPtr<T> ScriptNew(short) requires (std::is_constructible_v<T> == false)
-		{
-			return {};
 		}
 
 	private:
