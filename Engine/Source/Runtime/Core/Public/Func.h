@@ -99,7 +99,7 @@ namespace Ayla
 					invocationListCopy[i](std::forward<UArgs>(args)...);
 				}
 
-				return invocationListCopy.back(std::forward<UArgs>(args)...);
+				return invocationListCopy.back()(std::forward<UArgs>(args)...);
 			}
 			else
 			{
