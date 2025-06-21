@@ -4,17 +4,9 @@ namespace AylaEngine;
 
 internal class ClCompiler : CppCompiler
 {
-    private static SemaphoreSlim m_Access;
-
     private readonly TargetInfo m_TargetInfo;
     private readonly VisualStudioInstallation.Product m_Product;
     private readonly StringBuilder m_CommandBuilder = new();
-
-    static ClCompiler()
-    {
-        int hardwareConcurrency = Environment.ProcessorCount;
-        m_Access = new SemaphoreSlim(hardwareConcurrency);
-    }
 
     public ClCompiler(TargetInfo targetInfo, VisualStudioInstallation.Product product)
     {
@@ -166,15 +158,11 @@ internal class ClCompiler : CppCompiler
 
         m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
         Terminal.Output output;
-        await m_Access.WaitAsync(cancellationToken);
-        try
+        using (await GetAccess(cancellationToken))
         {
             output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
         }
-        finally
-        {
-            m_Access.Release();
-        }
+        
         if (output.ExitCode == 0)
         {
             var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
