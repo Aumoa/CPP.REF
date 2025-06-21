@@ -61,8 +61,8 @@
 
 namespace Ayla::GenericPlatformMacros
 {
-	template<class T, size_t N>
-	constexpr size_t NativeArraySize(const T(&)[N])
+	template<class T, std::size_t N>
+	constexpr std::size_t NativeArraySize(const T(&)[N])
 	{
 		return N;
 	}
