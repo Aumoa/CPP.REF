@@ -18,5 +18,10 @@ public class Core : ModuleRules
             AddPublicAdditionalMacros("WIN32_LEAN_AND_MEAN");
             AddPrivateAdditionalLibraries("dbghelp.lib", "Rpcrt4.lib", "Kernel32.lib", "Ws2_32.lib");
         }
+        else if (TargetInfo.Platform.Group == PlatformGroup.Linux)
+        {
+            // apt install libicu-dev
+            AddPrivateAdditionalLibraries("icuuc", "icudata");
+        }
     }
 }

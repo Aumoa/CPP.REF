@@ -1,5 +1,11 @@
 ﻿namespace AylaEngine;
 
+/// <summary>
+/// Represents a Visual Studio installation and provides methods to interact with its components,
+/// such as compilers, linkers, and Windows SDKs. This class is responsible for discovering
+/// installed Visual Studio products and Windows Kits, and for spawning compiler and linker
+/// instances for Windows build targets.
+/// </summary>
 internal class VisualStudioInstallation : Installation
 {
     public enum License

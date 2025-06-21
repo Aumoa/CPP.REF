@@ -54,7 +54,9 @@ internal class ClCompiler : CppCompiler
             // Use standard preprocessor.
             "/Zc:preprocessor " +
             // Causes the compiler to display the full path of source code files passed to the compiler in diagnostics.
-            "/FC "
+            "/FC " +
+            // Generates complete debugging information.
+            "/Zi "
         );
 
         switch (m_TargetInfo.Config)
@@ -66,8 +68,6 @@ internal class ClCompiler : CppCompiler
                     "/Oi- " +
                     // Disable optimization.
                     "/Od " +
-                    // Generates complete debugging information.
-                    "/Zi " +
                     // Enable fast runtime checks.
                     "/RTC1 " +
                     // Multithreaded DLL
@@ -81,8 +81,6 @@ internal class ClCompiler : CppCompiler
                     "/Oi " +
                     // Enables function-level linking.
                     "/Gy " +
-                    // Generates complete debugging information.
-                    "/Zi " +
                     // Creates fast code.
                     "/O2 " +
                     // Multithreaded DLL
@@ -110,7 +108,6 @@ internal class ClCompiler : CppCompiler
         {
             additionalMacros = additionalMacros.Append("DO_CHECK=1");
         }
-
 
         List<string> macros = [];
         foreach (var macro in additionalMacros)

@@ -46,7 +46,7 @@ internal static partial class BuildRunner
             targetProjects = depends.Append(targetProject);
         }
 
-        var installation = new VisualStudioInstallation();
+        var installation = Installation.CreateDefaultInstallation();
         int compiled = 0;
         int totalActions = 0;
         int log = 1;

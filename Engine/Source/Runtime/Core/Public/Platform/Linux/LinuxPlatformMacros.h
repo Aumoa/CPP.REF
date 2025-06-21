@@ -7,7 +7,7 @@
 #include "Platform/Generic/GenericPlatformMacros.h"
 #include <signal.h>
 
-#define FORCEINLINE __attribute__((always_inline))
+#define FORCEINLINE __attribute__((always_inline)) inline
 #define FORCEINLINE_LAMBDA __attribute__((always_inline)) inline
 #define FORCENOINLINE __attribute__((noinline))
 #define PLATFORM_BREAK() (::raise(SIGTRAP))

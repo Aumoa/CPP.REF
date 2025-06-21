@@ -1,0 +1,78 @@
+
+using System.Text;
+
+namespace AylaEngine;
+
+internal class GccLinker : Linker
+{
+    private readonly TargetInfo m_TargetInfo;
+
+    public GccLinker(TargetInfo targetInfo)
+    {
+        m_TargetInfo = targetInfo;
+    }
+
+    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompiler.CompileItem[] sourceObjects, CancellationToken cancellationToken)
+    {
+        var options = new Terminal.Options
+        {
+            Executable = "gcc",
+            Logging = Terminal.Logging.None
+        };
+
+        var linkCommands = new StringBuilder();
+
+        var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.OutputFileName(m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        Directory.CreateDirectory(outputPath);
+
+        switch (module.Rules.Type)
+        {
+            case ModuleType.Library:
+            case ModuleType.Game:
+                linkCommands.Append(
+                    "-shared "
+                );
+                break;
+            case ModuleType.Application:
+                linkCommands.Append(
+                    string.Empty
+                );
+                break;
+        }
+
+        for (int i = 0; i < sourceObjects.Length; ++i)
+        {
+            var intermediateDirectory = sourceObjects[i].Descriptor.Intermediate(module.Name, m_TargetInfo, FolderPolicy.PathType.Current);
+            var fileName = Path.GetFileName(sourceObjects[i].SourceCode.FilePath);
+            var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
+            linkCommands.AppendFormat("\"{0}\" ", objectFileName);
+        }
+
+        foreach (var additionalLibrary in module.AdditionalLibraries.Concat(module.DependencyModuleNames.Select(p => p + ".lib")))
+        {
+            linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
+        }
+
+        var result = await Terminal.ExecuteCommandAsync(linkCommands.ToString(), options, cancellationToken);
+        if (result.IsCompletedSuccessfully && ((result.StdOut.Length == 0 && result.Logs.Length == 0) || (result.StdOut.Length == 1 && result.Logs.Length == 1 && string.IsNullOrWhiteSpace(result.StdOut[0].Value))))
+        {
+            Terminal.Log[] outputs =
+            [
+                new Terminal.Log
+                {
+                    Value = outputFileName,
+                    Verbosity = Terminal.Verbose.Info
+                }
+            ];
+
+            result = result with
+            {
+                StdOut = outputs,
+                Logs = outputs
+            };
+        }
+
+        return result;
+    }
+}

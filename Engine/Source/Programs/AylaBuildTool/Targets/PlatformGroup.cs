@@ -2,5 +2,6 @@
 
 public enum PlatformGroup
 {
-    Windows
+    Windows,
+    Linux
 }

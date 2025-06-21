@@ -109,8 +109,9 @@ internal partial class RHTGenerator
                         }
                     }
                     sourceCodeText +=  "}\n";
-                    sourceCodeText +=  "\n";
                 }
+                
+                sourceCodeText +=  "\n";
 
                 string FunctionName1(string name) => FunctionName(@namespace, @class, name);
 

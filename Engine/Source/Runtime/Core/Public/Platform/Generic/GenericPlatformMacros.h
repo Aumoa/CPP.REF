@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 // Whether the CPU is x86/x64 (i.e. both 32 and 64-bit variants)
 #ifndef PLATFORM_CPU_X86_FAMILY
 #	if (defined(_M_IX86) || defined(__i386__) || defined(_M_X64) || defined(__amd64__) || defined(__x86_64__))
