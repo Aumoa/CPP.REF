@@ -3,6 +3,9 @@
 *.sln
 Engine/.vs
 
+# Visual Studio Code
+.vscode
+
 # Script Projects
 *.Script.csproj
 **/Script/bin
