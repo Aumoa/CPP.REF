@@ -37,15 +37,15 @@ internal static partial class BuildRunner
 
         public async Task<Terminal.Output> LinkAsync(IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
-            await Task.WhenAll(NeedCompileTasks.Select(p => p.Task));
-
-            foreach (var name in Resolver.DependencyModuleNames)
-            {
-                await moduleTasks.Where(p => p.Resolver.Name == name).First().Task;
-            }
-
             try
             {
+                await Task.WhenAll(NeedCompileTasks.Select(p => p.Task));
+
+                foreach (var name in Resolver.DependencyModuleNames)
+                {
+                    await moduleTasks.Where(p => p.Resolver.Name == name).First().Task;
+                }
+
                 var linker = await installation.SpawnLinkerAsync(targetInfo, cancellationToken);
                 var output = await linker.LinkAsync(Resolver, m_AllCompiles, cancellationToken);
                 m_CompletionSource.SetResult();
