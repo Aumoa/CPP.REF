@@ -314,6 +314,21 @@ namespace Ayla
 			delete token;
 		}
 	}
+
+	void* WindowsPlatformProcess::LoadLibrary(String fileName) noexcept
+	{
+		return LoadLibraryW((fileName + TEXT(".dll")).c_str());
+	}
+
+	void WindowsPlatformProcess::FreeLibrary(void* handle) noexcept
+	{
+		FreeLibrary((HMODULE)handle);
+	}
+
+	void* WindowsPlatformProcess::GetLibraryFunction(void* handle, String functionName) noexcept
+	{
+		return GetProcAddress((HMODULE)handle, functionName.AsCodepage().c_str());
+	}
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__

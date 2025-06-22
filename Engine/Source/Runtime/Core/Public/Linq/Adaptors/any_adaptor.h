@@ -52,8 +52,8 @@ namespace Ayla::inline Linq::Adaptors
 			return false;
 		}
 
-		template<std::ranges::input_range R, std::invocable<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type> T>
-		friend constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::any_adaptor_closure_lambda<T>&& adaptor) noexcept
+		template<std::ranges::input_range R, std::invocable<typename std::iterator_traits<std::ranges::iterator_t<R>>::value_type> U>
+		friend constexpr auto operator |(R&& view, Ayla::Linq::Adaptors::any_adaptor_closure_lambda<U>&& adaptor) noexcept
 		{
 			return adaptor(std::forward<R>(view));
 		}

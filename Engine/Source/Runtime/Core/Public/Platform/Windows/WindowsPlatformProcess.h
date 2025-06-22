@@ -41,6 +41,10 @@ namespace Ayla
 
 		static SuspendToken* SuspendAllThreads() noexcept;
 		static void ResumeAllThreads(SuspendToken* token) noexcept;
+
+		static void* LoadLibrary(String fileName) noexcept;
+		static void FreeLibrary(void* handle) noexcept;
+		static void* GetLibraryFunction(void* handle, String functionName) noexcept;
 	};
 
 	using PlatformProcess = WindowsPlatformProcess;

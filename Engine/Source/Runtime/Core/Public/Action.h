@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 #include "Threading/Spinlock.h"
 
 namespace Ayla
@@ -10,50 +11,53 @@ namespace Ayla
 	template<class... TArgs>
 	class Action
 	{
-		using function_t = std::function<void(TArgs...)>;
+		using raw_t = void(TArgs...);
+		using function_t = std::function<raw_t>;
+		using vector_t = std::vector<function_t>;
 
 	private:
-		mutable Spinlock m_Lock;
-		std::vector<function_t> m_InvocationList;
+		std::shared_ptr<vector_t> m_InvocationList;
+
+	private:
+		inline Action(std::shared_ptr<vector_t>&& invocationList)
+			: m_InvocationList{ std::move(invocationList) }
+		{
+		}
 
 	public:
-		inline Action() noexcept
+		inline Action()
+			: m_InvocationList{ std::make_shared<vector_t>() }
 		{
 		}
 
 		template<class... UArgs>
 		inline Action(UArgs&&... args) requires std::constructible_from<function_t, UArgs...>
-			: m_InvocationList{ { function_t(std::forward<UArgs>(args))...} }
+			: m_InvocationList{ std::make_shared<vector_t>(vector_t{ function_t(std::forward<UArgs>(args)...) }) }
 		{
 		}
 
 		inline Action(const Action& action)
+			: m_InvocationList{ action.m_InvocationList }
 		{
-			auto lock = std::unique_lock(action.m_Lock);
-			m_InvocationList = action.m_InvocationList;
 		}
 
 		inline Action(Action&& action) noexcept
+			: m_InvocationList{ std::move(action.m_InvocationList) }
 		{
-			auto lock = std::unique_lock(action.m_Lock);
-			m_InvocationList = std::move(action.m_InvocationList);
 		}
 
 		[[nodiscard]]
 		inline bool IsBound() const
 		{
-			auto lock = std::unique_lock(m_Lock);
-			return m_InvocationList.size() > 0;
+			auto invocationList = m_InvocationList;
+			return invocationList->size() > 0;
 		}
 
 		template<class... UArgs> requires std::invocable<function_t, UArgs...>
 		inline void Invoke(UArgs&&... args) const
 		{
-			auto lock = std::unique_lock(m_Lock);
-			auto invocationListCopy = m_InvocationList;
-			lock.unlock();
-
-			for (auto& invocation : invocationListCopy)
+			auto invocationList = m_InvocationList;
+			for (auto& invocation : *invocationList)
 			{
 				invocation(std::forward<UArgs>(args)...);
 			}
@@ -75,41 +79,26 @@ namespace Ayla
 
 		inline void Clear() noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			m_InvocationList.clear();
+			m_InvocationList = std::make_shared<vector_t>();
 		}
 
 		[[nodiscard]]
 		inline operator bool() const noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			return m_InvocationList.size() > 0;
+			return IsBound();
 		}
 
 		inline Action& operator =(const Action& action)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &action;
-
-			lock1 = std::unique_lock(m_Lock);
-			if (same == false)
-			{
-				lock2 = std::unique_lock(action.m_Lock);
-			}
-
 			m_InvocationList = action.m_InvocationList;
 			return *this;
 		}
 
 		inline Action& operator =(Action&& action)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &action;
-
-			lock1 = std::unique_lock(m_Lock);
-			if (same == false)
+			if (this == &action)
 			{
-				lock2 = std::unique_lock(action.m_Lock);
+				return *this;
 			}
 
 			m_InvocationList = std::move(action.m_InvocationList);
@@ -118,63 +107,64 @@ namespace Ayla
 
 		inline Action& operator =(std::nullptr_t) noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			m_InvocationList.clear();
+			Clear();
+			return *this;
 		}
 
 		inline Action& operator +=(const Action& action)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &action;
-
-			lock1 = std::unique_lock(m_Lock);
-			if (same == false)
+			auto selfInvocationList = m_InvocationList;
+			auto addInvocationList = action.m_InvocationList;
+			auto newInvocationList = std::make_shared<vector_t>();
+			for (const auto& invocation : *selfInvocationList)
 			{
-				lock2 = std::unique_lock(action.m_Lock);
+				newInvocationList->emplace_back(invocation);
 			}
-
-			m_InvocationList.insert(m_InvocationList.end(), action.m_InvocationList.begin(), action.m_InvocationList.end());
+			for (const auto& invocation : *addInvocationList)
+			{
+				newInvocationList->emplace_back(invocation);
+			}
+			
+			m_InvocationList = newInvocationList;
 			return *this;
 		}
 
 		inline Action& operator -=(const Action& action)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &action;
+			auto selfInvocationList = m_InvocationList;
+			auto removeInvocationList = action.m_InvocationList;
+			auto newInvocationList = std::make_shared<vector_t>(*selfInvocationList);
 
-			lock1 = std::unique_lock(m_Lock);
-			if (same)
+			// removeInvocationList의 각 함수와 동일한 함수 객체를 newInvocationList에서 제거
+			for (const auto& toRemove : *removeInvocationList)
 			{
-				m_InvocationList.clear();
-				return *this;
-			}
-			else
-			{
-				lock2 = std::unique_lock(action.m_Lock);
+				auto pred = [&](const function_t& f)
+				{
+					return f.target_type() == toRemove.target_type()
+						&& f.template target<raw_t>() == toRemove.template target<raw_t>();
+				};
+
+				auto it = std::find_if(newInvocationList->begin(), newInvocationList->end(), pred);
+				if (it != newInvocationList->end())
+				{
+					newInvocationList->erase(it);
+				}
 			}
 
-			auto it = std::search(m_InvocationList.rbegin(), m_InvocationList.rend(), action.m_InvocationList.rbegin(), action.m_InvocationList.rend());
-			if (it == m_InvocationList.rend())
-			{
-				return *this;
-			}
-
-			m_InvocationList.erase(it, it + action.m_InvocationList.size());
+			m_InvocationList = newInvocationList;
 			return *this;
 		}
 
 		[[nodiscard]]
 		inline constexpr bool operator ==(std::nullptr_t) const noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			return m_InvocationList.size() == 0;
+			return !IsBound();
 		}
 
 		[[nodiscard]]
 		inline constexpr bool operator !=(std::nullptr_t) const noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			return m_InvocationList.size() > 0;
+			return IsBound();
 		}
 
 		template<class... UArgs> requires std::invocable<function_t, UArgs...>
@@ -186,71 +176,48 @@ namespace Ayla
 		[[nodiscard]]
 		static Action Combine(const Action& action1, const Action& action2)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = &action1 == &action2;
-
-			lock1 = std::unique_lock(action1.m_Lock);
-			if (same == false)
-			{
-				lock2 = std::unique_lock(action2.m_Lock);
-			}
-
-			Action result;
-			result.m_InvocationList = action1.m_InvocationList;
-			result.m_InvocationList.insert(result.m_InvocationList.begin(), action2.m_InvocationList.begin(), action2.m_InvocationList.end());
+			Action result = std::make_shared<vector_t>(*action1.m_InvocationList);
+			auto addInvocationList = action2.m_InvocationList;
+			result.m_InvocationList.insert(addInvocationList->begin(), addInvocationList->end());
 			return result;
+		}
+
+		[[nodiscard]]
+		inline Action operator +(const Action& addAction) const
+		{
+			return Combine(*this, addAction);
 		}
 
 		[[nodiscard]]
 		static Action Remove(const Action& action1, const Action& action2)
 		{
-			bool same = &action1 == &action2;
-			if (same)
+			auto selfInvocationList = action1.m_InvocationList;
+			auto removeInvocationList = action2.m_InvocationList;
+			auto newInvocationList = std::make_shared<vector_t>(*selfInvocationList);
+
+			// removeInvocationList의 각 함수와 동일한 함수 객체를 newInvocationList에서 제거
+			for (const auto& toRemove : *removeInvocationList)
 			{
-				return Action{};
+				auto pred = [&](const function_t& f)
+				{
+					return f.target_type() == toRemove.target_type()
+						&& f.template target<void>() == toRemove.template target<void>();
+				};
+
+				auto it = std::find_if(newInvocationList->begin(), newInvocationList->end(), pred);
+				if (it != newInvocationList->end())
+				{
+					newInvocationList->erase(it);
+				}
 			}
 
-			auto lock1 = std::unique_lock(action1.m_Lock);
-			auto lock2 = std::unique_lock(action2.m_Lock);
-
-			auto it = std::search(action1.m_InvocationList.rbegin(), action1.m_InvocationList.rend(), action2.m_InvocationList.rbegin(), action2.m_InvocationList.rend());
-			if (it == action1.m_InvocationList.rend())
-			{
-				return *this;
-			}
-
-			std::vector<function_t> copiedInvocationList = action1.m_InvocationList;
-			copiedInvocationList.erase(it, it + action2.m_InvocationList.size());
-			return *this;
+			return newInvocationList;
 		}
 
 		[[nodiscard]]
-		static Action RemoveAll(const Action& action1, const Action& action2)
+		inline Action operator -(const Action& removeAction) const
 		{
-			bool same = &action1 == &action2;
-			if (same)
-			{
-				return Action{};
-			}
-
-			auto lock1 = std::unique_lock(action1.m_Lock);
-			auto lock2 = std::unique_lock(action2.m_Lock);
-			std::vector<function_t> copiedInvocationList = action1.m_InvocationList;
-
-			while (true)
-			{
-				auto it = std::search(copiedInvocationList.rbegin(), copiedInvocationList.rend(), action2.m_InvocationList.rbegin(), action2.m_InvocationList.rend());
-				if (it == copiedInvocationList.rend())
-				{
-					break;
-				}
-
-				copiedInvocationList.erase(it, it + action2.m_InvocationList.size());
-			}
-
-			Action result;
-			result.m_InvocationList = copiedInvocationList;
-			return result;
+			return Remove(*this, removeAction);
 		}
 	};
 }

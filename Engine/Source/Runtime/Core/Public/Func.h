@@ -4,174 +4,165 @@
 
 #include <functional>
 #include <concepts>
+#include <vector>
 #include "Threading/Spinlock.h"
 #include "NullReferenceException.h"
 
 namespace Ayla
 {
-	template<size_t Index, class T, class... TArgs>
-	struct variant_index
+	namespace Func_Internal
 	{
-		using type = typename variant_index<Index - 1, TArgs...>::type;
-	};
-
-	template<class T, class... TArgs>
-	struct variant_index<0, T, TArgs...>
-	{
-		using type = T;
-	};
-
-	template<size_t Index, class... TArgs>
-	using variant_index_t = typename variant_index<Index, TArgs...>::type;
-
-	template<class... TArgs>
-	struct function_args
-	{
-	private:
-		template<size_t... Index>
-		static auto generate_signature(std::index_sequence<Index...>&&)
+		template<size_t Index, class T, class... TArgs>
+		struct variant_index
 		{
-			using return_t = variant_index_t<sizeof...(TArgs) - 1, TArgs...>;
-			return std::function<return_t(
-				variant_index_t<Index, TArgs...>...
-			)>();
-		}
+			using type = typename variant_index<Index - 1, TArgs...>::type;
+		};
 
-	public:
-		using type = decltype(generate_signature(std::make_index_sequence<sizeof...(TArgs) - 1>{}));
-
-		template<size_t... Index>
-		static auto function_reinterpret_cast(void(*func)(), std::index_sequence<Index...>&&)
+		template<class T, class... TArgs>
+		struct variant_index<0, T, TArgs...>
 		{
+			using type = T;
+		};
+
+		template<size_t Index, class... TArgs>
+		using variant_index_t = typename variant_index<Index, TArgs...>::type;
+
+		template<class... TArgs>
+		struct function_args
+		{
+		public:
 			using return_t = variant_index_t<sizeof...(TArgs) - 1, TArgs...>;
-			return reinterpret_cast<return_t(*)(variant_index_t<Index, TArgs...>...)>(func);
-		}
-	};
+
+		private:
+			template<size_t... Index>
+			static auto generate_signature_raw(std::index_sequence<Index...>&&)
+			{
+				return (return_t(*)(variant_index_t<Index, TArgs...>...))nullptr;
+			}
+
+			template<size_t... Index>
+			static auto generate_signature_func(std::index_sequence<Index...>&&)
+			{
+				return (std::function<return_t(variant_index_t<Index, TArgs...>...)>)nullptr;
+			}
+
+		public:
+			using sig_raw = decltype(generate_signature_raw(std::make_index_sequence<sizeof...(TArgs) - 1>{}));
+			using sig_func = decltype(generate_signature_func(std::make_index_sequence<sizeof...(TArgs) - 1>{}));
+		};
+	}
 
 	template<class... TArgs>
 	class Func
 	{
-		using function_t = ::Ayla::function_args<TArgs...>::type;
+		using raw_t = ::Ayla::Func_Internal::function_args<TArgs...>::sig_raw;
+		using function_t = ::Ayla::Func_Internal::function_args<TArgs...>::sig_func;
+		using vector_t = std::vector<function_t>;
+		using result_t = ::Ayla::Func_Internal::function_args<TArgs...>::return_t;
+		static_assert(std::same_as<result_t, void> == false);
 
 	private:
-		mutable Spinlock m_Lock;
-		std::vector<function_t> m_InvocationList;
+		std::shared_ptr<vector_t> m_InvocationList;
+
+	private:
+		inline Func(std::shared_ptr<vector_t>&& invocationList)
+			: m_InvocationList{ std::move(invocationList) }
+		{
+		}
 
 	public:
-		inline Func() noexcept
+		inline Func()
+			: m_InvocationList{ std::make_shared<vector_t>() }
 		{
 		}
 
 		template<class... UArgs>
 		inline Func(UArgs&&... args) requires std::constructible_from<function_t, UArgs...>
-			: m_InvocationList{ { function_t(std::forward<UArgs>(args))... } }
+			: m_InvocationList{ std::make_shared<vector_t>(vector_t{ function_t(std::forward<UArgs>(args)...) }) }
 		{
 		}
 
 		inline Func(const Func& func)
+			: m_InvocationList{ func.m_InvocationList }
 		{
-			auto lock = std::unique_lock(func.m_Lock);
-			m_InvocationList = func.m_InvocationList;
 		}
 
 		inline Func(Func&& func) noexcept
+			: m_InvocationList{ std::move(func.m_InvocationList) }
 		{
-			auto lock = std::unique_lock(func.m_Lock);
-			m_InvocationList = std::move(func.m_InvocationList);
 		}
 
-		[[nodiscard]] bool IsBound() const
+		[[nodiscard]]
+		inline bool IsBound() const
 		{
-			return this->operator bool();
-		}
-
-		template<class... UArgs> requires std::invocable<function_t, UArgs...>
-		inline auto Invoke(UArgs&&... args) const
-		{
-			auto lock = std::unique_lock(m_Lock);
-			auto invocationListCopy = m_InvocationList;
-			lock.unlock();
-
-			if (invocationListCopy.size() > 0)
-			{
-				for (size_t i = 0; i < invocationListCopy.size() - 1; ++i)
-				{
-					invocationListCopy[i](std::forward<UArgs>(args)...);
-				}
-
-				return invocationListCopy.back()(std::forward<UArgs>(args)...);
-			}
-			else
-			{
-				throw new NullReferenceException();
-			}
+			auto invocationList = m_InvocationList;
+			return invocationList->size() > 0;
 		}
 
 		template<class... UArgs> requires std::invocable<function_t, UArgs...>
-		inline auto InvokeIfBound(UArgs&&... args) const
+		inline result_t Invoke(UArgs&&... args) const
 		{
-			if constexpr (std::same_as<std::invoke_result_t<function_t>, void>)
+			auto invocationList = m_InvocationList;
+			size_t count = invocationList->size();
+			for (size_t i = 0; i < count; ++i)
 			{
-				if (IsBound())
+				auto& invocation = invocationList->at(i);
+				if (i == count - 1)
 				{
-					Invoke(std::forward<UArgs>(args)...);
-					return true;
+					return invocation(std::forward<UArgs>(args)...);
 				}
 				else
 				{
-					return false;
+					invocation(std::forward<UArgs>(args)...);
 				}
 			}
-			else
+
+			throw new NullReferenceException();
+		}
+
+		template<class... UArgs> requires std::invocable<function_t, UArgs...>
+		inline std::optional<result_t> InvokeIfBound(UArgs&&... args) const
+		{
+			auto invocationList = m_InvocationList;
+			size_t count = invocationList->size();
+			for (size_t i = 0; i < count; ++i)
 			{
-				if (IsBound())
+				auto& invocation = invocationList->at(i);
+				if (i == count - 1)
 				{
-					return std::optional(Invoke(std::forward<UArgs>(args)...));
+					return std::optional<result_t>(invocation(std::forward<UArgs>(args)...));
 				}
 				else
 				{
-					return std::optional<std::invoke_result_t<function_t>>{};
+					invocation(std::forward<UArgs>(args)...);
 				}
 			}
+
+			return std::optional<result_t>();
 		}
 
 		inline void Clear() noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			m_InvocationList.clear();
+			m_InvocationList = std::make_shared<vector_t>();
 		}
 
 		[[nodiscard]]
 		inline operator bool() const noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			return m_InvocationList.size() > 0;
+			return IsBound();
 		}
 
 		inline Func& operator =(const Func& func)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &func;
-
-			lock1 = std::unique_lock(m_Lock);
-			if (same == false)
-			{
-				lock2 = std::unique_lock(func.m_Lock);
-			}
-
 			m_InvocationList = func.m_InvocationList;
 			return *this;
 		}
 
 		inline Func& operator =(Func&& func)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &func;
-
-			lock1 = std::unique_lock(m_Lock);
-			if (same == false)
+			if (this == &func)
 			{
-				lock2 = std::unique_lock(func.m_Lock);
+				return *this;
 			}
 
 			m_InvocationList = std::move(func.m_InvocationList);
@@ -180,63 +171,64 @@ namespace Ayla
 
 		inline Func& operator =(std::nullptr_t) noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			m_InvocationList.clear();
+			Clear();
+			return *this;
 		}
 
 		inline Func& operator +=(const Func& func)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &func;
-
-			lock1 = std::unique_lock(m_Lock);
-			if (same == false)
+			auto selfInvocationList = m_InvocationList;
+			auto addInvocationList = func.m_InvocationList;
+			auto newInvocationList = std::make_shared<vector_t>();
+			for (const auto& invocation : *selfInvocationList)
 			{
-				lock2 = std::unique_lock(func.m_Lock);
+				newInvocationList->emplace_back(invocation);
 			}
-
-			m_InvocationList.insert(m_InvocationList.end(), func.m_InvocationList.begin(), func.m_InvocationList.end());
+			for (const auto& invocation : *addInvocationList)
+			{
+				newInvocationList->emplace_back(invocation);
+			}
+			
+			m_InvocationList = newInvocationList;
 			return *this;
 		}
 
 		inline Func& operator -=(const Func& func)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = this == &func;
+			auto selfInvocationList = m_InvocationList;
+			auto removeInvocationList = func.m_InvocationList;
+			auto newInvocationList = std::make_shared<vector_t>(*selfInvocationList);
 
-			lock1 = std::unique_lock(m_Lock);
-			if (same)
+			// removeInvocationList의 각 함수와 동일한 함수 객체를 newInvocationList에서 제거
+			for (const auto& toRemove : *removeInvocationList)
 			{
-				m_InvocationList.clear();
-				return *this;
-			}
-			else
-			{
-				lock2 = std::unique_lock(func.m_Lock);
+				auto pred = [&](const function_t& f)
+				{
+					return f.target_type() == toRemove.target_type()
+						&& f.template target<raw_t>() == toRemove.template target<raw_t>();
+				};
+
+				auto it = std::find_if(newInvocationList->begin(), newInvocationList->end(), pred);
+				if (it != newInvocationList->end())
+				{
+					newInvocationList->erase(it);
+				}
 			}
 
-			auto it = std::search(m_InvocationList.rbegin(), m_InvocationList.rend(), func.m_InvocationList.rbegin(), func.m_InvocationList.rend());
-			if (it == m_InvocationList.rend())
-			{
-				return *this;
-			}
-
-			m_InvocationList.erase(it, it + func.m_InvocationList.size());
+			m_InvocationList = newInvocationList;
 			return *this;
 		}
 
 		[[nodiscard]]
 		inline constexpr bool operator ==(std::nullptr_t) const noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			return m_InvocationList.size() == 0;
+			return !IsBound();
 		}
 
 		[[nodiscard]]
 		inline constexpr bool operator !=(std::nullptr_t) const noexcept
 		{
-			auto lock = std::unique_lock(m_Lock);
-			return m_InvocationList.size() > 0;
+			return IsBound();
 		}
 
 		template<class... UArgs> requires std::invocable<function_t, UArgs...>
@@ -246,78 +238,50 @@ namespace Ayla
 		}
 
 		[[nodiscard]]
-		static Func Combine(const Func& action1, const Func& action2)
+		static Func Combine(const Func& func1, const Func& func2)
 		{
-			std::unique_lock<Spinlock> lock1, lock2;
-			bool same = &action1 == &action2;
-
-			lock1 = std::unique_lock(action1.m_Lock);
-			if (same == false)
-			{
-				lock2 = std::unique_lock(action2.m_Lock);
-			}
-
-			Func result;
-			result.m_InvocationList = action1.m_InvocationList;
-			result.m_InvocationList.insert(result.m_InvocationList.begin(), action2.m_InvocationList.begin(), action2.m_InvocationList.end());
+			Action result = std::make_shared<vector_t>(*func1.m_InvocationList);
+			auto addInvocationList = func2.m_InvocationList;
+			result.m_InvocationList.insert(addInvocationList->begin(), addInvocationList->end());
 			return result;
 		}
 
 		[[nodiscard]]
-		static Func Remove(const Func& action1, const Func& action2)
+		inline Func operator +(const Func& addFunc) const
 		{
-			bool same = &action1 == &action2;
-			if (same)
-			{
-				return Func{};
-			}
-
-			auto lock1 = std::unique_lock(action1.m_Lock);
-			auto lock2 = std::unique_lock(action2.m_Lock);
-
-			auto it = std::search(action1.m_InvocationList.rbegin(), action1.m_InvocationList.rend(), action2.m_InvocationList.rbegin(), action2.m_InvocationList.rend());
-			if (it == action1.m_InvocationList.rend())
-			{
-				return *this;
-			}
-
-			std::vector<function_t> copiedInvocationList = action1.m_InvocationList;
-			copiedInvocationList.erase(it, it + action2.m_InvocationList.size());
-			return *this;
+			return Combine(*this, addFunc);
 		}
 
 		[[nodiscard]]
-		static Func RemoveAll(const Func& action1, const Func& action2)
+		static Func Remove(const Func& func1, const Func& func2)
 		{
-			bool same = &action1 == &action2;
-			if (same)
-			{
-				return Func{};
-			}
+			auto selfInvocationList = func1.m_InvocationList;
+			auto removeInvocationList = func2.m_InvocationList;
+			auto newInvocationList = std::make_shared<vector_t>(*selfInvocationList);
 
-			auto lock1 = std::unique_lock(action1.m_Lock);
-			auto lock2 = std::unique_lock(action2.m_Lock);
-			std::vector<function_t> copiedInvocationList = action1.m_InvocationList;
-
-			while (true)
+			// removeInvocationList의 각 함수와 동일한 함수 객체를 newInvocationList에서 제거
+			for (const auto& toRemove : *removeInvocationList)
 			{
-				auto it = std::search(copiedInvocationList.rbegin(), copiedInvocationList.rend(), action2.m_InvocationList.rbegin(), action2.m_InvocationList.rend());
-				if (it == copiedInvocationList.rend())
+				auto pred = [&](const function_t& f)
 				{
-					break;
-				}
+					return f.target_type() == toRemove.target_type()
+						&& f.template target<void>() == toRemove.template target<void>();
+				};
 
-				copiedInvocationList.erase(it, it + action2.m_InvocationList.size());
+				auto it = std::find_if(newInvocationList->begin(), newInvocationList->end(), pred);
+				if (it != newInvocationList->end())
+				{
+					newInvocationList->erase(it);
+				}
 			}
 
-			Func result;
-			result.m_InvocationList = copiedInvocationList;
-			return result;
+			return newInvocationList;
 		}
 
-		inline static Func FromAnonymous(void(*AnnPtr)())
+		[[nodiscard]]
+		inline Func operator -(const Func& removeFunc) const
 		{
-			return Func(function_args<TArgs...>::function_reinterpret_cast(AnnPtr, std::make_index_sequence<sizeof...(TArgs) - 1>{}));
+			return Remove(*this, removeFunc);
 		}
 	};
 }

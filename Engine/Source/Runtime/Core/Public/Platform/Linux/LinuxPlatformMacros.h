@@ -8,7 +8,7 @@
 #include <signal.h>
 
 #define FORCEINLINE __attribute__((always_inline)) inline
-#define FORCEINLINE_LAMBDA __attribute__((always_inline)) inline
+#define FORCEINLINE_LAMBDA 
 #define FORCENOINLINE __attribute__((noinline))
 #define PLATFORM_BREAK() (::raise(SIGTRAP))
 #define PLATFORM_UNREFERENCED_PARAMETER(X) (void)sizeof((int[]){(X, 0)})

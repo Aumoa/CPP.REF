@@ -25,11 +25,10 @@ namespace Ayla
 
 		status = U_ZERO_ERROR;
 		std::wstring utf16Str;
-		ws.resize((utf16Len) * sizeof(UChar))
+		utf16Str.resize((utf16Len) * sizeof(UChar));
 		u_strFromUTF8(utf16Str.data(), utf16Len + 1, NULL, utf8Str, -1, &status);
 		if (U_FAILURE(status))
 		{
-			free(utf16Str);
 			return L"";
 		}
 
