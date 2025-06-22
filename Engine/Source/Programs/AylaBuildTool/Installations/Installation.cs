@@ -19,7 +19,8 @@ internal abstract class Installation
         }
         else
         {
-            throw new PlatformNotSupportedException();
+            Console.Error.WriteLine("Not supported platform.");
+            throw TerminateException.Internal();
         }
     }
 }

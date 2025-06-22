@@ -12,13 +12,7 @@ internal static partial class BuildRunner
             projectPath = Path.GetDirectoryName(options.ProjectFile);
         }
 
-        var buildTarget = new TargetInfo
-        {
-            Platform = PlatformInfo.Win64,
-            Editor = options.Editor,
-            Config = options.Config
-        };
-
+        var buildTarget = TargetInfo.CreateDefaultTargetInfo(options);
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
         IEnumerable<ModuleProject> targetProjects;
@@ -285,6 +279,10 @@ internal static partial class BuildRunner
                     string fileText = string.Format("{0} {1}", MakeOutputPrefix(), compileTask.Item.SourceCode.FilePath);
 
                     string[] outputs = new string[output.Logs.Length];
+                    if (outputs.Length == 0)
+                    {
+                        outputs = new string[1];
+                    }
                     outputs[0] = fileText;
                     for (int i = 1; i < output.Logs.Length; ++i)
                     {

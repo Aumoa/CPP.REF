@@ -1,4 +1,6 @@
-﻿namespace AylaEngine;
+﻿using System.Runtime.InteropServices;
+
+namespace AylaEngine;
 
 internal record TargetInfo : ITargetInfo
 {
@@ -31,6 +33,33 @@ internal record TargetInfo : ITargetInfo
                     Editor = editor
                 };
             }
+        }
+    }
+
+    public static TargetInfo CreateDefaultTargetInfo(BuildOptions options)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return new TargetInfo
+            {
+                Platform = PlatformInfo.Win64,
+                Editor = options.Editor,
+                Config = options.Config
+            };
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            return new TargetInfo
+            {
+                Platform = PlatformInfo.Linux64,
+                Editor = options.Editor,
+                Config = options.Config
+            };
+        }
+        else
+        {
+            Console.Error.WriteLine("Not supported platform.");
+            throw TerminateException.Internal();
         }
     }
 }

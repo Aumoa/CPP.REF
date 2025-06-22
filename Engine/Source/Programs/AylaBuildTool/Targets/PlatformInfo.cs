@@ -20,4 +20,11 @@ public record PlatformInfo
         Group = PlatformGroup.Windows,
         Architecture = Architecture.X64
     };
+
+    public static readonly PlatformInfo Linux64 = new()
+    {
+        Name = "Linux64",
+        Group = PlatformGroup.Linux,
+        Architecture = Architecture.X64
+    };
 }
