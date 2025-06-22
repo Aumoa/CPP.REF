@@ -50,10 +50,10 @@ internal static partial class BuildRunner
             var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
 
             Directory.CreateDirectory(Path.Combine(intDir, "Bindings"));
-            var headerText = Generator.GenerateHeader().Replace("\r\n", "\n").Trim();
+            var headerText = Generator.GenerateHeader().Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
 
-            var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n").Trim();
+            var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
             GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Group, Project.Name, generatedSourceCode, Project.Group.IntermediateDirectory);

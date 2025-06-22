@@ -11,7 +11,7 @@ internal static class TextFileHelper
         if (directoryExist && File.Exists(filePath))
         {
             var previousContent = await File.ReadAllTextAsync(filePath, cancellationToken);
-            if (previousContent.Trim().Replace("\r\n", "\n") == content.Trim())
+            if (previousContent.Replace("\r\n", "\n") == content)
             {
                 return false;
             }
