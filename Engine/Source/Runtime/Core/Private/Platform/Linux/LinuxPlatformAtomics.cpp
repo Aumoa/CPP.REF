@@ -15,9 +15,9 @@ namespace Ayla
     // 내부 유틸리티 함수
     namespace
     {
-        inline pthread_rwlock_t* GetRWLock(void*& LockVal)
+        inline pthread_mutex_t* GetRWLock(void*& LockVal)
         {
-            return reinterpret_cast<pthread_rwlock_t*>(LockVal);
+            return reinterpret_cast<pthread_mutex_t*>(LockVal);
         }
 
         inline pthread_cond_t* GetCondVar(void*& CondVal)
@@ -28,7 +28,7 @@ namespace Ayla
 
     void LinuxPlatformAtomics::InitializeSpinlock(void*& LockVal) noexcept
     {
-        auto* rwlock = new pthread_rwlock_t();
+        auto* rwlock = new pthread_mutex_t();
         pthread_rwlock_init(rwlock, nullptr);
         LockVal = rwlock;
     }
@@ -61,9 +61,9 @@ namespace Ayla
     {
         int ret;
         if (bShared)
-            ret = pthread_rwlock_tryrdlock(GetRWLock(LockVal));
+            ret = pthread_mutex_tryrdlock(GetRWLock(LockVal));
         else
-            ret = pthread_rwlock_trywrlock(GetRWLock(LockVal));
+            ret = pthread_mutex_trywrlock(GetRWLock(LockVal));
         return ret == 0;
     }
 
@@ -86,7 +86,7 @@ namespace Ayla
 
     void LinuxPlatformAtomics::WaitSpinlockConditionVariable(void*& CondVal, void*& LockVal, bool bShared) noexcept
     {
-        (void)bShared; // pthread_rwlock_t는 unlock 후 wait 필요
+        (void)bShared; // pthread_mutex_t는 unlock 후 wait 필요
         pthread_cond_wait(GetCondVar(CondVal), GetRWLock(LockVal));
     }
 
