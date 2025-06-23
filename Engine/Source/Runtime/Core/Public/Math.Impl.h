@@ -90,9 +90,9 @@ namespace Ayla
 	template<std::floating_point T>
 	constexpr void Math::SinCos(const Radians<T>& x, T& sin, T& cos)
 	{
-		static constexpr T pi = std::numbers::pi_v<T>;
-		static constexpr T half_pi = pi * 0.5;
-		static constexpr T inv_pi = std::numbers::inv_pi_v<T>;
+		constexpr T pi = std::numbers::pi_v<T>;
+		constexpr T half_pi = pi * 0.5;
+		constexpr T inv_pi = std::numbers::inv_pi_v<T>;
 
 		// Map Value to y in [-pi,pi], x = 2*pi*quotient + remainder.
 		T quotient = (inv_pi * 0.5) * x.Value;

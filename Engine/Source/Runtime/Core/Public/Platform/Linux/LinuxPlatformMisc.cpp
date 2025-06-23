@@ -19,7 +19,7 @@ namespace Ayla
 	String PlatformMisc::FormatSystemCode(int32 InSystemCode) noexcept
 	{
 		static thread_local char Buf[1024] = {};
-        if (stderror_r(InSystemCode, Buf, sizeof(Buf)) == 0)
+        if (strerror_r(InSystemCode, Buf, sizeof(Buf)) == 0)
         {
             return String::FromLiteral(Buf);
         }

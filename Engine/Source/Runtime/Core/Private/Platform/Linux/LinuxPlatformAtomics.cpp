@@ -28,16 +28,16 @@ namespace Ayla
 
     void LinuxPlatformAtomics::InitializeSpinlock(void*& LockVal) noexcept
     {
-        auto* rwlock = new pthread_mutex_t();
-        pthread_rwlock_init(rwlock, nullptr);
-        LockVal = rwlock;
+        auto* mutex = new pthread_mutex_t();
+        pthread_mutex_init(mutex, nullptr);
+        LockVal = mutex;
     }
 
     void LinuxPlatformAtomics::DestroySpinlock(void*& LockVal) noexcept
     {
         if (LockVal)
         {
-            pthread_rwlock_destroy(GetRWLock(LockVal));
+            pthread_mutex_destroy(GetRWLock(LockVal));
             delete GetRWLock(LockVal);
             LockVal = nullptr;
         }
@@ -45,26 +45,20 @@ namespace Ayla
 
     void LinuxPlatformAtomics::AcquireSpinlock(void*& LockVal, bool bShared) noexcept
     {
-        if (bShared)
-            pthread_rwlock_rdlock(GetRWLock(LockVal));
-        else
-            pthread_rwlock_wrlock(GetRWLock(LockVal));
+        PLATFORM_UNREFERENCED_PARAMETER(bShared);
+        pthread_mutex_lock(GetRWLock(LockVal));
     }
 
     void LinuxPlatformAtomics::ReleaseSpinlock(void*& LockVal, bool bShared) noexcept
     {
-        (void)bShared; // 읽기/쓰기 구분 없이 unlock
-        pthread_rwlock_unlock(GetRWLock(LockVal));
+        PLATFORM_UNREFERENCED_PARAMETER(bShared);
+        pthread_mutex_unlock(GetRWLock(LockVal));
     }
 
     bool LinuxPlatformAtomics::TryAcquireSpinlock(void*& LockVal, bool bShared) noexcept
     {
-        int ret;
-        if (bShared)
-            ret = pthread_mutex_tryrdlock(GetRWLock(LockVal));
-        else
-            ret = pthread_mutex_trywrlock(GetRWLock(LockVal));
-        return ret == 0;
+        PLATFORM_UNREFERENCED_PARAMETER(bShared);
+        return pthread_mutex_trylock(GetRWLock(LockVal)) == 0;
     }
 
     void LinuxPlatformAtomics::InitializeSpinlockConditionVariable(void*& CondVal) noexcept
@@ -86,13 +80,13 @@ namespace Ayla
 
     void LinuxPlatformAtomics::WaitSpinlockConditionVariable(void*& CondVal, void*& LockVal, bool bShared) noexcept
     {
-        (void)bShared; // pthread_mutex_t는 unlock 후 wait 필요
+        PLATFORM_UNREFERENCED_PARAMETER(bShared);
         pthread_cond_wait(GetCondVar(CondVal), GetRWLock(LockVal));
     }
 
     bool LinuxPlatformAtomics::WaitForSpinlockConditionVariable(void*& CondVal, void*& LockVal, size_t Sleep, bool bShared) noexcept
     {
-        (void)bShared;
+        PLATFORM_UNREFERENCED_PARAMETER(bShared);
         struct timespec ts;
         clock_gettime(CLOCK_REALTIME, &ts);
         size_t sec = Sleep / 1000;

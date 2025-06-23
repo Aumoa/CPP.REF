@@ -144,7 +144,8 @@ namespace Ayla
 
     void LinuxPlatformProcess::StacktraceCurrent(std::vector<StackFrame>& OutStackframes) noexcept
     {
-        OutStackframes = StackTrace::CaptureCurrent();
+        auto current = StackTrace::Current();
+        OutStackframes.insert(current.begin(), current.end());
     }
 
     void LinuxPlatformProcess::StacktraceFromThread(void* Handle, std::vector<StackFrame>& OutStackframes) noexcept
@@ -172,8 +173,7 @@ namespace Ayla
         auto handler = [](int sig)
         {
             Console::Error.WriteLine(String::Format(TEXT("Caught signal: {0}"), sig));
-            std::vector<StackFrame> frames = StackTrace::CaptureCurrent();
-            Console::Error.WriteLine(StackTrace::ToString(frames));
+            Console::Error.WriteLine(StackTrace::Current());
             _exit(128 + sig);
         };
 
