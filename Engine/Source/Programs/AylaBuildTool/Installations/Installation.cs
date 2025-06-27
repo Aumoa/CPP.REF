@@ -4,6 +4,9 @@ namespace AylaEngine;
 
 internal abstract class Installation
 {
+    public abstract ValueTask<string> GetCompilerPath(TargetInfo targetInfo, CancellationToken cancellationToken);
+    public abstract ValueTask<string> GetIntelliSenseMode(TargetInfo targetInfo, CancellationToken cancellationToken);
+
     public abstract ValueTask<CppCompiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken);
     public abstract ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken);
 

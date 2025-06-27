@@ -1,7 +1,8 @@
 {
   "profiles": {
     "AylaBuildTool": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "generate -g VisualStudioCode"
     }
   }
 }

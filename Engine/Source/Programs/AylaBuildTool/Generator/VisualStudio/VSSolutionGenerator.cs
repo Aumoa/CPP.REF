@@ -21,7 +21,7 @@ internal class VSSolutionGenerator : Generator
     private static readonly Guid EngineEditorFilterGuid = Guid.Parse("F25589A2-561D-BD3C-A288-05D20D162C9C");
     private static readonly Guid ProgramFilterGuid = Guid.Parse("C39416C3-6B11-1C22-C316-84C2012A201C");
 
-    public override async Task GenerateAsync(Solution solution, CancellationToken cancellationToken = default)
+    public override async ValueTask GenerateAsync(Solution solution, CancellationToken cancellationToken = default)
     {
         var solutionFileName = Path.Combine(solution.PrimaryGroup.RootDirectory, solution.PrimaryGroup.Name + ".sln");
         string? previousSolutionText = null;

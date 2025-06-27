@@ -137,6 +137,30 @@ internal class VisualStudioInstallation : Installation
         }
     }
 
+    public override ValueTask<string> GetCompilerPath(TargetInfo targetInfo, CancellationToken cancellationToken)
+    {
+        if (targetInfo.Platform.Group != PlatformGroup.Windows)
+        {
+            Console.Error.WriteLine("Non-windows build target not supported.");
+            throw TerminateException.User();
+        }
+
+        var product = s_Products[0];
+        return ValueTask.FromResult(product.GetClCompiler(targetInfo.Platform.Architecture));
+    }
+
+    public override ValueTask<string> GetIntelliSenseMode(TargetInfo targetInfo, CancellationToken cancellationToken)
+    {
+        switch (targetInfo.Platform.Architecture)
+        {
+            case Architecture.X64:
+                return ValueTask.FromResult("windows-msvc-x64");
+        }
+
+        Console.Error.WriteLine("Architecture({0}) not support.", targetInfo.Platform.Architecture);
+        throw TerminateException.NotSupport();
+    }
+
     public override ValueTask<CppCompiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
     {
         if (targetInfo.Platform.Group != PlatformGroup.Windows)

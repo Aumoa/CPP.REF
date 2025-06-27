@@ -7,4 +7,7 @@ internal record GenerateOptions
 {
     [Option('p', "project", HelpText = "The project for generate project files.")]
     public string? ProjectFile { get; init; }
+
+    [Option('g', "generator")]
+    public GeneratorType GeneratorType { get; init; } = GeneratorType.VisualStudio;
 }

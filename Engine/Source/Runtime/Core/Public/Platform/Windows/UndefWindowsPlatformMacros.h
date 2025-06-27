@@ -15,3 +15,4 @@
 #undef FormatMessage
 #undef SetEnvironmentVariable
 #undef GetEnvironmentVariable
+#undef LoadLibrary

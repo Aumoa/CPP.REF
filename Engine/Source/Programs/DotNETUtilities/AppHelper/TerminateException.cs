@@ -8,6 +8,7 @@ public class TerminateException : Exception
     public const int EC_Internal = 3;
     public const int EC_Thirdparty = 4;
     public const int EC_Abort = 5;
+    public const int EC_NotSupport = 6;
 
     public readonly int ReturnCode;
 
@@ -22,4 +23,5 @@ public class TerminateException : Exception
     public static TerminateException Internal() => new(EC_Internal);
     public static TerminateException Thirdparty() => new(EC_Thirdparty);
     public static TerminateException Abort() => new(EC_Abort);
+    public static TerminateException NotSupport() => new(EC_NotSupport);
 }

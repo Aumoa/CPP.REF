@@ -1,4 +1,4 @@
-// Copyright 2020-2025 Aumoa.lib. All right reserved.
+﻿// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Platform/Linux/LinuxPlatformIO.h"
 
@@ -258,3 +258,5 @@ namespace Ayla
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__
+
+#endif PLATFORM_LINUX
