@@ -1,0 +1,47 @@
+{
+  "folders": [
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/ThirdParty/backtrace"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Runtime/ApplicationCore"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Runtime/Core"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Runtime/RenderCore"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Programs/DotNETUtilities"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Runtime/Numerics"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Programs/AylaBuildTool"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Editor/CoreEd"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Runtime/Launch"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Editor/AssetDatabase"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Runtime/Engine"
+    },
+    {
+      "path": "/home/liberty/src/CPP.REF/Engine/Source/Runtime/WindowsAPI"
+    }
+  ],
+  "settings": {
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "files.exclude": {
+      "**/Intermediate": true,
+      "**/Binaries": true
+    }
+  }
+}

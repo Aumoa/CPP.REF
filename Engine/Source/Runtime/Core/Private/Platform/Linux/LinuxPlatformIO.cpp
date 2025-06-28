@@ -10,6 +10,7 @@
 #include "SystemException.h"
 #include "Threading/ThreadPool.h"
 #include "Platform/PlatformCommon.h"
+#include "LinuxStandardStreamTextWriter.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -29,20 +30,22 @@ namespace Ayla
 
     TextWriter& LinuxPlatformIO::GetStandardOutput() noexcept
     {
-        static TextWriter Writer(STDOUT_FILENO);
-        return Writer;
+        static LinuxStandardStreamTextWriter writer(STDOUT_FILENO);
+        return writer;
     }
 
     TextWriter& LinuxPlatformIO::GetStandardError() noexcept
     {
-        static TextWriter Writer(STDERR_FILENO);
-        return Writer;
+        static LinuxStandardStreamTextWriter writer(STDERR_FILENO);
+        return writer;
     }
 
     void LinuxPlatformIO::InitializeIOCPHandle(void*& Handle) noexcept
     {
+        const uint32 kUringQueueDepth = 64;
+
         auto* h = new IOCPHandle();
-        if (io_uring_queue_init(kUringQueueDepth, &h->ring, 0) < 0)
+        if (io_uring_queue_init((unsigned)kUringQueueDepth, &h->ring, 0) < 0)
         {
             delete h;
             Handle = nullptr;
@@ -86,7 +89,7 @@ namespace Ayla
         {
             struct __kernel_timespec ts;
             ts.tv_sec = Dur.GetTotalMilliseconds() / 1000;
-            ts.tv_nsec = (Dur.GetTotalMilliseconds() % 1000) * 1000000;
+            ts.tv_nsec = (fmod(Dur.GetTotalMilliseconds(), 1000)) * 1000000;
             ret = io_uring_wait_cqe_timeout(&h->ring, &cqe, &ts);
         }
         else
@@ -118,17 +121,19 @@ namespace Ayla
         case FileMode::Open:      break;
         case FileMode::OpenOrCreate: flags |= O_CREAT; break;
         case FileMode::Truncate:  flags |= O_TRUNC; break;
-        case FileMode::Append:    flags |= O_APPEND | O_CREAT; break;
         }
 
         switch (InAccessMode)
         {
         case FileAccessMode::Read:    flags |= O_RDONLY; break;
         case FileAccessMode::Write:   flags |= O_WRONLY; break;
-        case FileAccessMode::ReadWrite: flags |= O_RDWR; break;
+        case FileAccessMode::Append:  flags |= O_APPEND | O_CREAT; break;
+        case (FileAccessMode::Read | FileAccessMode::Write):
+            flags |= O_RDWR;
+            break;
         }
 
-        int fd = open(InFilename.c_str(), flags, 0666);
+        int fd = open(InFilename.AsCodepage().c_str(), flags, 0666);
         if (fd == -1)
         {
             Handle = nullptr;
@@ -259,4 +264,4 @@ namespace Ayla
 
 #undef __ALLOW_PLATFORM_COMMON_H__
 
-#endif PLATFORM_LINUX
+#endif

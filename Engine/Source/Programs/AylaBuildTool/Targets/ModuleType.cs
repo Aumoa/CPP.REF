@@ -4,5 +4,6 @@ public enum ModuleType
 {
     Library,
     Application,
-    Game
+    Game,
+    ThirdParty
 }

@@ -1,0 +1,3 @@
+[submodule "Engine/Source/ThirdParty/backtrace/src"]
+	path = Engine/Source/ThirdParty/backtrace/src
+	url = https://github.com/ianlancetaylor/libbacktrace

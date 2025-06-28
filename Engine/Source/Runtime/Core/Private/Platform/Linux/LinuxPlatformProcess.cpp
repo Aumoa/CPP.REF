@@ -24,6 +24,7 @@
 #include <cstring>
 #include <fstream>
 #include <dlfcn.h>
+#include <execinfo.h>
 
 namespace Ayla
 {
@@ -144,8 +145,39 @@ namespace Ayla
 
     void LinuxPlatformProcess::StacktraceCurrent(std::vector<StackFrame>& OutStackframes) noexcept
     {
-        auto current = StackTrace::Current();
-        OutStackframes.insert(current.begin(), current.end());
+        constexpr int MaxFrames = 64;
+        void* frames[MaxFrames];
+        int frameCount = backtrace(frames, MaxFrames);
+
+        for (int i = 0; i < frameCount; ++i) {
+            Dl_info info;
+            String module, description;
+            int64 addressOf = reinterpret_cast<int64>(frames[i]);
+            if (dladdr(frames[i], &info))
+            {
+                module = String::FromLiteral(info.dli_fname ? info.dli_fname : "");
+                if (info.dli_sname)
+                {
+                    int status = 0;
+                    char* demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status);
+                    if (demangled && status == 0)
+                    {
+                        description = String::FromLiteral(demangled);
+                        free(ㄴ);
+                    }
+                    else
+                    {
+                        description = String::FromLiteral(info.dli_sname);
+                    }
+                }
+            }
+
+            OutStackframes.emplace_back(StackFrame
+            {
+                .Module = module,
+                .Description = description
+            });
+        }
     }
 
     void LinuxPlatformProcess::StacktraceFromThread(void* Handle, std::vector<StackFrame>& OutStackframes) noexcept
@@ -230,11 +262,12 @@ namespace Ayla
         }
 
         // pthread_setname_np는 16자 제한이 있음
-        std::string name = InDescription.ToString();
-        if (name.length() > 15)
-            name = name.substr(0, 15);
+        if (InDescription.length() > 15)
+        {
+            InDescription = InDescription.Substring(0, 15);
+        }
 
-        pthread_setname_np(thread, name.c_str());
+        pthread_setname_np(thread, InDescription.AsCodepage().c_str());
     }
 
     void* LinuxPlatformProcess::CreateProcess(const ProcessStartInfo& InStartInfo) noexcept
@@ -244,7 +277,7 @@ namespace Ayla
         {
             // Child process
             std::vector<char*> args;
-            args.push_back(const_cast<char*>(InStartInfo.FileName.c_str()));
+            args.push_back(const_cast<char*>(InStartInfo.FileName.AsCodepage().c_str()));
             std::string argStr = InStartInfo.Arguments;
             std::istringstream iss(argStr);
             std::string token;
@@ -254,7 +287,7 @@ namespace Ayla
             }
             args.push_back(nullptr);
 
-            execvp(InStartInfo.FileName.c_str(), args.data());
+            execvp(InStartInfo.FileName.AsCodepage().c_str(), args.data());
             _exit(127);
         }
         else if (pid > 0)
@@ -276,12 +309,12 @@ namespace Ayla
 
     bool LinuxPlatformProcess::SetEnvironmentVariable(String InName, String InValue) noexcept
     {
-        return setenv(InName.c_str(), InValue.c_str(), 1) == 0;
+        return setenv(InName.AsCodepage().c_str(), InValue.c_str(), 1) == 0;
     }
 
     String LinuxPlatformProcess::GetEnvironmentVariable(String InName) noexcept
     {
-        const char* val = getenv(InName.c_str());
+        const char* val = getenv(InName.AsCodepage().c_str());
         if (!val)
             return String::GetEmpty();
         return String::FromLiteral(val);

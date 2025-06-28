@@ -17,6 +17,7 @@ internal readonly struct SourceCodeDescriptor(GroupDescriptor Group, string Modu
         switch (extensions)
         {
             case ".cpp":
+            case ".c":
                 type = SourceCodeType.SourceCode;
                 break;
             case ".h" or ".inl":

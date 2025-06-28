@@ -47,8 +47,8 @@ internal static class VSCCppProjectGenerator
         [JsonPropertyName("label")]
         public required string Label { get; set; }
 
-        [JsonPropertyName("shell")]
-        public required string Shell { get; set; }
+        [JsonPropertyName("type")]
+        public required string Type { get; set; }
 
         [JsonPropertyName("command")]
         public required string Command { get; set; }
@@ -58,6 +58,9 @@ internal static class VSCCppProjectGenerator
 
         [JsonPropertyName("group")]
         public required Group Group { get; set; }
+
+        [JsonPropertyName("problemMatcher")]
+        public required string[] ProblemMatcher { get; set; }
     }
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -66,16 +69,23 @@ internal static class VSCCppProjectGenerator
         WriteIndented = true
     };
 
-    public static async ValueTask GenerateAsync(Solution solution, ModuleProject project, CancellationToken cancellationToken)
+    public static async ValueTask GenerateAsync(Solution solution, ModuleProject project, List<string> outputFolders, CancellationToken cancellationToken)
     {
         string vscode_FullName = Path.Combine(project.SourceDirectory, ".vscode");
         string c_cpp_properties_FileName = "c_cpp_properties.json";
         string c_cpp_properties_FullName = Path.Combine(vscode_FullName, c_cpp_properties_FileName);
         string tasks_FileName = "tasks.json";
         string tasks_FullName = Path.Combine(vscode_FullName, tasks_FileName);
+        lock (outputFolders)
+        {
+            outputFolders.Add(project.SourceDirectory);
+        }
+
+        var currentAssemblyLocation = Global.AssemblyLocation;
 
         var installation = Installation.CreateDefaultInstallation();
         List<Configuration> configurations = [];
+        List<Task> tasks = [];
         foreach (var targetInfo in TargetInfo.GetAllTargets())
         {
             if (targetInfo.Platform == PlatformInfo.Current)
@@ -94,6 +104,27 @@ internal static class VSCCppProjectGenerator
                     CppStandard = "c++20",
                     IntelliSenseMode = intelliSenseMode
                 });
+
+                tasks.Add(new Task
+                {
+                    Label = project.Name + " " + FormatTargetName(targetInfo),
+                    Type = "shell",
+                    Command = "dotnet",
+                    Arguments = [
+                        currentAssemblyLocation, "build",
+                        "--target", project.Name,
+                        "--config", targetInfo.Config.ToString(),
+                        targetInfo.Editor ? "--editor" : string.Empty
+                    ],
+                    Group = new()
+                    {
+                        Kind = "build",
+                        IsDefault = false
+                    },
+                    ProblemMatcher = [
+                        "$gcc"
+                    ]
+                });
             }
 
             IEnumerable<MacroSet> AppendPlatformMacros(IEnumerable<MacroSet> set)
@@ -110,15 +141,29 @@ internal static class VSCCppProjectGenerator
             }
         }
 
-        const int version = 4;
-        string json = JsonSerializer.Serialize(new
-        {
-            configurations,
-            version
-        }, JsonOptions);
-
         Directory.CreateDirectory(vscode_FullName);
-        await File.WriteAllTextAsync(c_cpp_properties_FullName, json, cancellationToken);
+
+        {
+            const int version = 4;
+            string c_cpp_properties_Json = JsonSerializer.Serialize(new
+            {
+                configurations,
+                version
+            }, JsonOptions);
+
+            await File.WriteAllTextAsync(c_cpp_properties_FullName, c_cpp_properties_Json, cancellationToken);
+        }
+
+        {
+            const string version = "2.0.0";
+            string tasks_Json = JsonSerializer.Serialize(new
+            {
+                version,
+                tasks
+            }, JsonOptions);
+
+            await File.WriteAllTextAsync(tasks_FullName, tasks_Json, cancellationToken);
+        }
 
         static string FormatMacro(MacroSet set)
         {

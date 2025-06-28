@@ -20,7 +20,9 @@ internal record TargetInfo : ITargetInfo
     public static IEnumerable<TargetInfo> GetAllTargets()
     {
         return InnerGet(PlatformInfo.Win64, true)
-            .Concat(InnerGet(PlatformInfo.Win64, false));
+            .Concat(InnerGet(PlatformInfo.Win64, false))
+            .Concat(InnerGet(PlatformInfo.Linux64, true))
+            .Concat(InnerGet(PlatformInfo.Linux64, false));
 
         IEnumerable<TargetInfo> InnerGet(PlatformInfo platform, bool editor)
         {
