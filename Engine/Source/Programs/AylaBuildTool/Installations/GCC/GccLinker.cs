@@ -5,10 +5,12 @@ namespace AylaEngine;
 
 internal class GccLinker : Linker
 {
+    private readonly Installation m_Installation;
     private readonly TargetInfo m_TargetInfo;
 
-    public GccLinker(TargetInfo targetInfo)
+    public GccLinker(Installation installation, TargetInfo targetInfo)
     {
+        m_Installation = installation;
         m_TargetInfo = targetInfo;
     }
 
@@ -23,7 +25,7 @@ internal class GccLinker : Linker
         var linkCommands = new StringBuilder();
 
         var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
         switch (module.Rules.Type)
@@ -53,6 +55,8 @@ internal class GccLinker : Linker
         {
             linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
         }
+        
+        linkCommands.AppendFormat("-o\"{0}\" ", outputFileName);
 
         var result = await Terminal.ExecuteCommandAsync(linkCommands.ToString(), options, cancellationToken);
         if (result.IsCompletedSuccessfully && ((result.StdOut.Length == 0 && result.Logs.Length == 0) || (result.StdOut.Length == 1 && result.Logs.Length == 1 && string.IsNullOrWhiteSpace(result.StdOut[0].Value))))

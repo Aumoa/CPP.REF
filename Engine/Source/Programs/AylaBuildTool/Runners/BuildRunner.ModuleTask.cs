@@ -9,13 +9,15 @@ internal static partial class BuildRunner
         public readonly ModuleRulesResolver Resolver;
         public readonly CompileTask[] NeedCompileTasks;
 
+        private readonly Installation m_Installation;
         private readonly CompileItem[] m_AllCompiles;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public ModuleTask(ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles)
+        public ModuleTask(Installation installation, ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles)
         {
             Resolver = resolver;
             NeedCompileTasks = needCompiles;
+            m_Installation = installation;
             m_AllCompiles = allCompiles;
         }
 
@@ -26,7 +28,7 @@ internal static partial class BuildRunner
                 return true;
             }
 
-            var outputFileName = Resolver.Group.OutputFileName(targetInfo, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
+            var outputFileName = Resolver.Group.OutputFileName(m_Installation, targetInfo, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
             if (File.Exists(outputFileName) == false)
             {
                 return true;

@@ -14,6 +14,7 @@ internal static class VSCppProjectGenerator
     {
         var engineGroup = solution.EngineGroup;
         var primaryGroup = solution.PrimaryGroup;
+        var installation = new VisualStudioInstallation();
 
         var group = project.Group;
         var projectFilesDirectory = Path.Combine(primaryGroup.IntermediateDirectory, "ProjectFiles");
@@ -287,7 +288,7 @@ internal static class VSCppProjectGenerator
                     var resolver = project.GetResolver(buildTarget);
                     var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                     var includes = GenerateIncludePaths(resolver);
-                    var outputFileName = FolderPolicy.OutputFileName(project.Name, rules.Type);
+                    var outputFileName = installation.OutputFileName(project.Name, rules.Type);
 
                     AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                     Indent(() =>

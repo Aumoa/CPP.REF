@@ -39,7 +39,7 @@ internal class GccInstallation : Installation
 
     public override ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult<Linker>(new GccLinker(targetInfo));
+        return ValueTask.FromResult<Linker>(new GccLinker(this, targetInfo));
     }
 
     public override async ValueTask<string[]> ParseDependenciesAsync(string depsFileName, CancellationToken cancellationToken)
@@ -52,5 +52,16 @@ internal class GccInstallation : Installation
         }
 
         return lines[2..].Select(p => p.Trim()).Where(p => string.IsNullOrEmpty(p) == false).ToArray();
+    }
+
+    public override string OutputFileName(string projectName, ModuleType moduleType)
+    {
+        return moduleType switch
+        {
+            ModuleType.Library => $"lib{projectName}.so",
+            ModuleType.Game => $"lib{projectName}.so",
+            ModuleType.Application => $"{projectName}",
+            _ => string.Empty
+        };
     }
 }

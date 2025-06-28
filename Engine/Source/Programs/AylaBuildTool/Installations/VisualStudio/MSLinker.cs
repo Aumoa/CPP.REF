@@ -4,12 +4,14 @@ namespace AylaEngine;
 
 internal class MSLinker : Linker
 {
+    private readonly Installation m_Installation;
     private readonly TargetInfo m_TargetInfo;
     private readonly VisualStudioInstallation.Product m_Product;
     private readonly StringBuilder m_CommandBuilder = new();
 
-    public MSLinker(TargetInfo targetInfo, VisualStudioInstallation.Product product)
+    public MSLinker(Installation installation, TargetInfo targetInfo, VisualStudioInstallation.Product product)
     {
+        m_Installation = installation;
         m_TargetInfo = targetInfo;
         m_Product = product;
     }
@@ -25,7 +27,7 @@ internal class MSLinker : Linker
         m_CommandBuilder.Clear();
 
         var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
         switch (module.Rules.Type)

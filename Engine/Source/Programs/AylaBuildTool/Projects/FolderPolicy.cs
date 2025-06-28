@@ -21,20 +21,9 @@ internal static class FolderPolicy
         return PathPolicy(result, pathType);
     }
 
-    public static string OutputFileName(string projectName, ModuleType moduleType)
+    public static string OutputFileName(this GroupDescriptor descriptor, Installation installation,  ITargetInfo targetInfo, string projectName, ModuleType moduleType, PathType pathType)
     {
-        return projectName + moduleType switch
-        {
-            ModuleType.Library => ".dll",
-            ModuleType.Game => ".dll",
-            ModuleType.Application => ".exe",
-            _ => string.Empty
-        };
-    }
-
-    public static string OutputFileName(this GroupDescriptor descriptor, ITargetInfo targetInfo, string projectName, ModuleType moduleType, PathType pathType)
-    {
-        var result = Path.Combine(Output(descriptor, targetInfo, pathType), OutputFileName(projectName, moduleType));
+        var result = Path.Combine(Output(descriptor, targetInfo, pathType), installation.OutputFileName(projectName, moduleType));
         return PathPolicy(result, pathType);
     }
 

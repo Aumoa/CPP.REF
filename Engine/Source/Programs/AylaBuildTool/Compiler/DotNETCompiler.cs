@@ -9,11 +9,11 @@ internal class DotNETCompiler
 {
     private static SemaphoreSlim m_Access = new(1);
 
-    private static IEnumerable<string> GatherSourceCodes(string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
+    private static IEnumerable<string> GatherSourceCodes(Installation installation, string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
     {
         var allSourceFiles = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
         string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
-        var outputFile = group.OutputFileName(targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
+        var outputFile = group.OutputFileName(installation, targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
         var objDir = Path.GetFullPath(Path.Combine(sourceDirectory, "obj"));
         var binDir = Path.GetFullPath(Path.Combine(sourceDirectory, "bin"));
 
@@ -37,7 +37,7 @@ internal class DotNETCompiler
         }
     }
 
-    private static void GenerateCache(string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
+    private static void GenerateCache(Installation installation, string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
     {
         string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
 
@@ -48,7 +48,7 @@ internal class DotNETCompiler
 
         Directory.CreateDirectory(intDir);
 
-        foreach (var sourceFile in GatherSourceCodes(sourceDirectory, assemblyName, group, targetInfo))
+        foreach (var sourceFile in GatherSourceCodes(installation, sourceDirectory, assemblyName, group, targetInfo))
         {
             var relativeFileName = Path.GetRelativePath(sourceDirectory, sourceFile);
             var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
@@ -58,7 +58,7 @@ internal class DotNETCompiler
         }
     }
 
-    public static bool NeedCompile(string projectFile, GroupDescriptor group, TargetInfo targetInfo)
+    public static bool NeedCompile(Installation installation, string projectFile, GroupDescriptor group, TargetInfo targetInfo)
     {
         string? sourceDirectory = Path.GetDirectoryName(projectFile);
         if (sourceDirectory == null)
@@ -67,13 +67,13 @@ internal class DotNETCompiler
         }
 
         string assemblyName = Path.GetFileNameWithoutExtension(projectFile);
-        return NeedCompile(sourceDirectory, assemblyName, group, targetInfo);
+        return NeedCompile(installation, sourceDirectory, assemblyName, group, targetInfo);
     }
 
-    public static bool NeedCompile(string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
+    public static bool NeedCompile(Installation installation, string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
     {
         string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
-        var outputFile = group.OutputFileName(targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
+        var outputFile = group.OutputFileName(installation, targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
         var objDir = Path.GetFullPath(Path.Combine(sourceDirectory, "obj"));
         if (File.Exists(outputFile) == false)
         {
@@ -88,7 +88,7 @@ internal class DotNETCompiler
         HashSet<string> cacheFiles = [];
         cacheFiles.AddRange(Directory.GetFiles(intDir, "*.cache", SearchOption.TopDirectoryOnly));
 
-        foreach (var sourceFile in GatherSourceCodes(sourceDirectory, assemblyName, group, targetInfo))
+        foreach (var sourceFile in GatherSourceCodes(installation, sourceDirectory, assemblyName, group, targetInfo))
         {
             var relativeFileName = Path.GetRelativePath(sourceDirectory, sourceFile);
             var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
@@ -111,12 +111,12 @@ internal class DotNETCompiler
         return cacheFiles.Count > 0;
     }
 
-    public async Task<string> CompileAsync(string sourceDirectory, string assemblyName, string projectDescription, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+    public async Task<string> CompileAsync(Installation installation, string sourceDirectory, string assemblyName, string projectDescription, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
     {
         await m_Access.WaitAsync(cancellationToken);
         try
         {
-            var sourceFiles = GatherSourceCodes(sourceDirectory, assemblyName, group, targetInfo)
+            var sourceFiles = GatherSourceCodes(installation, sourceDirectory, assemblyName, group, targetInfo)
                 .Select(CSCompiler.SourceCodeProvider.FromFile);
 
             var config = VSUtility.GetConfigName(targetInfo);
@@ -140,7 +140,7 @@ internal class DotNETCompiler
             var outputDll = Path.Combine(outputDir, assemblyName + ".dll");
             await CSCompiler.CompileToAsync(assemblyName, outputDll, sourceFiles, CSCompiler.GetDefaultAssemblies().Concat(referencedAssemblies), cancellationToken);
 
-            GenerateCache(sourceDirectory, assemblyName, group, targetInfo);
+            GenerateCache(installation, sourceDirectory, assemblyName, group, targetInfo);
             return outputDll;
         }
         catch (CSCompilerError error)
@@ -159,7 +159,7 @@ internal class DotNETCompiler
         }
     }
 
-    public async Task<string> CompileAsync(string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+    public async Task<string> CompileAsync(Installation installation, string projectFile, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
     {
         var sourceDirectory = Path.GetDirectoryName(projectFile);
         if (sourceDirectory == null)
@@ -169,6 +169,6 @@ internal class DotNETCompiler
 
         var assemblyName = Path.GetFileNameWithoutExtension(projectFile);
         string csproj = await File.ReadAllTextAsync(projectFile);
-        return await CompileAsync(sourceDirectory, assemblyName, csproj, group, targetInfo, cancellationToken);
+        return await CompileAsync(installation, sourceDirectory, assemblyName, csproj, group, targetInfo, cancellationToken);
     }
 }
