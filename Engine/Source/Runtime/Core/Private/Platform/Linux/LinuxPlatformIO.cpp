@@ -11,6 +11,7 @@
 #include "Threading/ThreadPool.h"
 #include "Platform/PlatformCommon.h"
 #include "LinuxStandardStreamTextWriter.h"
+#include "IO/IOCompletionOverlapped.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>

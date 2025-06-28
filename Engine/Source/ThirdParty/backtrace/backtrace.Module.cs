@@ -8,6 +8,8 @@ public class backtrace : ModuleRules
 	public backtrace()
 	{
 		Type = ModuleType.ThirdParty;
-		AddPublicIncludePaths(".");
+		AddPublicIncludePaths("src");
+
+		ThirdParty.NeedConfigure = true;
 	}
 }

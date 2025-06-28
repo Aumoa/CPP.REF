@@ -25,6 +25,7 @@
 #include <fstream>
 #include <dlfcn.h>
 #include <execinfo.h>
+#include <cxxabi.h>
 
 namespace Ayla
 {
@@ -163,7 +164,7 @@ namespace Ayla
                     if (demangled && status == 0)
                     {
                         description = String::FromLiteral(demangled);
-                        free(ㄴ);
+                        free(demangled);
                     }
                     else
                     {
@@ -204,8 +205,7 @@ namespace Ayla
         // SIGSEGV, SIGABRT 등 치명적 시그널 발생 시 스택트레이스를 출력하는 핸들러 등록
         auto handler = [](int sig)
         {
-            Console::Error.WriteLine(String::Format(TEXT("Caught signal: {0}"), sig));
-            Console::Error.WriteLine(StackTrace::Current());
+            Console::Error.WriteLine(String::Format(TEXT("Caught signal: {0}\n{1}"), sig, StackTrace::Current().ToString()));
             _exit(128 + sig);
         };
 
@@ -278,7 +278,7 @@ namespace Ayla
             // Child process
             std::vector<char*> args;
             args.push_back(const_cast<char*>(InStartInfo.FileName.AsCodepage().c_str()));
-            std::string argStr = InStartInfo.Arguments;
+            std::string argStr = InStartInfo.Arguments.string();
             std::istringstream iss(argStr);
             std::string token;
             while (iss >> token)
@@ -309,7 +309,7 @@ namespace Ayla
 
     bool LinuxPlatformProcess::SetEnvironmentVariable(String InName, String InValue) noexcept
     {
-        return setenv(InName.AsCodepage().c_str(), InValue.c_str(), 1) == 0;
+        return setenv(InName.AsCodepage().c_str(), InValue.AsCodepage().c_str(), 1) == 0;
     }
 
     String LinuxPlatformProcess::GetEnvironmentVariable(String InName) noexcept
