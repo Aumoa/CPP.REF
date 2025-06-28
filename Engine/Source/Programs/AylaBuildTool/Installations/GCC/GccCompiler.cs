@@ -4,10 +4,12 @@ namespace AylaEngine;
 
 internal class GccCompiler : CppCompiler
 {
+    private readonly Installation m_Installation;
     private readonly TargetInfo m_TargetInfo;
 
-    public GccCompiler(TargetInfo targetInfo)
+    public GccCompiler(Installation installation, TargetInfo targetInfo)
     {
+        m_Installation = installation;
         m_TargetInfo = targetInfo;
     }
 
@@ -20,9 +22,8 @@ internal class GccCompiler : CppCompiler
         };
 
         var compileCommands = new StringBuilder();
-        var makefileCommands = new StringBuilder();
 
-        AddCommands("-std=c++20", "-g", "-fPIC");
+        AddCompilerCommands("-std=c++20", "-g", "-fPIC");
 
         switch (m_TargetInfo.Config)
         {
@@ -42,7 +43,7 @@ internal class GccCompiler : CppCompiler
             includes.Add($"-I\"{includeDirectory}\"");
         }
 
-        AddCommands(includes.ToArray());
+        AddCompilerCommands(includes.ToArray());
 
         var additionalMacros = item.Resolver.AdditionalMacros
             .Append("PLATFORM_LINUX=1")
@@ -67,7 +68,7 @@ internal class GccCompiler : CppCompiler
             }
         }
 
-        AddCommands(macros.ToArray());
+        AddCompilerCommands(macros.ToArray());
 
         var fileName = Path.GetFileName(item.SourceCode.FilePath);
         var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
@@ -78,19 +79,13 @@ internal class GccCompiler : CppCompiler
         Directory.CreateDirectory(intermediateDirectory);
 
         AddCompilerCommands("-c");
-        AddMakefileCommands("-M");
 
-        AddCommands($"{item.SourceCode.FilePath}");
+        AddCompilerCommands($"{item.SourceCode.FilePath}");
 
         AddCompilerCommands($"-o\"{objectFileName}\"");
-        AddMakefileCommands($"> \"{depsFileName}\"");
+        AddCompilerCommands($"-MMD -MF\"{depsFileName}\"");
 
         Terminal.Output output;
-        using (await GetAccess(cancellationToken))
-        {
-            output = await Terminal.ExecuteCommandAsync(makefileCommands.ToString(), options, cancellationToken);
-        }
-
         using (await GetAccess(cancellationToken))
         {
             output = await Terminal.ExecuteCommandAsync(compileCommands.ToString(), options, cancellationToken);
@@ -98,51 +93,21 @@ internal class GccCompiler : CppCompiler
         
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
+            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
             cached.SaveCached(cacheFileName);
         }
 
         return output;
 
-        void AddCommands(params ReadOnlySpan<string?> args)
-        {
-            Internal__AddCommands(args, true, true);
-        }
-
         void AddCompilerCommands(params ReadOnlySpan<string?> args)
         {
-            Internal__AddCommands(args, true, false);
-        }
-
-        void AddMakefileCommands(params ReadOnlySpan<string?> args)
-        {
-            Internal__AddCommands(args, false, true);
-        }
-
-        void Internal__AddCommands(ReadOnlySpan<string?> args, bool addToCompiler, bool addToMakefile)
-        {
-            if (addToCompiler)
+            if (args.Length > 0)
             {
-                if (args.Length > 0)
+                if (compileCommands.Length > 0)
                 {
-                    if (compileCommands.Length > 0)
-                    {
-                        compileCommands.Append(' ');
-                    }
-                    compileCommands.Append(string.Join(' ', args));
+                    compileCommands.Append(' ');
                 }
-            }
-
-            if (addToMakefile)
-            {
-                if (args.Length > 0)
-                {
-                    if (makefileCommands.Length > 0)
-                    {
-                        makefileCommands.Append(' ');
-                    }
-                    makefileCommands.Append(string.Join(' ', args));
-                }
+                compileCommands.Append(string.Join(' ', args));
             }
         }
     }

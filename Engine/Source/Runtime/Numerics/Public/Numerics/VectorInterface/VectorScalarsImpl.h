@@ -37,6 +37,8 @@ private: \
 	{ \
 	}
 
+namespace Ayla
+{
 	template<class T, size_t N>
 	struct VectorScalarsImpl
 	{
@@ -58,6 +60,7 @@ private: \
 
 		VECTOR_SCALARS_CONSTEXPR_CTORS;
 	};
+}
 
 #define DECLARE_VECTOR_SCALARS_IMPL(ScalarsCount, Members)	\
 template<class T>											\

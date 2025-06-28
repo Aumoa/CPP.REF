@@ -4,12 +4,14 @@ namespace AylaEngine;
 
 internal class ClCompiler : CppCompiler
 {
+    private readonly Installation m_Installation;
     private readonly TargetInfo m_TargetInfo;
     private readonly VisualStudioInstallation.Product m_Product;
     private readonly StringBuilder m_CommandBuilder = new();
 
-    public ClCompiler(TargetInfo targetInfo, VisualStudioInstallation.Product product)
+    public ClCompiler(Installation installation, TargetInfo targetInfo, VisualStudioInstallation.Product product)
     {
+        m_Installation = installation;
         m_TargetInfo = targetInfo;
         m_Product = product;
     }
@@ -162,7 +164,7 @@ internal class ClCompiler : CppCompiler
         
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
+            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
             cached.SaveCached(cacheFileName);
         }
 

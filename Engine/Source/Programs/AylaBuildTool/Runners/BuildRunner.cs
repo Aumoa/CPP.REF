@@ -136,7 +136,7 @@ internal static partial class BuildRunner
 
                     if (options.Clean != CleanOptions.Rebuild)
                     {
-                        var cached = await SourceCodeCache.MakeCachedAsync(item.SourceCode.FilePath, project.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
+                        var cached = await SourceCodeCache.MakeCachedAsync(installation, item.SourceCode.FilePath, project.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
                         if (File.Exists(cacheFileName) == false ||
                             SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
                         {

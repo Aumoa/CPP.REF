@@ -99,7 +99,7 @@ internal readonly struct SourceCodeCache
         }
     }
 
-    public static async ValueTask<SourceCodeCache> MakeCachedAsync(string sourceCode, string ruleFilePath, string dependsFileName, string[] dependRuleFileNames, CancellationToken cancellationToken)
+    public static async ValueTask<SourceCodeCache> MakeCachedAsync(Installation installation, string sourceCode, string ruleFilePath, string dependsFileName, string[] dependRuleFileNames, CancellationToken cancellationToken)
     {
         if (File.Exists(dependsFileName) == false)
         {
@@ -109,16 +109,12 @@ internal readonly struct SourceCodeCache
         var sourceCodeWriteTime = File.GetLastWriteTimeUtc(sourceCode);
         var buildToolWriteTime = File.GetLastWriteTimeUtc(Global.AssemblyLocation);
         var ruleFileWriteTime = File.GetLastWriteTimeUtc(ruleFilePath);
-        string depsJson = await File.ReadAllTextAsync(dependsFileName, cancellationToken);
-        var includes = JsonNode.Parse(depsJson)?["Data"]?["Includes"]?.AsArray();
+        var includes = await installation.ParseDependenciesAsync(dependsFileName, cancellationToken);
         DateTime[] depsWriteTimes = [];
-        if (includes != null)
+        depsWriteTimes = new DateTime[includes.Length];
+        for (int i = 0; i < includes.Length; i++)
         {
-            depsWriteTimes = new DateTime[includes.Count];
-            for (int i = 0; i < includes.Count; i++)
-            {
-                depsWriteTimes[i] = File.GetLastWriteTimeUtc(includes[i]!.GetValue<string>());
-            }
+            depsWriteTimes[i] = File.GetLastWriteTimeUtc(includes[i]);
         }
         DateTime[] dependRuleFilesWriteTime = new DateTime[dependRuleFileNames.Length];
         for (int i = 0; i < dependRuleFileNames.Length; ++i)

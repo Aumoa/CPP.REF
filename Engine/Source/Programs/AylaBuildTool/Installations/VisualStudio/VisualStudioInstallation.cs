@@ -1,4 +1,6 @@
-﻿namespace AylaEngine;
+﻿using System.Text.Json.Nodes;
+
+namespace AylaEngine;
 
 /// <summary>
 /// Represents a Visual Studio installation and provides methods to interact with its components,
@@ -25,7 +27,7 @@ internal class VisualStudioInstallation : Installation
         public required VSVersion VisualStudioVersion { get; init; }
         public required Version CompilerVersion { get; init; }
         public required string Directory { get; init; }
-        
+
         public string GetClCompiler(Architecture arch)
         {
             return Path.Combine(Directory, "bin", "Hostx64", arch.ToString().ToLower(), "cl.exe");
@@ -170,7 +172,7 @@ internal class VisualStudioInstallation : Installation
         }
 
         var product = s_Products[0];
-        return ValueTask.FromResult<CppCompiler>(new ClCompiler(targetInfo, product));
+        return ValueTask.FromResult<CppCompiler>(new ClCompiler(this, targetInfo, product));
     }
 
     public override ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
@@ -183,6 +185,13 @@ internal class VisualStudioInstallation : Installation
 
         var product = s_Products[0];
         return ValueTask.FromResult<Linker>(new MSLinker(targetInfo, product));
+    }
+
+    public override async ValueTask<string[]> ParseDependenciesAsync(string depsFileName, CancellationToken cancellationToken)
+    {
+        var json = await File.ReadAllTextAsync(depsFileName, cancellationToken);
+        var includes = JsonNode.Parse(json)?["Data"]?["Includes"]?.AsArray();
+        return includes!.Select(p => p!.GetValue<string>()).ToArray();
     }
 
     public static IEnumerable<string> GatherWindowsKitInclude()

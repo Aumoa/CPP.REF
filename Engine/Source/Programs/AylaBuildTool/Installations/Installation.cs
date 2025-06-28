@@ -10,6 +10,8 @@ internal abstract class Installation
     public abstract ValueTask<CppCompiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken);
     public abstract ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken);
 
+    public abstract ValueTask<string[]> ParseDependenciesAsync(string depsFileName, CancellationToken cancellationToken);
+
     public static Installation CreateDefaultInstallation()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

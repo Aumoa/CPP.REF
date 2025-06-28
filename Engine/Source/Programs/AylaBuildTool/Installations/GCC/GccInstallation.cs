@@ -34,11 +34,23 @@ internal class GccInstallation : Installation
 
     public override ValueTask<CppCompiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult<CppCompiler>(new GccCompiler(targetInfo));
+        return ValueTask.FromResult<CppCompiler>(new GccCompiler(this, targetInfo));
     }
 
     public override ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
     {
         return ValueTask.FromResult<Linker>(new GccLinker(targetInfo));
+    }
+
+    public override async ValueTask<string[]> ParseDependenciesAsync(string depsFileName, CancellationToken cancellationToken)
+    {
+        var plain = await File.ReadAllTextAsync(depsFileName, cancellationToken);
+        var lines = plain.Split('\n').Select(p => p.Trim(['\\', '\r'])).ToArray();
+        if (lines.Length <= 2)
+        {
+            return Array.Empty<string>();
+        }
+
+        return lines[2..].Select(p => p.Trim()).Where(p => string.IsNullOrEmpty(p) == false).ToArray();
     }
 }
