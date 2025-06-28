@@ -3,11 +3,12 @@
 using System;
 using AylaEngine;
 
-public class backtrace : ModuleRules
+public class freetype : ModuleRules
 {
-	public backtrace()
+	public freetype()
 	{
 		Type = ModuleType.ThirdParty;
 		AddPublicIncludePaths(".");
 	}
 }
+
