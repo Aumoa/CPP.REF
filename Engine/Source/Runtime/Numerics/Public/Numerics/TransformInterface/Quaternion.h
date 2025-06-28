@@ -194,9 +194,9 @@ namespace Ayla
 		}
 
 		template<TIsVector<T, 4> IQuaternion>
-		constexpr Quaternion Lerp(const IQuaternion& Q, T T) const
+		constexpr Quaternion Lerp(const IQuaternion& q, T t) const
 		{
-			return Lerp(*this, Q, T);
+			return Lerp(*this, q, t);
 		}
 
 		template<TIsVector<T, 4> IQuaternionL, TIsVector<T, 4> IQuaternionR>
@@ -259,7 +259,7 @@ namespace Ayla
 			return M;
 		}
 
-		template<TIsMatrix<T, 3, 3> IMatrix = struct Matrix4x4>
+		template<TIsMatrix<T, 3, 3> IMatrix = struct Matrix4x4<T>>
 		constexpr IMatrix GetMatrix() const
 		{
 			return GetMatrix<IMatrix>(*this);
@@ -357,10 +357,10 @@ namespace Ayla
 		template<class T, TIsVector<T, 4> IQuaternion, TIsVector<T, 3> IVector>
 		static constexpr IVector TransformPoint(const IQuaternion& QW, const IVector& V)
 		{
-			const IVector Q(QW);
-			const T W = QW.W;
-			const IVector T = (Q ^ V) * 2.0;
-			return V + (T * W) + (Q ^ T);
+			const IVector quat(QW);
+			const T w = QW.W;
+			const IVector translate = (quat ^ V) * 2.0;
+			return V + (translate * w) + (quat ^ translate);
 		}
 	};
 

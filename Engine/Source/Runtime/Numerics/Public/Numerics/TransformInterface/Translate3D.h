@@ -18,20 +18,20 @@ namespace Ayla
 		{
 		}
 
-		constexpr Translate3D(const Translate3D& T) : X(T.X), Y(T.Y), Z(T.Z)
+		constexpr Translate3D(const Translate3D& v) : X(v.X), Y(v.Y), Z(v.Z)
 		{
 		}
 
 		template<TIsVector<T, 3> IVector>
-		constexpr Translate3D(const IVector& V) : X(V[0]), Y(V[1]), Z(V[2])
+		constexpr Translate3D(const IVector& v) : X(v[0]), Y(v[1]), Z(v[2])
 		{
 		}
 
-		constexpr Translate3D& operator =(const Translate3D& T)
+		constexpr Translate3D& operator =(const Translate3D& v)
 		{
-			X = T.X;
-			Y = T.Y;
-			Z = T.Z;
+			X = v.X;
+			Y = v.Y;
+			Z = v.Z;
 			return *this;
 		}
 
@@ -91,9 +91,9 @@ namespace Ayla
 
 	public:
 		template<TIsVector<T, 3> ITranslate>
-		static constexpr Translate3D Inverse(const ITranslate& T)
+		static constexpr Translate3D Inverse(const ITranslate& v)
 		{
-			return -T;
+			return -v;
 		}
 
 		constexpr Translate3D Inverse() const
@@ -108,9 +108,9 @@ namespace Ayla
 		}
 
 		template<TIsVector<T, 3> ITranslate>
-		constexpr Translate3D Concatenate(const ITranslate& T) const
+		constexpr Translate3D Concatenate(const ITranslate& v) const
 		{
-			return Concatenate(*this, T);
+			return Concatenate(*this, v);
 		}
 
 		static constexpr Translate3D Identity()
@@ -119,9 +119,9 @@ namespace Ayla
 		}
 
 		template<TIsVector<T, 3> ITranslate, TIsVector<T, 3> IVector>
-		constexpr static IVector TransformPoint(const ITranslate& T, const IVector& P)
+		constexpr static IVector TransformPoint(const ITranslate& v, const IVector& p)
 		{
-			return P + T;
+			return p + v;
 		}
 
 		template<TIsVector<T, 3> IVector>
@@ -131,9 +131,9 @@ namespace Ayla
 		}
 
 		template<TIsVector<T, 3> ITranslate, TIsVector<T, 3> IVector>
-		constexpr static IVector TransformVector(const ITranslate& T, const IVector& V)
+		constexpr static IVector TransformVector(const ITranslate& t, const IVector& v)
 		{
-			return V;
+			return v;
 		}
 
 		template<TIsVector<T, 3> IVector>

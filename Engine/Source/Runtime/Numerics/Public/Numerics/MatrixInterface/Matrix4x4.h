@@ -120,16 +120,16 @@ namespace Ayla
 		template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
 		static auto Decompose(const IMatrix& M, ITranslation& OutT, IScale& OutS, IQuaternion& OutQ)
 		{
-			Translate3D T;
-			Scale3D S;
-			Quaternion Q;
+			Translate3D<T> translate;
+			Scale3D<T> scale;
+			Quaternion<T> rot;
 
-			auto R = Decompose(Matrix4x4(M), T, S, Q);
+			auto R = Decompose(Matrix4x4(M), translate, scale, rot);
 			if (R)
 			{
-				OutT = T;
-				OutS = S;
-				OutQ = Q;
+				OutT = translate;
+				OutS = scale;
+				OutQ = rot;
 			}
 
 			return R;
@@ -155,9 +155,9 @@ namespace Ayla
 		}
 
 		template<TIsMatrix<T, 4, 3> IMatrix = Matrix4x4, TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
-		static auto AffineTransformation(const ITranslation& T, const IScale& S, const IQuaternion& Q)
+		static auto AffineTransformation(const ITranslation& translate, const IScale& scale, const IQuaternion& rot)
 		{
-			Matrix4x4 M = AffineTransformation(Translate3D(T), Scale3D(S), Quaternion(Q));
+			Matrix4x4 M = AffineTransformation(Translate3D(translate), Scale3D(scale), Quaternion(rot));
 			IMatrix R = IMatrix::Identity();
 
 			for (size_t i = 0; i < 4; ++i)
@@ -172,9 +172,9 @@ namespace Ayla
 		}
 
 		template<TIsVector<T, 3> ITranslation>
-		static auto Translation(const ITranslation& T)
+		static auto Translation(const ITranslation& translate)
 		{
-			return Translation(Vector3(T));
+			return Translation(Vector3(translate));
 		}
 
 		template<TIsVector<T, 3> IScale>
