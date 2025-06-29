@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericApplication.h"
-#include "WindowsApplication.gen.h"
 
 #if PLATFORM_WINDOWS
 
@@ -13,11 +12,8 @@
 
 namespace Ayla
 {
-    ACLASS()
     class WindowsApplication : public GenericApplication
     {
-        GENERATED_BODY()
-
     private:
         DirectoryReference EngineDirectory;
 

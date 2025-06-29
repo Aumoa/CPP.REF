@@ -7,17 +7,13 @@
 #include "GenericPlatform/GenericPlatformInputEvent.h"
 #include "GenericPlatform/GenericWindow.h"
 #include "IO/DirectoryReference.h"
-#include "GenericApplication.gen.h"
 
 namespace Ayla
 {
     class GenericWindow;
 
-    ACLASS()
-    class APPLICATIONCORE_API GenericApplication : public Object
+    class APPLICATIONCORE_API GenericApplication
     {
-        GENERATED_BODY()
-
     private:
         static GenericApplication* sApp;
         void* ApplicationPointer = nullptr;
@@ -26,9 +22,10 @@ namespace Ayla
 
     protected:
         GenericApplication();
-        virtual void Finalize() override;
 
     public:
+        virtual ~GenericApplication() noexcept;
+
         virtual RPtr<GenericWindow> MakeWindow(const GenericWindowDefinition& InDefinition) = 0;
         virtual Vector2N GetScreenResolution() = 0;
         virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& OutInputEvents) = 0;

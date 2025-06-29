@@ -199,7 +199,6 @@ namespace Ayla
 			auto removeInvocationList = func.m_InvocationList;
 			auto newInvocationList = std::make_shared<vector_t>(*selfInvocationList);
 
-			// removeInvocationList의 각 함수와 동일한 함수 객체를 newInvocationList에서 제거
 			for (const auto& toRemove : *removeInvocationList)
 			{
 				auto pred = [&](const function_t& f)
@@ -259,7 +258,6 @@ namespace Ayla
 			auto removeInvocationList = func2.m_InvocationList;
 			auto newInvocationList = std::make_shared<vector_t>(*selfInvocationList);
 
-			// removeInvocationList의 각 함수와 동일한 함수 객체를 newInvocationList에서 제거
 			for (const auto& toRemove : *removeInvocationList)
 			{
 				auto pred = [&](const function_t& f)

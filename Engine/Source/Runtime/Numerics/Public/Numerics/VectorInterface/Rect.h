@@ -67,18 +67,7 @@ namespace Ayla
 		}
 
 		template<TIsVector<float, 4> IRectResult = Rect, TIsTransform<Vector2<T>> ITransform2D, TIsVector<float, 4> IRect>
-		static constexpr IRectResult TransformRect(const ITransform2D& Transform, const IRect& InRect)
-		{
-			const auto TL = Transform.TransformPoint(Rect::LeftTop(InRect));
-			const auto RB = Transform.TransformPoint(Rect::RightBottom(InRect));
-
-			IRectResult R;
-			R[0] = Math::Min(TL.X, RB.X);
-			R[1] = Math::Min(TL.Y, RB.Y);
-			R[2] = Math::Max(TL.X, RB.X);
-			R[3] = Math::Max(TL.Y, RB.Y);
-			return R;
-		}
+		static constexpr IRectResult TransformRect(const ITransform2D& Transform, const IRect& InRect);
 
 	public:
 		constexpr Rect operator -() const
@@ -344,6 +333,21 @@ namespace Ayla
 			return r;
 		}
 	};
+
+	template<class T>
+	template<TIsVector<float, 4> IRectResult, TIsTransform<Vector2<T>> ITransform2D, TIsVector<float, 4> IRect>
+	constexpr IRectResult Rect<T>::TransformRect(const ITransform2D& Transform, const IRect& InRect)
+	{
+		const auto TL = Transform.TransformPoint(Rect<>::LeftTop(InRect));
+		const auto RB = Transform.TransformPoint(Rect<>::RightBottom(InRect));
+
+		IRectResult R;
+		R[0] = Math::Min(TL.X, RB.X);
+		R[1] = Math::Min(TL.Y, RB.Y);
+		R[2] = Math::Max(TL.X, RB.X);
+		R[3] = Math::Max(TL.Y, RB.Y);
+		return R;
+	}
 
 	template<class T>
 	template<TIsVector<T, 2> IPoint>

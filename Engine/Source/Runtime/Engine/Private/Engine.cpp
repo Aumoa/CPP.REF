@@ -21,7 +21,7 @@ namespace Ayla
 		return New<InitializationContext>();
 	}
 
-	void Engine::Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app)
+	void Engine::Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, std::shared_ptr<GenericApplication> app)
 	{
 		m_App = app;
 

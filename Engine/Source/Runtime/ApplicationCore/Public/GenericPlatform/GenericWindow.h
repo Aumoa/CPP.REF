@@ -4,15 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericWindowDefinition.h"
-#include "GenericWindow.gen.h"
 
 namespace Ayla
 {
-    ACLASS()
-    class APPLICATIONCORE_API GenericWindow : public Object
+    class APPLICATIONCORE_API GenericWindow
     {
-        GENERATED_BODY()
-
     protected:
         GenericWindow();
 

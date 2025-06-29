@@ -21,8 +21,7 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		APROPERTY()
-		PPtr<GenericApplication> m_App;
+		std::shared_ptr<GenericApplication> m_App;
 		APROPERTY()
 		PPtr<Graphics> m_Graphics;
 
@@ -31,7 +30,7 @@ namespace Ayla
 		virtual ~Engine() noexcept override;
 
 		virtual RPtr<InitializationContext> PreInitialize();
-		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, RPtr<GenericApplication> app);
+		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, std::shared_ptr<GenericApplication> app);
 
 		virtual void Tick(const std::vector<GenericPlatformInputEvent>& inputEvents);
 

@@ -6,7 +6,7 @@
 
 namespace Ayla
 {
-	void Debug::Injected_Log(String category, int32 logLevel, String message)
+	void Debug::Log(String category, LogVerbosity logLevel, String message)
 	{
 		static String LogVerbosityStr[] =
 		{
@@ -18,7 +18,7 @@ namespace Ayla
 		};
 
 		// TODO:
-		auto output = String::Format(TEXT("{}: {}: {}"), category, LogVerbosityStr[logLevel], message);
+		auto output = String::Format(TEXT("{}: {}: {}"), category, LogVerbosityStr[(int32)logLevel], message);
 		PlatformProcess::OutputDebugString(String::Format(TEXT("{}\n"), output));
 		Console::WriteLine(output);
 	}

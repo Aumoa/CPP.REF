@@ -13,7 +13,6 @@ namespace Ayla
 {
     struct CORE_API LinuxPlatformAtomics : public GenericPlatformAtomics
     {
-        // Increment
         static FORCEINLINE int8 InterlockedIncrement(volatile int8* Value) noexcept
         {
             return __sync_add_and_fetch(Value, 1);
@@ -47,7 +46,6 @@ namespace Ayla
             return __sync_add_and_fetch(Value, 1);
         }
 
-        // Decrement
         static FORCEINLINE int8 InterlockedDecrement(volatile int8* Value) noexcept
         {
             return __sync_sub_and_fetch(Value, 1);
@@ -81,7 +79,6 @@ namespace Ayla
             return __sync_sub_and_fetch(Value, 1);
         }
 
-        // Add
         static FORCEINLINE int8 InterlockedAdd(volatile int8* Value, int8 Amount) noexcept
         {
             return __sync_fetch_and_add(Value, Amount);
@@ -115,7 +112,6 @@ namespace Ayla
             return __sync_fetch_and_add(Value, Amount);
         }
 
-        // Exchange
         static FORCEINLINE int8 InterlockedExchange(volatile int8* Value, int8 Exchange) noexcept
         {
             return __sync_lock_test_and_set(Value, Exchange);
@@ -153,7 +149,6 @@ namespace Ayla
             return __sync_lock_test_and_set(Dest, Exchange);
         }
 
-        // CompareExchange
         static FORCEINLINE int8 InterlockedCompareExchange(volatile int8* Dest, int8 Exchange, int8 Comparand) noexcept
         {
             return __sync_val_compare_and_swap(Dest, Comparand, Exchange);
@@ -187,7 +182,6 @@ namespace Ayla
             return __sync_val_compare_and_swap(Dest, Comparand, Exchange);
         }
 
-        // And
         static FORCEINLINE int8 InterlockedAnd(volatile int8* Value, const int8 AndValue) noexcept
         {
             return __sync_fetch_and_and(Value, AndValue);
@@ -221,7 +215,6 @@ namespace Ayla
             return __sync_fetch_and_and(Value, AndValue);
         }
 
-        // Or
         static FORCEINLINE int8 InterlockedOr(volatile int8* Value, const int8 OrValue) noexcept
         {
             return __sync_fetch_and_or(Value, OrValue);
@@ -255,7 +248,6 @@ namespace Ayla
             return __sync_fetch_and_or(Value, OrValue);
         }
 
-        // Xor
         static FORCEINLINE int8 InterlockedXor(volatile int8* Value, const int8 XorValue) noexcept
         {
             return __sync_fetch_and_xor(Value, XorValue);
@@ -289,7 +281,6 @@ namespace Ayla
             return __sync_fetch_and_xor(Value, XorValue);
         }
 
-        // AtomicRead
         static FORCEINLINE int8 AtomicRead(volatile const int8* Src) noexcept
         {
             return __atomic_load_n(Src, __ATOMIC_SEQ_CST);
@@ -323,7 +314,6 @@ namespace Ayla
             return __atomic_load_n(Src, __ATOMIC_SEQ_CST);
         }
 
-        // AtomicRead_Relaxed
         static FORCEINLINE int8 AtomicRead_Relaxed(volatile const int8* Src) noexcept
         {
             return __atomic_load_n(Src, __ATOMIC_RELAXED);
@@ -357,7 +347,6 @@ namespace Ayla
             return __atomic_load_n(Src, __ATOMIC_RELAXED);
         }
 
-        // AtomicStore
         static FORCEINLINE void AtomicStore(volatile int8* Src, int8 Val) noexcept
         {
             __atomic_store_n(Src, Val, __ATOMIC_SEQ_CST);
@@ -391,7 +380,6 @@ namespace Ayla
             __atomic_store_n(Src, Val, __ATOMIC_SEQ_CST);
         }
 
-        // AtomicStore_Relaxed
         static FORCEINLINE void AtomicStore_Relaxed(volatile int8* Src, int8 Val) noexcept
         {
             __atomic_store_n(Src, Val, __ATOMIC_RELAXED);
@@ -430,7 +418,6 @@ namespace Ayla
             return __sync_val_compare_and_swap(Dest, Comparand, Exchange);
         }
 
-        // Spinlock 및 Condition Variable 함수는 플랫폼별로 별도 구현 필요
         static void InitializeSpinlock(void*& LockVal) noexcept;
         static void DestroySpinlock(void*& LockVal) noexcept;
         static void AcquireSpinlock(void*& LockVal, bool bShared) noexcept;

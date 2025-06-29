@@ -9,15 +9,11 @@
 
 #define __ALLOW_PLATFORM_COMMON_H__
 #include "Platform/PlatformCommon.h"
-#include "WindowsWindow.gen.h"
 
 namespace Ayla
 {
-    ACLASS()
     class WindowsWindow : public GenericWindow
     {
-        GENERATED_BODY()
-
     private:
         static std::map<uint64, String> RegisteredClasses;
 

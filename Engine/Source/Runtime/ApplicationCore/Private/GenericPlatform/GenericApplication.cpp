@@ -1,7 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "GenericPlatform/GenericApplication.h"
-#include "GenericPlatform/GenericWIndow.h"
+#include "GenericPlatform/GenericWindow.h"
 
 namespace Ayla
 {
@@ -13,9 +13,8 @@ namespace Ayla
         sApp = this;
     }
 
-    void GenericApplication::Finalize()
+    GenericApplication::~GenericApplication() noexcept
     {
-        Super::Finalize();
         check(sApp);
         sApp = nullptr;
     }

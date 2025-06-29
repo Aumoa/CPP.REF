@@ -3,26 +3,14 @@
 #pragma once
 
 #include "String_.h"
-#include "Object.h"
 #include "Diagnostics/LogVerbosity.h"
-#include "Debug.gen.h"
 
 namespace Ayla
 {
-	ACLASS()
-	class CORE_API Debug : public Object
+	class CORE_API Debug
 	{
-		GENERATED_BODY()
-
 	public:
-		AFUNCTION()
-		static void Injected_Log(String category, int32 logLevel, String message);
-
-	public:
-		static inline void Log(String category, LogVerbosity logLevel, String message)
-		{
-			Injected_Log(category, static_cast<int32>(logLevel), message);
-		}
+		static void Log(String category, LogVerbosity logLevel, String message);
 
 		template<class... TArgs>
 		static inline void LogFormat(String category, LogVerbosity logLevel, String format, TArgs&&... args)
