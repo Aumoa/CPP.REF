@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Numerics/DirectXMath.h"
 
 #define VECTOR_SCALARS_CONSTEXPR_CTORS \
 	constexpr VectorScalarsImpl(const T& S = 0) : Scalars{} \
@@ -69,6 +70,7 @@ namespace Ayla
 
 		union
 		{
+			DirectX::XMVECTOR V;
 			T Scalars[4];
 			struct
 			{

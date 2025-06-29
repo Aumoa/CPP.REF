@@ -5,6 +5,7 @@ Engine/.vs
 
 # Visual Studio Code
 .vscode
+*.code-workspace
 
 # Script Projects
 *.Script.csproj

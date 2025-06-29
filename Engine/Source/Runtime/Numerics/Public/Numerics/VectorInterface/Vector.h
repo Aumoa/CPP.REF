@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Numerics/NumericConcepts.h"
 #include "Numerics/VectorInterface/VectorScalarsImpl.h"
+#include "Numerics/DirectXMath.h"
 
 namespace Ayla
 {

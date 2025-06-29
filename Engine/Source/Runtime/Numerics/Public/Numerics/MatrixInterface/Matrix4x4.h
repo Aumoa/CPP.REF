@@ -7,6 +7,7 @@
 #include "Numerics/TransformInterface/Translate3D.h"
 #include "Numerics/TransformInterface/Scale3D.h"
 #include "Numerics/TransformInterface/Quaternion.h"
+#include "Numerics/DirectXMath.h"
 
 namespace Ayla
 {
@@ -15,6 +16,7 @@ namespace Ayla
 	{
 		union
 		{
+			Vector<T, 4> V[4];
 			struct
 			{
 				T _11, _12, _13, _14;
@@ -22,7 +24,6 @@ namespace Ayla
 				T _31, _32, _33, _34;
 				T _41, _42, _43, _44;
 			};
-			Vector<T, 4> V[4];
 		};
 
 		constexpr Matrix4x4(T _11, T _12, T _13, T _14, T _21, T _22, T _23, T _24, T _31, T _32, T _33, T _34, T _41, T _42, T _43, T _44)
@@ -257,38 +258,26 @@ namespace Ayla
 		}
 	};
 
-	struct NUMERICS_API SIMDMatrix
-	{
-		SIMDMatrix() = delete;
-
-		static float Determinant(const Matrix4x4<float>& M);
-		static Matrix4x4<float> Inverse(const Matrix4x4<float>& M);
-		static bool Decompose(const Matrix4x4<float>& M, Translate3DF& OutT, Scale3DF& OutS, QuaternionF& OutQ);
-
-		static Vector3F TransformPoint(const Matrix4x4<float>& M, const Vector3F& P);
-		static Vector3F TransformVector(const Matrix4x4<float>& M, const Vector3F& V);
-		static Matrix4x4<float> Multiply(const Matrix4x4<float>& ML, const Matrix4x4<float>& MR);
-
-		static Matrix4x4<float> LookToLH(const Vector3F& Location, const Vector3F& Dir, const Vector3F& Up);
-		static Matrix4x4<float> PerspectiveFovLH(RadiansF Fov, float AspectRatio, float Near, float Far);
-		static Matrix4x4<float> AffineTransformation(const Translate3DF& T, const Scale3DF& S, const QuaternionF& Q);
-		static Matrix4x4<float> Translation(const Vector3F& T);
-		static Matrix4x4<float> Scale(const Scale3DF& S);
-		static Matrix4x4<float> Rotation(const Vector3F& Axis, RadiansF Angle);
-		static Matrix4x4<float> RotationX(RadiansF Angle);
-		static Matrix4x4<float> RotationY(RadiansF Angle);
-		static Matrix4x4<float> RotationZ(RadiansF Angle);
-	};
-
 	template<>
 	struct Matrix4x4<void>
 	{
+#define XM_C(v) reinterpret_cast<const DirectX::XMMATRIX&>(v)
+#define XM_V(v) reinterpret_cast<DirectX::XMMATRIX&>(v)
+#define MX_C(v) reinterpret_cast<const Matrix4x4<T>&>(v)
+#define MX_V(v) reinterpret_cast<Matrix4x4<T>&>(v)
+
+#define ASSIGN(x, y) x = reinterpret_cast<std::remove_reference_t<decltype(x)>&>(y)
+#define FLOAT3(x) DirectX::XMLoadFloat3(reinterpret_cast<const DirectX::XMFLOAT3*>(&x))
+#define FLOAT4(x) reinterpret_cast<const DirectX::XMVECTOR&>(x)
+
 		template<class T>
 		static constexpr T Determinant(const Matrix4x4<T>& M)
 		{
 			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
 			{
-				return Matrix4x4<>::Determinant(M);
+				using namespace DirectX;
+				auto v = XMMatrixDeterminant(XM_C(M));
+				return XMVectorGetX(v);
 			}
 			else
 			{
@@ -313,7 +302,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
 			{
-				return Matrix4x4<>::Inverse(M);
+				using namespace DirectX;
+				return MX_V(XMMatrixInverse(nullptr, XM_V(M)));
 			}
 			else
 			{
@@ -322,11 +312,17 @@ namespace Ayla
 		}
 
 		template<class T>
-		static constexpr bool Decompose(const Matrix4x4<T>& M, Translate3D<T>& translate, Scale3D<T>& scale , Quaternion<T>& rotation)
+		static constexpr bool Decompose(const Matrix4x4<T>& M, Translate3D<T>& translate, Scale3D<T>& scale, Quaternion<T>& rotation)
 		{
 			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
 			{
-				return SIMDMatrix::Decompose(M, translate, scale, rotation);
+				using namespace DirectX;
+				XMVECTOR xmtrans, xmscale, xmquat;
+				bool success = XMMatrixDecompose(&xmtrans, &xmscale, &xmquat, XM_C(M));
+				ASSIGN(translate, xmtrans);
+				ASSIGN(scale, xmscale);
+				ASSIGN(rotation, xmquat);
+				return success;
 			}
 			else
 			{
@@ -360,7 +356,9 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
 			{
-				return SIMDMatrix::TransformPoint(M, P);
+				using namespace DirectX;
+				auto r = XMVector3Transform(FLOAT3(P), XM_C(M));
+				return reinterpret_cast<Vector3<T>&>(r);
 			}
 			else
 			{
@@ -373,7 +371,9 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
 			{
-				return SIMDMatrix::TransformVector(M, V);
+				using namespace DirectX;
+				auto r = XMVector3TransformNormal(FLOAT3(V), XM_C(M));
+				return reinterpret_cast<Vector3<T>&>(r);
 			}
 			else
 			{
@@ -386,7 +386,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
 			{
-				return SIMDMatrix::Multiply(ML, MR);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixMultiply(XM_C(ML), XM_C(MR)));
 			}
 			else
 			{
@@ -399,7 +400,11 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
 			{
-				return SIMDMatrix::LookToLH(EyePosition, EyeDirection, UpDirection);
+				using namespace DirectX;
+				auto location = FLOAT3(EyePosition);
+				auto direction = FLOAT3(EyeDirection);
+				auto up = FLOAT3(UpDirection);
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixLookToLH(location, direction, up));
 			}
 			else
 			{
@@ -430,7 +435,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::PerspectiveFovLH(fieldOfView, aspectRatio, near, far);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixPerspectiveFovLH(fieldOfView.Value, aspectRatio, near, far));
 			}
 			else
 			{
@@ -471,7 +477,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::AffineTransformation(translate, scale, rotation);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixAffineTransformation(FLOAT3(scale), XMVectorZero(), FLOAT4(rotation), FLOAT3(translate)));
 			}
 			else
 			{
@@ -490,11 +497,12 @@ namespace Ayla
 		}
 
 		template<class T>
-		static Matrix4x4 Translation(const Vector3<T>& translate)
+		static Matrix4x4<T> Translation(const Vector3<T>& translate)
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::Translation(translate);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixTranslation(translate.X, translate.Y, translate.Z));
 			}
 			else
 			{
@@ -515,7 +523,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::Scale(scale);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixScaling(scale.X, scale.Y, scale.Z));
 			}
 			else
 			{
@@ -536,7 +545,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::Rotation(Axis, Angle);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationAxis(FLOAT3(Axis), Angle.Value));
 			}
 			else
 			{
@@ -577,7 +587,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::RotationX(Angle);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationX(Angle.Value));
 			}
 			else
 			{
@@ -599,7 +610,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::RotationY(Angle);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationY(Angle.Value));
 			}
 			else
 			{
@@ -621,7 +633,8 @@ namespace Ayla
 		{
 			if constexpr (std::same_as<T, float>)
 			{
-				return SIMDMatrix::RotationZ(Angle);
+				using namespace DirectX;
+				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationZ(Angle.Value));
 			}
 			else
 			{
@@ -637,6 +650,14 @@ namespace Ayla
 				return M;
 			}
 		}
+#undef XM_C
+#undef XM_V
+#undef MX_C
+#undef MX_V
+
+#undef ASSIGN
+#undef FLOAT3
+#undef FLOAT4
 	};
 
 	using Matrix4x4F = Matrix4x4<float>;
