@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Launch.gen.h"
 
 namespace Ayla
 {
@@ -17,10 +16,8 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		APROPERTY()
-		PPtr<GenericApplication> m_GenericApp;
-		APROPERTY()
-		PPtr<Engine> m_Engine;
+		std::shared_ptr<GenericApplication> m_GenericApp;
+		std::shared_ptr<Engine> m_Engine;
 
 	protected:
 		Launch();
@@ -28,11 +25,10 @@ namespace Ayla
 	public:
 		virtual ~Launch() noexcept override;
 
-		AFUNCTION()
 		virtual int32 StartApplication();
-		RPtr<GenericApplication> GetApplication();
+		std::shared_ptr<GenericApplication> GetApplication();
 
 		virtual void* GetApplicationPointer() = 0;
-		virtual RPtr<PlatformRenderFeature> CreatePlatformRenderFeature() = 0;
+		virtual std::shared_ptr<PlatformRenderFeature> CreatePlatformRenderFeature() = 0;
 	};
 }

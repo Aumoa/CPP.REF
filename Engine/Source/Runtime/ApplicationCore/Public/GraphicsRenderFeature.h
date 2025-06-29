@@ -3,19 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphicsRenderFeature.gen.h"
 
 namespace Ayla
 {
-	ACLASS()
-	class APPLICATIONCORE_API GraphicsRenderFeature : public Object
-	{
-		GENERATED_BODY()
+	class GenericApplication;
 
+	class APPLICATIONCORE_API GraphicsRenderFeature
+	{
 	protected:
 		GraphicsRenderFeature();
 
 	public:
 		virtual ~GraphicsRenderFeature() noexcept override;
+
+		virtual bool HasGenericApplication() = 0;
+		virtual std::shared_ptr<GenericApplication> CreateGenericApplication() = 0;
 	};
 }
