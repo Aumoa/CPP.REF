@@ -11,7 +11,7 @@
 namespace Ayla
 {
 	template<class T = void>
-	struct Matrix4x4
+	struct alignas(std::same_as<T, float> ? 16 : alignof(T)) Matrix4x4
 	{
 		union
 		{

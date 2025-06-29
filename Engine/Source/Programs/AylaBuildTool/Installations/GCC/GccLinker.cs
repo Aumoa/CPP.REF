@@ -50,13 +50,20 @@ internal class GccLinker : Linker
             var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
             linkCommands.AppendFormat("\"{0}\" ", objectFileName);
         }
+        
+        linkCommands.AppendFormat("-o\"{0}\" ", outputFileName);
 
-        foreach (var additionalLibrary in module.AdditionalLibraries.Concat(module.DependencyModuleNames.Select(p => p + ".lib")))
+        string[] libPaths = [module.EngineGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current), module.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current)];
+        foreach (var libPath in libPaths.Distinct())
+        {
+            linkCommands.AppendFormat("-L\"{0}\" ", libPath);
+            linkCommands.AppendFormat("-Wl,-rpath,\"{0}\" ", libPath);
+        }
+
+        foreach (var additionalLibrary in module.AdditionalLibraries.Concat(module.DependencyModuleNames))
         {
             linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
         }
-        
-        linkCommands.AppendFormat("-o\"{0}\" ", outputFileName);
 
         var result = await Terminal.ExecuteCommandAsync(linkCommands.ToString(), options, cancellationToken);
         if (result.IsCompletedSuccessfully && ((result.StdOut.Length == 0 && result.Logs.Length == 0) || (result.StdOut.Length == 1 && result.Logs.Length == 1 && string.IsNullOrWhiteSpace(result.StdOut[0].Value))))

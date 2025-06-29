@@ -60,6 +60,27 @@ namespace Ayla
 
 		VECTOR_SCALARS_CONSTEXPR_CTORS;
 	};
+
+	template<>
+	struct alignas(16) VectorScalarsImpl<float, 4>
+	{
+		using T = float;
+		static constexpr size_t Count = 4;
+
+		union
+		{
+			T Scalars[4];
+			struct
+			{
+				T X;
+				T Y;
+				T Z;
+				T W;
+			};
+		};
+
+		VECTOR_SCALARS_CONSTEXPR_CTORS;
+	};
 }
 
 #define DECLARE_VECTOR_SCALARS_IMPL(ScalarsCount, Members)	\

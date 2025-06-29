@@ -23,7 +23,7 @@ internal class GccCompiler : CppCompiler
 
         var compileCommands = new StringBuilder();
 
-        AddCompilerCommands("-std=c++20", "-g", "-fPIC");
+        AddCompilerCommands("-std=c++20", "-g", "-fPIC", "-mavx2");
 
         switch (m_TargetInfo.Config)
         {
