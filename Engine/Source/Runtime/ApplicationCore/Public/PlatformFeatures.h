@@ -3,25 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PlatformFeatures.gen.h"
 
 namespace Ayla
 {
-	class GraphicsRenderFeature;
+	class GenericApplication;
 
-	ACLASS()
-	class APPLICATIONCORE_API PlatformFeatures : public Object
+	class APPLICATIONCORE_API PlatformFeatures
 	{
-		GENERATED_BODY()
-
 	protected:
 		PlatformFeatures();
 
 	public:
-		virtual ~PlatformFeatures() noexcept override;
+		virtual ~PlatformFeatures() noexcept;
 
-	public:
-		virtual size_t NumSupportGraphicsRenderFeature() = 0;
-		virtual RPtr<GraphicsRenderFeature> CreateGraphicsRenderFeature(size_t index) = 0;
+		virtual bool HasGenericApplication() = 0;
+		virtual std::shared_ptr<GenericApplication> CreateGenericApplication() = 0;
 	};
 }

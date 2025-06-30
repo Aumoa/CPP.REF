@@ -30,7 +30,7 @@ namespace Ayla
 		}
 
 		template<std::invocable<> U>
-		void finally_(U&& finally_)
+		auto finally_(U&& finally_)
 		{
 			struct finally_caller
 			{
@@ -48,7 +48,7 @@ namespace Ayla
 			} finally_invoke(std::forward<U>(finally_));
 
 			m_Used = true;
-			m_Try();
+			return m_Try();
 		}
 	};
 

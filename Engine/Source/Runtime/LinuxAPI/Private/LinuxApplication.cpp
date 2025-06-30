@@ -62,7 +62,7 @@ namespace Ayla
                     (event.xbutton.button == Button1) ? GenericPlatformInputMouseButtonType::Left :
                     (event.xbutton.button == Button2) ? GenericPlatformInputMouseButtonType::Middle :
                     (event.xbutton.button == Button3) ? GenericPlatformInputMouseButtonType::Right :
-                    GenericPlatformInputMouseButtonType::Unknown;
+                    (GenericPlatformInputMouseButtonType)-1;
                 mouseButton.bUp = (event.type == ButtonRelease);
                 mouseButton.Location = Vector2N(event.xbutton.x, event.xbutton.y);
                 break;

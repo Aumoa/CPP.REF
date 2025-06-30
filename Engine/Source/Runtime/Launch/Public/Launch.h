@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Launch.gen.h"
 
 namespace Ayla
 {
 	class GenericApplication;
 	class Engine;
-	class PlatformRenderFeature;
+	class DynamicLibrary;
 
 	ACLASS()
 	class LAUNCH_API Launch : public Object
@@ -16,19 +17,17 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::shared_ptr<GenericApplication> m_GenericApp;
-		std::shared_ptr<Engine> m_Engine;
+		GenericApplication* m_GenericApp;
 
 	protected:
-		Launch();
+		Launch(GenericApplication* genericApp);
 
 	public:
 		virtual ~Launch() noexcept override;
 
-		virtual int32 StartApplication();
-		std::shared_ptr<GenericApplication> GetApplication();
+		virtual int32 StartApplication(void* applicationPointer);
+		GenericApplication* GetApplication();
 
-		virtual void* GetApplicationPointer() = 0;
-		virtual std::shared_ptr<PlatformRenderFeature> CreatePlatformRenderFeature() = 0;
+		static int32 GuardedMain(std::vector<String> args, DynamicLibrary& api, void* applicationPointer);
 	};
 }

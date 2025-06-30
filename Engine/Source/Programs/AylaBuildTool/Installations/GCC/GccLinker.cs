@@ -18,7 +18,7 @@ internal class GccLinker : Linker
     {
         var options = new Terminal.Options
         {
-            Executable = "gcc",
+            Executable = "g++",
             Logging = Terminal.Logging.None
         };
 
@@ -60,7 +60,7 @@ internal class GccLinker : Linker
             linkCommands.AppendFormat("-Wl,-rpath,\"{0}\" ", libPath);
         }
 
-        foreach (var additionalLibrary in module.AdditionalLibraries.Concat(module.DependencyModuleNames))
+        foreach (var additionalLibrary in module.AdditionalLibraries.Concat(module.DependencyModuleNames).Append("stdc++"))
         {
             linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
         }

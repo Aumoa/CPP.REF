@@ -49,6 +49,14 @@ namespace Ayla
 		public:
 			using sig_raw = decltype(generate_signature_raw(std::make_index_sequence<sizeof...(TArgs) - 1>{}));
 			using sig_func = decltype(generate_signature_func(std::make_index_sequence<sizeof...(TArgs) - 1>{}));
+			
+
+			template<size_t... Index>
+			static auto function_reinterpret_cast(void(*func)(), std::index_sequence<Index...>&&)
+			{
+				using return_t = variant_index_t<sizeof...(TArgs) - 1, TArgs...>;
+				return reinterpret_cast<return_t(*)(variant_index_t<Index, TArgs...>...)>(func);
+			}
 		};
 	}
 
@@ -280,6 +288,11 @@ namespace Ayla
 		inline Func operator -(const Func& removeFunc) const
 		{
 			return Remove(*this, removeFunc);
+		}
+
+		inline static Func FromAnonymous(void(*AnnPtr)())
+		{
+			return Func(Func_Internal::function_args<TArgs...>::function_reinterpret_cast(AnnPtr, std::make_index_sequence<sizeof...(TArgs) - 1>{}));
 		}
 	};
 }

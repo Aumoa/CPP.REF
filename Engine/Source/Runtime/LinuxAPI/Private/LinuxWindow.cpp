@@ -26,7 +26,7 @@ namespace Ayla
         m_Display = XOpenDisplay(nullptr);
         if (m_Display == nullptr)
         {
-            return nullptr;
+            throw InvalidOperationException(TEXT("Cannot open display."));
         }
 
         int screen = DefaultScreen(m_Display);
@@ -37,16 +37,9 @@ namespace Ayla
             BlackPixel(m_Display, screen), WhitePixel(m_Display, screen)
         );
 
-        // 기본 이벤트 마스크 등 추가 가능
         XSelectInput(m_Display, m_Window, ExposureMask | KeyPressMask | StructureNotifyMask);
-
-        // 윈도우 이름 설정
-        XStoreName(ptr->m_Display, ptr->m_Window, "LinuxWindow");
-
-        // 바로 표시하지 않고, Show()에서 XMapWindow 호출
-        XFlush(ptr->m_Display);
-
-        return ptr;
+        XStoreName(m_Display, m_Window, "LinuxWindow");
+        XFlush(m_Display);
     }
 
     GenericWindowDefinition LinuxWindow::GetDefinition() const

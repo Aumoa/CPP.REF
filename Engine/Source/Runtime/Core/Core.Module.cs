@@ -23,6 +23,7 @@ public class Core : ModuleRules
             // apt install libicu-dev
             AddPrivateAdditionalLibraries("icuuc", "icudata");
             // apt install liburing-dev
+            AddPrivateAdditionalLibraries("uring");
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Ayla
     public:
         virtual ~GenericApplication() noexcept;
 
-        virtual RPtr<GenericWindow> MakeWindow(const GenericWindowDefinition& InDefinition) = 0;
+        virtual std::shared_ptr<GenericWindow> MakeWindow(const GenericWindowDefinition& InDefinition) = 0;
         virtual Vector2N GetScreenResolution() = 0;
         virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& OutInputEvents) = 0;
 
@@ -44,7 +44,17 @@ namespace Ayla
         int32 GetExitCode();
 
     public:
-        static RPtr<GenericApplication> CreateApplication();
         static GenericApplication& Get() noexcept { return *sApp; }
     };
+}
+
+#define NAMEOF_CREATE_GENERIC_APPLICATION TEXT("CreateGenericApplication")
+
+#define DEFINE_CREATE_GENERIC_APPLICATION(ClassName) \
+extern "C" \
+{ \
+    PLATFORM_SHARED_EXPORT auto CreateGenericApplication() \
+    { \
+        return (GenericApplication*)new ClassName(); \
+    } \
 }
