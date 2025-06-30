@@ -6,10 +6,10 @@
 namespace Ayla
 {
 	Exception::Exception(const String& InMessage, std::exception_ptr InInnerException, std::source_location Src) noexcept
-		: Message(InMessage)
-		, InnerException(InInnerException)
-		, Src(Src)
-		, Stacktrace(StackTrace::Current().ToString())
+		: m_Message(InMessage)
+		, m_InnerException(InInnerException)
+		, m_Src(Src)
+		, m_Stacktrace(StackTrace::Current().ToString())
 	{
 	}
 
@@ -19,12 +19,12 @@ namespace Ayla
 
 	String Exception::ToString() const noexcept
 	{
-		if (InnerException)
+		if (m_InnerException)
 		{
-			String Composed = String::Format(TEXT("{}: {}\n"), String(typeid(*this).name()), Message);
+			String Composed = String::Format(TEXT("{}: {}\n"), String(typeid(*this).name()), m_Message);
 			try
 			{
-				std::rethrow_exception(InnerException);
+				std::rethrow_exception(m_InnerException);
 			}
 			catch (const Exception& E)
 			{
@@ -38,32 +38,12 @@ namespace Ayla
 			{
 				Composed += String::Format(TEXT("---> Unknown exception.\n"));
 			}
-			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), Stacktrace);
+			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), m_Stacktrace);
 			return Composed;
 		}
 		else
 		{
-			return String::Format(TEXT("{}: {}\n{}"), String(typeid(*this).name()), Message, Stacktrace);
+			return String::Format(TEXT("{}: {}\n{}"), String(typeid(*this).name()), m_Message, m_Stacktrace);
 		}
-	}
-
-	String Exception::GetMessage() const noexcept
-	{
-		return Message;
-	}
-
-	std::exception_ptr Exception::GetInnerException() const noexcept
-	{
-		return InnerException;
-	}
-
-	std::source_location Exception::GetSourceLocation() const noexcept
-	{
-		return Src;
-	}
-
-	String Exception::GetStackTrace() const noexcept
-	{
-		return Stacktrace;
 	}
 }
