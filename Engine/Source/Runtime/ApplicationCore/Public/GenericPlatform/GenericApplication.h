@@ -55,6 +55,6 @@ extern "C" \
 { \
     PLATFORM_SHARED_EXPORT auto CreateGenericApplication() \
     { \
-        return (GenericApplication*)new ClassName(); \
+        return (::Ayla::GenericApplication*)(new ClassName()); \
     } \
 }

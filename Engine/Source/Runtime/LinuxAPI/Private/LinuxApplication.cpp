@@ -5,42 +5,46 @@
 #include "LinuxApplication.h"
 #include "LinuxWindow.h"
 #include "IO/FileReference.h"
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include <unistd.h>
 #include <vector>
 
 namespace Ayla
 {
+    std::vector<GenericPlatformInputEvent> LinuxApplication::InputEvents;
+
     LinuxApplication::LinuxApplication()
+        : m_Display{ XOpenDisplay(nullptr) }
     {
+    }
+
+    LinuxApplication::~LinuxApplication() noexcept
+    {
+        XCloseDisplay(m_Display);
+        m_Display = nullptr;
     }
 
     std::shared_ptr<GenericWindow> LinuxApplication::MakeWindow(const GenericWindowDefinition& winDef)
     {
-        return std::make_shared<LinuxWindow>(winDef);
+        auto window = std::make_shared<LinuxWindow>(m_Display, winDef);
+        auto lock = std::unique_lock{ m_Spinlock };
+        m_WeakWindows.try_emplace(window->GetOSWindowHandle(), window);
+        return window;
     }
 
     Vector2N LinuxApplication::GetScreenResolution()
     {
-        Display* display = XOpenDisplay(nullptr);
-        if (!display) return Vector2N(0, 0);
-        int screen = DefaultScreen(display);
-        int width = DisplayWidth(display, screen);
-        int height = DisplayHeight(display, screen);
-        XCloseDisplay(display);
+        int screen = DefaultScreen(m_Display);
+        int width = DisplayWidth(m_Display, screen);
+        int height = DisplayHeight(m_Display, screen);
         return Vector2N(width, height);
     }
 
     void LinuxApplication::PumpMessages(std::vector<GenericPlatformInputEvent>& outInputEvents)
     {
-        Display* display = XOpenDisplay(nullptr);
-        if (!display) return;
-
-        while (XPending(display))
+        while (XPending(m_Display))
         {
             XEvent event;
-            XNextEvent(display, &event);
+            XNextEvent(m_Display, &event);
 
             switch (event.type)
             {
@@ -67,13 +71,26 @@ namespace Ayla
                 mouseButton.Location = Vector2N(event.xbutton.x, event.xbutton.y);
                 break;
             }
+            case ClientMessage:
+            {
+                auto* id = reinterpret_cast<void*>(event.xclient.window);
+                auto lock = std::unique_lock{ m_Spinlock };
+                auto it = m_WeakWindows.find(id);
+                if (it == m_WeakWindows.end())
+                {
+                    continue;
+                }
+
+                auto targetWindow = it->second.lock();
+                lock.unlock();
+
+                targetWindow->OnDestroy();
+            }
             case DestroyNotify:
                 // 종료 처리 필요시 구현
                 break;
             }
         }
-
-        XCloseDisplay(display);
 
         std::swap(InputEvents, outInputEvents);
         InputEvents.clear();
@@ -92,5 +109,7 @@ namespace Ayla
         return DirectoryReference();
     }
 }
+
+DEFINE_CREATE_GENERIC_APPLICATION(::Ayla::LinuxApplication);
 
 #endif

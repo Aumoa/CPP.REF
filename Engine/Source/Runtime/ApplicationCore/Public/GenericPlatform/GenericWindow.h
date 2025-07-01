@@ -13,6 +13,8 @@ namespace Ayla
         GenericWindow();
 
     public:
+        virtual ~GenericWindow() noexcept;
+
         virtual GenericWindowDefinition GetDefinition() const = 0;
         virtual void* GetOSWindowHandle() const = 0;
         virtual void Show() = 0;

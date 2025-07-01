@@ -3,15 +3,13 @@
 #if PLATFORM_LINUX
 
 #include "LinuxWindow.h"
+#include "GenericPlatform/GenericApplication.h"
 
 namespace Ayla
 {
-    LinuxWindow::LinuxWindow(const GenericWindowDefinition& winDef)
+    LinuxWindow::LinuxWindow(Display* display, const GenericWindowDefinition& winDef)
+        : m_Display{ display }
     {
-        m_Window = XCreateSimpleWindow(m_Display, DefaultRootWindow(m_Display), 100, 100, 400, 300, 1, 0, 0);
-        XMapWindow(m_Display, m_Window);
-        XFlush(m_Display);
-
         int nX = (int)winDef.DesiredScreenPosition.X;
         if (nX == -1) nX = 100;
         int nY = (int)winDef.DesiredScreenPosition.Y;
@@ -23,12 +21,6 @@ namespace Ayla
 
         m_CachedDefinition = winDef;
 
-        m_Display = XOpenDisplay(nullptr);
-        if (m_Display == nullptr)
-        {
-            throw InvalidOperationException(TEXT("Cannot open display."));
-        }
-
         int screen = DefaultScreen(m_Display);
         Window root = RootWindow(m_Display, screen);
 
@@ -37,9 +29,16 @@ namespace Ayla
             BlackPixel(m_Display, screen), WhitePixel(m_Display, screen)
         );
 
+        Atom wmDelete = XInternAtom(m_Display, "WM_DELETE_WINDOW", False);
+        XSetWMProtocols(m_Display, m_Window, &wmDelete, 1);
+
         XSelectInput(m_Display, m_Window, ExposureMask | KeyPressMask | StructureNotifyMask);
         XStoreName(m_Display, m_Window, "LinuxWindow");
         XFlush(m_Display);
+    }
+
+    LinuxWindow::~LinuxWindow() noexcept
+    {
     }
 
     GenericWindowDefinition LinuxWindow::GetDefinition() const
@@ -80,6 +79,18 @@ namespace Ayla
         XWindowAttributes attr;
         XGetWindowAttributes(m_Display, m_Window, &attr);
         return Vector2N(attr.width, attr.height);
+    }
+
+    void LinuxWindow::OnDestroy()
+    {
+        auto window = m_Window;
+        m_Window = 0;
+        XDestroyWindow(m_Display, window);
+
+        if (m_CachedDefinition.bPrimaryWindow)
+        {
+            GenericApplication::Get().QuitApplication(0);
+        }
     }
 }
 

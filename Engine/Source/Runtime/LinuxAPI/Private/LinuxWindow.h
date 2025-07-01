@@ -16,13 +16,16 @@ namespace Ayla
         GenericWindowDefinition m_CachedDefinition;
 
     public:
-        LinuxWindow(const GenericWindowDefinition& winDef);
+        LinuxWindow(Display* display, const GenericWindowDefinition& winDef);
+        virtual ~LinuxWindow() noexcept override;
 
         virtual GenericWindowDefinition GetDefinition() const override;
         virtual void* GetOSWindowHandle() const override;
         virtual void Show() override;
         virtual void Hide() override;
         virtual Vector2N GetSize() const override;
+
+        void OnDestroy();
     };
 }
 

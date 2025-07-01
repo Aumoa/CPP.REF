@@ -2,6 +2,7 @@
 
 #include "Launch.h"
 #include "GenericPlatform/GenericApplication.h"
+#include "GenericPlatform/GenericWindow.h"
 #include "Localizational/Name.h"
 #include "Platform/DynamicLibrary.h"
 
@@ -19,6 +20,13 @@ namespace Ayla
     int32 Launch::StartApplication(void* applicationPointer)
     {
         m_GenericApp->SetApplicationPointer(applicationPointer);
+
+        GenericWindowDefinition wDef =
+        {
+            .bPrimaryWindow = true
+        };
+        auto window = m_GenericApp->MakeWindow(wDef);
+        window->Show();
         
 // #if WITH_EDITOR
 //         m_Engine = New<EditorEngine>();

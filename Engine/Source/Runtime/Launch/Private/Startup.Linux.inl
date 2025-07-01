@@ -10,14 +10,16 @@
 int main(int argc, char* argv[])
 {
 	using namespace ::Ayla;
-	DynamicLibrary apiSet(TEXT("LinuxAPI"));
+	DynamicLibrary test(TEXT("libX11.so.6"));
+	DynamicLibrary apiSet(TEXT("libLinuxAPI.so"));
 	std::vector<String> args{ (size_t)argc };
 	for (int i = 0; i < argc; ++i)
 	{
 		args[i] = String::FromLiteral(std::string_view(argv[i]));
 	}
 
-	return Launch::GuardedMain(std::move(args), apiSet, nullptr);
+	int32 exitCode = Launch::GuardedMain(std::move(args), apiSet, nullptr);
+	return exitCode;
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__

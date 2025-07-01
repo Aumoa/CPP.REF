@@ -7,4 +7,8 @@ namespace Ayla
 	GenericWindow::GenericWindow()
 	{
 	}
+
+	GenericWindow::~GenericWindow() noexcept
+	{
+	}
 }

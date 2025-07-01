@@ -359,8 +359,14 @@ namespace Ayla
 
 	void* LinuxPlatformProcess::LoadLibrary(String fileName) noexcept
 	{
-        auto name = (TEXT("lib") + fileName + TEXT(".so")).AsCodepage();
-		return dlopen(name.c_str(), RTLD_LAZY);
+		auto handle = dlopen(fileName.AsCodepage().c_str(), RTLD_NOW | RTLD_GLOBAL);
+        if (handle == nullptr)
+        {
+            auto err = dlerror();
+            auto s = String::FromCodepage(err);
+            OutputDebugString(s);
+        }
+        return handle;
 	}
 
 	void LinuxPlatformProcess::FreeLibrary(void* handle) noexcept

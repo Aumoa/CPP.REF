@@ -2,17 +2,28 @@
 
 #pragma once
 
+#if PLATFORM_LINUX
+
 #include "CoreMinimal.h"
 #include "GenericPlatform/GenericApplication.h"
-
-#if PLATFORM_LINUX
+#include "Threading/Spinlock.h"
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 
 namespace Ayla
 {
+    class LinuxWindow;
+
     class LinuxApplication : public GenericApplication
     {
+    private:
+        Display* m_Display = nullptr;
+        Spinlock m_Spinlock;
+        std::map<void*, std::weak_ptr<LinuxWindow>> m_WeakWindows;
+
     public:
         LinuxApplication();
+        virtual ~LinuxApplication() noexcept override;
 
         virtual std::shared_ptr<GenericWindow> MakeWindow(const GenericWindowDefinition& winDef) override;
         virtual Vector2N GetScreenResolution() override;
