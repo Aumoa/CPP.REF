@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 		args[i] = String::FromLiteral(std::string_view(argv[i]));
 	}
 
-	return Launch::GuardedMain(std::move(args), apiSet);
+	return Launch::GuardedMain(std::move(args), apiSet, nullptr);
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__

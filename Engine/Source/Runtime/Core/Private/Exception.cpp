@@ -21,7 +21,7 @@ namespace Ayla
 	{
 		if (m_InnerException)
 		{
-			String Composed = String::Format(TEXT("{}: {}\n"), String(typeid(*this).name()), m_Message);
+			String Composed = String::Format(TEXT("{}: {}\n"), String::FromCodepage(typeid(*this).name()), m_Message);
 			try
 			{
 				std::rethrow_exception(m_InnerException);
@@ -43,7 +43,7 @@ namespace Ayla
 		}
 		else
 		{
-			return String::Format(TEXT("{}: {}\n{}"), String(typeid(*this).name()), m_Message, m_Stacktrace);
+			return String::Format(TEXT("{}: {}\n{}"), String::FromCodepage(typeid(*this).name()), m_Message, m_Stacktrace);
 		}
 	}
 }

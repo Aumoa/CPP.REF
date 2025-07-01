@@ -22,12 +22,12 @@ namespace Ayla
 	public:
 		~GenericImage() noexcept;
 
-		void CopyPixels(int32 Stride, int32 BufferSize, void* DestBuf);
-		Task<> CopyPixelsAsync(int32 Stride, int32 BufferSize, void* DestBuf);
-		void CopyPixels(const RectN& InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf);
-		Task<> CopyPixelsAsync(RectN InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf);
+		virtual void CopyPixels(int32 Stride, int32 BufferSize, void* DestBuf) = 0;
+		virtual Task<> CopyPixelsAsync(int32 Stride, int32 BufferSize, void* DestBuf) = 0;
+		virtual void CopyPixels(const RectN& InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf) = 0;
+		virtual Task<> CopyPixelsAsync(RectN InCopyRect, int32 Stride, int32 BufferSize, void* DestBuf) = 0;
 
-		Vector2N GetSize() const;
+		virtual Vector2N GetSize() const = 0;
 
 		static Task<RPtr<GenericImage>> LoadFromFileAsync(String InFilename);
 	};

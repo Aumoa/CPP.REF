@@ -2,4 +2,6 @@
 
 #if PLATFORM_WINDOWS
 #include "Startup.Windows.inl"
+#elif PLATFORM_LINUX
+#include "Startup.Linux.inl"
 #endif
