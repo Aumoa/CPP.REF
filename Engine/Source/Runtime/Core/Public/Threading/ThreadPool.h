@@ -29,22 +29,21 @@ namespace Ayla
 		static void* IO;
 		static size_t Workers;
 		static size_t IOCPWorkers;
+		static std::vector<std::thread> Threads;
 
 	public:
-		static void Initialize(size_t InNumWorkerThreads, size_t InNumCompletionPortThreads);
+		static void Initialize(size_t InNumWorkerThreads = 0, size_t InNumCompletionPortThreads = 0);
+		static void Shutdown();
 
 		static void BindHandle(void* NativeHandle);
 		static void UnbindHandle(void* NativeHandle);
 
 		static void QueueUserWorkItem(Action<> InWork);
 		static void QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork);
+		static void QueueSignal();
 
 		static void GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
 		static void GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
-
-	private:
-		static void UpdateWorkers();
-		static void UpdateIOCPWorkers();
 
 	private:
 		static void Worker(size_t Index);

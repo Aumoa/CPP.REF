@@ -4,6 +4,7 @@
 
 #include "Platform/PlatformMacros.h"
 #include <stop_token>
+#include <memory>
 
 namespace Ayla
 {
@@ -11,7 +12,8 @@ namespace Ayla
 	{
 	private:
 		friend class CancellationTokenSource;
-		std::stop_token token;
+		std::shared_ptr<std::stop_source> m_Source;
+		std::stop_token m_Token;
 
 	public:
 		inline CancellationToken() noexcept
@@ -19,28 +21,30 @@ namespace Ayla
 		}
 
 		inline CancellationToken(const CancellationToken& rhs) noexcept
-			: token(rhs.token)
+			: m_Source{ rhs.m_Source }
+			, m_Token{ rhs.m_Token }
 		{
 		}
 
 		inline CancellationToken(CancellationToken&& rhs) noexcept
-			: token(std::move(rhs.token))
+			: m_Source{ std::move(rhs.m_Source) }
+			, m_Token{ std::move(rhs.m_Token) }
 		{
 		}
 
 		inline bool IsCancellationRequested() const noexcept
 		{
-			return token.stop_requested();
+			return m_Token.stop_requested();
 		}
 
 		inline bool CanBeCanceled() const noexcept
 		{
-			return token.stop_possible();
+			return m_Token.stop_possible();
 		}
 
 		inline void ThrowIfCancellationRequested() const
 		{
-			if (token.stop_requested())
+			if (m_Token.stop_requested())
 			{
 				ThrowOperationCanceledException();
 			}
@@ -48,29 +52,31 @@ namespace Ayla
 
 		inline CancellationToken& operator =(const CancellationToken& rhs) noexcept
 		{
-			token = rhs.token;
+			m_Source = rhs.m_Source;
+			m_Token = rhs.m_Token;
 			return *this;
 		}
 
 		inline CancellationToken& operator =(CancellationToken&& rhs) noexcept
 		{
-			token = std::move(rhs.token);
+			m_Source = std::move(rhs.m_Source);
+			m_Token = std::move(rhs.m_Token);
 			return *this;
 		}
 
 		inline bool operator ==(const CancellationToken& rhs) const noexcept
 		{
-			return token == rhs.token;
+			return m_Source == rhs.m_Source && m_Token == rhs.m_Token;
 		}
 
 		inline explicit operator std::stop_token& () noexcept
 		{
-			return token;
+			return m_Token;
 		}
 
 		inline explicit operator const std::stop_token& () const noexcept
 		{
-			return token;
+			return m_Token;
 		}
 
 	private:

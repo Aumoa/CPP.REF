@@ -12,6 +12,7 @@
 #include "Reflection/ReflectionMacros.h"
 #include <chrono>
 #include <thread>
+#include <map>
 #include "GC.gen.h"
 
 namespace Ayla
@@ -22,11 +23,8 @@ namespace Ayla
 	template<class T>
 	class PPtr;
 
-	ACLASS()
-	class CORE_API GC : public Object
+	class CORE_API GC
 	{
-		GENERATED_BODY()
-
 	private:
 		friend class Object;
 		template<class T>
@@ -47,9 +45,7 @@ namespace Ayla
 
 	public:
 		static void SuppressFinalize(const RPtr<Object>& target);
-		AFUNCTION()
 		static void Collect(int32 generation = 2);
-		AFUNCTION()
 		static void WaitForCompleteToFinalize();
 
 	private:

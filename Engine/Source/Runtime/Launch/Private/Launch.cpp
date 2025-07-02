@@ -5,6 +5,7 @@
 #include "GenericPlatform/GenericWindow.h"
 #include "Localizational/Name.h"
 #include "Platform/DynamicLibrary.h"
+#include "IO/File.h"
 
 namespace Ayla
 {
@@ -56,6 +57,8 @@ namespace Ayla
     {
         return try_([&]()
         {
+            ThreadPool::Initialize();
+
             if (api.IsValid() == false)
             {
                 throw InvalidOperationException(TEXT("Failed to load Platform API set."));
@@ -75,6 +78,8 @@ namespace Ayla
         {
             GC::Collect();
             GC::WaitForCompleteToFinalize();
+            
+            ThreadPool::Shutdown();
         });
     }
 }

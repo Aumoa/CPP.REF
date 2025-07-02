@@ -132,9 +132,16 @@ internal static class VSCCppProjectGenerator
                 switch (targetInfo.Platform.Group)
                 {
                     case PlatformGroup.Windows:
-                        return set.Concat(["PLATFORM_WINDOWS=1", "_UNICODE", "UNICODE"]);
+                        set = set.Concat(["PLATFORM_WINDOWS=1", "_UNICODE", "UNICODE"]);
+                        break;
                     case PlatformGroup.Linux:
-                        return set.Append("PLATFORM_LINUX=1");
+                        set = set.Append("PLATFORM_LINUX=1");
+                        break;
+                }
+                
+                if (targetInfo.Config != AylaEngine.Configuration.Shipping)
+                {
+                    set = set.Append("DO_CHECK=1");
                 }
 
                 return set;

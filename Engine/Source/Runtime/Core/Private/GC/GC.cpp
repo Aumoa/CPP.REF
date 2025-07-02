@@ -9,8 +9,10 @@
 #include "Diagnostics/PerformanceTimer.h"
 #include "Diagnostics/Debug.h"
 #include "Platform/PlatformProcess.h"
+#include "Threading/Thread.h"
 #include <set>
 #include <chrono>
+#include <thread>
 
 namespace Ayla
 {
@@ -90,11 +92,9 @@ namespace Ayla
 		gatherQueue_.clear();
 
 		auto& self_ = Object::s_RootCollection;
-		PlatformProcess::SuspendToken* stoken = nullptr;
 		if (nolock == false)
 		{
 			self_.m_Mutex.lock();
-			stoken = PlatformProcess::SuspendAllThreads();
 		}
 
 		if (generation == 0 && self_.m_InstanceIndexPool[1].size() < Object::RootCollection::G1Size)
@@ -188,11 +188,6 @@ namespace Ayla
 						gatherQueue.clear();
 					}
 				}
-			}
-
-			if (stoken != nullptr)
-			{
-				PlatformProcess::ResumeAllThreads(stoken);
 			}
 
 			{

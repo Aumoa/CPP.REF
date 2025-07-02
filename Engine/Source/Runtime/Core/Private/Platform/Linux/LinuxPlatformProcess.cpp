@@ -13,11 +13,7 @@
 #include "Diagnostics/StackFrame.h"
 #include "Diagnostics/StackTrace.h"
 #include "Diagnostics/Debug.h"
-#include <mutex>
-#include <map>
-#include <thread>
 #include <sys/types.h>
-#include <dirent.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
@@ -29,101 +25,6 @@
 
 namespace Ayla
 {
-    struct LinuxPlatformProcess::SnapshotRunner
-    {
-        static std::unique_ptr<SnapshotRunner> Run()
-        {
-            auto i = std::make_unique<SnapshotRunner>();
-            i->Start();
-            return i;
-        }
-
-        Spinlock m_Mtx;
-        std::map<pid_t, pid_t> m_Threads; // thread id, tid
-
-    private:
-        void Start()
-        {
-            using namespace std::chrono_literals;
-
-            Spinlock mtx;
-            SpinlockConditionVariable cv;
-            bool init = false;
-            std::thread([&]()
-            {
-                Capture();
-
-                auto lock = std::unique_lock(mtx);
-                cv.NotifyOne();
-                init = true;
-                lock.unlock();
-
-                while (true)
-                {
-                    std::this_thread::sleep_for(10s);
-                    Capture();
-                }
-            }).detach();
-
-            auto lock = std::unique_lock(mtx);
-            while (init == false)
-            {
-                cv.Wait(lock);
-            }
-        }
-
-        void Capture()
-        {
-            pid_t pid = getpid();
-            std::vector<pid_t> tids;
-
-            std::string taskDir = "/proc/" + std::to_string(pid) + "/task";
-            DIR* dir = opendir(taskDir.c_str());
-            if (!dir)
-            {
-                Debug::LogCritical(TEXT("LogPlatform"), TEXT("Failed to open /proc/[pid]/task."));
-                return;
-            }
-
-            struct dirent* entry;
-            while ((entry = readdir(dir)) != nullptr)
-            {
-                if (entry->d_type == DT_DIR)
-                {
-                    pid_t tid = atoi(entry->d_name);
-                    if (tid > 0 && tid != gettid())
-                    {
-                        tids.push_back(tid);
-                    }
-                }
-            }
-            closedir(dir);
-
-            auto lock = std::unique_lock(m_Mtx);
-            std::map<pid_t, pid_t> threadsCopy;
-            std::swap(threadsCopy, m_Threads);
-            for (auto& tid : tids)
-            {
-                auto it = threadsCopy.find(tid);
-                if (it == threadsCopy.end())
-                {
-                    m_Threads.emplace(tid, tid);
-                }
-                else
-                {
-                    m_Threads.emplace(it->first, it->second);
-                    threadsCopy.erase(it);
-                }
-            }
-            lock.unlock();
-        }
-    };
-
-    struct LinuxPlatformProcess::SuspendToken
-    {
-        std::vector<pid_t> m_SuspendThreads;
-    };
-
     bool LinuxPlatformProcess::IsDebuggerPresent() noexcept
     {
         std::ifstream status("/proc/self/status");
@@ -318,43 +219,6 @@ namespace Ayla
         if (!val)
             return String::GetEmpty();
         return String::FromLiteral(val);
-    }
-
-    auto LinuxPlatformProcess::SuspendAllThreads() noexcept -> SuspendToken*
-    {
-        static auto s_Snapshot = SnapshotRunner::Run();
-
-        auto token = new SuspendToken();
-        pid_t currentId = gettid();
-        auto lock = std::unique_lock(s_Snapshot->m_Mtx);
-        for (auto& [tid, _] : s_Snapshot->m_Threads)
-        {
-            if (tid != currentId)
-            {
-                token->m_SuspendThreads.emplace_back(tid);
-            }
-        }
-        lock.unlock();
-
-        for (auto& tid : token->m_SuspendThreads)
-        {
-            // SIGSTOP으로 스레드 일시정지
-            syscall(SYS_tgkill, getpid(), tid, SIGSTOP);
-        }
-
-        return token;
-    }
-
-    void LinuxPlatformProcess::ResumeAllThreads(SuspendToken* token) noexcept
-    {
-        if (token != nullptr)
-        {
-            for (auto& tid : token->m_SuspendThreads)
-            {
-                syscall(SYS_tgkill, getpid(), tid, SIGCONT);
-            }
-            delete token;
-        }
     }
 
 	void* LinuxPlatformProcess::LoadLibrary(String fileName) noexcept

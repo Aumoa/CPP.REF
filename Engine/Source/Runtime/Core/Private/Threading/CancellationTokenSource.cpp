@@ -8,14 +8,14 @@ namespace Ayla
 {
 	void CancellationTokenSource::CancelAfter(const TimeSpan& delay)
 	{
-		if (hasValue == false)
+		if (m_Source == nullptr)
 		{
 			ThrowInvalidOperationException();
 		}
 
-		std::ignore = Task<>::Delay(delay, GetToken()).ContinueWith([source = get_source()](Task<>) mutable
+		std::ignore = Task<>::Delay(delay, GetToken()).ContinueWith([source = m_Source](Task<>) mutable
 		{
-			source.request_stop();
+			source->request_stop();
 		});
 	}
 
