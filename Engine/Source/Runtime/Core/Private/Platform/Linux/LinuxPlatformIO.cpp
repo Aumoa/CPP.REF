@@ -9,6 +9,8 @@
 #include "AssertionMacros.h"
 #include "SystemException.h"
 #include "Threading/ThreadPool.h"
+#include "Threading/CancellationToken.h"
+#include "Threading/CancellationTokenSource.h"
 #include "Platform/PlatformCommon.h"
 #include "LinuxStandardStreamTextWriter.h"
 #include "IO/IOCompletionOverlapped.h"
@@ -24,9 +26,87 @@
 
 namespace Ayla
 {
-    struct IOCPHandle
+    class IOCompletionPort
     {
-        io_uring ring;
+    private:
+        static constexpr uint32 kUringQueueDepth = 64;
+        io_uring m_Ring;
+
+        std::queue<std::pair<IOCompletionOverlapped*, size_t>> m_Overlaps;
+        std::mutex m_Mutex;
+        std::condition_variable m_Cond;
+
+        std::mutex m_CancellationLock;
+        CancellationTokenSource m_DispatchCancel;
+
+    public:
+        IOCompletionPort()
+        {
+            io_uring_queue_init((unsigned int)kUringQueueDepth, &m_Ring, 0);
+            std::thread([this]() { this->io_uring_dispatch(this->m_DispatchCancel.GetToken()); }).detach();
+        }
+
+        ~IOCompletionPort() noexcept
+        {
+            auto lock = std::unique_lock{ m_CancellationLock };
+            m_DispatchCancel.Cancel();
+            lock.unlock();
+            io_uring_queue_exit(&m_Ring);
+        }
+
+        bool DispatchQueuedCompletionStatus(const TimeSpan& dur) noexcept
+        {
+            auto lock = std::unique_lock{ m_Mutex };
+            if (m_Overlaps.empty())
+            {
+                m_Cond.wait_for(lock, (std::chrono::nanoseconds)dur);
+            }
+
+            if (m_Overlaps.empty())
+            {
+                return false;
+            }
+
+            auto [overlap, res] = m_Overlaps.front();
+            m_Overlaps.pop();
+            lock.unlock();
+
+            if (res >= 0)
+            {
+                overlap->Complete(res);
+            }
+            else
+            {
+                overlap->Failed(res);
+            }
+
+            return true;
+        }
+        
+        void io_uring_dispatch(CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                auto lock = std::unique_lock{ m_CancellationLock };
+                cancellationToken.ThrowIfCancellationRequested();
+                io_uring_cqe* cqe = nullptr;
+                int i_errno = io_uring_wait_cqe(&this->m_Ring, &cqe);
+                lock.unlock();
+
+                if (i_errno == 0)
+                {
+                    auto* overlap = (IOCompletionOverlapped*)cqe->user_data;
+                    auto lock = std::unique_lock{ m_Mutex };
+                    m_Overlaps.emplace(overlap, (size_t)cqe->res);
+                    io_uring_cqe_seen(&this->m_Ring, cqe);
+                    m_Cond.notify_one();
+                }
+                else
+                {
+                    PlatformProcess::OutputDebugString(String::Format(TEXT("i_errno = {}"), i_errno));
+                }
+            }
+        }
     };
 
     TextWriter& LinuxPlatformIO::GetStandardOutput() noexcept
@@ -44,67 +124,31 @@ namespace Ayla
     void LinuxPlatformIO::InitializeIOCPHandle(void*& Handle) noexcept
     {
         const uint32 kUringQueueDepth = 64;
-
-        auto* h = new IOCPHandle();
-        if (io_uring_queue_init((unsigned)kUringQueueDepth, &h->ring, 0) < 0)
-        {
-            delete h;
-            Handle = nullptr;
-        }
-        else
-        {
-            Handle = h;
-        }
+        auto* completionPort = new IOCompletionPort();
+        Handle = completionPort;
     }
 
     void LinuxPlatformIO::DestroyIOCPHandle(void* Handle) noexcept
     {
-        if (!Handle) return;
-        auto* h = static_cast<IOCPHandle*>(Handle);
-        io_uring_queue_exit(&h->ring);
-        delete h;
+        delete reinterpret_cast<IOCompletionPort*>(Handle);
     }
 
     void LinuxPlatformIO::BindIOHandle(void* Handle, void* Socket) noexcept
     {
-        // io_uring은 소켓/파일 디스크립터를 별도 언바인딩하지 않음
-        (void)Handle;
-        (void)Socket;
+        PLATFORM_UNREFERENCED_PARAMETER(Handle);
+        PLATFORM_UNREFERENCED_PARAMETER(Socket);
     }
 
     void LinuxPlatformIO::UnbindIOHandle(void* Handle, void* Socket) noexcept
     {
-        // 리눅스에서는 특별한 언바인딩 필요 없음
-        (void)Handle;
-        (void)Socket;
+        PLATFORM_UNREFERENCED_PARAMETER(Handle);
+        PLATFORM_UNREFERENCED_PARAMETER(Socket);
     }
 
     bool LinuxPlatformIO::DispatchQueuedCompletionStatus(void* Handle, const TimeSpan& Dur) noexcept
     {
-        if (!Handle) return false;
-        auto* h = static_cast<IOCPHandle*>(Handle);
-
-        struct io_uring_cqe* cqe = nullptr;
-        int ret;
-        if (Dur.GetTotalMilliseconds() > 0)
-        {
-            struct __kernel_timespec ts;
-            ts.tv_sec = Dur.GetTotalMilliseconds() / 1000;
-            ts.tv_nsec = (fmod(Dur.GetTotalMilliseconds(), 1000)) * 1000000;
-            ret = io_uring_wait_cqe_timeout(&h->ring, &cqe, &ts);
-        }
-        else
-        {
-            ret = io_uring_peek_cqe(&h->ring, &cqe);
-        }
-
-        if (ret == 0 && cqe)
-        {
-            // 실제 프로젝트에서는 cqe->user_data를 통해 콜백/오버랩 구조체를 찾아 처리
-            io_uring_cqe_seen(&h->ring, cqe);
-            return true;
-        }
-        return false;
+        auto iocp = reinterpret_cast<IOCompletionPort*>(Handle);
+        return iocp->DispatchQueuedCompletionStatus(Dur);
     }
 
     bool LinuxPlatformIO::DispatchQueuedCompletionStatus(void* Handle) noexcept
