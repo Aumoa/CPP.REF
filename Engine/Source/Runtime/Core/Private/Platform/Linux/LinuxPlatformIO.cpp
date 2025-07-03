@@ -315,7 +315,7 @@ namespace Ayla
 
     Action<IOCompletionOverlapped*, size_t, int32> LinuxPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
     {
-        return [TCS, WriteIO](IOCompletionOverlapped* Self, size_t written, int32 err)
+        return [TCS, WriteIO](IOCompletionOverlapped* self, size_t written, int32 err)
         {
             if (err)
             {
@@ -328,35 +328,37 @@ namespace Ayla
         };
     }
 
-    bool LinuxPlatformIO::WriteFile(void* handle, std::span<const uint8> InBytes, IOCompletionOverlapped* Overlap) noexcept
+    bool LinuxPlatformIO::WriteFile(void* handle, std::span<const uint8> inBytes, IOCompletionOverlapped* overlap) noexcept
     {
         auto* socketHandle = reinterpret_cast<SocketHandle*>(handle);
         auto sqe = socketHandle->m_CompletionPort->get_scoped_sqe();
-        io_uring_prep_write(sqe, socketHandle->m_fd, InBytes.data(), InBytes.size_bytes(), 0);
-        io_uring_sqe_set_data(sqe, Overlap);
+        io_uring_prep_write(sqe, socketHandle->m_fd, inBytes.data(), inBytes.size_bytes(), (__u64)-1);
+        io_uring_sqe_set_data(sqe, overlap);
         return true;
     }
 
     Action<IOCompletionOverlapped*, size_t, int32> LinuxPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
     {
-        return [TCS, ReadIO](IOCompletionOverlapped* Self, size_t Read, int32 ErrorCode)
+        return [TCS, ReadIO](IOCompletionOverlapped* self, size_t read, int32 err)
         {
-            auto ScopedPtr = std::unique_ptr<IOCompletionOverlapped>(Self);
-
-            if (ErrorCode)
+            if (err)
             {
-                TCS.SetException(std::make_exception_ptr(SystemException(ErrorCode)));
+                TCS.SetException(std::make_exception_ptr(SystemException(err)));
             }
             else
             {
-                TCS.SetResult(Read);
+                TCS.SetResult(read);
             }
         };
     }
 
-    bool LinuxPlatformIO::ReadFile(void* Handle, std::span<uint8> OutBytes, IOCompletionOverlapped* Overlap) noexcept
+    bool LinuxPlatformIO::ReadFile(void* handle, std::span<uint8> outBytes, IOCompletionOverlapped* overlap) noexcept
     {
-        throw 0;
+        auto* socketHandle = reinterpret_cast<SocketHandle*>(handle);
+        auto sqe = socketHandle->m_CompletionPort->get_scoped_sqe();
+        io_uring_prep_read(sqe, socketHandle->m_fd, outBytes.data(), outBytes.size_bytes(), (__u64)-1);
+        io_uring_sqe_set_data(sqe, overlap);
+        return true;
     }
 }
 
