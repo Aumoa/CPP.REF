@@ -14,8 +14,11 @@ namespace Ayla
     {
     private:
         VkInstance m_Instance{ nullptr };
+        VkDevice m_Device{ nullptr };
 
     public:
         VkGraphics(GenericApplication* app);
+
+        virtual void InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) override;
     };
 }

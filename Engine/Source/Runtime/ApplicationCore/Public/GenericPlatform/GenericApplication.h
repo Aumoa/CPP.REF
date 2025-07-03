@@ -16,7 +16,6 @@ namespace Ayla
     {
     private:
         static GenericApplication* sApp;
-        void* ApplicationPointer = nullptr;
         bool bFreezed = false;
         std::optional<int32> ExitCode;
 
@@ -33,9 +32,7 @@ namespace Ayla
         virtual String GetApplicationName();
         virtual DirectoryReference GetEngineDirectory() const = 0;
         virtual std::span<const char* const> GetVulkanExtensionNames() const = 0;
-
-        virtual void SetApplicationPointer(void* InAppPointer);
-        virtual void* GetApplicationPointer();
+        virtual void* GetApplicationPointer() const = 0;
 
         virtual void Freeze();
         bool IsFreezed() noexcept;

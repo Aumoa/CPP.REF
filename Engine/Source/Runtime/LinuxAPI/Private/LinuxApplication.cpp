@@ -108,6 +108,11 @@ namespace Ayla
         }
         return DirectoryReference();
     }
+
+    void* LinuxApplication::GetApplicationPointer() const
+    {
+        return m_Display;
+    }
     
     std::span<const char* const> LinuxApplication::GetVulkanExtensionNames() const
     {

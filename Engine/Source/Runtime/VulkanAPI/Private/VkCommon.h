@@ -1,6 +1,8 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+#include <X11/Xlib.h>
 #include <vulkan/vulkan.h>
+#include <vulkan/vulkan_xlib.h>
 #include <vulkan/vk_enum_string_helper.h>
 
 #define VKR(expr) \

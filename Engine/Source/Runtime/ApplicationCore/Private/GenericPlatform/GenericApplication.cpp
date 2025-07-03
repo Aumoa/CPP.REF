@@ -24,17 +24,6 @@ namespace Ayla
         return TEXT("");
     }
 
-    void GenericApplication::SetApplicationPointer(void* InAppPointer)
-    {
-        check(!bFreezed);
-        ApplicationPointer = InAppPointer;
-    }
-
-    void* GenericApplication::GetApplicationPointer()
-    {
-        return ApplicationPointer;
-    }
-
     void GenericApplication::Freeze()
     {
         bFreezed = true;

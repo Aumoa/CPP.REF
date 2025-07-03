@@ -25,9 +25,9 @@ namespace Ayla
 	public:
 		virtual ~Launch() noexcept override;
 
-		virtual int32 StartApplication(void* applicationPointer);
+		virtual int32 StartApplication();
 		GenericApplication* GetApplication();
 
-		static int32 GuardedMain(std::vector<String> args, DynamicLibrary& api, void* applicationPointer);
+		static int32 GuardedMain(std::vector<String> args, DynamicLibrary& api);
 	};
 }

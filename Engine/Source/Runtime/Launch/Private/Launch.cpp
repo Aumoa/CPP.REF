@@ -19,10 +19,8 @@ namespace Ayla
     {
     }
 
-    int32 Launch::StartApplication(void* applicationPointer)
+    int32 Launch::StartApplication()
     {
-        m_GenericApp->SetApplicationPointer(applicationPointer);
-
         auto graphics = Graphics::CreateGraphics(RenderFeatures::Vulkan, m_GenericApp);
 
         GenericWindowDefinition wDef =
@@ -30,6 +28,7 @@ namespace Ayla
             .bPrimaryWindow = true
         };
         auto window = m_GenericApp->MakeWindow(wDef);
+        graphics->InstallSwapChain(window);
         window->Show();
         
 // #if WITH_EDITOR
@@ -56,7 +55,7 @@ namespace Ayla
         return m_GenericApp;
     }
 
-    int32 Launch::GuardedMain(std::vector<String> args, DynamicLibrary& api, void* applicationPointer)
+    int32 Launch::GuardedMain(std::vector<String> args, DynamicLibrary& api)
     {
         return try_([&]()
         {
@@ -75,7 +74,7 @@ namespace Ayla
 
             auto app = std::unique_ptr<GenericApplication>{ loader() };
             auto launch = New<Launch>(app.get());
-            return launch->StartApplication(applicationPointer);
+            return launch->StartApplication();
         })
         .finally_([]()
         {

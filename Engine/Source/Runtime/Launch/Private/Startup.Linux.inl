@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 		args[i] = String::FromLiteral(std::string_view(argv[i]));
 	}
 
-	int32 exitCode = Launch::GuardedMain(std::move(args), apiSet, nullptr);
+	int32 exitCode = Launch::GuardedMain(std::move(args), apiSet);
 	return exitCode;
 }
 
