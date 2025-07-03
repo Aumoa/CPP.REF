@@ -29,7 +29,7 @@ internal class GccCompiler : CppCompiler
         {
             case Configuration.Debug:
             case Configuration.DebugGame:
-                AddCompilerCommands("-Og");
+                AddCompilerCommands("-Og", "-ggdb", "-fno-omit-frame-pointer", "-fno-inline", "-D_GLIBCXX_DEBUG");
                 break;
             case Configuration.Development:
             case Configuration.Shipping:
