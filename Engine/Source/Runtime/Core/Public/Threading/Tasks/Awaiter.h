@@ -25,6 +25,7 @@ namespace Ayla
 		VoidableOptional<T> Promise;
 		TaskStatus Status;
 		std::exception_ptr ExceptionPtr;
+		std::atomic<bool> m_ExceptionPtrHandled = false;
 
 		std::vector<std::function<void(std::shared_ptr<AwaiterBase>)>> Thens;
 		std::vector<std::unique_ptr<TCallback>> StopCallbacks;
@@ -41,6 +42,14 @@ namespace Ayla
 		}
 
 		Awaiter(const Awaiter&) = delete;
+
+		~Awaiter()
+		{
+			if (ExceptionPtr && m_ExceptionPtrHandled == false)
+			{
+				std::rethrow_exception(ExceptionPtr);
+			}
+		}
 
 		decltype(auto) await_resume()
 		{
@@ -77,6 +86,7 @@ namespace Ayla
 			Wait();
 			if (ExceptionPtr)
 			{
+				m_ExceptionPtrHandled = true;
 				std::rethrow_exception(ExceptionPtr);
 			}
 			return Promise.GetValue();
