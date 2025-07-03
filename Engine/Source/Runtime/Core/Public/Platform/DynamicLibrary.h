@@ -10,7 +10,9 @@ namespace Ayla
 {
 	class CORE_API DynamicLibrary
 	{
-		class Implementation;
+		struct Implementation;
+		DynamicLibrary(const DynamicLibrary&) = delete;
+		DynamicLibrary& operator =(const DynamicLibrary&) = delete;
 
 	private:
 		String LibraryName;
@@ -19,9 +21,12 @@ namespace Ayla
 	public:
 		DynamicLibrary();
 		DynamicLibrary(String InLibraryName);
+		DynamicLibrary(DynamicLibrary&& rhs) noexcept;
 		~DynamicLibrary() noexcept;
 
 		bool IsValid() const;
+		String GetName() const;
+		void Detach();
 
 		template<class... TArgs>
 		Action<TArgs...> LoadAction(String Signature)
@@ -46,6 +51,8 @@ namespace Ayla
 
 			return Func<TArgs...>::FromAnonymous(Ptr);
 		}
+
+		DynamicLibrary& operator =(DynamicLibrary&& rhs) noexcept;
 
 	private:
 		void (*InternalLoadFunction(String Signature))();

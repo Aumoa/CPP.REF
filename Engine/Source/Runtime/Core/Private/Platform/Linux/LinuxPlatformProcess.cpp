@@ -223,6 +223,7 @@ namespace Ayla
 
 	void* LinuxPlatformProcess::LoadLibrary(String fileName) noexcept
 	{
+        fileName = TEXT("lib") + fileName + TEXT(".so");
 		auto handle = dlopen(fileName.AsCodepage().c_str(), RTLD_NOW | RTLD_GLOBAL);
         if (handle == nullptr)
         {

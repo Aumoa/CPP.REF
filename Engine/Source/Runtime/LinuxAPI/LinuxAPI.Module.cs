@@ -9,7 +9,7 @@ public class LinuxAPI : ModuleRules
 	{
 		AddPublicIncludePaths("Public");
 		AddPrivateIncludePaths("Private");
-		AddPublicDependencyModuleNames("RenderCore");
+		AddPublicDependencyModuleNames("ApplicationCore");
 		AddPrivateAdditionalLibraries("X11");
 	}
 }

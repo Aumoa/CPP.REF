@@ -9,7 +9,7 @@ public class Launch : ModuleRules
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
-        AddPublicDependencyModuleNames("Core", "ApplicationCore", "Engine");
+        AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore");
         Type = ModuleType.Application;
 
         if (TargetInfo.Editor)

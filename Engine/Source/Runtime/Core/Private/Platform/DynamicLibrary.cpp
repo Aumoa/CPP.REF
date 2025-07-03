@@ -5,11 +5,10 @@
 
 namespace Ayla
 {
-	class DynamicLibrary::Implementation
+	struct DynamicLibrary::Implementation
 	{
 		void* hModule = nullptr;
 
-	public:
 		inline Implementation(String InLibraryName)
 		{
 			hModule = PlatformProcess::LoadLibrary(InLibraryName);
@@ -45,6 +44,13 @@ namespace Ayla
 	{
 	}
 
+	DynamicLibrary::DynamicLibrary(DynamicLibrary&& rhs) noexcept
+		: LibraryName(std::move(rhs.LibraryName))
+		, Impl(rhs.Impl)
+	{
+		rhs.Impl = nullptr;
+	}
+
 	DynamicLibrary::~DynamicLibrary() noexcept
 	{
 		if (Impl)
@@ -57,6 +63,26 @@ namespace Ayla
 	bool DynamicLibrary::IsValid() const
 	{
 		return !LibraryName.IsEmpty() && Impl != nullptr && Impl->IsValid();
+	}
+
+	String DynamicLibrary::GetName() const
+	{
+		return LibraryName;
+	}
+
+	void DynamicLibrary::Detach()
+	{
+		Impl->hModule = nullptr;
+		delete Impl;
+		Impl = nullptr;
+	}
+
+	DynamicLibrary& DynamicLibrary::operator =(DynamicLibrary&& rhs) noexcept
+	{
+		LibraryName = std::move(rhs.LibraryName);
+		Impl = rhs.Impl;
+		rhs.Impl = nullptr;
+		return *this;
 	}
 
 	void (*DynamicLibrary::InternalLoadFunction(String Signature))()

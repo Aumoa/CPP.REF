@@ -32,6 +32,7 @@ namespace Ayla
 
         virtual String GetApplicationName();
         virtual DirectoryReference GetEngineDirectory() const = 0;
+        virtual std::span<const char* const> GetVulkanExtensionNames() const = 0;
 
         virtual void SetApplicationPointer(void* InAppPointer);
         virtual void* GetApplicationPointer();

@@ -10,7 +10,7 @@
 int main(int argc, char* argv[])
 {
 	using namespace ::Ayla;
-	DynamicLibrary apiSet(TEXT("libLinuxAPI.so"));
+	DynamicLibrary apiSet(TEXT("LinuxAPI"));
 	std::vector<String> args{ (size_t)argc };
 	for (int i = 0; i < argc; ++i)
 	{

@@ -29,6 +29,7 @@ namespace Ayla
         virtual Vector2N GetScreenResolution() override;
         virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& outInputEvents) override;
         virtual DirectoryReference GetEngineDirectory() const override;
+        virtual std::span<const char* const> GetVulkanExtensionNames() const override;
 
     private:
         static std::vector<GenericPlatformInputEvent> InputEvents;

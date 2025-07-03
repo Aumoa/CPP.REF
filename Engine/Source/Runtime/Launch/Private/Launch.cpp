@@ -6,6 +6,7 @@
 #include "Localizational/Name.h"
 #include "Platform/DynamicLibrary.h"
 #include "IO/File.h"
+#include "Graphics.h"
 
 namespace Ayla
 {
@@ -21,6 +22,8 @@ namespace Ayla
     int32 Launch::StartApplication(void* applicationPointer)
     {
         m_GenericApp->SetApplicationPointer(applicationPointer);
+
+        auto graphics = Graphics::CreateGraphics(RenderFeatures::Vulkan, m_GenericApp);
 
         GenericWindowDefinition wDef =
         {
