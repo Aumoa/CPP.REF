@@ -30,25 +30,71 @@ namespace Ayla
 
         VKR(vkCreateInstance(&vkInstanceCreateInfo, nullptr, &m_Instance));
 
-        // const float queuePriorities[] = { 1.0f };
-        // VkDeviceQueueCreateInfo vkQueueInfos[] =
-        // {
-        //     {
-        //         .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-        //         .queueFamilyIndex = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT | VK_QUEUE_TRANSFER_BIT,
-        //         .queueCount = 1,
-        //         .pQueuePriorities = queuePriorities
-        //     }
-        // };
+        uint32_t gpuCount = 0;
+        VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, nullptr));
 
-        // VkDeviceCreateInfo vkDeviceInfo =
-        // {
-        //     .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-        //     .queueCreateInfoCount = 1,
-        //     .pQueueCreateInfos = vkQueueInfos,
-        //     .enabledExtensionCount = (uint32_t)extensions.size(),
-        //     .ppEnabledExtensionNames = extensions.data()
-        // };
+        std::vector<VkPhysicalDevice> physicalDevices{ gpuCount };
+        VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, physicalDevices.data()));
+
+        auto formatDeviceType = [](VkPhysicalDeviceType dt)
+        {
+            switch (dt)
+            {
+                case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+                    return TEXT("INTEGRATED_GPU");
+                case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+                    return TEXT("DISCRETE_GPU");
+                case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+                    return TEXT("VIRTUAL_GPU");
+                case VK_PHYSICAL_DEVICE_TYPE_CPU:
+                    return TEXT("CPU");
+            }
+
+            return TEXT("UNKNOWN");
+        };
+
+        for (size_t i = 0; i < physicalDevices.size(); ++i)
+        {
+            auto& pd = physicalDevices[i];
+            VkPhysicalDeviceProperties props;
+            vkGetPhysicalDeviceProperties(pd, &props);
+            PlatformProcess::OutputDebugString(String::Format(TEXT("Physical Device #{}: {} ({})"), i, String::FromLiteral(props.deviceName), formatDeviceType(props.deviceType)));
+
+            uint32_t extensionsCount = 0;
+            vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, nullptr);
+
+            std::vector<VkExtensionProperties> pdExtensions{ (size_t)extensionsCount };
+            vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, pdExtensions.data());
+
+            PlatformProcess::OutputDebugString(TEXT("  Extensions: "));
+            for (auto& extension : pdExtensions)
+            {
+                PlatformProcess::OutputDebugString(String::Format(TEXT("    {}"), String::FromCodepage(extension.extensionName)));
+            }
+        }
+
+        const float queuePriorities[] = { 1.0f };
+        VkDeviceQueueCreateInfo vkQueueInfos[] =
+        {
+            {
+                .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                .queueFamilyIndex = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
+                .queueCount = 1,
+                .pQueuePriorities = queuePriorities
+            }
+        };
+
+        std::vector<const char*> deviceExtensions = { "VK_KHR_swapchain" };
+        VkDeviceCreateInfo vkDeviceInfo =
+        {.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            .queueCreateInfoCount = 1,
+            .pQueueCreateInfos = vkQueueInfos,
+            .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
+            .ppEnabledExtensionNames = deviceExtensions.data()
+        };
+
+        VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
+        vkGetDeviceQueue(m_Device, VK_QUEUE_GRAPHICS_BIT, 0, &m_GraphicsQueue);
     }
 
     void VkGraphics::InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow)

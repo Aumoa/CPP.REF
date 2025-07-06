@@ -15,6 +15,7 @@ namespace Ayla
     private:
         VkInstance m_Instance{ nullptr };
         VkDevice m_Device{ nullptr };
+        VkQueue m_GraphicsQueue{ nullptr };
 
     public:
         VkGraphics(GenericApplication* app);
