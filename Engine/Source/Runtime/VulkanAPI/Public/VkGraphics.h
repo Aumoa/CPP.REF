@@ -13,12 +13,15 @@ namespace Ayla
     class VULKANAPI_API VkGraphics : public Graphics
     {
     private:
-        VkInstance m_Instance{ nullptr };
+        VkInstanceRef m_Instance;
+        VkPhysicalDevice m_PhysicalDevice{ nullptr };
         VkDevice m_Device{ nullptr };
         VkQueue m_GraphicsQueue{ nullptr };
+        VkSemaphore m_Semaphore{ nullptr };
 
     public:
         VkGraphics(GenericApplication* app);
+        virtual ~VkGraphics() noexcept override;
 
         virtual void InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) override;
     };

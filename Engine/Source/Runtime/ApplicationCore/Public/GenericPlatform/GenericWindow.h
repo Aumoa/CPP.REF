@@ -24,6 +24,21 @@ namespace Ayla
         virtual ~GenericWindow() noexcept;
 
         void AddExtension(std::shared_ptr<GenericWindowExtension> extension);
+
+        template<class T>
+        std::shared_ptr<T> GetExtension()
+        {
+            auto lock = std::unique_lock{ m_Lock };
+            for (auto& extension : m_Extensions)
+            {
+                if (auto ptr = dynamic_cast<T*>(extension.get()); ptr != nullptr)
+                {
+                    return std::static_pointer_cast<T>(extension);
+                }
+            }
+
+            return nullptr;
+        }
         
         virtual GenericWindowDefinition GetDefinition() const = 0;
         virtual void* GetOSWindowHandle() const = 0;

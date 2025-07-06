@@ -2,7 +2,7 @@
 
 #include "VkGraphics.h"
 #include "GenericPlatform/GenericApplication.h"
-#include "GenericPlatform/GenericWindowExtension.h"
+#include "GenericPlatform/GenericWindowSwapchainExtension.h"
 #include "GenericPlatform/GenericApplication.h"
 
 namespace Ayla
@@ -28,13 +28,13 @@ namespace Ayla
             .ppEnabledExtensionNames = extensions.data()
         };
 
-        VKR(vkCreateInstance(&vkInstanceCreateInfo, nullptr, &m_Instance));
+        VKR(vkCreateInstance(&vkInstanceCreateInfo, nullptr, m_Instance.ReleaseAndGetAddressOf()));
 
         uint32_t gpuCount = 0;
-        VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, nullptr));
+        VKR(vkEnumeratePhysicalDevices(m_Instance.Get(), &gpuCount, nullptr));
 
         std::vector<VkPhysicalDevice> physicalDevices{ gpuCount };
-        VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, physicalDevices.data()));
+        VKR(vkEnumeratePhysicalDevices(m_Instance.Get(), &gpuCount, physicalDevices.data()));
 
         auto formatDeviceType = [](VkPhysicalDeviceType dt)
         {
@@ -61,10 +61,10 @@ namespace Ayla
             PlatformProcess::OutputDebugString(String::Format(TEXT("Physical Device #{}: {} ({})"), i, String::FromLiteral(props.deviceName), formatDeviceType(props.deviceType)));
 
             uint32_t extensionsCount = 0;
-            vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, nullptr);
+            VKR(vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, nullptr));
 
             std::vector<VkExtensionProperties> pdExtensions{ (size_t)extensionsCount };
-            vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, pdExtensions.data());
+            VKR(vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, pdExtensions.data()));
 
             PlatformProcess::OutputDebugString(TEXT("  Extensions: "));
             for (auto& extension : pdExtensions)
@@ -94,26 +94,65 @@ namespace Ayla
         };
 
         VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
-        vkGetDeviceQueue(m_Device, VK_QUEUE_GRAPHICS_BIT, 0, &m_GraphicsQueue);
+        vkGetDeviceQueue(m_Device, 0, 0, &m_GraphicsQueue);
+        m_PhysicalDevice = physicalDevices[0];
+
+        VkSemaphoreCreateInfo semaphoreCreateInfo
+        {
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+        };
+        VKR(vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphore));
+    }
+
+    VkGraphics::~VkGraphics() noexcept
+    {
+        m_GraphicsQueue = nullptr;
+        m_PhysicalDevice = nullptr;
+
+        if (m_Device != nullptr)
+        {
+            vkDestroyDevice(m_Device, nullptr);
+            m_Device = nullptr;
+        }
     }
 
     void VkGraphics::InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow)
     {
-        class SwapChainExtension : public GenericWindowExtension
+        class SwapChainExtension : public GenericWindowSwapchainExtension
         {
-            VkInstance m_Instance;
+        private:
+            VkGraphics* m_Owner;
             VkSurfaceKHR m_Surface;
+            VkSwapchainKHR m_Swapchain;
 
         public:
-            SwapChainExtension(VkInstance instance, VkSurfaceKHR surface)
-                : m_Instance(instance)
+            SwapChainExtension(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain)
+                : m_Owner(owner)
                 , m_Surface(surface)
+                , m_Swapchain(swapchain)
             {
             }
 
             virtual ~SwapChainExtension() noexcept override
             {
-                vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
+                vkDestroySurfaceKHR(m_Owner->m_Instance.Get(), m_Surface, nullptr);
+            }
+
+            virtual void Present() override
+            {
+                uint32_t imageIndex;
+                VKR(vkAcquireNextImageKHR(m_Owner->m_Device, m_Swapchain, UINT64_MAX, m_Owner->m_Semaphore, VK_NULL_HANDLE, &imageIndex));
+
+                VkPresentInfoKHR presentInfo
+                {
+                    .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+                    .waitSemaphoreCount = 1,
+                    .pWaitSemaphores = &m_Owner->m_Semaphore,
+                    .swapchainCount = 1,
+                    .pSwapchains = &m_Swapchain,
+                    .pImageIndices = &imageIndex
+                };
+                VKR(vkQueuePresentKHR(m_Owner->m_GraphicsQueue, &presentInfo));
             }
         };
 
@@ -121,16 +160,57 @@ namespace Ayla
         auto window = reinterpret_cast<Window>(targetWindow->GetOSWindowHandle());
         
         VkXlibSurfaceCreateInfoKHR surfaceInfo
-        {
+        { 
             .sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
             .dpy = display,
             .window = window
         };
 
         VkSurfaceKHR surface;
-        VKR(vkCreateXlibSurfaceKHR(m_Instance, &surfaceInfo, nullptr, &surface));
+        VKR(vkCreateXlibSurfaceKHR(m_Instance.Get(), &surfaceInfo, nullptr, &surface));
+        
+        VkSurfaceCapabilitiesKHR caps;
+        VKR(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_PhysicalDevice, surface, &caps));
 
-        targetWindow->AddExtension(std::make_shared<SwapChainExtension>(m_Instance, surface));
+        uint32_t formatCount = 0;
+        VKR(vkGetPhysicalDeviceSurfaceFormatsKHR(m_PhysicalDevice, surface, &formatCount, nullptr));
+
+        std::vector<VkSurfaceFormatKHR> formats{ (size_t)formatCount };
+        VKR(vkGetPhysicalDeviceSurfaceFormatsKHR(m_PhysicalDevice, surface, &formatCount, formats.data()));
+
+        size_t chosenFormatIndex = -1;
+        for (size_t i = 0; i < formats.size(); ++i)
+        {
+            PlatformProcess::OutputDebugString(String::Format(TEXT("{}"), formats[i].format));
+            if (formats[i].format == VK_FORMAT_B8G8R8A8_UNORM)
+            {
+                chosenFormatIndex = i;
+                break;
+            }
+        }
+
+        if (chosenFormatIndex == -1){
+            throw new InvalidOperationException(TEXT("Required format(B8G8R8A8_UNORM) not supported."));
+        }
+
+        VkSwapchainCreateInfoKHR swapchainCreateInfo
+        {
+            .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+            .surface = surface,
+            .minImageCount = 2,
+            .imageFormat = formats[chosenFormatIndex].format,
+            .imageColorSpace = formats[chosenFormatIndex].colorSpace,
+            .imageExtent = caps.currentExtent,
+            .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+            .preTransform = caps.currentTransform,
+            .presentMode = VK_PRESENT_MODE_FIFO_KHR,
+            .clipped = VK_TRUE
+        };
+
+        VkSwapchainKHR swapchain;
+        VKR(vkCreateSwapchainKHR(m_Device, &swapchainCreateInfo, nullptr, &swapchain));
+
+        targetWindow->AddExtension(std::make_shared<SwapChainExtension>(this, surface, swapchain));
     }
 }
 

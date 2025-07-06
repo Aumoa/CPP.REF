@@ -3,6 +3,7 @@
 #include "Launch.h"
 #include "GenericPlatform/GenericApplication.h"
 #include "GenericPlatform/GenericWindow.h"
+#include "GenericPlatform/GenericWindowSwapchainExtension.h"
 #include "Localizational/Name.h"
 #include "Platform/DynamicLibrary.h"
 #include "IO/File.h"
@@ -30,6 +31,8 @@ namespace Ayla
         auto window = m_GenericApp->MakeWindow(wDef);
         graphics->InstallSwapChain(window);
         window->Show();
+
+        auto swapchainExt = window->GetExtension<GenericWindowSwapchainExtension>();
         
 // #if WITH_EDITOR
 //         m_Engine = New<EditorEngine>();
@@ -44,6 +47,7 @@ namespace Ayla
         while (!m_GenericApp->IsQuitRequested())
         {
             m_GenericApp->PumpMessages(inputEvents);
+            swapchainExt->Present();
             //m_Engine->Tick(inputEvents);
         }
 
