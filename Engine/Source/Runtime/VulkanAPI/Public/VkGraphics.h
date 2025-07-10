@@ -15,14 +15,19 @@ namespace Ayla
     private:
         VkInstanceRef m_Instance;
         VkPhysicalDevice m_PhysicalDevice{ nullptr };
-        VkDevice m_Device{ nullptr };
+        VkDeviceRef m_Device;
         VkQueue m_GraphicsQueue{ nullptr };
-        VkSemaphore m_Semaphore{ nullptr };
+        VkSemaphore m_Semaphore;
 
     public:
         VkGraphics(GenericApplication* app);
         virtual ~VkGraphics() noexcept override;
 
         virtual void InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) override;
+
+        VkInstance GetInstance() const noexcept { return m_Instance; }
+        VkDevice GetDevice() const noexcept { return m_Device; }
+        VkQueue GetGraphicsQueue() const noexcept { return m_GraphicsQueue; }
+        VkSemaphore GetSemaphore() const noexcept { return m_Semaphore; }
     };
 }

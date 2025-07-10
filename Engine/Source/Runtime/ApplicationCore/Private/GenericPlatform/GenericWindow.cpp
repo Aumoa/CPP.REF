@@ -1,6 +1,8 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "GenericPlatform/GenericWindow.h"
+#include "GenericPlatform/IGenericWindowResizeEventHandler.h"
+#include "GenericPlatform/GenericWindowExtension.h"
 
 namespace Ayla
 {
@@ -16,5 +18,20 @@ namespace Ayla
 	{
 		auto lock = std::unique_lock(m_Lock);
 		m_Extensions.emplace_back(std::move(extension));
+	}
+
+	void GenericWindow::NotifyResize(const Vector2N& newSize)
+	{
+		auto lock = std::unique_lock(m_Lock);
+		auto extensions = m_Extensions;
+		lock.unlock();
+
+		for (auto& extension : extensions)
+		{
+			if (auto* handler = dynamic_cast<IGenericWindowResizeEventHandler*>(extension.get()); handler)
+			{
+				handler->OnResize(newSize);
+			}
+		}
 	}
 }

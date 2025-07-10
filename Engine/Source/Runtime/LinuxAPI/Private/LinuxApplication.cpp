@@ -46,6 +46,19 @@ namespace Ayla
             XEvent event;
             XNextEvent(m_Display, &event);
 
+            auto resolveWindow = [&]() -> std::shared_ptr<LinuxWindow>
+            {
+                auto* id = reinterpret_cast<void*>(event.xclient.window);
+                auto lock = std::unique_lock{ m_Spinlock };
+                auto it = m_WeakWindows.find(id);
+                if (it == m_WeakWindows.end())
+                {
+                    return nullptr;
+                }
+
+                return it->second.lock();
+            };
+
             switch (event.type)
             {
             case MotionNotify:
@@ -73,18 +86,25 @@ namespace Ayla
             }
             case ClientMessage:
             {
-                auto* id = reinterpret_cast<void*>(event.xclient.window);
-                auto lock = std::unique_lock{ m_Spinlock };
-                auto it = m_WeakWindows.find(id);
-                if (it == m_WeakWindows.end())
+                auto targetWindow = resolveWindow();
+                if (!targetWindow)
                 {
                     continue;
                 }
 
-                auto targetWindow = it->second.lock();
-                lock.unlock();
-
                 targetWindow->OnDestroy();
+                break;
+            }
+            case ConfigureNotify:
+            {
+                auto targetWindow = resolveWindow();
+                if (!targetWindow)
+                {
+                    continue;
+                }
+
+                targetWindow->NotifyResize(Vector2N(event.xconfigure.width, event.xconfigure.height));
+                break;
             }
             case DestroyNotify:
                 // 종료 처리 필요시 구현

@@ -1,5 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+#pragma once
+
 #include <X11/Xlib.h>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_xlib.h>
@@ -81,6 +83,17 @@ public:
         rhs.m_Ptr = nullptr;
         return *this;
     }
+
+    inline T* operator &() noexcept
+    {
+        return ReleaseAndGetAddressOf();
+    }
+
+    inline operator T() const noexcept
+    {
+        return Get();
+    }
 };
 
 using VkInstanceRef = VkRef<VkInstance, vkDestroyInstance>;
+using VkDeviceRef = VkRef<VkDevice, vkDestroyDevice>;

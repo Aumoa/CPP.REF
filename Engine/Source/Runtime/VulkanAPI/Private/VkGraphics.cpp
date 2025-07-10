@@ -4,6 +4,7 @@
 #include "GenericPlatform/GenericApplication.h"
 #include "GenericPlatform/GenericWindowSwapchainExtension.h"
 #include "GenericPlatform/GenericApplication.h"
+#include "VkSwapchainExt.h"
 
 namespace Ayla
 {
@@ -28,13 +29,13 @@ namespace Ayla
             .ppEnabledExtensionNames = extensions.data()
         };
 
-        VKR(vkCreateInstance(&vkInstanceCreateInfo, nullptr, m_Instance.ReleaseAndGetAddressOf()));
+        VKR(vkCreateInstance(&vkInstanceCreateInfo, nullptr, &m_Instance));
 
         uint32_t gpuCount = 0;
-        VKR(vkEnumeratePhysicalDevices(m_Instance.Get(), &gpuCount, nullptr));
+        VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, nullptr));
 
         std::vector<VkPhysicalDevice> physicalDevices{ gpuCount };
-        VKR(vkEnumeratePhysicalDevices(m_Instance.Get(), &gpuCount, physicalDevices.data()));
+        VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, physicalDevices.data()));
 
         auto formatDeviceType = [](VkPhysicalDeviceType dt)
         {
@@ -73,12 +74,33 @@ namespace Ayla
             }
         }
 
+
+        // Find a queue family that supports VK_QUEUE_GRAPHICS_BIT
+        uint32_t queueFamilyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, nullptr);
+        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, queueFamilies.data());
+
+        int graphicsQueueFamilyIndex = -1;
+        for (uint32_t i = 0; i < queueFamilyCount; ++i)
+        {
+            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            {
+                graphicsQueueFamilyIndex = i;
+                break;
+            }
+        }
+        if (graphicsQueueFamilyIndex == -1)
+        {
+            throw std::runtime_error("No queue family supports VK_QUEUE_GRAPHICS_BIT");
+        }
+
         const float queuePriorities[] = { 1.0f };
         VkDeviceQueueCreateInfo vkQueueInfos[] =
         {
             {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                .queueFamilyIndex = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_TRANSFER_BIT,
+                .queueFamilyIndex = (uint32_t)graphicsQueueFamilyIndex,
                 .queueCount = 1,
                 .pQueuePriorities = queuePriorities
             }
@@ -86,7 +108,8 @@ namespace Ayla
 
         std::vector<const char*> deviceExtensions = { "VK_KHR_swapchain" };
         VkDeviceCreateInfo vkDeviceInfo =
-        {.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+        {
+            .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .queueCreateInfoCount = 1,
             .pQueueCreateInfos = vkQueueInfos,
             .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
@@ -94,7 +117,7 @@ namespace Ayla
         };
 
         VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
-        vkGetDeviceQueue(m_Device, 0, 0, &m_GraphicsQueue);
+        vkGetDeviceQueue(m_Device, graphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
         m_PhysicalDevice = physicalDevices[0];
 
         VkSemaphoreCreateInfo semaphoreCreateInfo
@@ -109,53 +132,15 @@ namespace Ayla
         m_GraphicsQueue = nullptr;
         m_PhysicalDevice = nullptr;
 
-        if (m_Device != nullptr)
+        if (m_Semaphore)
         {
-            vkDestroyDevice(m_Device, nullptr);
-            m_Device = nullptr;
+            vkDestroySemaphore(m_Device, m_Semaphore, nullptr);
+            m_Semaphore = nullptr;
         }
     }
 
     void VkGraphics::InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow)
     {
-        class SwapChainExtension : public GenericWindowSwapchainExtension
-        {
-        private:
-            VkGraphics* m_Owner;
-            VkSurfaceKHR m_Surface;
-            VkSwapchainKHR m_Swapchain;
-
-        public:
-            SwapChainExtension(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain)
-                : m_Owner(owner)
-                , m_Surface(surface)
-                , m_Swapchain(swapchain)
-            {
-            }
-
-            virtual ~SwapChainExtension() noexcept override
-            {
-                vkDestroySurfaceKHR(m_Owner->m_Instance.Get(), m_Surface, nullptr);
-            }
-
-            virtual void Present() override
-            {
-                uint32_t imageIndex;
-                VKR(vkAcquireNextImageKHR(m_Owner->m_Device, m_Swapchain, UINT64_MAX, m_Owner->m_Semaphore, VK_NULL_HANDLE, &imageIndex));
-
-                VkPresentInfoKHR presentInfo
-                {
-                    .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-                    .waitSemaphoreCount = 1,
-                    .pWaitSemaphores = &m_Owner->m_Semaphore,
-                    .swapchainCount = 1,
-                    .pSwapchains = &m_Swapchain,
-                    .pImageIndices = &imageIndex
-                };
-                VKR(vkQueuePresentKHR(m_Owner->m_GraphicsQueue, &presentInfo));
-            }
-        };
-
         auto* display = reinterpret_cast<Display*>(GenericApplication::Get().GetApplicationPointer());
         auto window = reinterpret_cast<Window>(targetWindow->GetOSWindowHandle());
         
@@ -167,7 +152,7 @@ namespace Ayla
         };
 
         VkSurfaceKHR surface;
-        VKR(vkCreateXlibSurfaceKHR(m_Instance.Get(), &surfaceInfo, nullptr, &surface));
+        VKR(vkCreateXlibSurfaceKHR(m_Instance, &surfaceInfo, nullptr, &surface));
         
         VkSurfaceCapabilitiesKHR caps;
         VKR(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_PhysicalDevice, surface, &caps));
@@ -210,7 +195,7 @@ namespace Ayla
         VkSwapchainKHR swapchain;
         VKR(vkCreateSwapchainKHR(m_Device, &swapchainCreateInfo, nullptr, &swapchain));
 
-        targetWindow->AddExtension(std::make_shared<SwapChainExtension>(this, surface, swapchain));
+        targetWindow->AddExtension(std::make_shared<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo));
     }
 }
 

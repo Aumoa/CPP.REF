@@ -101,7 +101,7 @@ internal static class VSCCppProjectGenerator
                     Defines = AppendPlatformMacros(resolver.AdditionalMacros).Select(FormatMacro).ToArray(),
                     CompilerPath = compilerPath,
                     CStandard = "c11",
-                    CppStandard = "c++20",
+                    CppStandard = "c++23",
                     IntelliSenseMode = intelliSenseMode
                 });
 

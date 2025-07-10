@@ -6,6 +6,7 @@
 #include "GenericPlatform/GenericWindowDefinition.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
+#include "Numerics/VectorInterface/Vector.h"
 
 namespace Ayla
 {
@@ -45,5 +46,7 @@ namespace Ayla
         virtual void Show() = 0;
         virtual void Hide() = 0;
         virtual Vector2N GetSize() const = 0;
+        
+        void NotifyResize(const Vector2N& newSize);
     };
 }
