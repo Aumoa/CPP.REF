@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenericPlatform/GenericWindowDefinition.h"
-#include "GenericPlatform/GenericPlatformInputEvent.h"
-#include "GenericPlatform/GenericWindow.h"
+#include "GenericWindowDefinition.h"
+#include "GenericPlatformInputEvent.h"
+#include "GenericWindow.h"
 #include "IO/DirectoryReference.h"
 
 namespace Ayla

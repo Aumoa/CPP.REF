@@ -1,9 +1,9 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Launch.h"
-#include "GenericPlatform/GenericApplication.h"
-#include "GenericPlatform/GenericWindow.h"
-#include "GenericPlatform/GenericWindowSwapchainExtension.h"
+#include "GenericApplication.h"
+#include "GenericWindow.h"
+#include "GenericWindowSwapchainExtension.h"
 #include "Localizational/Name.h"
 #include "Platform/DynamicLibrary.h"
 #include "IO/File.h"

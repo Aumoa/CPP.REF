@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "VkCommon.h"
-#include "GenericPlatform/GenericWindowSwapchainExtension.h"
-#include "GenericPlatform/IGenericWindowResizeEventHandler.h"
+#include "GenericWindowSwapchainExtension.h"
+#include "IGenericWindowResizeEventHandler.h"
 
 namespace Ayla
 {

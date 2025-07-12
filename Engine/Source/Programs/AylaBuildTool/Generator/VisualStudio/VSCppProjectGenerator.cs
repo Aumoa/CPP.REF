@@ -55,6 +55,15 @@ internal static class VSCppProjectGenerator
                         AppendFormatLine("""<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>""");
                         AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Current));
                         AppendFormatLine("""<LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>""");
+                        
+                        if (rules.Type == ModuleType.Application)
+                        {
+                            AppendFormatLine("""<LocalDebuggerCommand>$(OutDir){0}</LocalDebuggerCommand>""", project.Name + ".exe");
+                        }
+                        else
+                        {
+                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows));
+                        }
                     });
                     AppendFormatLine("""</PropertyGroup>""");
                 }

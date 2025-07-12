@@ -3,7 +3,13 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#if PLATFORM_LINUX
 #include <vulkan/vulkan_xlib.h>
+#elif PLATFORM_WINDOWS
+#define __ALLOW_PLATFORM_COMMON_H__
+#include "Platform/PlatformCommon.h"
+#include <vulkan/vulkan_win32.h>
+#endif
 #include <vulkan/vk_enum_string_helper.h>
 #include <format>
 
@@ -97,3 +103,5 @@ public:
 
 using VkInstanceRef = VkRef<VkInstance, vkDestroyInstance>;
 using VkDeviceRef = VkRef<VkDevice, vkDestroyDevice>;
+
+#undef __ALLOW_PLATFORM_COMMON_H__

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenericPlatform/GenericWindowDefinition.h"
+#include "GenericWindowDefinition.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include "Numerics/VectorInterface/Vector.h"

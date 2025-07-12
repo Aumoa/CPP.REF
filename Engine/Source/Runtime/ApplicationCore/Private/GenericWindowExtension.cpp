@@ -1,6 +1,6 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "GenericPlatform/GenericWindowExtension.h"
+#include "GenericWindowExtension.h"
 
 namespace Ayla
 {

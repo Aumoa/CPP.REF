@@ -1,7 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "GenericPlatform/GenericApplication.h"
-#include "GenericPlatform/GenericWindow.h"
+#include "GenericApplication.h"
+#include "GenericWindow.h"
 
 namespace Ayla
 {

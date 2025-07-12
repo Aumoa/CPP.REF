@@ -136,7 +136,11 @@ namespace Ayla
     
     std::span<const char* const> LinuxApplication::GetVulkanExtensionNames() const
     {
-        static constexpr std::array<const char*, 2> kExtensions{ "VK_KHR_surface", "VK_KHR_xlib_surface" };
+        static constexpr std::array<const char*, 2> kExtensions
+        {
+            "VK_KHR_surface",
+            "VK_KHR_xlib_surface"
+        };
         return kExtensions;
     }
 }

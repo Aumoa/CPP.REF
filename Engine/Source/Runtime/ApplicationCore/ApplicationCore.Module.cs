@@ -10,16 +10,5 @@ public class ApplicationCore : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics");
-
-        if (TargetInfo.Platform.Group == PlatformGroup.Windows)
-        {
-            if (TargetInfo.Platform.Architecture == Architecture.X64)
-            {
-                AddPrivateAdditionalMacros("_WIN64");
-            }
-
-            AddPrivateAdditionalLibraries("Gdi32.lib", "gdiplus.lib");
-            AddPrivateDisableWarnings(4245, 4458);
-        }
     }
 }

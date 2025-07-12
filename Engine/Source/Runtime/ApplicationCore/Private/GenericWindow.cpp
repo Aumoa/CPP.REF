@@ -1,8 +1,8 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "GenericPlatform/GenericWindow.h"
-#include "GenericPlatform/IGenericWindowResizeEventHandler.h"
-#include "GenericPlatform/GenericWindowExtension.h"
+#include "GenericWindow.h"
+#include "IGenericWindowResizeEventHandler.h"
+#include "GenericWindowExtension.h"
 
 namespace Ayla
 {

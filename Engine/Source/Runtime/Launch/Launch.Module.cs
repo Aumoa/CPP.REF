@@ -11,10 +11,5 @@ public class Launch : ModuleRules
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore");
         Type = ModuleType.Application;
-
-        if (TargetInfo.Editor)
-        {
-            AddPublicDependencyModuleNames("CoreEd");
-        }
     }
 }

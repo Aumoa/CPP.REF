@@ -1,10 +1,11 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "VkGraphics.h"
-#include "GenericPlatform/GenericApplication.h"
-#include "GenericPlatform/GenericWindowSwapchainExtension.h"
-#include "GenericPlatform/GenericApplication.h"
+#include "GenericApplication.h"
+#include "GenericWindowSwapchainExtension.h"
 #include "VkSwapchainExt.h"
+#include "Linq/Concat.h"
+#include <ranges>
 
 namespace Ayla
 {
@@ -19,17 +20,63 @@ namespace Ayla
             .engineVersion = VK_MAKE_VERSION(1, 0, 0),
             .apiVersion = VK_API_VERSION_1_0
         };
+
+        uint32_t extCount = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &extCount, nullptr);
+        std::vector<VkExtensionProperties> supportedExtensions(extCount);
+        vkEnumerateInstanceExtensionProperties(nullptr, &extCount, supportedExtensions.data());
+
+        PlatformProcess::OutputDebugString(TEXT("Support instance extensions:\n"));
+
+        for (size_t i = 0; i < supportedExtensions.size(); ++i)
+        {
+            auto& extension = supportedExtensions[i];
+            PlatformProcess::OutputDebugString(String::Format(TEXT("  #{}: {}\n"), i, String::FromLiteral(extension.extensionName)));
+        }
+
+        static constexpr std::array<const char*, 1> kLayers
+        {
+			"VK_LAYER_KHRONOS_validation"
+        };
+
+        static constexpr std::array<const char*, 1> kExtensions
+        {
+            "VK_EXT_debug_utils"
+        };
+
+        std::vector<const char*> extensions =
+            std::ranges::to<std::vector<const char*>>(
+                app->GetVulkanExtensionNames() | Linq::Concat(kExtensions)
+            );
         
-        auto extensions = app->GetVulkanExtensionNames();
         VkInstanceCreateInfo vkInstanceCreateInfo =
         {
             .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
             .pApplicationInfo = &vkAppInfo,
+			.enabledLayerCount = (uint32_t)kLayers.size(),
+			.ppEnabledLayerNames = kLayers.data(),
             .enabledExtensionCount = (uint32_t)extensions.size(),
             .ppEnabledExtensionNames = extensions.data()
         };
 
         VKR(vkCreateInstance(&vkInstanceCreateInfo, nullptr, &m_Instance));
+
+        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo =
+        {
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+            .pfnUserCallback = [](VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) -> VkBool32
+            {
+                PlatformProcess::OutputDebugString(String::Format(TEXT("Vulkan: {}"), String::FromCodepage(pCallbackData->pMessage)));
+                return VK_FALSE;
+            }
+		};
+
+		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT");
+        if (func)
+        {
+        }
 
         uint32_t gpuCount = 0;
         VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, nullptr));
@@ -141,11 +188,12 @@ namespace Ayla
 
     void VkGraphics::InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow)
     {
+#if PLATFORM_LINUX
         auto* display = reinterpret_cast<Display*>(GenericApplication::Get().GetApplicationPointer());
         auto window = reinterpret_cast<Window>(targetWindow->GetOSWindowHandle());
-        
+
         VkXlibSurfaceCreateInfoKHR surfaceInfo
-        { 
+        {
             .sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR,
             .dpy = display,
             .window = window
@@ -153,6 +201,17 @@ namespace Ayla
 
         VkSurfaceKHR surface;
         VKR(vkCreateXlibSurfaceKHR(m_Instance, &surfaceInfo, nullptr, &surface));
+#elif PLATFORM_WINDOWS
+        auto* hwnd = reinterpret_cast<HWND>(targetWindow->GetOSWindowHandle());
+        VkWin32SurfaceCreateInfoKHR surfaceInfo
+        {
+            .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+            .hinstance = GetModuleHandle(nullptr),
+            .hwnd = hwnd
+        };
+        VkSurfaceKHR surface;
+		VKR(vkCreateWin32SurfaceKHR(m_Instance, &surfaceInfo, nullptr, &surface));
+#endif
         
         VkSurfaceCapabilitiesKHR caps;
         VKR(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_PhysicalDevice, surface, &caps));
@@ -163,7 +222,7 @@ namespace Ayla
         std::vector<VkSurfaceFormatKHR> formats{ (size_t)formatCount };
         VKR(vkGetPhysicalDeviceSurfaceFormatsKHR(m_PhysicalDevice, surface, &formatCount, formats.data()));
 
-        size_t chosenFormatIndex = -1;
+        size_t chosenFormatIndex = (size_t)-1;
         for (size_t i = 0; i < formats.size(); ++i)
         {
             PlatformProcess::OutputDebugString(String::Format(TEXT("{}"), formats[i].format));
@@ -174,8 +233,15 @@ namespace Ayla
             }
         }
 
-        if (chosenFormatIndex == -1){
+        if (chosenFormatIndex == (size_t)-1)
+        {
             throw new InvalidOperationException(TEXT("Required format(B8G8R8A8_UNORM) not supported."));
+        }
+
+        VkCompositeAlphaFlagBitsKHR compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        if (caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR)
+        {
+            compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
         }
 
         VkSwapchainCreateInfoKHR swapchainCreateInfo
@@ -186,8 +252,10 @@ namespace Ayla
             .imageFormat = formats[chosenFormatIndex].format,
             .imageColorSpace = formats[chosenFormatIndex].colorSpace,
             .imageExtent = caps.currentExtent,
+            .imageArrayLayers = 1,
             .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
             .preTransform = caps.currentTransform,
+            .compositeAlpha = compositeAlpha,
             .presentMode = VK_PRESENT_MODE_FIFO_KHR,
             .clipped = VK_TRUE
         };

@@ -2,7 +2,7 @@
 
 #include "Graphics.h"
 #include "Platform/DynamicLibrary.h"
-#include "GenericPlatform/GenericApplication.h"
+#include "GenericApplication.h"
 
 namespace Ayla
 {

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenericPlatform/GenericWindowExtension.h"
+#include "GenericWindowExtension.h"
 
 namespace Ayla
 {
