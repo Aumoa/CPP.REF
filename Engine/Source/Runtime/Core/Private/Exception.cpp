@@ -1,7 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Exception.h"
-#include "Diagnostics/StackTrace.h"
+#include <sstream>
 
 namespace Ayla
 {
@@ -9,7 +9,7 @@ namespace Ayla
 		: m_Message(InMessage)
 		, m_InnerException(InInnerException)
 		, m_Src(Src)
-		, m_Stacktrace(StackTrace::Current().ToString())
+		, m_Stacktrace(std::stacktrace::current())
 	{
 	}
 
@@ -38,12 +38,15 @@ namespace Ayla
 			{
 				Composed += String::Format(TEXT("---> Unknown exception.\n"));
 			}
-			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), m_Stacktrace);
+
+			auto ss = std::format("{}", m_Stacktrace);
+			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), String::FromCodepage(ss));
 			return Composed;
 		}
 		else
 		{
-			return String::Format(TEXT("{}: {}\n{}"), String::FromCodepage(typeid(*this).name()), m_Message, m_Stacktrace);
+			auto ss = std::format("{}", m_Stacktrace);
+			return String::Format(TEXT("{}: {}\n{}"), String::FromCodepage(typeid(*this).name()), m_Message, String::FromCodepage(ss));
 		}
 	}
 }

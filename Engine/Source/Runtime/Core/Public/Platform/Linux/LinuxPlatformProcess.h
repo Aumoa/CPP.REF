@@ -22,11 +22,6 @@ namespace Ayla
         static bool IsDebuggerPresent() noexcept;
         static void OutputDebugString(String InMessage) noexcept;
 
-        static void StacktraceCurrent(std::vector<StackFrame>& OutStackframes) noexcept;
-        static void StacktraceFromThread(void* Handle, std::vector<StackFrame>& OutStackframes) noexcept;
-        static void StacktraceFromException(void* lpExceptionPointer, std::vector<StackFrame>& OutStackframes) noexcept;
-
-        static void SetupStacktraceSignals() noexcept;
         static String FindEngineDirectory();
 
         static void* AllocateCurrentThreadHandle() noexcept;

@@ -1,15 +1,17 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#if PLATFORM_LINUX
+#if PLATFORM_WINDOWS
 
-#include <arpa/inet.h>
+#define __ALLOW_PLATFORM_COMMON_H__
+
+#include "Platform/PlatformCommon.h"
 #include "Socket.Common.inl"
 
 namespace Ayla
 {
 	struct Socket::PlatformSocket
 	{
-		const int m_Socket;
+		const SOCKET m_Socket;
 
 		PlatformSocket(AddressFamily af, SocketType st)
 			: m_Socket{ socket(AddressFamilyToInt32(af), SocketTypeToInt32(st), 0) }
@@ -18,9 +20,11 @@ namespace Ayla
 
 		~PlatformSocket() noexcept
 		{
-			close(m_Socket);
+			closesocket(m_Socket);
 		}
 	};
 }
+
+#undef __ALLOW_PLATFORM_COMMON_H__
 
 #endif

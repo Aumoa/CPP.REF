@@ -34,6 +34,7 @@ namespace Ayla
 
 		static bool DispatchQueuedCompletionStatus(void* Handle, const TimeSpan& Dur) noexcept;
 		static bool DispatchQueuedCompletionStatus(void* Handle) noexcept;
+		static void QueueInterruptSignal(void* handle) noexcept;
 
 		static void OpenFileHandle(void*& Handle, String InFilename, FileMode InFileMode, FileAccessMode InAccessMode, FileSharedMode InSharedMode) noexcept;
 		static bool CloseFileHandle(void* Handle) noexcept;

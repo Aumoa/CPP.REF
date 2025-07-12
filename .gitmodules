@@ -1,6 +1,3 @@
-[submodule "Engine/Source/ThirdParty/backtrace/src"]
-	path = Engine/Source/ThirdParty/backtrace/src
-	url = https://github.com/ianlancetaylor/libbacktrace
 [submodule "Engine/Source/ThirdParty/freetype"]
 	path = Engine/Source/ThirdParty/freetype/src
 	url = https://github.com/freetype/freetype.git

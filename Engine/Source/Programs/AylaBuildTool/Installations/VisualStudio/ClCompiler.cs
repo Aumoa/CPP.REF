@@ -31,8 +31,8 @@ internal class ClCompiler : CppCompiler
             "/nologo " +
             // Compiles without linking.
             "/c " +
-            // C++20 standard ISO/IEC 14882:2020.
-            "/std:c++20 " +
+            // C++23 standard.
+            "/std:c++23preview " +
             // Enable C++ exception handling (no SEH exceptions) and extern "C" defaults to nothrow.
             "/EHsc " +
             // wchar_t is a native type, not a typedef.

@@ -4,6 +4,7 @@
 #include "ArgumentException.h"
 
 #include "Socket.Linux.inl"
+#include "Socket.Windows.inl"
 
 namespace Ayla
 {

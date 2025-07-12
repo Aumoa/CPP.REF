@@ -111,16 +111,16 @@ namespace Ayla
 		{
 			auto* Ptr = IOCompletionOverlapped::FromOverlapped(Overlapped);
 			ThreadPool::QueueUserWorkItem([Ptr, bStatus, NumberOfBytes, ErrorCode = ::WSAGetLastError()]()
+			{
+				if (bStatus)
 				{
-					if (bStatus)
-					{
-						Ptr->Complete((size_t)NumberOfBytes);
-					}
-					else
-					{
-						Ptr->Failed(ErrorCode);
-					}
-				});
+					Ptr->Complete((size_t)NumberOfBytes);
+				}
+				else
+				{
+					Ptr->Failed(ErrorCode);
+				}
+			});
 			return true;
 		}
 		else
@@ -132,6 +132,12 @@ namespace Ayla
 	bool WindowsPlatformIO::DispatchQueuedCompletionStatus(void* Handle) noexcept
 	{
 		return DispatchQueuedCompletionStatus(Handle, TimeSpan::FromMilliseconds(INFINITE));
+	}
+
+	void WindowsPlatformIO::QueueInterruptSignal(void* handle) noexcept
+	{
+		check(handle);
+		// Windows platform need not queue interrupt signal.
 	}
 
 	void WindowsPlatformIO::OpenFileHandle(void*& Handle, String InFilename, FileMode InFileMode, FileAccessMode InAccessMode, FileSharedMode InSharedMode) noexcept

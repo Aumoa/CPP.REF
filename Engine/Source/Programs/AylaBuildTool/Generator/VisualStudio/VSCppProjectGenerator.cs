@@ -54,7 +54,7 @@ internal static class VSCppProjectGenerator
                         }
                         AppendFormatLine("""<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>""");
                         AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Current));
-                        AppendFormatLine("""<LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>""");
+                        AppendFormatLine("""<LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>""");
                     });
                     AppendFormatLine("""</PropertyGroup>""");
                 }
@@ -294,7 +294,7 @@ internal static class VSCppProjectGenerator
                     Indent(() =>
                     {
                         var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build {projectPath}--target \"{project.Name}\" --config {buildTarget.Config} {(buildTarget.Editor ? "--editor " : string.Empty)}";
-                        AppendFormatLine("""<AdditionalOptions>/std:c++20 /Zc:preprocessor</AdditionalOptions>""", outDir);
+                        AppendFormatLine("""<AdditionalOptions>/std:c++23preview /Zc:preprocessor</AdditionalOptions>""", outDir);
                         AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
                         AppendFormatLine("""<NMakeBuildCommandLine>dotnet {0}</NMakeBuildCommandLine>""", buildCommand);
                         AppendFormatLine("""<NMakeReBuildCommandLine>dotnet {0} --clean Rebuild</NMakeReBuildCommandLine>""", buildCommand);
