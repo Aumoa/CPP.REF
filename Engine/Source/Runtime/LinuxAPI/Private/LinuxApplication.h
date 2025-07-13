@@ -5,7 +5,7 @@
 #if PLATFORM_LINUX
 
 #include "CoreMinimal.h"
-#include "GenericPlatform/GenericApplication.h"
+#include "GenericApplication.h"
 #include "Threading/Spinlock.h"
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -25,6 +25,7 @@ namespace Ayla
         LinuxApplication();
         virtual ~LinuxApplication() noexcept override;
 
+        virtual std::shared_ptr<GenericActivity> CreateMainActivity() override;
         virtual std::shared_ptr<GenericWindow> MakeWindow(const GenericWindowDefinition& winDef) override;
         virtual Vector2N GetScreenResolution() override;
         virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& outInputEvents) override;

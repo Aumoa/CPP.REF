@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.h>
 #if PLATFORM_LINUX
+#include <X11/Xlib.h>
 #include <vulkan/vulkan_xlib.h>
 #elif PLATFORM_WINDOWS
 #define __ALLOW_PLATFORM_COMMON_H__

@@ -17,7 +17,7 @@ internal class GccCompiler : CppCompiler
     {
         var options = new Terminal.Options
         {
-            Executable = "gcc",
+            Executable = "g++",
             Logging = Terminal.Logging.None
         };
 

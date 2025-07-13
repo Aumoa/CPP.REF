@@ -3,7 +3,7 @@
 #if PLATFORM_LINUX
 
 #include "LinuxWindow.h"
-#include "GenericPlatform/GenericApplication.h"
+#include "GenericApplication.h"
 
 namespace Ayla
 {
@@ -86,11 +86,6 @@ namespace Ayla
         auto window = m_Window;
         m_Window = 0;
         XDestroyWindow(m_Display, window);
-
-        if (m_CachedDefinition.bPrimaryWindow)
-        {
-            GenericApplication::Get().QuitApplication(0);
-        }
     }
 }
 

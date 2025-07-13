@@ -4,6 +4,7 @@
 
 #include "LinuxApplication.h"
 #include "LinuxWindow.h"
+#include "LinuxActivity.h"
 #include "IO/FileReference.h"
 #include <unistd.h>
 #include <vector>
@@ -21,6 +22,11 @@ namespace Ayla
     {
         XCloseDisplay(m_Display);
         m_Display = nullptr;
+    }
+
+    std::shared_ptr<GenericActivity> LinuxApplication::CreateMainActivity()
+    {
+        return std::make_shared<LinuxActivity>();
     }
 
     std::shared_ptr<GenericWindow> LinuxApplication::MakeWindow(const GenericWindowDefinition& winDef)
@@ -93,6 +99,7 @@ namespace Ayla
                 }
 
                 targetWindow->OnDestroy();
+                targetWindow->NotifyDestroy();
                 break;
             }
             case ConfigureNotify:

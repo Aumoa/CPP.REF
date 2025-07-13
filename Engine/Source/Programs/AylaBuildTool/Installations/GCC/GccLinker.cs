@@ -60,7 +60,10 @@ internal class GccLinker : Linker
             linkCommands.AppendFormat("-Wl,-rpath,\"{0}\" ", libPath);
         }
 
-        foreach (var additionalLibrary in module.AdditionalLibraries.Concat(module.DependencyModuleNames).Append("stdc++"))
+        foreach (var additionalLibrary in module.AdditionalLibraries
+            .Concat(module.DependencyModuleNames)
+            .Append("stdc++")
+            .Append("stdc++exp"))
         {
             linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
         }

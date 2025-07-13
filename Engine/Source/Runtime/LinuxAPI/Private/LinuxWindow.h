@@ -1,7 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "CoreMinimal.h"
-#include "GenericPlatform/GenericWindow.h"
+#include "GenericWindow.h"
 
 #if PLATFORM_LINUX
 
