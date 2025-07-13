@@ -10,6 +10,7 @@ namespace Ayla
 	class Graphics;
 	class GenericActivity;
 	class GenericWindowSwapchainExtension;
+	class RenderThread;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -20,6 +21,7 @@ namespace Ayla
 		std::shared_ptr<GenericActivity> m_MainActivity;
 		std::shared_ptr<Graphics> m_Graphics;
 		std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
+		std::unique_ptr<RenderThread> m_RenderThread;
 
 	public:
 		Engine();

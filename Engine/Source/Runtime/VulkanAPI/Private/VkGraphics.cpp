@@ -155,10 +155,17 @@ namespace Ayla
             }
         };
 
-        std::vector<const char*> deviceExtensions = { "VK_KHR_swapchain" };
+        VkPhysicalDeviceTimelineSemaphoreFeatures timelineFeatures =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES,
+            .timelineSemaphore = VK_TRUE
+        };
+
+        std::vector<const char*> deviceExtensions = { "VK_KHR_swapchain", "VK_KHR_timeline_semaphore" };
         VkDeviceCreateInfo vkDeviceInfo =
         {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+            .pNext = &timelineFeatures,
             .queueCreateInfoCount = 1,
             .pQueueCreateInfos = vkQueueInfos,
             .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
@@ -168,8 +175,17 @@ namespace Ayla
         VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
         vkGetDeviceQueue(m_Device, graphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
         m_PhysicalDevice = physicalDevices[0];
+		m_QueueFamilyIndex = (size_t)graphicsQueueFamilyIndex;
 
-        VkSemaphoreCreateInfo semaphoreCreateInfo
+        VkFenceCreateInfo fenceCreateInfo =
+        {
+            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+            .flags = VK_FENCE_CREATE_SIGNALED_BIT
+		};
+
+		VKR(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &m_Fence));
+
+        VkSemaphoreCreateInfo semaphoreCreateInfo =
         {
             .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
         };
@@ -181,6 +197,12 @@ namespace Ayla
         m_GraphicsQueue = nullptr;
         m_PhysicalDevice = nullptr;
 
+        if (m_Fence)
+        {
+            vkDestroyFence(m_Device, m_Fence, nullptr);
+            m_Fence = nullptr;
+        }
+        
         if (m_Semaphore)
         {
             vkDestroySemaphore(m_Device, m_Semaphore, nullptr);
@@ -268,6 +290,15 @@ namespace Ayla
         auto extension = std::make_shared<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo);
         targetWindow->AddExtension(extension);
         return extension;
+    }
+
+    void VkGraphics::BeginRenderThread()
+    {
+        VKR(vkWaitForFences(m_Device, 1, &m_Fence, VK_TRUE, 10000));
+    }
+
+    void VkGraphics::EndRenderThread()
+    {
     }
 }
 

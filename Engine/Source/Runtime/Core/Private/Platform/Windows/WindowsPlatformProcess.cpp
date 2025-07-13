@@ -131,7 +131,7 @@ namespace Ayla
 
 	void WindowsPlatformProcess::OutputDebugString(String InMessage) noexcept
 	{
-		::OutputDebugStringW(InMessage.c_str());
+		::OutputDebugStringW((InMessage + TEXT("\n")).c_str());
 	}
 
 	String WindowsPlatformProcess::FindEngineDirectory()

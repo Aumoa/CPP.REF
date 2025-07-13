@@ -5,6 +5,7 @@
 #include "GenericApplication.h"
 #include "GenericActivity.h"
 #include "GenericWindowSwapchainExtension.h"
+#include "Rendering/RenderThread.h"
 
 namespace Ayla
 {
@@ -27,15 +28,19 @@ namespace Ayla
 
 		m_Graphics = Graphics::CreateGraphics(RenderFeatures::Vulkan);
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
+		m_RenderThread = std::make_unique<RenderThread>(m_Graphics);
 
 		m_MainActivity->AfterInitialize();
 	}
 
 	void Engine::Tick()
 	{
-		for (auto& swapchainExt : m_SwapchainExtensions)
+		m_RenderThread->Dispatch([swapchainExtensions = m_SwapchainExtensions, graphics = m_Graphics]()
 		{
-			swapchainExt->Present();
-		}
+			for (auto& swapchainExt : swapchainExtensions)
+			{
+				swapchainExt->Present();
+			}
+		});
 	}
 }
