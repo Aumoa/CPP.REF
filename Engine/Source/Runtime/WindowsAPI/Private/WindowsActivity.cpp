@@ -5,7 +5,7 @@
 #include "WindowsActivity.h"
 #include "WindowsApplication.h"
 #include "WindowsWindow.h"
-#include "MainWindowExt.h"
+#include "GenericMainWindowDefaultExt.h"
 
 namespace Ayla
 {
@@ -19,7 +19,7 @@ namespace Ayla
 			.DesiredScreenSize = Vector2N(-1, -1),
 		}));
 
-		m_MainWindow->AddExtension(std::make_shared<MainWindowExt>());
+		m_MainWindow->AddExtension(std::make_shared<GenericMainWindowDefaultExt>());
 	}
 
 	WindowsActivity::~WindowsActivity() noexcept

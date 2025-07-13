@@ -8,7 +8,7 @@
 
 namespace Ayla
 {
-    class GenericMainWindowDefaultExt : public GenericWindowExtension, public IGenericWindowDestroyEventHandler
+    class APPLICATIONCORE_API GenericMainWindowDefaultExt : public GenericWindowExtension, public IGenericWindowDestroyEventHandler
     {
     public:
         GenericMainWindowDefaultExt();
