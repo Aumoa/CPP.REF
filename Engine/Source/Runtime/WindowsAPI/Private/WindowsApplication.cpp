@@ -3,9 +3,10 @@
 #if PLATFORM_WINDOWS
 
 #include "WindowsApplication.h"
+#include "WindowsWindow.h"
+#include "WindowsActivity.h"
 #include "IO/FileReference.h"
 #include "IO/DirectoryReference.h"
-#include "WindowsWindow.h"
 
 namespace Ayla
 {
@@ -19,6 +20,11 @@ namespace Ayla
 	{
 	}
 
+	std::shared_ptr<GenericActivity> WindowsApplication::CreateMainActivity()
+	{
+		return std::make_shared<WindowsActivity>();
+	}
+
 	std::shared_ptr<GenericWindow> WindowsApplication::MakeWindow(const GenericWindowDefinition& winDef)
 	{
 		return std::make_shared<WindowsWindow>(winDef);
@@ -26,14 +32,10 @@ namespace Ayla
 
 	Vector2N WindowsApplication::GetScreenResolution()
 	{
-		HMONITOR monitor = MonitorFromWindow(nullptr, MONITOR_DEFAULTTOPRIMARY);
-		MONITORINFO info = { sizeof(MONITORINFO) };
-		if (GetMonitorInfo(monitor, &info))
-		{
-			return Vector2N(info.rcMonitor.right - info.rcMonitor.left,
-						   info.rcMonitor.bottom - info.rcMonitor.top);
-		}
-		return Vector2N(0, 0);
+		return Vector2N(
+			GetSystemMetrics(SM_CXSCREEN),
+			GetSystemMetrics(SM_CYSCREEN)
+		);
 	}
 
 	void WindowsApplication::PumpMessages(std::vector<GenericPlatformInputEvent>& outInputEvents)

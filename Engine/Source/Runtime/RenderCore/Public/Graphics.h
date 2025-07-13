@@ -9,6 +9,7 @@ namespace Ayla
 {
     class GenericApplication;
     class GenericWindow;
+    class GenericWindowSwapchainExtension;
 
     class RENDERCORE_API Graphics
     {
@@ -18,9 +19,9 @@ namespace Ayla
     public:
         virtual ~Graphics() noexcept;
 
-        virtual void InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) = 0;
+        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) = 0;
 
-        static std::shared_ptr<Graphics> CreateGraphics(RenderFeatures api, GenericApplication* app);
+        static std::shared_ptr<Graphics> CreateGraphics(RenderFeatures api);
     };
 }
 
@@ -29,8 +30,8 @@ namespace Ayla
 #define DEFINE_CREATE_GRAPHICS(ClassName) \
 extern "C" \
 { \
-    PLATFORM_SHARED_EXPORT auto CreateGraphics(::Ayla::GenericApplication* app) \
+    PLATFORM_SHARED_EXPORT auto CreateGraphics() \
     { \
-        return (::Ayla::Graphics*)(new ClassName(app)); \
+        return (::Ayla::Graphics*)(new ClassName()); \
     } \
 }

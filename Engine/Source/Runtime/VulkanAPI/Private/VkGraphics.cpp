@@ -9,8 +9,10 @@
 
 namespace Ayla
 {
-    VkGraphics::VkGraphics(GenericApplication* app)
+    VkGraphics::VkGraphics()
     {
+        auto& app = GenericApplication::Get();
+
         VkApplicationInfo vkAppInfo =
         {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -46,7 +48,7 @@ namespace Ayla
 
         std::vector<const char*> extensions =
             std::ranges::to<std::vector<const char*>>(
-                app->GetVulkanExtensionNames() | Linq::Concat(kExtensions)
+                app.GetVulkanExtensionNames() | Linq::Concat(kExtensions)
             );
         
         VkInstanceCreateInfo vkInstanceCreateInfo =
@@ -186,7 +188,7 @@ namespace Ayla
         }
     }
 
-    void VkGraphics::InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow)
+    std::shared_ptr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow)
     {
 #if PLATFORM_LINUX
         auto* display = reinterpret_cast<Display*>(GenericApplication::Get().GetApplicationPointer());
@@ -263,7 +265,9 @@ namespace Ayla
         VkSwapchainKHR swapchain;
         VKR(vkCreateSwapchainKHR(m_Device, &swapchainCreateInfo, nullptr, &swapchain));
 
-        targetWindow->AddExtension(std::make_shared<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo));
+        auto extension = std::make_shared<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo);
+        targetWindow->AddExtension(extension);
+        return extension;
     }
 }
 

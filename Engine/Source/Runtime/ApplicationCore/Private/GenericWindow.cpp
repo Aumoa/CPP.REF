@@ -2,6 +2,7 @@
 
 #include "GenericWindow.h"
 #include "IGenericWindowResizeEventHandler.h"
+#include "IGenericWindowDestroyEventHandler.h"
 #include "GenericWindowExtension.h"
 
 namespace Ayla
@@ -23,7 +24,7 @@ namespace Ayla
 	void GenericWindow::NotifyResize(const Vector2N& newSize)
 	{
 		auto lock = std::unique_lock(m_Lock);
-		auto extensions = m_Extensions;
+		std::vector extensions = m_Extensions;
 		lock.unlock();
 
 		for (auto& extension : extensions)
@@ -31,6 +32,21 @@ namespace Ayla
 			if (auto* handler = dynamic_cast<IGenericWindowResizeEventHandler*>(extension.get()); handler)
 			{
 				handler->OnResize(newSize);
+			}
+		}
+	}
+
+	void GenericWindow::NotifyDestroy()
+	{
+		auto lock = std::unique_lock(m_Lock);
+		std::vector extensions = m_Extensions;
+		lock.unlock();
+
+		for (auto& extension : extensions)
+		{
+			if (auto* handler = dynamic_cast<IGenericWindowDestroyEventHandler*>(extension.get()); handler)
+			{
+				handler->OnDestroy();
 			}
 		}
 	}

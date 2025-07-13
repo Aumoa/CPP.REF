@@ -9,7 +9,7 @@ public class Launch : ModuleRules
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
-        AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore");
+        AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore", "Engine");
         Type = ModuleType.Application;
     }
 }

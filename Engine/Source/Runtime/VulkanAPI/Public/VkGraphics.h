@@ -20,10 +20,10 @@ namespace Ayla
         VkSemaphore m_Semaphore;
 
     public:
-        VkGraphics(GenericApplication* app);
+        VkGraphics();
         virtual ~VkGraphics() noexcept override;
 
-        virtual void InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) override;
+        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) override;
 
         VkInstance GetInstance() const noexcept { return m_Instance; }
         VkDevice GetDevice() const noexcept { return m_Device; }

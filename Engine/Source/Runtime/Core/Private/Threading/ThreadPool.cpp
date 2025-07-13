@@ -119,14 +119,12 @@ namespace Ayla
 
 	void ThreadPool::GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads)
 	{
-		check(IO);
 		OutWorkerThreads = NumWorkerThreads;
 		OutCompletionPortThreads = NumCompletionPortThreads;
 	}
 
 	void ThreadPool::GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads)
 	{
-		check(IO);
 		OutWorkerThreads = NumWorkerThreads;
 		OutCompletionPortThreads = NumCompletionPortThreads;
 	}

@@ -7,7 +7,6 @@
 
 namespace Ayla
 {
-	class GenericApplication;
 	class Engine;
 	class DynamicLibrary;
 
@@ -17,16 +16,16 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		GenericApplication* m_GenericApp;
+		APROPERTY()
+		PPtr<Engine> m_Engine;
 
 	protected:
-		Launch(GenericApplication* genericApp);
+		Launch();
 
 	public:
 		virtual ~Launch() noexcept override;
 
 		virtual int32 StartApplication();
-		GenericApplication* GetApplication();
 
 		static int32 GuardedMain(std::vector<String> args, DynamicLibrary& api);
 	};

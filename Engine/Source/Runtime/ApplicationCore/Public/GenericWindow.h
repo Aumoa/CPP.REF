@@ -48,5 +48,6 @@ namespace Ayla
         virtual Vector2N GetSize() const = 0;
         
         void NotifyResize(const Vector2N& newSize);
+        void NotifyDestroy();
     };
 }

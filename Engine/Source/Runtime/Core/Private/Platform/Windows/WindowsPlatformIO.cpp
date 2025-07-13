@@ -77,7 +77,7 @@ namespace Ayla
 
 	void WindowsPlatformIO::DestroyIOCPHandle(void* Handle) noexcept
 	{
-		if constexpr (sizeof(HANDLE) < sizeof(void*))
+		if constexpr (sizeof(HANDLE) <= sizeof(void*))
 		{
 			__nop();
 		}
@@ -137,7 +137,12 @@ namespace Ayla
 	void WindowsPlatformIO::QueueInterruptSignal(void* handle) noexcept
 	{
 		check(handle);
-		// Windows platform need not queue interrupt signal.
+		size_t numWorkerThreads, numCompletionPortThreads;
+		ThreadPool::GetMaxThreads(numWorkerThreads, numCompletionPortThreads);
+		for (size_t i = 0; i < numCompletionPortThreads; ++i)
+		{
+			PostQueuedCompletionStatus(GetHANDLE(handle), 0, 0, nullptr);
+		}
 	}
 
 	void WindowsPlatformIO::OpenFileHandle(void*& Handle, String InFilename, FileMode InFileMode, FileAccessMode InAccessMode, FileSharedMode InSharedMode) noexcept

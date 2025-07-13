@@ -1,10 +1,10 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Engine.h"
-#include "InitializationContext.h"
-#include "HAL/PlatformRenderFeature.h"
-#include "HAL/Graphics.h"
-#include "GenericPlatform/GenericApplication.h"
+#include "Graphics.h"
+#include "GenericApplication.h"
+#include "GenericActivity.h"
+#include "GenericWindowSwapchainExtension.h"
 
 namespace Ayla
 {
@@ -16,39 +16,26 @@ namespace Ayla
 	{
 	}
 
-	RPtr<InitializationContext> Engine::PreInitialize()
-	{
-		return New<InitializationContext>();
-	}
-
-	void Engine::Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, std::shared_ptr<GenericApplication> app)
-	{
-		m_App = app;
-
-		context->Progress(TEXT("Initializing graphics..."));
-		m_Graphics = prf->CreateGraphics(RenderAPI::D3D12);
-		m_Graphics->Initialize();
-	}
-
-	void Engine::Tick(const std::vector<GenericPlatformInputEvent>& inputEvents)
-	{
-		HandleEventsForWindows(inputEvents);
-
-		m_Graphics->BeginRender();
-		RenderWindows();
-		m_Graphics->EndRender();
-	}
-
-	RPtr<Graphics> Engine::GetGraphics()
-	{
-		return m_Graphics;
-	}
-
-	void Engine::HandleEventsForWindows(const std::vector<GenericPlatformInputEvent>& inputEvents)
+	void Engine::PreInitialize()
 	{
 	}
 
-	void Engine::RenderWindows()
+	void Engine::Initialize()
 	{
+		m_MainActivity = GenericApplication::Get().CreateMainActivity();
+		m_MainActivity->BeforeInitialize();
+
+		m_Graphics = Graphics::CreateGraphics(RenderFeatures::Vulkan);
+		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
+
+		m_MainActivity->AfterInitialize();
+	}
+
+	void Engine::Tick()
+	{
+		for (auto& swapchainExt : m_SwapchainExtensions)
+		{
+			swapchainExt->Present();
+		}
 	}
 }

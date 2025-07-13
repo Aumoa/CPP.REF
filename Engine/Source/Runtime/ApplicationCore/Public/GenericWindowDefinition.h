@@ -9,8 +9,8 @@ namespace Ayla
 {
     struct GenericWindowDefinition
     {
+        String Caption;
         uint8 bPopup : 1 = false;
-        uint8 bPrimaryWindow : 1 = false;
         uint8 bSystemMenu : 1 = false;
         uint8 bThickframe : 1 = false;
         uint8 bSizebox : 1 = false;

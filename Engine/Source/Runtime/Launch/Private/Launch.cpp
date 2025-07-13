@@ -1,18 +1,13 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Launch.h"
+#include "Engine.h"
 #include "GenericApplication.h"
-#include "GenericWindow.h"
-#include "GenericWindowSwapchainExtension.h"
-#include "Localizational/Name.h"
 #include "Platform/DynamicLibrary.h"
-#include "IO/File.h"
-#include "Graphics.h"
 
 namespace Ayla
 {
-    Launch::Launch(GenericApplication* genericApp)
-        : m_GenericApp{ genericApp }
+    Launch::Launch()
     {
     }
 
@@ -22,41 +17,19 @@ namespace Ayla
 
     int32 Launch::StartApplication()
     {
-        auto graphics = Graphics::CreateGraphics(RenderFeatures::Vulkan, m_GenericApp);
+        m_Engine = New<Engine>();
+        m_Engine->PreInitialize();
+        m_Engine->Initialize();
 
-        GenericWindowDefinition wDef =
-        {
-            .bPrimaryWindow = true
-        };
-        auto window = m_GenericApp->MakeWindow(wDef);
-        graphics->InstallSwapChain(window);
-        window->Show();
-
-        auto swapchainExt = window->GetExtension<GenericWindowSwapchainExtension>();
-        
-// #if WITH_EDITOR
-//         m_Engine = New<EditorEngine>();
-// #else
-//         m_Engine = New<::Ayla::Engine>();
-// #endif
-
-//         auto initializationContext = m_Engine->PreInitialize();
-//         m_Engine->Initialize(initializationContext, CreatePlatformRenderFeature(), m_GenericApp);
-
+        auto& app = GenericApplication::Get();
         std::vector<GenericPlatformInputEvent> inputEvents;
-        while (!m_GenericApp->IsQuitRequested())
+        while (!app.IsQuitRequested())
         {
-            m_GenericApp->PumpMessages(inputEvents);
-            swapchainExt->Present();
-            //m_Engine->Tick(inputEvents);
+            app.PumpMessages(inputEvents);
+            m_Engine->Tick();
         }
 
-        return m_GenericApp->GetExitCode();
-    }
-
-    GenericApplication* Launch::GetApplication()
-    {
-        return m_GenericApp;
+        return app.GetExitCode();
     }
 
     int32 Launch::GuardedMain(std::vector<String> args, DynamicLibrary& api)
@@ -77,7 +50,7 @@ namespace Ayla
             }
 
             auto app = std::unique_ptr<GenericApplication>{ loader() };
-            auto launch = New<Launch>(app.get());
+            auto launch = New<Launch>();
             return launch->StartApplication();
         })
         .finally_([]()

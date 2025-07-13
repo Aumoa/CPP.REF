@@ -7,13 +7,9 @@
 
 namespace Ayla
 {
-	class InitializationContext;
-	class PlatformRenderFeature;
 	class Graphics;
-	class GenericApplication;
-	class GraphicsWindow;
-	class GenericWindow;
-	struct GenericPlatformInputEvent;
+	class GenericActivity;
+	class GenericWindowSwapchainExtension;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -21,24 +17,17 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::shared_ptr<GenericApplication> m_App;
-		APROPERTY()
-		PPtr<Graphics> m_Graphics;
+		std::shared_ptr<GenericActivity> m_MainActivity;
+		std::shared_ptr<Graphics> m_Graphics;
+		std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 
 	public:
 		Engine();
 		virtual ~Engine() noexcept override;
 
-		virtual RPtr<InitializationContext> PreInitialize();
-		virtual void Initialize(RPtr<InitializationContext> context, RPtr<PlatformRenderFeature> prf, std::shared_ptr<GenericApplication> app);
+		virtual void PreInitialize();
+		virtual void Initialize();
 
-		virtual void Tick(const std::vector<GenericPlatformInputEvent>& inputEvents);
-
-	public:
-		RPtr<Graphics> GetGraphics();
-
-	protected:
-		virtual void HandleEventsForWindows(const std::vector<GenericPlatformInputEvent>& inputEvents);
-		virtual void RenderWindows();
+		virtual void Tick();
 	};
 }
