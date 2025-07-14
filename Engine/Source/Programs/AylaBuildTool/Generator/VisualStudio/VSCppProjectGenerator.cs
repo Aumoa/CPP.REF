@@ -17,7 +17,7 @@ internal static class VSCppProjectGenerator
         var installation = new VisualStudioInstallation();
 
         var group = project.Group;
-        var projectFilesDirectory = Path.Combine(primaryGroup.IntermediateDirectory, "ProjectFiles");
+        var projectFilesDirectory = project.SourceDirectory;
         await Task.WhenAll(
             GenerateVcxprojAsync(),
             GenerateVcxprojFiltersAsync(),
