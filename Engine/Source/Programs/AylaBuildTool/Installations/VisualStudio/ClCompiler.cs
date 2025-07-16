@@ -61,6 +61,14 @@ internal class ClCompiler : CppCompiler
             "/Zi "
         );
 
+        if (item.SourceCode.Type == SourceCodeType.ModuleInterface)
+        {
+            m_CommandBuilder.Append(
+                // Enables C++ modules.
+                "/exportModule "
+            );
+        }
+
         switch (m_TargetInfo.Config)
         {
             case Configuration.Debug:
@@ -154,6 +162,19 @@ internal class ClCompiler : CppCompiler
             pdbFileName,
             depsFileName
         );
+
+        if (item.SourceCode.Type == SourceCodeType.ModuleInterface)
+        {
+            m_CommandBuilder.AppendFormat(
+                "/ifcOutput \"{0}\" ",
+                intermediateDirectory
+            );
+
+            m_CommandBuilder.AppendFormat(
+                "/ifcSearchDir \"{0}\" ",
+                intermediateDirectory
+            );
+        }
 
         m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
         Terminal.Output output;

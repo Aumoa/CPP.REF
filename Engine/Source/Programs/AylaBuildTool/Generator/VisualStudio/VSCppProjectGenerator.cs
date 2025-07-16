@@ -293,6 +293,7 @@ internal static class VSCppProjectGenerator
                     var configName = VSUtility.GetConfigName(buildTarget);
                     var archName = VSUtility.GetArchitectureName(buildTarget);
                     var outDir = group.Output(buildTarget, FolderPolicy.PathType.Windows);
+                    var intDir = group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Windows);
                     var rules = project.GetRule(buildTarget);
                     var resolver = project.GetResolver(buildTarget);
                     var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
@@ -303,7 +304,7 @@ internal static class VSCppProjectGenerator
                     Indent(() =>
                     {
                         var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build {projectPath}--target \"{project.Name}\" --config {buildTarget.Config} {(buildTarget.Editor ? "--editor " : string.Empty)}";
-                        AppendFormatLine("""<AdditionalOptions>/std:c++23preview /Zc:preprocessor</AdditionalOptions>""", outDir);
+                        AppendFormatLine("""<AdditionalOptions>/std:c++23preview /Zc:preprocessor /exportModule /ifcOutput "{0}" /ifcSearchDir "{0}"</AdditionalOptions>""", outDir);
                         AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
                         AppendFormatLine("""<NMakeBuildCommandLine>dotnet {0}</NMakeBuildCommandLine>""", buildCommand);
                         AppendFormatLine("""<NMakeReBuildCommandLine>dotnet {0} --clean Rebuild</NMakeReBuildCommandLine>""", buildCommand);
@@ -401,7 +402,7 @@ internal static class VSCppProjectGenerator
         {
             return descriptor.Type switch
             {
-                SourceCodeType.SourceCode => "ClCompile",
+                SourceCodeType.SourceCode or SourceCodeType.ModuleInterface => "ClCompile",
                 SourceCodeType.Header or SourceCodeType.Declaration => "ClInclude",
                 SourceCodeType.NativeVisualizer => "Natvis",
                 _ => throw new NotSupportedException()

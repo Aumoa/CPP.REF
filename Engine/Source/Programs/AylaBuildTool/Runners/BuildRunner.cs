@@ -56,7 +56,7 @@ internal static partial class BuildRunner
                 {
                     foreach (var sourceCode in project.GetSourceCodes())
                     {
-                        if (sourceCode.Type == SourceCodeType.SourceCode)
+                        if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
                         {
                             var fileName = Path.GetFileName(sourceCode.FilePath);
                             var cacheFileName = Path.Combine(intDir, fileName + ".cache");
@@ -120,7 +120,7 @@ internal static partial class BuildRunner
 
             foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
             {
-                if (sourceCode.Type == SourceCodeType.SourceCode)
+                if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
                 {
                     var item = new CppCompiler.CompileItem
                     {

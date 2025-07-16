@@ -2,9 +2,11 @@
 .vs/
 *.sln
 Engine/.vs
+**/obj/
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+**/x64/
 
 # Visual Studio Code
 .vscode

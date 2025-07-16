@@ -20,6 +20,9 @@ internal readonly struct SourceCodeDescriptor(GroupDescriptor Group, string Modu
             case ".c":
                 type = SourceCodeType.SourceCode;
                 break;
+            case ".ixx":
+                type = SourceCodeType.ModuleInterface;
+                break;
             case ".h" or ".inl":
                 type = SourceCodeType.Header;
                 break;

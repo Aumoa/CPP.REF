@@ -4,11 +4,11 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <IsPublishable>False</IsPublishable>
     <OutputPath>..\..\..\Binaries\DotNET\</OutputPath>
     <OutputType>Exe</OutputType>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<RootNamespace>AylaEngine</RootNamespace>
+	<PublishAot>True</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>

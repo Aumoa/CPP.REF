@@ -5,5 +5,6 @@ internal enum SourceCodeType
     SourceCode,
     Declaration,
     Header,
-    NativeVisualizer
+    NativeVisualizer,
+    ModuleInterface
 }
