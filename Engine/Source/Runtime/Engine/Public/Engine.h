@@ -29,6 +29,7 @@ namespace Ayla
 
 		virtual void PreInitialize();
 		virtual void Initialize();
+		virtual void Shutdown();
 
 		virtual void Tick();
 	};

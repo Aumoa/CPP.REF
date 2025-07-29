@@ -12,7 +12,6 @@
 
 namespace Ayla
 {
-    // 내부 유틸리티 함수
     namespace
     {
         inline pthread_mutex_t* GetRWLock(void*& LockVal)

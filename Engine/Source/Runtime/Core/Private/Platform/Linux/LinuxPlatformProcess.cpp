@@ -61,14 +61,12 @@ namespace Ayla
 		return (void*)(intptr_t)gettid();
 	}
 
-	void LinuxPlatformProcess::DestroyCurrentThreadHandle(void* /*InHandle*/) noexcept
+	void LinuxPlatformProcess::DestroyCurrentThreadHandle(void*) noexcept
 	{
-		// Nothing to do on Linux
 	}
 
 	void LinuxPlatformProcess::SetThreadDescription(void* InHandle, String InDescription) noexcept
 	{
-		// InHandle이 nullptr이면 현재 스레드에 적용
 		pthread_t thread;
 		if (InHandle == nullptr)
 		{
@@ -76,12 +74,9 @@ namespace Ayla
 		}
 		else
 		{
-			// gettid()로 얻은 tid를 pthread_t로 변환 (플랫폼에 따라 다를 수 있음)
-			// 대부분의 리눅스에서는 pthread_t와 tid가 다르므로, 안전하게는 현재 스레드만 지원
 			thread = pthread_self();
 		}
 
-		// pthread_setname_np는 16자 제한이 있음
 		if (InDescription.length() > 15)
 		{
 			InDescription = InDescription.Substring(0, 15);
@@ -95,7 +90,6 @@ namespace Ayla
 		pid_t pid = fork();
 		if (pid == 0)
 		{
-			// Child process
 			std::vector<char*> args;
 			args.push_back(const_cast<char*>(InStartInfo.FileName.AsCodepage().c_str()));
 			std::string argStr = InStartInfo.Arguments.string();

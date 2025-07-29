@@ -23,12 +23,17 @@ namespace Ayla
 
         auto& app = GenericApplication::Get();
         std::vector<GenericPlatformInputEvent> inputEvents;
-        while (!app.IsQuitRequested())
+        while (true)
         {
             app.PumpMessages(inputEvents);
+            if (app.IsQuitRequested())
+            {
+                break;
+			}
             m_Engine->Tick();
         }
 
+        m_Engine->Shutdown();
         return app.GetExitCode();
     }
 

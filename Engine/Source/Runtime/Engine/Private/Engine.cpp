@@ -33,6 +33,11 @@ namespace Ayla
 		m_MainActivity->AfterInitialize();
 	}
 
+	void Engine::Shutdown()
+	{
+		m_RenderThread->Join();
+	}
+
 	void Engine::Tick()
 	{
 		m_RenderThread->Dispatch([swapchainExtensions = m_SwapchainExtensions, graphics = m_Graphics]()
