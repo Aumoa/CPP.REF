@@ -5,11 +5,12 @@
 
 namespace Ayla
 {
-    VkSwapchainExt::VkSwapchainExt(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain, const VkSwapchainCreateInfoKHR& swapchainCreateInfo)
+    VkSwapchainExt::VkSwapchainExt(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain, const VkSwapchainCreateInfoKHR& swapchainCreateInfo, VkQueue suitableQueue)
         : m_Owner(owner)
         , m_Surface(surface)
         , m_Swapchain(swapchain)
         , m_SwapchainCreateInfoCache(swapchainCreateInfo)
+        , m_SuitableQueue(suitableQueue)
     {
     }
 
@@ -36,7 +37,7 @@ namespace Ayla
             .pSwapchains = &m_Swapchain,
             .pImageIndices = &imageIndex
         };
-        VKR(vkQueuePresentKHR(m_Owner->GetGraphicsQueue(), &presentInfo));
+        VKR(vkQueuePresentKHR(m_SuitableQueue, &presentInfo));
     }
 
     void VkSwapchainExt::OnResize(const Vector2N& newSize)

@@ -17,7 +17,8 @@ namespace Ayla
         VkPhysicalDevice m_PhysicalDevice{ nullptr };
         VkDeviceRef m_Device;
         VkQueue m_GraphicsQueue{ nullptr };
-		size_t m_QueueFamilyIndex{ (size_t)-1 };
+		uint32_t m_GraphicsQueueFamilyIndex{ 0 };
+        uint32_t m_QueueCount{ 0 };
         VkFence m_Fence{ nullptr };
         VkSemaphore m_Semaphore{ nullptr };
 
@@ -32,7 +33,7 @@ namespace Ayla
         VkInstance GetInstance() const noexcept { return m_Instance; }
         VkDevice GetDevice() const noexcept { return m_Device; }
         VkQueue GetGraphicsQueue() const noexcept { return m_GraphicsQueue; }
-        size_t GetQueueFamilyIndex() const noexcept { return m_QueueFamilyIndex; }
+		uint32_t GetGraphicsQueueFamilyIndex() const noexcept { return m_GraphicsQueueFamilyIndex; }
         VkFence GetFence() const noexcept { return m_Fence; }
         VkSemaphore GetSemaphore() const noexcept { return m_Semaphore; }
     };

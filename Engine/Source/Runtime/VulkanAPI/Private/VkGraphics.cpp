@@ -119,35 +119,37 @@ namespace Ayla
         }
 
         // Find a queue family that supports VK_QUEUE_GRAPHICS_BIT
-        uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, nullptr);
-        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, queueFamilies.data());
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &m_QueueCount, nullptr);
+        std::vector<VkQueueFamilyProperties> queueFamilies(m_QueueCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &m_QueueCount, queueFamilies.data());
 
-        int graphicsQueueFamilyIndex = -1;
-        for (uint32_t i = 0; i < queueFamilyCount; ++i)
+        m_GraphicsQueueFamilyIndex = (uint32_t)-1;
+        for (uint32_t i = 0; i < m_QueueCount; ++i)
         {
             if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
             {
-                graphicsQueueFamilyIndex = i;
+                m_GraphicsQueueFamilyIndex = i;
                 break;
             }
         }
-        if (graphicsQueueFamilyIndex == -1)
+        if (m_GraphicsQueueFamilyIndex == -1)
         {
             throw std::runtime_error("No queue family supports VK_QUEUE_GRAPHICS_BIT");
         }
 
         const float queuePriorities[] = { 1.0f };
-        VkDeviceQueueCreateInfo vkQueueInfos[] =
+        std::vector<VkDeviceQueueCreateInfo> vkQueueInfos;
+		vkQueueInfos.reserve((size_t)m_QueueCount);
+        for (uint32_t i = 0; i < m_QueueCount; ++i)
         {
+            vkQueueInfos.emplace_back(VkDeviceQueueCreateInfo
             {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                .queueFamilyIndex = (uint32_t)graphicsQueueFamilyIndex,
+                .queueFamilyIndex = i,
                 .queueCount = 1,
                 .pQueuePriorities = queuePriorities
-            }
-        };
+            });
+        }
 
         VkPhysicalDeviceTimelineSemaphoreFeatures timelineFeatures =
         {
@@ -160,16 +162,15 @@ namespace Ayla
         {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .pNext = &timelineFeatures,
-            .queueCreateInfoCount = 1,
-            .pQueueCreateInfos = vkQueueInfos,
+            .queueCreateInfoCount = (uint32_t)vkQueueInfos.size(),
+            .pQueueCreateInfos = vkQueueInfos.data(),
             .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
             .ppEnabledExtensionNames = deviceExtensions.data()
         };
 
         VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
-        vkGetDeviceQueue(m_Device, graphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
+        vkGetDeviceQueue(m_Device, m_GraphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
         m_PhysicalDevice = physicalDevices[0];
-		m_QueueFamilyIndex = (size_t)graphicsQueueFamilyIndex;
 
         VkFenceCreateInfo fenceCreateInfo =
         {
@@ -278,10 +279,26 @@ namespace Ayla
             .clipped = VK_TRUE
         };
 
+        VkQueue suitableQueue = VK_NULL_HANDLE;
+        for (uint32_t i = 0; i < m_QueueCount; ++i)
+        {
+            VkBool32 supported;
+            VKR(vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, surface, &supported));
+            if (supported)
+            {
+                vkGetDeviceQueue(m_Device, i, 0, &suitableQueue);
+            }
+        }
+
+        if (suitableQueue == VK_NULL_HANDLE)
+        {
+			throw new InvalidOperationException(TEXT("No suitable queue found for swapchain."));
+        }
+
         VkSwapchainKHR swapchain;
         VKR(vkCreateSwapchainKHR(m_Device, &swapchainCreateInfo, nullptr, &swapchain));
 
-        auto extension = std::make_shared<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo);
+        auto extension = std::make_shared<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo, suitableQueue);
         targetWindow->AddExtension(extension);
         return extension;
     }

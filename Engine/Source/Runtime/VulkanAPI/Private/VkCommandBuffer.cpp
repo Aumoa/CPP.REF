@@ -12,7 +12,7 @@ namespace Ayla
 		{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-			.queueFamilyIndex = (uint32_t)graphics->GetQueueFamilyIndex()
+			.queueFamilyIndex = (uint32_t)graphics->GetGraphicsQueueFamilyIndex()
 		};
 
 		VKR(vkCreateCommandPool(graphics->GetDevice(), &commandPoolCreateInfo, nullptr, &m_CommandPool));

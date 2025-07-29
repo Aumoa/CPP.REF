@@ -18,9 +18,10 @@ namespace Ayla
         VkSurfaceKHR m_Surface;
         VkSwapchainKHR m_Swapchain;
         VkSwapchainCreateInfoKHR m_SwapchainCreateInfoCache;
+        VkQueue m_SuitableQueue;
 
     public:
-        VkSwapchainExt(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain, const VkSwapchainCreateInfoKHR& swapchainCreateInfo);
+        VkSwapchainExt(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain, const VkSwapchainCreateInfoKHR& swapchainCreateInfo, VkQueue suitableQueue);
         virtual ~VkSwapchainExt() noexcept override;
 
         virtual void Present() override;
