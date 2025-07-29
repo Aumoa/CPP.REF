@@ -75,11 +75,6 @@ namespace Ayla
             }
 		};
 
-		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT");
-        if (func)
-        {
-        }
-
         uint32_t gpuCount = 0;
         VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, nullptr));
 
@@ -122,7 +117,6 @@ namespace Ayla
                 PlatformProcess::OutputDebugString(String::Format(TEXT("    {}"), String::FromCodepage(extension.extensionName)));
             }
         }
-
 
         // Find a queue family that supports VK_QUEUE_GRAPHICS_BIT
         uint32_t queueFamilyCount = 0;
