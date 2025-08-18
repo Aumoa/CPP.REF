@@ -35,7 +35,7 @@ public: \
 
 #define GENERATED_BODY__DECLARE_GATHER_PROPERTIES() \
 protected: \
-	static void GatherProperties(PropertyCollector& collection);
+	static void GatherProperties(::Ayla::PropertyCollector& collection);
 
 #define GENERATED_BODY__GATHER_PROPERTIES_PROP(Name) \
 		collector.Add(TEXT(#Name), ::Ayla::PropertyCollector::Advance<This>(&reinterpret_cast<This*>(0)->Name));

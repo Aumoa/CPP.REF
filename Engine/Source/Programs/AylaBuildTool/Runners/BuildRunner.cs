@@ -36,7 +36,7 @@ internal static partial class BuildRunner
             }
 
             var resolver = mp.GetResolver(buildTarget);
-            var depends = solution.FindDepends(resolver.DependencyModuleNames).OfType<ModuleProject>();
+            var depends = solution.FindDepends(resolver.DependencyModuleNames.Append("Launch").Append("VulkanAPI").Append("WindowsAPI")).OfType<ModuleProject>();
             targetProjects = depends.Append(targetProject);
         }
 

@@ -1,6 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Rendering/RenderThread.h"
+#include "Threading/Thread.h"
 #include "Graphics.h"
 
 namespace Ayla
@@ -28,6 +29,8 @@ namespace Ayla
 
 	void RenderThread::ThreadProc(std::shared_ptr<Graphics> graphics)
 	{
+		Thread::GetCurrentThread().SetDescription(TEXT("Render Thread #0"));
+
 		while (true)
 		{
 			auto lock = std::unique_lock{ m_Mtx };
