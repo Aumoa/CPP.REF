@@ -38,7 +38,7 @@ protected: \
 	static void GatherProperties(::Ayla::PropertyCollector& collection);
 
 #define GENERATED_BODY__GATHER_PROPERTIES_PROP(Name) \
-		collector.Add(TEXT(#Name), ::Ayla::PropertyCollector::Advance<This>(&reinterpret_cast<This*>(0)->Name));
+		collector.Add(TEXT(#Name), ::Ayla::PropertyCollector::Advance<This>(&reinterpret_cast<This*>(0)->Name), 0);
 
 #define GENERATED_BODY__IMPL(V1, V2, V3) AYLA__COMBINE_3_MACROS(V1, V2, V3)
 
@@ -49,3 +49,11 @@ protected: \
 #define AFUNCTION(...)
 
 #define rthis (::Ayla::RPtr{ this })
+
+namespace Ayla::Reflection
+{
+	template<class T>
+	using reflexpr_t = T::reflexpr_class;
+}
+
+#define reflexpr(T) ::Ayla::Reflection::reflexpr_t<T>

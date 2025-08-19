@@ -63,6 +63,7 @@
 #include "Reflection/PPtrGather.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/TypeRegister.h"
+#include "Reflection/reflexpr.h"
 
 #include "Diagnostics/Debug.h"
 

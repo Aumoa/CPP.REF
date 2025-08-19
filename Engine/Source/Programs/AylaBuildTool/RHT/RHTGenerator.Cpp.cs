@@ -11,13 +11,16 @@ internal partial class RHTGenerator
         {
             foreach (var property in aclass.Properties)
             {
-                if (collection.FindMatch(property.TypeName, aclass, out var generator, out _) == false)
+                if (property.TypeName.ByRef)
                 {
-                    var context = property.Context;
-                    throw new ParsingErrorException(context.FilePath, context.LineNumber, context.ColumnNumber, $"The requested class \"{property.TypeName.CSharp}\"'s defining header file could not be found in the Reflection header file list.");
-                }
+                    if (collection.FindMatch(property.TypeName, aclass, out var generator, out _) == false)
+                    {
+                        var context = property.Context;
+                        throw new ParsingErrorException(context.FilePath, context.LineNumber, context.ColumnNumber, $"The requested class \"{property.TypeName.CSharp}\"'s defining header file could not be found in the Reflection header file list.");
+                    }
 
-                headers.Add(generator.SourceCode.FilePath);
+                    headers.Add(generator.SourceCode.FilePath);
+                }
             }
         }
 
