@@ -94,18 +94,25 @@ internal static partial class BuildRunner
             }
 
             var engineOutput = solution.EngineGroup.Output(buildTarget, FolderPolicy.PathType.Current);
-            Directory.Delete(engineOutput, true);
+            if (Directory.Exists(engineOutput))
+            {
+                Directory.Delete(engineOutput, true);
+            }
 
             if (solution.PrimaryGroup != null && solution.PrimaryGroup != solution.EngineGroup)
             {
                 var primaryOutput = solution.PrimaryGroup.Output(buildTarget, FolderPolicy.PathType.Current);
-                Directory.Delete(primaryOutput, true);
+                if (Directory.Exists(primaryOutput))
+                {
+                    Directory.Delete(primaryOutput, true);
+                }
             }
 
             await DispatchGenerateHeaderWorkers();
             await GenerateRunner.RunAsync(new GenerateOptions
             {
-                ProjectFile = options.ProjectFile
+                ProjectFile = options.ProjectFile,
+                GeneratorType = options.GeneratorType
             }, cancellationToken);
             return;
         }

@@ -15,6 +15,6 @@ namespace Ayla
 
 	RPtr<Scene> GameInstance::GetEntryScene()
 	{
-		return nullptr;
+		return m_EntryScene ? (RPtr<Scene>)m_EntryScene : New<Scene>();
 	}
 }

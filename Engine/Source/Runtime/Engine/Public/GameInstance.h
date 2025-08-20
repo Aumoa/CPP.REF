@@ -15,6 +15,10 @@ namespace Ayla
 	{
 		GENERATED_BODY()
 
+	private:
+		APROPERTY()
+		PPtr<Scene> m_EntryScene;
+
 	public:
 		GameInstance();
 		virtual ~GameInstance() noexcept override;

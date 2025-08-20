@@ -19,4 +19,7 @@ internal record BuildOptions
 
     [Option("clean", HelpText = "Specifies the policy for retaining existing output files during the build.", Default = CleanOptions.None)]
     public CleanOptions Clean { get; init; }
+
+    [Option('g', "generator")]
+    public GeneratorType GeneratorType { get; init; } = GeneratorType.VisualStudio;
 }

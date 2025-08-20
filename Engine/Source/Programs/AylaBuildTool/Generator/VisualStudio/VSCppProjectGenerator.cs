@@ -48,10 +48,6 @@ internal static class VSCppProjectGenerator
                     Indent(() =>
                     {
                         var rules = ModuleRules.New(project.RuleType, new TargetInfo { Platform = buildConfig.Platform });
-                        if (rules.Type == ModuleType.Game)
-                        {
-                            AppendFormatLine("""<LocalDebuggerCommand>{0}\DotNET\ScriptingLaunch.exe</LocalDebuggerCommand>""", engineGroup.BinariesDirectory);
-                        }
                         AppendFormatLine("""<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>""");
                         AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Current));
                         AppendFormatLine("""<LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>""");
@@ -59,6 +55,10 @@ internal static class VSCppProjectGenerator
                         if (rules.Type == ModuleType.Application)
                         {
                             AppendFormatLine("""<LocalDebuggerCommand>$(OutDir){0}</LocalDebuggerCommand>""", project.Name + ".exe");
+                        }
+                        else if (rules.Type == ModuleType.Game)
+                        {
+                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe --assembly {1}</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
                         }
                         else
                         {
@@ -303,7 +303,7 @@ internal static class VSCppProjectGenerator
                     AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                     Indent(() =>
                     {
-                        var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build {projectPath}--target \"{project.Name}\" --config {buildTarget.Config} {(buildTarget.Editor ? "--editor " : string.Empty)}";
+                        var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build -g VisualStudio {projectPath}--target \"{project.Name}\" --config {buildTarget.Config} {(buildTarget.Editor ? "--editor " : string.Empty)}";
                         AppendFormatLine("""<AdditionalOptions>/std:c++23preview /Zc:preprocessor /exportModule /ifcOutput "{0}" /ifcSearchDir "{0}"</AdditionalOptions>""", outDir);
                         AppendFormatLine("""<NMakePreprocessorDefinitions>{0};PLATFORM_WINDOWS=1</NMakePreprocessorDefinitions>""", pps);
                         AppendFormatLine("""<NMakeBuildCommandLine>dotnet {0}</NMakeBuildCommandLine>""", buildCommand);
