@@ -39,7 +39,7 @@ internal static partial class BuildRunner
 
             var resolver = mp.GetResolver(buildTarget);
             var depends = solution.FindDepends(resolver.DependencyModuleNames.Concat(requiredProjects)).OfType<ModuleProject>();
-            targetProjects = depends.Append(targetProject);
+            targetProjects = depends.Append(targetProject).Distinct();
         }
 
         var installation = Installation.CreateDefaultInstallation();
