@@ -35,8 +35,10 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
+            string[] requiredProjects = ["Engine", "Launch", "VulkanAPI", "WindowsAPI"];
+
             var resolver = mp.GetResolver(buildTarget);
-            var depends = solution.FindDepends(resolver.DependencyModuleNames.Append("Launch").Append("VulkanAPI").Append("WindowsAPI")).OfType<ModuleProject>();
+            var depends = solution.FindDepends(resolver.DependencyModuleNames.Concat(requiredProjects)).OfType<ModuleProject>();
             targetProjects = depends.Append(targetProject);
         }
 
