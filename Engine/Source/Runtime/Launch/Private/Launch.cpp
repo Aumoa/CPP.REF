@@ -3,11 +3,12 @@
 #include "Launch.h"
 #include "Engine.h"
 #include "GenericApplication.h"
+#include "CommandLineParser.h"
 #include "Platform/DynamicLibrary.h"
 
 namespace Ayla
 {
-    Launch::Launch()
+    Launch::Launch(std::unique_ptr<CommandLineParser> args) : m_Args{ std::move(args) }
     {
     }
 
@@ -19,7 +20,7 @@ namespace Ayla
     {
         m_Engine = New<Engine>();
         m_Engine->PreInitialize();
-        m_Engine->Initialize();
+        m_Engine->Initialize(m_Args.get());
 
         auto& app = GenericApplication::Get();
         std::vector<GenericPlatformInputEvent> inputEvents;
@@ -37,7 +38,7 @@ namespace Ayla
         return app.GetExitCode();
     }
 
-    int32 Launch::GuardedMain(std::vector<String> args, DynamicLibrary& api)
+    int32 Launch::GuardedMain(std::unique_ptr<CommandLineParser> args, DynamicLibrary& api)
     {
         return try_([&]()
         {
@@ -55,7 +56,7 @@ namespace Ayla
             }
 
             auto app = std::unique_ptr<GenericApplication>{ loader() };
-            auto launch = New<Launch>();
+            auto launch = New<Launch>(std::move(args));
             return launch->StartApplication();
         })
         .finally_([]()

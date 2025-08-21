@@ -45,7 +45,11 @@ internal static partial class BuildRunner
 
                 foreach (var name in Resolver.DependencyModuleNames)
                 {
-                    await moduleTasks.Where(p => p.Resolver.Name == name).First().Task;
+                    var task = moduleTasks.Where(p => p.Resolver.Name == name).FirstOrDefault();
+                    if (task != null)
+                    {
+                        await task.Task;
+                    }
                 }
 
                 var linker = await installation.SpawnLinkerAsync(targetInfo, cancellationToken);

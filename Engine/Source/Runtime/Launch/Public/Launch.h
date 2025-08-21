@@ -9,6 +9,7 @@ namespace Ayla
 {
 	class Engine;
 	class DynamicLibrary;
+	class CommandLineParser;
 
 	ACLASS()
 	class LAUNCH_API Launch : public Object
@@ -16,17 +17,18 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
+		std::unique_ptr<CommandLineParser> m_Args;
 		APROPERTY()
 		PPtr<Engine> m_Engine;
 
 	protected:
-		Launch();
+		Launch(std::unique_ptr<CommandLineParser> args);
 
 	public:
 		virtual ~Launch() noexcept override;
 
 		virtual int32 StartApplication();
 
-		static int32 GuardedMain(std::vector<String> args, DynamicLibrary& api);
+		static int32 GuardedMain(std::unique_ptr<CommandLineParser> args, DynamicLibrary& api);
 	};
 }

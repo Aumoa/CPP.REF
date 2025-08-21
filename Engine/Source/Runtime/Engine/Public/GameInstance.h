@@ -26,3 +26,12 @@ namespace Ayla
 		virtual RPtr<Scene> GetEntryScene();
 	};
 }
+
+#define DEFINE_GAME_INSTANCE_CLASS(Namespace, ClassName) \
+extern "C" \
+{ \
+	PLATFORM_SHARED_EXPORT ::Ayla::RPtr<::Ayla::GameInstance>* CreateGameInstance__() \
+	{ \
+		return new ::Ayla::RPtr<::Ayla::GameInstance>(::Ayla::Object::New<::Namespace::ClassName>()); \
+	} \
+}

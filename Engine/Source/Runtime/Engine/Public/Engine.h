@@ -11,6 +11,8 @@ namespace Ayla
 	class GenericActivity;
 	class GenericWindowSwapchainExtension;
 	class RenderThread;
+	class GameInstance;
+	class CommandLineParser;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -23,14 +25,23 @@ namespace Ayla
 		std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 		std::unique_ptr<RenderThread> m_RenderThread;
 
+		APROPERTY()
+		PPtr<GameInstance> m_GameInstance;
+
 	public:
 		Engine();
 		virtual ~Engine() noexcept override;
 
 		virtual void PreInitialize();
-		virtual void Initialize();
+		virtual void Initialize(const CommandLineParser* args);
 		virtual void Shutdown();
 
 		virtual void Tick();
+
+	private:
+		void InitializeActivity();
+		void InitializeGraphics();
+		void InitializeGame(const CommandLineParser* args);
+		void PostInitialized();
 	};
 }

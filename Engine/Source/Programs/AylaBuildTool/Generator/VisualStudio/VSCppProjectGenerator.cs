@@ -58,7 +58,7 @@ internal static class VSCppProjectGenerator
                         }
                         else if (rules.Type == ModuleType.Game)
                         {
-                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe --assembly {1}</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows), project.Name);
+                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe --gameassembly "{1}"</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows), project.Group.OutputFileName(installation, rules.TargetInfo, project.Name, rules.Type, FolderPolicy.PathType.Windows));
                         }
                         else
                         {
