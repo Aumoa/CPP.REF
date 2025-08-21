@@ -103,6 +103,7 @@ namespace Ayla
 		virtual ~Object() noexcept;
 
 		String ToString();
+		Type* GetType() const { return m_Type; }
 
 		Object& operator =(const Object&) = delete;
 		Object& operator =(Object&&) = delete;
