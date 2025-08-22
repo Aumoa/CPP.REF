@@ -15,6 +15,7 @@ namespace Ayla
 		std::mutex m_Mtx;
 		std::condition_variable m_Cv;
 		std::queue<std::move_only_function<void()>> m_CompletionActions;
+		std::atomic<bool> m_StopRequested = false;
 
 	public:
 		RenderThread(std::shared_ptr<Graphics> graphics);

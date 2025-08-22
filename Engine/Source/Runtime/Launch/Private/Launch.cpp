@@ -40,7 +40,7 @@ namespace Ayla
 
     int32 Launch::GuardedMain(std::unique_ptr<CommandLineParser> args, DynamicLibrary& api)
     {
-        return try_([&]()
+        return try__
         {
             ThreadPool::Initialize();
 
@@ -58,13 +58,19 @@ namespace Ayla
             auto app = std::unique_ptr<GenericApplication>{ loader() };
             auto launch = New<Launch>(std::move(args));
             return launch->StartApplication();
-        })
-        .finally_([]()
+        }
+        catch (const Exception& e)
+        {
+            Debug::LogCriticalFormat(TEXT("LogException"), e.GetMessage());
+            return -1;
+        }
+        finally__
         {
             GC::Collect();
             GC::WaitForCompleteToFinalize();
             
             ThreadPool::Shutdown();
-        });
+        }
+        end_try__;
     }
 }

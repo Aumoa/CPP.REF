@@ -9,6 +9,7 @@
 #include "CommandLineParser.h"
 #include "Platform/DynamicLibrary.h"
 #include "Rendering/RenderThread.h"
+#include "Exceptions/ModuleNotFoundException.h"
 
 namespace Ayla
 {
@@ -26,10 +27,24 @@ namespace Ayla
 
 	void Engine::Initialize(const CommandLineParser* args)
 	{
-		InitializeActivity();
-		InitializeGraphics();
-		InitializeGame(args);
-		PostInitialized();
+		bool initialized = false;
+		try__
+		{
+			InitializeActivity();
+			InitializeGraphics();
+			InitializeGame(args);
+			PostInitialized();
+			initialized = true;
+		}
+		finally__
+		{
+			if (initialized == false)
+			{
+				m_RenderThread->Dispatch([]() {});
+				m_RenderThread->Join();
+			}
+		}
+		end_try__;
 	}
 
 	void Engine::Shutdown()
@@ -67,9 +82,19 @@ namespace Ayla
 		auto it = options.find(TEXT("gameassembly"));
 		if (it != options.end())
 		{
-			auto gameAssembly = it->second[0];
-			auto lib = DynamicLibrary(gameAssembly.value());
+			auto gameAssembly = it->second[0].value();
+			auto lib = DynamicLibrary(gameAssembly);
+			if (lib.IsValid() == false)
+			{
+				throw ModuleNotFoundException(gameAssembly);
+			}
+
 			auto loader = lib.LoadFunction<RPtr<GameInstance>*>(TEXT("CreateGameInstance__"));
+			if (loader == nullptr)
+			{
+				throw InvalidOperationException(String::Format(TEXT("Failed to load game instance from {0}. Ensure that the GameInstance class is exposed in the assembly via the DEFINE_GAME_INSTANCE_CLASS() macro."), gameAssembly));
+			}
+
 			auto rptrPtr = loader();
 			m_GameInstance = *rptrPtr;
 			delete rptrPtr;

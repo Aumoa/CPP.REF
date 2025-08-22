@@ -56,13 +56,15 @@ internal static class VSCppProjectGenerator
                         {
                             AppendFormatLine("""<LocalDebuggerCommand>$(OutDir){0}</LocalDebuggerCommand>""", project.Name + ".exe");
                         }
-                        else if (rules.Type == ModuleType.Game)
-                        {
-                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe --gameassembly "{1}"</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows), project.Group.OutputFileName(installation, rules.TargetInfo, project.Name, rules.Type, FolderPolicy.PathType.Windows));
-                        }
                         else
                         {
                             AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows));
+                        }
+
+                        if (rules.Type == ModuleType.Game)
+                        {
+                            var outputFileName = project.Group.OutputFileName(installation, buildConfig, project.Name, rules.Type, FolderPolicy.PathType.Windows);
+                            AppendFormatLine("""<LocalDebuggerCommandArguments>--gameassembly "{0}"</LocalDebuggerCommandArguments>""", Path.ChangeExtension(outputFileName, null));
                         }
                     });
                     AppendFormatLine("""</PropertyGroup>""");

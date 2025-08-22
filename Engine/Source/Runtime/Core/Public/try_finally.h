@@ -36,9 +36,8 @@ namespace Ayla
 			{
 				U m_Finally;
 
-				finally_caller(U&& finally_)
+				finally_caller(U&& finally_) : m_Finally{ std::forward<U>(finally_) }
 				{
-					m_Finally = std::forward<U>(finally_);
 				}
 
 				~finally_caller() noexcept
@@ -55,3 +54,7 @@ namespace Ayla
 	template<std::invocable<> T>
 	try_(T) -> try_<T>;
 }
+
+#define try__ try_([&]() { try
+#define finally__ catch (...) { throw; } }).finally_([&]()
+#define end_try__ )

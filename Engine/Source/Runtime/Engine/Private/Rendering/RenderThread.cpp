@@ -24,6 +24,10 @@ namespace Ayla
 
 	void RenderThread::Join()
 	{
+		auto lock = std::unique_lock{ m_Mtx };
+		m_StopRequested = true;
+		m_Cv.notify_one();
+		lock.unlock();
 		m_Thread.join();
 	}
 
@@ -31,12 +35,16 @@ namespace Ayla
 	{
 		Thread::GetCurrentThread().SetDescription(TEXT("Render Thread #0"));
 
-		while (true)
+		while (m_StopRequested == false)
 		{
 			auto lock = std::unique_lock{ m_Mtx };
 			while (m_CompletionActions.empty())
 			{
 				m_Cv.wait(lock);
+				if (m_StopRequested)
+				{
+					break;
+				}
 			}
 
 			auto completionAction = std::move(m_CompletionActions.front());
