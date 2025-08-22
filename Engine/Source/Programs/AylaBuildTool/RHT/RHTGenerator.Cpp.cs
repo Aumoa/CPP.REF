@@ -86,42 +86,42 @@ internal partial class RHTGenerator
                             arguments.Add(parameter.TypeName.CppBindingsArgument(aclass, parameter.Name));
                         }
 
-                        sourceCodeText += $"  PLATFORM_SHARED_EXPORT {function.Return.Cpp} {FunctionName1(function.Name)}({string.Join(", ", parameters)})\n";
-                        sourceCodeText +=  "  {\n";
-                        if (function.Static == false)
-                        {
-                            sourceCodeText += $"   auto& self__ = {Self__()};\n";
-                        }
-                        sourceCodeText += $"   return {CallFunction()};\n";
-                        sourceCodeText +=  "  }\n";
-                        sourceCodeText +=  "\n";
+                        //sourceCodeText += $"  PLATFORM_SHARED_EXPORT {function.Return.Cpp} {FunctionName1(function.Name)}({string.Join(", ", parameters)})\n";
+                        //sourceCodeText +=  "  {\n";
+                        //if (function.Static == false)
+                        //{
+                        //    sourceCodeText += $"   auto& self__ = {Self__()};\n";
+                        //}
+                        //sourceCodeText += $"   return {CallFunction()};\n";
+                        //sourceCodeText +=  "  }\n";
+                        //sourceCodeText +=  "\n";
 
-                        string CallFunction()
-                        {
-                            string prefix;
-                            if (function.Static)
-                            {
-                                prefix = $"::{@namespace}::{@class}::";
-                            }
-                            else
-                            {
-                                prefix = $"self__->";
-                            }
+                        //string CallFunction()
+                        //{
+                        //    string prefix;
+                        //    if (function.Static)
+                        //    {
+                        //        prefix = $"::{@namespace}::{@class}::";
+                        //    }
+                        //    else
+                        //    {
+                        //        prefix = $"self__->";
+                        //    }
 
-                            return $"{prefix}{function.Name}(" + string.Join(", ", arguments) + ")";
-                        }
+                        //    return $"{prefix}{function.Name}(" + string.Join(", ", arguments) + ")";
+                        //}
                     }
                     sourceCodeText +=  "}\n";
                 }
                 
                 sourceCodeText +=  "\n";
 
-                string FunctionName1(string name) => FunctionName(@namespace, @class, name);
+                //string FunctionName1(string name) => FunctionName(@namespace, @class, name);
 
-                string Self__()
-                {
-                    return $"(::Ayla::Marshal::IntPtrToRPtr<::{@namespace}::{@class}>(self_))";
-                }
+                //string Self__()
+                //{
+                //    return $"(::Ayla::Marshal::IntPtrToRPtr<::{@namespace}::{@class}>(self_))";
+                //}
             }
         }
 
