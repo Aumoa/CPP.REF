@@ -1,14 +1,14 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "Actors/Actor.h"
+#include "Rendering/Camera.h"
 
 namespace Ayla
 {
-	Actor::Actor()
+	Camera::Camera() : Super()
 	{
 	}
 
-	Actor::~Actor() noexcept
+	Camera::~Camera() noexcept
 	{
 	}
 }

@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SerializableObject.h"
-#include "Actor.gen.h"
+#include "Components/Behaviour.h"
+#include "Camera.gen.h"
 
 namespace Ayla
 {
 	ACLASS()
-	class ENGINE_API Actor : public SerializableObject
+	class ENGINE_API Camera : public Behaviour
 	{
 		GENERATED_BODY()
 
 	public:
-		Actor();
-		virtual ~Actor() noexcept override;
+		Camera();
+		virtual ~Camera() noexcept override;
 	};
 }

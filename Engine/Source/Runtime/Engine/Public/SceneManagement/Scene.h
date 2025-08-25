@@ -8,13 +8,20 @@
 
 namespace Ayla
 {
+	class GameObject;
+
 	ACLASS()
 	class ENGINE_API Scene : public SerializableObject
 	{
 		GENERATED_BODY()
 
+	private:
+		std::vector<RPtr<GameObject>> m_GameObjects;
+
 	public:
 		Scene();
 		virtual ~Scene() noexcept override;
+
+		RPtr<GameObject> SpawnGameObject();
 	};
 }

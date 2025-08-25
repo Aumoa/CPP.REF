@@ -154,9 +154,9 @@ namespace Ayla
 				xup = XMVector3Cross(xforward, xright);
 
 				XMMATRIX xm;
-				xm.r[0] = xr;
-				xm.r[1] = xu;
-				xm.r[2] = xf;
+				xm.r[0] = xright;
+				xm.r[1] = xup;
+				xm.r[2] = xforward;
 				xm.r[3] = XMVectorSet(0, 0, 0, 1);
 
 				auto xq = XMQuaternionRotationMatrix(xm);
