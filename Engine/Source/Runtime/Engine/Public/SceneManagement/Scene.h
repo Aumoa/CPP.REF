@@ -17,11 +17,19 @@ namespace Ayla
 
 	private:
 		std::vector<RPtr<GameObject>> m_GameObjects;
+		bool m_Active = false;
+		bool m_Disposed = false;
 
 	public:
 		Scene();
 		virtual ~Scene() noexcept override;
 
+		AFUNCTION()
+		void Activate();
+		AFUNCTION()
+		void Destroy();
+
+		AFUNCTION()
 		RPtr<GameObject> SpawnGameObject();
 	};
 }

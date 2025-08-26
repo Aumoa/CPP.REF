@@ -48,6 +48,7 @@
 #include "SystemException.h"
 #include "OperationCanceledException.h"
 #include "ConstructorNotFoundException.h"
+#include "ObjectDisposedException.h"
 #include "Object.h"
 #include "Type.h"
 #include "try_finally.h"

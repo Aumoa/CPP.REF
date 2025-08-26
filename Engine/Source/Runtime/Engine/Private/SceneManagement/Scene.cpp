@@ -13,8 +13,23 @@ namespace Ayla
 	{
 	}
 
+	void Scene::Activate()
+	{
+		ObjectDisposedException::ThrowIfDisposed(m_Disposed, TEXT("Scene"));
+		m_Active = true;
+	}
+
+	void Scene::Destroy()
+	{
+		ObjectDisposedException::ThrowIfDisposed(m_Disposed, TEXT("Scene"));
+		m_GameObjects.clear();
+		m_Active = false;
+		m_Disposed = true;
+	}
+
 	RPtr<GameObject> Scene::SpawnGameObject()
 	{
+		ObjectDisposedException::ThrowIfDisposed(m_Disposed, TEXT("Scene"));
 		auto obj = New<GameObject>();
 		m_GameObjects.emplace_back(obj);
 		return obj;

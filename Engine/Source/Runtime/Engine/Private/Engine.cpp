@@ -10,6 +10,7 @@
 #include "Platform/DynamicLibrary.h"
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
+#include "SceneManagement/SceneManager.h"
 
 namespace Ayla
 {
@@ -104,6 +105,8 @@ namespace Ayla
 		{
 			m_GameInstance = New<GameInstance>();
 		}
+
+		std::ignore = SceneManager::LoadSceneAsync(m_GameInstance->GetEntryScene());
 	}
 
 	void Engine::PostInitialized()

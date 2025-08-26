@@ -6,6 +6,8 @@
 
 namespace Ayla
 {
+	class AssetImporter;
+
 	class ENGINE_API ImportingBackend
 	{
 	protected:
@@ -13,5 +15,7 @@ namespace Ayla
 
 	public:
 		virtual ~ImportingBackend() noexcept;
+
+		virtual std::unique_ptr<AssetImporter> CreateImporter(String filePath) = 0;
 	};
 }

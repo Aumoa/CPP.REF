@@ -79,6 +79,11 @@ namespace Ayla
 			return m_Token;
 		}
 
+		static inline CancellationToken None()
+		{
+			return CancellationToken();
+		}
+
 	private:
 		[[noreturn]]
 		static void ThrowOperationCanceledException();
