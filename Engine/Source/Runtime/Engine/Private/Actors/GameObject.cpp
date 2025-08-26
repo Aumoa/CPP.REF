@@ -5,10 +5,20 @@
 namespace Ayla
 {
 	GameObject::GameObject()
+		: m_Active(true)
 	{
 	}
 
 	GameObject::~GameObject() noexcept
 	{
+	}
+
+	void GameObject::SetActive(bool active)
+	{
+	}
+
+	bool GameObject::IsActiveSelf()
+	{
+		return m_Active;
 	}
 }

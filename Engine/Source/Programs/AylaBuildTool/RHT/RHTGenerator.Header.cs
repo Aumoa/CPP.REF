@@ -33,32 +33,35 @@ internal partial class RHTGenerator
                     headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__reflexpr_class \\\n";
                     headerText += $"struct reflexpr_class\\\n";
                     headerText += $"{{\\\n";
-                    headerText += $"  struct aliased\\\n";
+                    headerText += $"  struct aliased : public ::std::experimental::reflect::reflexpr_aliased\\\n";
                     headerText += $"  {{\\\n";
                     headerText += $"    static constexpr ::Ayla::String name = TEXT(\"{aclass.Class.Name}\");\\\n";
                     headerText += $"    static constexpr ::Ayla::String scope = TEXT(\"{aclass.Class.NamespaceCpp}\");\\\n";
                     headerText += $"  }};\\\n";
                     headerText += $"  \\\n";
-                    headerText += $"  struct members\\\n";
+                    headerText += $"  struct members : public ::std::experimental::reflect::reflexpr_members\\\n";
                     headerText += $"  {{\\\n";
                     foreach (var field in aclass.Properties)
                     {
-                        headerText += $"    static constexpr ::std::experimental::reflect::reflexpr_field<{field.TypeName.Cpp}> {field.Name} = {{}};\\\n";
-                    }
+                    headerText += $"    static consteval auto {field.Name}()\\\n";
+                    headerText += $"    {{\\\n";
+                    headerText += $"      return ::std::experimental::reflect::reflexpr_field<{field.TypeName.Cpp}, offsetof({aclass.Class.Name}, {field.Name})>();\\\n";
+                    headerText += $"    }}\\\n";
                     headerText += $"    \\\n";
+                    }
                     headerText += $"    template<size_t N>\\\n";
                     headerText += $"    static consteval auto get() noexcept\\\n";
                     headerText += $"    {{\\\n";
                     for (int i = 0; i < aclass.Properties.Count; ++i)
                     {
-                        headerText += $"      if constexpr (N == {i})\\\n";
-                        headerText += $"      {{\\\n";
-                        headerText += $"        return {aclass.Properties[i].Name};\\\n";
-                        headerText += $"      }}\\\n";
+                    headerText += $"      if constexpr (N == {i})\\\n";
+                    headerText += $"      {{\\\n";
+                    headerText += $"        return {aclass.Properties[i].Name}();\\\n";
+                    headerText += $"      }}\\\n";
                     }
                     if (aclass.Properties.Count > 0)
                     {
-                        headerText += $"      else\\\n";
+                    headerText += $"      else\\\n";
                     }
                     headerText += $"      {{\\\n";
                     headerText += $"        static_assert(N != N, \"Invalid reflexpr index\");\\\n";
