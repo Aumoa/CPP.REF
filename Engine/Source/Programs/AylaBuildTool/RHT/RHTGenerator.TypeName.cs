@@ -11,7 +11,7 @@ internal partial class RHTGenerator
 {
     public struct TypeName
     {
-        public readonly string Cpp;
+        public readonly string CppBindings;
         public readonly string CSharp;
         public readonly bool IsVoid;
         public readonly string? Namespace;
@@ -19,7 +19,7 @@ internal partial class RHTGenerator
 
         private TypeName(string cpp, string csharp, string? @namespace, bool byRef)
         {
-            Cpp = cpp;
+            CppBindings = cpp;
             CSharp = csharp;
             IsVoid = csharp == "void";
             Namespace = @namespace;
@@ -43,17 +43,17 @@ internal partial class RHTGenerator
             // If a namespace is specified along with the class declaration, the explicit namespace is prioritized.
             if (Namespace != null)
             {
-                return "::" + Namespace + "::" + Cpp;
+                return "::" + Namespace + "::" + CppBindings;
             }
             // Otherwise, it is initially assumed to be the same as the current class's namespace.
             else if (fromClass.Class.NamespaceCpp != "Ayla")
             {
-                return "::" + fromClass.Class.NamespaceCpp + "::" + Cpp;
+                return "::" + fromClass.Class.NamespaceCpp + "::" + CppBindings;
             }
             // Finally, it is assumed to be the engine namespace(Ayla).
             else
             {
-                return "::Ayla::" + Cpp;
+                return "::Ayla::" + CppBindings;
             }
         }
 
@@ -62,21 +62,21 @@ internal partial class RHTGenerator
             // If a namespace is specified along with the class declaration, the explicit namespace is prioritized.
             if (Namespace != null)
             {
-                return "global::" + Namespace + "." + Cpp;
+                return "global::" + Namespace + "." + CppBindings;
             }
             // Otherwise, it is initially assumed to be the same as the current class's namespace.
             else if (fromClass.Class.NamespaceCpp != "Ayla")
             {
-                return "global::" + fromClass.Class.NamespaceCpp + "." + Cpp;
+                return "global::" + fromClass.Class.NamespaceCpp + "." + CppBindings;
             }
             // Finally, it is assumed to be the engine namespace(Ayla).
             else
             {
-                return "global::Ayla." + Cpp;
+                return "global::Ayla." + CppBindings;
             }
         }
 
-        public readonly string CppBindingsParameter => ByRef ? "::Ayla::ssize_t" : Cpp;
+        public readonly string CppBindingsParameter => ByRef ? "::Ayla::ssize_t" : CppBindings;
 
         public string CppBindingsArgument(AClass fromClass, string name)
         {

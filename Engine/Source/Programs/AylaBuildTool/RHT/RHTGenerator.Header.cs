@@ -45,7 +45,17 @@ internal partial class RHTGenerator
                     {
                     headerText += $"    static consteval auto {field.Name}()\\\n";
                     headerText += $"    {{\\\n";
-                    headerText += $"      return ::std::experimental::reflect::reflexpr_field<{field.TypeName.Cpp}, offsetof({aclass.Class.Name}, {field.Name})>();\\\n";
+                    headerText += $"      return ::std::experimental::reflect::reflexpr_field<{field.TypeName.CppBindings}, offsetof({aclass.Class.Name}, {field.Name})>();\\\n";
+                    headerText += $"    }}\\\n";
+                    headerText += $"    \\\n";
+                    }
+                    for (int i = 0; i < aclass.Functions.Count; ++i)
+                    {
+                    var function = aclass.Functions[i];
+                    headerText += $"    static consteval auto {function.Name}__{i}()\\\n";
+                    headerText += $"    {{\\\n";
+                    headerText += $"      using signature_t = {function.Return.CppBindings}({aclass.Class.Name}::*)({string.Join(", ", function.ParameterInfos.Select(p => p.TypeName.CppBindings))});\\\n";
+                    headerText += $"      return ::std::experimental::reflect::reflexpr_method<signature_t, (signature_t)&{aclass.Class.Name}::{function.Name}>();\\\n";
                     headerText += $"    }}\\\n";
                     headerText += $"    \\\n";
                     }
@@ -59,16 +69,23 @@ internal partial class RHTGenerator
                     headerText += $"        return {aclass.Properties[i].Name}();\\\n";
                     headerText += $"      }}\\\n";
                     }
-                    if (aclass.Properties.Count > 0)
+                    for (int i = 0; i < aclass.Functions.Count; ++i)
+                    {
+                    headerText += $"      if constexpr (N == {(aclass.Properties.Count + i)})\\\n";
+                    headerText += $"      {{\\\n";
+                    headerText += $"        return {aclass.Functions[i].Name}__{i}();\\\n";
+                    headerText += $"      }}\\\n";
+                    }
+                    if (aclass.Properties.Count + aclass.Functions.Count > 0)
                     {
                     headerText += $"      else\\\n";
                     }
                     headerText += $"      {{\\\n";
-                    headerText += $"        static_assert(N != N, \"Invalid reflexpr index\");\\\n";
+                    headerText += $"        static_assert(N < {aclass.Properties.Count + aclass.Functions.Count}, \"Invalid reflexpr index\");\\\n";
                     headerText += $"      }}\\\n";
                     headerText += $"    }}\\\n";
                     headerText += $"    \\\n";
-                    headerText += $"    static constexpr size_t tuple_size = {aclass.Properties.Count};\\\n";
+                    headerText += $"    static constexpr size_t tuple_size = {aclass.Properties.Count + aclass.Functions.Count};\\\n";
                     headerText += $"  }};\\\n";
                     headerText += $"}};\n";
                     headerText += $"\n";

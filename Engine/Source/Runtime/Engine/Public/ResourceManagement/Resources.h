@@ -15,7 +15,6 @@ namespace Ayla
 		GENERATED_BODY()
 
 	public:
-		AFUNCTION()
 		static RPtr<StreamableAsset> Load(String filePath);
 	};
 }

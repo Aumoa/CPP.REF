@@ -19,14 +19,14 @@ internal partial class RHTGenerator
 
         public bool FindMatch(TypeName typeName, AClass current, [NotNullWhen(true)] out RHTGenerator? generator, [NotNullWhen(true)] out AClass? @class)
         {
-            if (m_Group.TryGetValue(typeName.Cpp, out var generators))
+            if (m_Group.TryGetValue(typeName.CppBindings, out var generators))
             {
                 var pairs = generators.SelectMany(p => p.Classes, (a, b) => (a, b));
 
                 // If a namespace is specified along with the class declaration, the explicit namespace is prioritized.
                 if (typeName.Namespace != null)
                 {
-                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.NamespaceCpp == typeName.Namespace);
+                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.CppBindings && p.b.Class.NamespaceCpp == typeName.Namespace);
                     if (match.a != null)
                     {
                         generator = match.a;
@@ -37,7 +37,7 @@ internal partial class RHTGenerator
                 else
                 {
                     // Otherwise, it is initially assumed to be the same as the current class's namespace.
-                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.NamespaceCpp == current.Class.NamespaceCpp);
+                    var match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.CppBindings && p.b.Class.NamespaceCpp == current.Class.NamespaceCpp);
                     if (match.a != null)
                     {
                         generator = match.a;
@@ -46,7 +46,7 @@ internal partial class RHTGenerator
                     }
 
                     // Finally, it is assumed to be the engine namespace(Ayla).
-                    match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.Cpp && p.b.Class.NamespaceCpp == "Ayla");
+                    match = pairs.FirstOrDefault(p => p.b.Class.Name == typeName.CppBindings && p.b.Class.NamespaceCpp == "Ayla");
                     if (match.a != null)
                     {
                         generator = match.a;
