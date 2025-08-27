@@ -65,6 +65,7 @@
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/TypeRegister.h"
 #include "Reflection/reflexpr.h"
+#include "Reflection/TransferFunction.h"
 
 #include "Diagnostics/Debug.h"
 

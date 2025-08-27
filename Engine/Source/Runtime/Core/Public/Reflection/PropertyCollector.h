@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Reflection/PPtrGather.h"
+#include "Reflection/reflexpr.h"
 #include <memory>
 #include <span>
 
@@ -19,6 +20,17 @@ namespace Ayla
 	public:
 		PropertyCollector() noexcept = default;
 		PropertyCollector(const PropertyCollector&) = delete;
+
+		template<std::reflect::is_reflexpr_field T>
+		inline void Transfer(T&&)
+		{
+			using element_t = std::reflect::get_field_type_t<T>;
+			if constexpr (std::derived_from<element_t, Object>)
+			{
+				using ptr_t = PPtr<element_t>;
+				m_PPtrMembers.emplace_back(PPtrGather<>::template Get<ptr_t>(), std::reflect::get_field_offset_v<T>);
+			}
+		}
 
 		template<std::derived_from<BasePtr> T>
 		inline void Add(String name, T* offset, int)

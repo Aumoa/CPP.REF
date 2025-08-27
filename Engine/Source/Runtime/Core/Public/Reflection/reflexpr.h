@@ -31,6 +31,11 @@ namespace std::inline experimental::reflect
 	{
 	};
 
+	template<class T>
+	struct get_field_offset
+	{
+	};
+
 
 	struct reflexpr_aliased
 	{
@@ -79,6 +84,24 @@ namespace std::inline experimental::reflect
 		using type = T::field_type;;
 	};
 
+	template<is_reflexpr_field T>
+	struct get_field_offset<T>
+	{
+		static constexpr size_t value = T::offset;
+	};
+
+
+	template<class T, T Pointer>
+	struct reflexpr_method : public reflexpr_member
+	{
+		using is_reflexpr_method = int;
+		using function_type = T;
+		static constexpr T pointer = Pointer;
+	};
+
+	template<class T>
+	concept is_reflexpr_method = std::same_as<typename T::is_reflexpr_method, int>;
+
 
 	struct reflexpr_members
 	{
@@ -122,6 +145,9 @@ namespace std::inline experimental::reflect
 
 	template<class T> requires requires { { T::scope } -> std::same_as<Ayla::String>; }
 	constexpr ::Ayla::String get_scope_v = T::scope;
+
+	template<class T> requires requires { { T::value } -> std::same_as<size_t>; }
+	constexpr size_t get_field_offset_v = T::value;
 }
 
 namespace std

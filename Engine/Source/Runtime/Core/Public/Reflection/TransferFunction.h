@@ -1,0 +1,24 @@
+// Copyright 2020-2025 Aumoa.lib. All right reserved.
+
+#pragma once
+
+#include <concepts>
+#include "Reflection/reflexpr.h"
+
+namespace Ayla
+{
+	struct TransferFunction_reflexpr_field_null : public std::experimental::reflect::reflexpr_field<int, 0>
+	{
+	};
+
+	struct TransferFunction_reflexpr_method_null : public std::experimental::reflect::reflexpr_method<void(*)(), static_cast<void(*)()>(0)>
+	{
+	};
+
+	template<class T>
+	concept TransferFunction = requires(T&& transfer)
+	{
+		{ transfer.Transfer(std::declval<TransferFunction_reflexpr_field_null>()) } -> std::same_as<void>;
+		{ transfer.Transfer(std::declval<TransferFunction_reflexpr_method_null>()) } -> std::same_as<void>;
+	};
+}
