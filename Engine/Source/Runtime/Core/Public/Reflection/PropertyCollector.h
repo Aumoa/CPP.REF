@@ -22,7 +22,7 @@ namespace Ayla
 		PropertyCollector(const PropertyCollector&) = delete;
 
 		template<std::reflect::is_reflexpr_field T>
-		inline void Transfer(T&&)
+		inline void Transfer()
 		{
 			using element_t = std::reflect::get_field_type_t<T>;
 			if constexpr (std::derived_from<element_t, Object>)
@@ -30,6 +30,11 @@ namespace Ayla
 				using ptr_t = PPtr<element_t>;
 				m_PPtrMembers.emplace_back(PPtrGather<>::template Get<ptr_t>(), std::reflect::get_field_offset_v<T>);
 			}
+		}
+
+		template<std::reflect::is_reflexpr_method T>
+		inline void Transfer()
+		{
 		}
 
 		template<std::derived_from<BasePtr> T>

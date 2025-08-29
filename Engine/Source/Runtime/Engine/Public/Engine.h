@@ -38,6 +38,22 @@ namespace Ayla
 
 		virtual void Tick();
 
+		template<TransferFunction F>
+		constexpr void Transfer(F&& transfer)
+		{
+			using class_t = reflexpr(Engine);
+			using members_t = std::reflect::get_data_members_t<class_t>;
+			Transfer2(std::forward<F>(transfer), std::make_index_sequence<std::tuple_size_v<members_t>>{});
+		}
+
+		template<TransferFunction F, std::size_t... I>
+		constexpr void Transfer2(F&& transfer, std::index_sequence<I...>&&)
+		{
+			using class_t = reflexpr(Engine);
+			using members_t = std::reflect::get_data_members_t<class_t>;
+			((transfer.template Transfer<std::tuple_element_t<I, members_t>>(), 0) + ...);
+		}
+
 	private:
 		void InitializeActivity();
 		void InitializeGraphics();

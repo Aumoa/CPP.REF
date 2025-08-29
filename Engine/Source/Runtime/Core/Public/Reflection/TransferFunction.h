@@ -18,7 +18,7 @@ namespace Ayla
 	template<class T>
 	concept TransferFunction = requires(T&& transfer)
 	{
-		{ transfer.Transfer(std::declval<TransferFunction_reflexpr_field_null>()) } -> std::same_as<void>;
-		{ transfer.Transfer(std::declval<TransferFunction_reflexpr_method_null>()) } -> std::same_as<void>;
+		{ transfer.template Transfer<TransferFunction_reflexpr_field_null>() } -> std::same_as<void>;
+		{ transfer.template Transfer<TransferFunction_reflexpr_method_null>() } -> std::same_as<void>;
 	};
 }

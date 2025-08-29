@@ -146,8 +146,8 @@ namespace std::inline experimental::reflect
 	template<class T> requires requires { { T::scope } -> std::same_as<Ayla::String>; }
 	constexpr ::Ayla::String get_scope_v = T::scope;
 
-	template<class T> requires requires { { T::value } -> std::same_as<size_t>; }
-	constexpr size_t get_field_offset_v = T::value;
+	template<class T> requires requires { { get_field_offset<T>::value } -> std::convertible_to<size_t>; }
+	constexpr size_t get_field_offset_v = get_field_offset<T>::value;
 }
 
 namespace std

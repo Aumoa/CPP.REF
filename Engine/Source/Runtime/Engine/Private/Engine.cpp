@@ -36,6 +36,9 @@ namespace Ayla
 			InitializeGame(args);
 			PostInitialized();
 			initialized = true;
+
+			PropertyCollector c;
+			Transfer(c);
 		}
 		finally__
 		{
