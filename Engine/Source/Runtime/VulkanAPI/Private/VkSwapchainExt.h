@@ -25,6 +25,7 @@ namespace Ayla
         virtual ~VkSwapchainExt() noexcept override;
 
         virtual void Present() override;
+        virtual void Destroy() override;
 
         virtual void OnResize(const Vector2N& newSize) override;
 

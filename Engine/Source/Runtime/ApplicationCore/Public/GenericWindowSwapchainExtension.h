@@ -16,5 +16,6 @@ namespace Ayla
         virtual ~GenericWindowSwapchainExtension() noexcept;
 
         virtual void Present() = 0;
+        virtual void Destroy() = 0;
     };
 }

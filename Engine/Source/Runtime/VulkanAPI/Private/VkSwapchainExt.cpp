@@ -16,10 +16,7 @@ namespace Ayla
 
     VkSwapchainExt::~VkSwapchainExt() noexcept
     {
-        CleanupSwapChain();
-
-        vkDestroySurfaceKHR(m_Owner->GetInstance(), m_Surface, nullptr);
-        m_Surface = nullptr;
+        checkf(m_Surface == nullptr, TEXT("Swapchain does not destroyed."));
     }
 
     void VkSwapchainExt::Present()
@@ -37,7 +34,16 @@ namespace Ayla
             .pSwapchains = &m_Swapchain,
             .pImageIndices = &imageIndex
         };
-        VKR(vkQueuePresentKHR(m_SuitableQueue, &presentInfo));
+
+        VKR(vkQueuePresentKHR(m_SuitableQueue, &presentInfo), VK_ERROR_SURFACE_LOST_KHR, VK_ERROR_OUT_OF_DATE_KHR);
+    }
+
+    void VkSwapchainExt::Destroy()
+    {
+        CleanupSwapChain();
+
+        vkDestroySurfaceKHR(m_Owner->GetInstance(), m_Surface, nullptr);
+        m_Surface = nullptr;
     }
 
     void VkSwapchainExt::OnResize(const Vector2N& newSize)

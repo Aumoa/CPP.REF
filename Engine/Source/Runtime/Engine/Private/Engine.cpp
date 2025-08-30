@@ -28,32 +28,31 @@ namespace Ayla
 
 	void Engine::Initialize(const CommandLineParser* args)
 	{
-		bool initialized = false;
-		try__
+		try
 		{
 			InitializeActivity();
 			InitializeGraphics();
 			InitializeGame(args);
 			PostInitialized();
-			initialized = true;
-
-			PropertyCollector c;
-			Transfer(c);
 		}
-		finally__
+		catch (...)
 		{
-			if (initialized == false)
-			{
-				m_RenderThread->Dispatch([]() {});
-				m_RenderThread->Join();
-			}
+			Shutdown();
+			throw;
 		}
-		end_try__;
 	}
 
 	void Engine::Shutdown()
 	{
-		m_RenderThread->Join();
+		m_RenderThread->RequestStop();
+
+		for (auto& swapchain : m_SwapchainExtensions)
+		{
+			swapchain->Destroy();
+		}
+
+		m_SwapchainExtensions.clear();
+		m_Graphics.reset();
 	}
 
 	void Engine::Tick()

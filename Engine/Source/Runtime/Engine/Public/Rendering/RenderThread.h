@@ -13,7 +13,8 @@ namespace Ayla
 	private:
 		std::thread m_Thread;
 		std::mutex m_Mtx;
-		std::condition_variable m_Cv;
+		std::condition_variable m_Request;
+		std::condition_variable m_Notify;
 		std::queue<std::move_only_function<void()>> m_CompletionActions;
 		std::atomic<bool> m_StopRequested = false;
 
@@ -22,7 +23,7 @@ namespace Ayla
 		~RenderThread() noexcept;
 
 		void Dispatch(std::move_only_function<void()> completionAction);
-		void Join();
+		void RequestStop();
 
 	private:
 		void ThreadProc(std::shared_ptr<Graphics> graphics);

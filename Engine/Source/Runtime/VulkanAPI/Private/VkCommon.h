@@ -14,8 +14,8 @@
 #include <vulkan/vk_enum_string_helper.h>
 #include <format>
 
-#define VKR(expr) \
-if (auto VKR_res__ = (expr); VKR_res__ != VK_SUCCESS) \
+#define VKR(expr, ...) \
+if (auto VKR_res__ = (expr); VkrFailure __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>) (VKR_res__)) \
 { \
     throw ::Ayla::InvalidOperationException(String::Format(TEXT("{}"), VKR_res__)); \
 }
@@ -33,6 +33,19 @@ struct std::formatter<T, wchar_t> : public std::formatter<::Ayla::String, wchar_
 
 DECLARE_FORMATTER(VkResult);
 DECLARE_FORMATTER(VkFormat);
+
+template<VkResult... Excepts_>
+constexpr bool VkrFailure(VkResult result) noexcept
+{
+    if constexpr (sizeof...(Excepts_) == 0)
+    {
+        return result != VK_SUCCESS;
+	}
+    else
+    {
+	    return result != VK_SUCCESS && ((result != Excepts_) && ...);
+    }
+}
 
 template<class T, void(*DestroyFunction)(T, const VkAllocationCallbacks*)>
 class VkRef

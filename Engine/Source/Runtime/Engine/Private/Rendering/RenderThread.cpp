@@ -18,15 +18,16 @@ namespace Ayla
 	void RenderThread::Dispatch(std::move_only_function<void()> completionAction)
 	{
 		auto lock = std::unique_lock{ m_Mtx };
+		m_Notify.wait(lock, [&]() { return m_CompletionActions.size() < 2; });
 		m_CompletionActions.emplace(std::move(completionAction));
-		m_Cv.notify_one();
+		m_Request.notify_one();
 	}
 
-	void RenderThread::Join()
+	void RenderThread::RequestStop()
 	{
 		auto lock = std::unique_lock{ m_Mtx };
 		m_StopRequested = true;
-		m_Cv.notify_one();
+		m_Request.notify_one();
 		lock.unlock();
 		m_Thread.join();
 	}
@@ -38,13 +39,10 @@ namespace Ayla
 		while (m_StopRequested == false)
 		{
 			auto lock = std::unique_lock{ m_Mtx };
-			while (m_CompletionActions.empty())
+			m_Request.wait(lock, [&]() { return !m_CompletionActions.empty() || m_StopRequested; });
+			if (m_StopRequested)
 			{
-				m_Cv.wait(lock);
-				if (m_StopRequested)
-				{
-					break;
-				}
+				break;
 			}
 
 			auto completionAction = std::move(m_CompletionActions.front());
@@ -53,6 +51,9 @@ namespace Ayla
 			lock.unlock();
 
 			completionAction();
+
+			lock.lock();
+			m_Notify.notify_one();
 		}
 	}
 }
