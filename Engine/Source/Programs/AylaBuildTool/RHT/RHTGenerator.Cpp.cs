@@ -59,10 +59,7 @@ internal partial class RHTGenerator
                     sourceCodeText += $"  void {@class}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
                     sourceCodeText +=  "  {\n";
                     sourceCodeText +=  "    Super::GatherProperties(collector);\n";
-                    foreach (var property in aclass.Properties)
-                    {
-                        sourceCodeText += $"    GENERATED_BODY__GATHER_PROPERTIES_PROP({property.Name});\n";
-                    }
+                    sourceCodeText += $"    Transfer(collector);\n";
                     sourceCodeText +=  "  }\n";
                     sourceCodeText +=  "}\n\n";
                     sourceCodeText +=  "extern \"C\"\n";
@@ -85,43 +82,11 @@ internal partial class RHTGenerator
                             parameters.Add($"{parameter.TypeName.CppBindingsParameter} {parameter.Name}");
                             arguments.Add(parameter.TypeName.CppBindingsArgument(aclass, parameter.Name));
                         }
-
-                        //sourceCodeText += $"  PLATFORM_SHARED_EXPORT {function.Return.Cpp} {FunctionName1(function.Name)}({string.Join(", ", parameters)})\n";
-                        //sourceCodeText +=  "  {\n";
-                        //if (function.Static == false)
-                        //{
-                        //    sourceCodeText += $"   auto& self__ = {Self__()};\n";
-                        //}
-                        //sourceCodeText += $"   return {CallFunction()};\n";
-                        //sourceCodeText +=  "  }\n";
-                        //sourceCodeText +=  "\n";
-
-                        //string CallFunction()
-                        //{
-                        //    string prefix;
-                        //    if (function.Static)
-                        //    {
-                        //        prefix = $"::{@namespace}::{@class}::";
-                        //    }
-                        //    else
-                        //    {
-                        //        prefix = $"self__->";
-                        //    }
-
-                        //    return $"{prefix}{function.Name}(" + string.Join(", ", arguments) + ")";
-                        //}
                     }
                     sourceCodeText +=  "}\n";
                 }
                 
                 sourceCodeText +=  "\n";
-
-                //string FunctionName1(string name) => FunctionName(@namespace, @class, name);
-
-                //string Self__()
-                //{
-                //    return $"(::Ayla::Marshal::IntPtrToRPtr<::{@namespace}::{@class}>(self_))";
-                //}
             }
         }
 

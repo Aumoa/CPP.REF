@@ -37,6 +37,27 @@ public: \
 protected: \
 	static void GatherProperties(::Ayla::PropertyCollector& collection);
 
+#define GENERATED_BODY__DECLARE_TRANSFER() \
+public: \
+	template<::Ayla::TransferFunction F> \
+	static constexpr void Transfer(F&& transfer) \
+	{ \
+		using class_t = reflexpr(This); \
+		using members_t = std::reflect::get_data_members_t<class_t>; \
+		Transfer2(std::forward<F>(transfer), std::make_index_sequence<std::tuple_size_v<members_t>>{}); \
+	} \
+	\
+	template<::Ayla::TransferFunction F, std::size_t... I> \
+	static constexpr void Transfer2(F&& transfer, std::index_sequence<I...>&&) \
+	{ \
+		if constexpr (sizeof...(I) > 0) \
+		{ \
+			using class_t = reflexpr(This); \
+			using members_t = std::reflect::get_data_members_t<class_t>; \
+			((transfer.template Transfer<std::tuple_element_t<I, members_t>>(), 0) + ...); \
+		} \
+	}
+
 #define GENERATED_BODY__GATHER_PROPERTIES_PROP(Name) \
 		collector.Add(TEXT(#Name), ::Ayla::PropertyCollector::Advance<This>(&reinterpret_cast<This*>(0)->Name), 0);
 

@@ -92,7 +92,9 @@ internal partial class RHTGenerator
                     headerText += $"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber} \\\n";
                     headerText += $"  GENERATED_BODY__DEFAULT_BODY({aclass.Class.Name}) \\\n";
                     headerText += $"  GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__reflexpr_class\\\n";
-                    headerText += $"  GENERATED_BODY__DECLARE_GATHER_PROPERTIES()\n\n";
+                    headerText += $"  GENERATED_BODY__DECLARE_GATHER_PROPERTIES()\\\n";
+                    headerText += $"  GENERATED_BODY__DECLARE_TRANSFER()\\\n";
+                    headerText += $"private:\n";
                 }
             }
         }

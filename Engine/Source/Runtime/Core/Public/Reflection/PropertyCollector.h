@@ -37,17 +37,6 @@ namespace Ayla
 		{
 		}
 
-		template<std::derived_from<BasePtr> T>
-		inline void Add(String name, T* offset, int)
-		{
-			m_PPtrMembers.emplace_back(PPtrGather<>::template Get<T>(), (size_t)offset);
-		}
-
-		template<class T>
-		inline void Add(String name, T* offset, short)
-		{
-		}
-
 		PropertyCollector& operator =(const PropertyCollector&) = delete;
 
 		template<class U, class T>
