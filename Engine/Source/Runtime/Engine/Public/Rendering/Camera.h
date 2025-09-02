@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/Behaviour.h"
+#include "Components/Behavior.h"
 #include "Camera.gen.h"
 
 namespace Ayla
 {
 	ACLASS()
-	class ENGINE_API Camera : public Behaviour
+	class ENGINE_API Camera : public Behavior
 	{
 		GENERATED_BODY()
 

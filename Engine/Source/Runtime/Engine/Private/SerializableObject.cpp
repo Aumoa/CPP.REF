@@ -11,4 +11,8 @@ namespace Ayla
 	SerializableObject::~SerializableObject() noexcept
 	{
 	}
+
+	void SerializableObject::MarkDirty()
+	{
+	}
 }

@@ -7,11 +7,15 @@
 
 namespace Ayla
 {
-	struct TransferFunction_reflexpr_field_null : public std::experimental::reflect::reflexpr_field<int, 0>
+	struct TransferFunction_reflexpr_field_null : public std::reflect::reflexpr_field<int, 0>
 	{
 	};
 
-	struct TransferFunction_reflexpr_method_null : public std::experimental::reflect::reflexpr_method<void(*)(), static_cast<void(*)()>(0)>
+	struct TransferFunction_reflexpr_method_null : public std::reflect::reflexpr_method<void(*)(), static_cast<void(*)()>(0)>
+	{
+	};
+
+	struct TransferFunction_reflexpr_constructor_null : public std::reflect::reflexpr_constructor<void(*)(), static_cast<void(*)()>(0)>
 	{
 	};
 
@@ -20,5 +24,6 @@ namespace Ayla
 	{
 		{ transfer.template Transfer<TransferFunction_reflexpr_field_null>() } -> std::same_as<void>;
 		{ transfer.template Transfer<TransferFunction_reflexpr_method_null>() } -> std::same_as<void>;
+		{ transfer.template Transfer<TransferFunction_reflexpr_constructor_null>() } -> std::same_as<void>;
 	};
 }

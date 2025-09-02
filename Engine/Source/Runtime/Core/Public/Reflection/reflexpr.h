@@ -102,6 +102,17 @@ namespace std::inline experimental::reflect
 	template<class T>
 	concept is_reflexpr_method = std::same_as<typename T::is_reflexpr_method, int>;
 
+	
+	template<class T, T Pointer>
+	struct reflexpr_constructor : public reflexpr_member
+	{
+		using is_reflexpr_constructor = int;
+		static constexpr T pointer = Pointer;
+	};
+
+	template<class T>
+	concept is_reflexpr_constructor = std::same_as<typename T::is_reflexpr_constructor, int>;
+
 
 	struct reflexpr_members
 	{

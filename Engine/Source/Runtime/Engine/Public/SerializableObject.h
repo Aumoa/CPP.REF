@@ -15,5 +15,7 @@ namespace Ayla
 	public:
 		SerializableObject();
 		virtual ~SerializableObject() noexcept override;
+
+		void MarkDirty();
 	};
 }

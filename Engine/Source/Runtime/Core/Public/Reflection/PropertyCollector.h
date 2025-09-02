@@ -37,6 +37,11 @@ namespace Ayla
 		{
 		}
 
+		template<std::reflect::is_reflexpr_constructor T>
+		inline void Transfer()
+		{
+		}
+
 		PropertyCollector& operator =(const PropertyCollector&) = delete;
 
 		template<class U, class T>

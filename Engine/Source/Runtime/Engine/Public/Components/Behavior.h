@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/Component.h"
-#include "Behaviour.gen.h"
+#include "Behavior.gen.h"
 
 namespace Ayla
 {
 	ACLASS()
-	class ENGINE_API Behaviour : public Component
+	class ENGINE_API Behavior : public Component
 	{
 		GENERATED_BODY()
 
@@ -18,8 +18,8 @@ namespace Ayla
 		bool m_Enabled = true;
 
 	public:
-		Behaviour();
-		virtual ~Behaviour() noexcept override;
+		Behavior();
+		virtual ~Behavior() noexcept override;
 
 		void SetEnabled(bool value);
 		bool IsEnabled() const noexcept { return m_Enabled; }

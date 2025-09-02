@@ -3,26 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SerializableObject.h"
+#include "NamedObject.h"
 #include "GameObject.gen.h"
 
 namespace Ayla
 {
+	class Component;
+
 	ACLASS()
-	class ENGINE_API GameObject : public SerializableObject
+	class ENGINE_API GameObject : public NamedObject
 	{
 		GENERATED_BODY()
 
 	private:
-		bool m_Active;
+		APROPERTY()
+		bool m_IsActive;
 
 	public:
 		GameObject();
 		virtual ~GameObject() noexcept override;
 
-		AFUNCTION()
 		void SetActive(bool active);
-		AFUNCTION()
-		bool IsActiveSelf();
+		bool IsActiveSelf() const { return m_IsActive; }
 	};
 }
