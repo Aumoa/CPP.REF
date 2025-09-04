@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System;
+using AylaEngine.RHT.Types;
 
 namespace AylaEngine;
 
@@ -36,7 +37,7 @@ internal static partial class BuildRunner
             return this;
         }
 
-        public async Task<bool> TryGenerateAsync(RHTGenerator.Collection collection, TargetInfo targetInfo, CancellationToken cancellationToken = default)
+        public async Task<bool> TryGenerateAsync(TypeNames collection, TargetInfo targetInfo, CancellationToken cancellationToken = default)
         {
             if (Generator == null)
             {
@@ -50,7 +51,7 @@ internal static partial class BuildRunner
             var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
 
             Directory.CreateDirectory(Path.Combine(intDir, "Bindings"));
-            var headerText = Generator.GenerateHeader().Replace("\r\n", "\n");
+            var headerText = Generator.GenerateHeader(collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
 
             var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n");

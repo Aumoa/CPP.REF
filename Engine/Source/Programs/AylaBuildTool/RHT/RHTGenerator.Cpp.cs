@@ -1,25 +1,23 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using AylaEngine.RHT.Syntaxes;
+using AylaEngine.RHT.Types;
+
 namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
-    public string GenerateSourceCode(RHTGenerator.Collection collection)
+    public string GenerateSourceCode(TypeNames collection)
     {
         List<string> headers = [];
         foreach (var aclass in Classes)
         {
             foreach (var property in aclass.Properties)
             {
-                if (property.TypeName.ByRef)
+                var type = collection.FindClass(property.Variable.TypeName, aclass.Class);
+                if (type is ClassName className)
                 {
-                    if (collection.FindMatch(property.TypeName, aclass, out var generator, out _) == false)
-                    {
-                        var context = property.Context;
-                        throw new ParsingErrorException(context.FilePath, context.LineNumber, context.ColumnNumber, $"The requested class \"{property.TypeName.CSharp}\"'s defining header file could not be found in the Reflection header file list.");
-                    }
-
-                    headers.Add(generator.SourceCode.FilePath);
+                    headers.Add(className.Source.SourceCode.FilePath);
                 }
             }
         }
@@ -42,49 +40,32 @@ internal partial class RHTGenerator
 
         foreach (var syntax in m_Syntaxes)
         {
-            if (syntax is AClass aclass)
+            if (syntax is SAClass aclass)
             {
                 var lineNumber = aclass.LineNumber;
 
-                string @namespace = aclass.Class.NamespaceCpp;
+                string @namespace = string.Join("::", aclass.Class.Namespaces.Select(p => p.Name));
                 string @class = aclass.Class.Name;
 
                 sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {@class});\n";
                 sourceCodeText += $"\n";
 
-                if (aclass.Body != null)
+                if (@class == "Object")
                 {
-                    sourceCodeText += $"namespace {@namespace}\n";
-                    sourceCodeText +=  "{\n";
-                    sourceCodeText += $"  void {@class}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
-                    sourceCodeText +=  "  {\n";
-                    sourceCodeText +=  "    Super::GatherProperties(collector);\n";
-                    sourceCodeText += $"    Transfer(collector);\n";
-                    sourceCodeText +=  "  }\n";
-                    sourceCodeText +=  "}\n\n";
-                    sourceCodeText +=  "extern \"C\"\n";
-                    sourceCodeText +=  "{\n";
-                    foreach (var function in aclass.Functions)
-                    {
-                        List<string> parameters = [];
-                        List<string> arguments = [];
-
-                        IEnumerable<string> parametersWithSelf = parameters;
-                        IEnumerable<string> argumentsWithSelf = arguments;
-
-                        if (function.Static == false)
-                        {
-                            parameters.Add("::Ayla::ssize_t self_");
-                        }
-
-                        foreach (var parameter in function.ParameterInfos)
-                        {
-                            parameters.Add($"{parameter.TypeName.CppBindingsParameter} {parameter.Name}");
-                            arguments.Add(parameter.TypeName.CppBindingsArgument(aclass, parameter.Name));
-                        }
-                    }
-                    sourceCodeText +=  "}\n";
+                    continue;
                 }
+
+                sourceCodeText += $"namespace {@namespace}\n";
+                sourceCodeText +=  "{\n";
+                sourceCodeText += $"  void {@class}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
+                sourceCodeText +=  "  {\n";
+                sourceCodeText +=  "    Super::GatherProperties(collector);\n";
+                sourceCodeText += $"    Transfer(collector);\n";
+                sourceCodeText +=  "  }\n";
+                sourceCodeText +=  "}\n\n";
+                sourceCodeText +=  "extern \"C\"\n";
+                sourceCodeText +=  "{\n";
+                sourceCodeText +=  "}\n";
                 
                 sourceCodeText +=  "\n";
             }

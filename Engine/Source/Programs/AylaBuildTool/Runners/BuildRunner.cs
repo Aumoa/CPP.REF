@@ -1,4 +1,6 @@
-﻿using static AylaEngine.CppCompiler;
+﻿using AylaEngine.RHT;
+using AylaEngine.RHT.Types;
+using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
 
@@ -211,33 +213,31 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
-            RHTGenerator.Collection generators;
+            TypeNames collection;
             {
                 Dictionary<string, List<RHTGenerator>> dict = [];
+                List<TypeName> typeNames = new();
                 foreach (var result in results)
                 {
                     if (result.Generator != null)
                     {
                         foreach (var @class in result.Generator.Classes)
                         {
-                            var cname = @class.Class.Name;
-                            if (dict.TryGetValue(cname, out var list) == false)
-                            {
-                                list = new List<RHTGenerator>();
-                                dict.Add(cname, list);
-                            }
-
-                            list.Add(result.Generator);
+                            typeNames.Add(new ClassName(
+                                new NamespaceName(@class.Class.Namespaces.Select(p => p.Name).ToArray()),
+                                @class.Class.Name,
+                                result.Generator
+                            ));
                         }
                     }
                 }
 
-                generators = new RHTGenerator.Collection(dict);
+                collection = new TypeNames(typeNames.ToArray());
             }
 
             foreach (var result in results)
             {
-                if (await result.TryGenerateAsync(generators, buildTarget, cancellationToken) == false)
+                if (await result.TryGenerateAsync(collection, buildTarget, cancellationToken) == false)
                 {
                     continue;
                 }

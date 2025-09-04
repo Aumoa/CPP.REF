@@ -14,7 +14,6 @@
 #include <vector>
 #include <functional>
 #include <typeinfo>
-#include "Object.gen.h"
 
 namespace Ayla
 {

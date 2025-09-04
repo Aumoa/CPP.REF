@@ -23,7 +23,9 @@ namespace Ayla
 		GameObject();
 		virtual ~GameObject() noexcept override;
 
+		AFUNCTION()
 		void SetActive(bool active);
+		AFUNCTION()
 		bool IsActiveSelf() const { return m_IsActive; }
 	};
 }

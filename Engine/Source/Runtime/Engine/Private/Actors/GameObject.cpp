@@ -5,7 +5,7 @@
 namespace Ayla
 {
 	GameObject::GameObject()
-		: m_IsActive(true)
+		: m_IsActive{ false }
 	{
 	}
 
