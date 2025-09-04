@@ -10,7 +10,7 @@ internal record SClass(
     string? DllSpec,
     char? EscapeBracket,
     SNamespace[] Namespaces,
-    string Base
+    STypeName? Base
     ) : Syntax(Context, EscapeBracket)
 {
     public override string ToString()
@@ -38,7 +38,8 @@ internal record SClass(
         ReadOnlySpan<char> name;
         var capture = context.Capture();
         char? escapeBracket = null;
-        string @base = string.Empty;
+        string? @base = null;
+        CapturedContext baseContext = default;
         switch (context.SelectExport(0, "{", ";", ":"))
         {
             case 0:
@@ -50,6 +51,7 @@ internal record SClass(
                 break;
             case 2:
                 name = context.Export(0, ":").Trim();
+                baseContext = context.Capture();
                 var inheritanceStr = context.Export(0, "{");
                 var inheritances = inheritanceStr.ToString().Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 @base = inheritances[0].Replace("public ", string.Empty);
@@ -73,7 +75,7 @@ internal record SClass(
             clsname = name.ToString();
         }
 
-        @class = new SClass(capture, clsname, dllspec, escapeBracket, bracketStack.OfType<SNamespace>().ToArray(), @base);
+        @class = new SClass(capture, clsname, dllspec, escapeBracket, bracketStack.OfType<SNamespace>().ToArray(), @base == null ? null : new STypeName(baseContext, [new STypeName.Part(STypeName.PartType.Name, @base)]));
         return true;
     }
 }

@@ -24,11 +24,6 @@ internal partial class RHTGenerator
             .ToUpper();
     }
 
-    private static string FunctionName(string @namespace, string @class, string name)
-    {
-        return $"Injected__{@namespace}__{@class}__{name}";
-    }
-
     public static async Task<RHTGenerator?> ParseAsync(SourceCodeDescriptor sourceCode, CancellationToken cancellationToken = default)
     {
         var headerFileName = Path.GetFileNameWithoutExtension(sourceCode.FilePath);

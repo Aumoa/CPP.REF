@@ -77,7 +77,7 @@ internal class BuiltinTypeName : TypeName
         Kinds.String => "string",
         Kinds.Single => "float",
         Kinds.Double => "double",
-        Kinds.Object => "object",
+        Kinds.Object => "global::Ayla.Object",
         _ => throw TerminateException.Arguments()
     };
 

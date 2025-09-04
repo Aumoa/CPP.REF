@@ -18,11 +18,27 @@ internal class TypeNames(TypeName[] customTypeNames)
         TypeName.String,
         TypeName.Single,
         TypeName.Double,
+        TypeName.Object,
         ArrayTypeName.GenericTypeDefinition,
         PPtrTypeName.GenericTypeDefinition,
         RPtrTypeName.GenericTypeDefinition,
         .. customTypeNames
     ];
+
+    public ClassName FindClass(SClass @class)
+    {
+        string tid = @class.Namespaces.Length == 0
+            ? "global::" + @class.Name
+            : "global::" + string.Join(".", @class.Namespaces.Select(p => p.Name)) + "." + @class.Name;
+
+        var found = All.OfType<ClassName>().FirstOrDefault(t => t.Id == tid);
+        if (found == null)
+        {
+            throw @class.Context.ParsingError($"Type Error: The type '{tid}' is not registered as a known type.");
+        }
+
+        return found;
+    }
 
     public TypeName FindClass(STypeName typeName, SClass declaringType)
     {
@@ -72,6 +88,13 @@ internal class TypeNames(TypeName[] customTypeNames)
                 {
                     break;
                 }
+            }
+
+            if (found == null)
+            {
+                // Find in the default namespace.
+                var nestedName = new NamespaceName("Ayla").CSharp(csName);
+                found = All.FirstOrDefault(t => t.Id == nestedName);
             }
         }
 

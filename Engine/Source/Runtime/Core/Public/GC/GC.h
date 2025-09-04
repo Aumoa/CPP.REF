@@ -13,7 +13,6 @@
 #include <chrono>
 #include <thread>
 #include <map>
-#include "GC.gen.h"
 
 namespace Ayla
 {

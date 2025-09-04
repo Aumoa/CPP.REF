@@ -48,14 +48,17 @@ internal static partial class BuildRunner
             var intDir = Project.Group.Intermediate(Project.Name, targetInfo, FolderPolicy.PathType.Current);
             var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
             var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
-            var generatedBindingCode = Path.Combine(intDir, "Bindings", fileName + ".bindings.cs");
+            var generatedBindingCode = Path.Combine(Project.SourceDirectory, "Script", "Bindings", fileName + ".bindings.cs");
 
-            Directory.CreateDirectory(Path.Combine(intDir, "Bindings"));
+            Directory.CreateDirectory(Path.Combine(Project.SourceDirectory, "Script", "Bindings"));
             var headerText = Generator.GenerateHeader(collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
 
             var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
+
+            var csText = Generator.GenerateCSharp(collection).Replace("\r\n", "\n");
+            await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, csText, cancellationToken);
 
             GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Group, Project.Name, generatedSourceCode, Project.Group.IntermediateDirectory);
             return true;

@@ -1,6 +1,7 @@
 # C# project intermediate file
 **/obj/
 **/Scripts/*.csproj
+**/Script/Bindings/*.bindings.cs
 
 Intermediate
 Binaries
