@@ -255,6 +255,73 @@ internal static partial class BuildRunner
                 }
             }
 
+            var projects = results.Where(p => p.Generator != null || p.Project.Name == "Core").GroupBy(p => p.Project);
+            foreach (var g in projects)
+            {
+                var project = g.Key;
+                var csprojPath = project.ScriptProjectFileName;
+
+                string projectReferences = string.Empty;
+                var resolver = project.GetResolver(buildTarget);
+
+                var depends = solution.FindDepends(resolver.DependencyModuleNames).OfType<ModuleProject>().ToArray();
+                if (depends.Length > 0)
+                {
+                    projectReferences += "\n";
+                    projectReferences += "  <ItemGroup>\n";
+                    foreach (var depend in GetParents(depends.Select(p => p.Name)).Distinct())
+                    {
+                        projectReferences += $"    <ProjectReference Include=\"{depend.ScriptProjectFileName}\" />\n";
+                    }
+                    projectReferences += "  </ItemGroup>\n";
+
+                    IEnumerable<ModuleProject> GetParents(IEnumerable<string> current)
+                    {
+                        foreach (var item in solution.FindDepends(current).OfType<ModuleProject>())
+                        {
+                            if (projects.Any(p => p.Key == item))
+                            {
+                                yield return item;
+                            }
+                            else
+                            {
+                                var resolver2 = item.GetResolver(buildTarget);
+                                foreach (var parent in GetParents(resolver2.DependencyModuleNames))
+                                {
+                                    yield return parent;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                string csprojText = $"""
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>{project.ScriptAssemblyName}</AssemblyName>
+    <RootNamespace>{project.Group.Name}.Script</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+{projectReferences}
+  <ItemGroup>
+    <Using Include="Ayla.Object">
+      <Alias>Object</Alias>
+    </Using>
+  </ItemGroup>
+
+</Project>
+
+""".Replace("\r\n", "\n");
+
+                await TextFileHelper.WriteIfChangedAsync(csprojPath, csprojText, cancellationToken);
+                project.ScriptProjectWriten = true;
+            }
+
             Console.WriteLine(" Done.");
         }
 

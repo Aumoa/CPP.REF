@@ -105,4 +105,6 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
     public string ScriptAssemblyName => Name + ".Script";
 
     public string ScriptProjectFileName => Path.Combine(ScriptSourceDirectory, ScriptAssemblyName + ".csproj");
+
+    public bool ScriptProjectWriten { get; set; }
 }

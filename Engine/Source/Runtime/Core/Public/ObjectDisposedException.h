@@ -10,17 +10,8 @@ namespace Ayla
 	class CORE_API ObjectDisposedException : public Exception
 	{
 	public:
-		ObjectDisposedException(String objectName)
-			: Exception(String::Format(TEXT("{0} is already disposed."), objectName))
-		{
-		}
+		ObjectDisposedException(String objectName);
 
-		static void ThrowIfDisposed(bool disposed, String objectName)
-		{
-			if (disposed)
-			{
-				throw ObjectDisposedException(objectName);
-			}
-		}
+		static void ThrowIfDisposed(bool disposed, String objectName);
 	};
 }
