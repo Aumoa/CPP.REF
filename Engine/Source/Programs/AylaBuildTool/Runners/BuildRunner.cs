@@ -295,6 +295,19 @@ internal static partial class BuildRunner
                     }
                 }
 
+                string namespaceName;
+                if (project.Group == solution.EngineGroup)
+                {
+                    namespaceName = "Ayla";
+                }
+                else
+                {
+                    namespaceName = project.Group.Name;
+                }
+
+                var platforms = string.Join(';', Enum.GetValues<Architecture>().Select(p => VSUtility.GetArchitectureName(p)));
+                var configurations = string.Join(';', TargetInfo.GetAllTargets().Select(p => VSUtility.GetConfigName(p)));
+
                 string csprojText = $"""
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -304,8 +317,12 @@ internal static partial class BuildRunner
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>{project.ScriptAssemblyName}</AssemblyName>
-    <RootNamespace>{project.Group.Name}.Script</RootNamespace>
+    <RootNamespace>{namespaceName}</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	<PublishAot>True</PublishAot>
+    <Configurations>{configurations}</Configurations>
+    <Platforms>{platforms}</Platforms>
   </PropertyGroup>
 {projectReferences}
   <ItemGroup>
@@ -319,7 +336,6 @@ internal static partial class BuildRunner
 """.Replace("\r\n", "\n");
 
                 await TextFileHelper.WriteIfChangedAsync(csprojPath, csprojText, cancellationToken);
-                project.ScriptProjectWriten = true;
             }
 
             Console.WriteLine(" Done.");

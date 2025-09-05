@@ -228,6 +228,10 @@ internal class VSSolutionGenerator : Generator
                     break;
                 case ModuleProject mp:
                     WriteModuleProject(mp);
+                    if (mp.IsScriptable())
+                    {
+                        WriteScriptProject(mp);
+                    }
                     break;
                 default:
                     throw new InvalidOperationException();
@@ -237,6 +241,12 @@ internal class VSSolutionGenerator : Generator
         void WriteProgramProject(ProgramProject project)
         {
             builder.AppendFormat("Project(\"{0}\") = \"{1}\", \"{2}\", \"{3}\"\n", CSharpProjectGuid.ToString("B").ToUpper(), project.Name, project.ProjectFilePath.Replace('/', '\\'), project.Decl.Guid.ToString("B").ToUpper());
+            builder.AppendFormat("EndProject\n");
+        }
+
+        void WriteScriptProject(ModuleProject project)
+        {
+            builder.AppendFormat("Project(\"{0}\") = \"{1}.Script\", \"{2}\", \"{3}\"\n", CSharpProjectGuid.ToString("B").ToUpper(), project.Name, project.ScriptProjectFileName.Replace('/', '\\'), project.Decl.ScriptGuid.ToString("B").ToUpper());
             builder.AppendFormat("EndProject\n");
         }
 

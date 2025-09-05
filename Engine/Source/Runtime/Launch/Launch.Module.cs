@@ -7,6 +7,7 @@ public class Launch : ModuleRules
 {
     public Launch()
     {
+        Scriptable = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore", "Engine");

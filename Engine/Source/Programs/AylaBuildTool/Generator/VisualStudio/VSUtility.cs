@@ -4,7 +4,9 @@ namespace AylaEngine;
 
 internal class VSUtility
 {
-    public static string GetArchitectureName(TargetInfo value) => value.Platform.Architecture switch
+    public static string GetArchitectureName(TargetInfo value) => GetArchitectureName(value.Platform.Architecture);
+
+    public static string GetArchitectureName(Architecture value) => value switch
     {
         Architecture.X64 => "x64",
         _ => throw new InvalidOperationException()

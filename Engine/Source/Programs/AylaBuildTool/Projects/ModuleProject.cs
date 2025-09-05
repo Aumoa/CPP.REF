@@ -55,6 +55,11 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
         return rules;
     }
 
+    public bool IsScriptable()
+    {
+        return TargetInfo.GetAllTargets().Any(t => GetRule(t).Scriptable);
+    }
+
     public ModuleRulesResolver GetResolver(ITargetInfo targetInfo)
     {
         ModuleRulesResolver? resolver;
@@ -105,6 +110,4 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
     public string ScriptAssemblyName => Name + ".Script";
 
     public string ScriptProjectFileName => Path.Combine(ScriptSourceDirectory, ScriptAssemblyName + ".csproj");
-
-    public bool ScriptProjectWriten { get; set; }
 }

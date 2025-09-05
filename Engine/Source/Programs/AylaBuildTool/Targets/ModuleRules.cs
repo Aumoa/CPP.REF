@@ -43,6 +43,8 @@ public class ModuleRules
 
     public ModuleType Type { get; protected init; } = ModuleType.Library;
 
+    public bool Scriptable { get; protected init; }
+
     public string Name => GetType().Name;
 
     public void AddPublicIncludePaths(params string[] items)
