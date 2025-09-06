@@ -16,14 +16,22 @@ public struct ObjectReferenceWrapper
             return null;
         }
 
-        if (Handle == 0)
+        Object.BeginWriteGCHandle(InstanceId);
+        try
         {
-            return (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [InstanceId], null);
+            if (Handle == 0)
+            {
+                return (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [InstanceId], null);
+            }
+            else
+            {
+                var handle = GCHandle.FromIntPtr(Handle);
+                return handle.Target as T;
+            }
         }
-        else
+        finally
         {
-            var handle = GCHandle.FromIntPtr(Handle);
-            return handle.Target as T;
+            Object.EndWriteGCHandle(InstanceId);
         }
     }
 }

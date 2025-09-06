@@ -152,3 +152,16 @@ namespace Ayla
 		((Object*)instancePtr)->m_GCHandle = gcHandle;
 	}
 }
+
+extern "C"
+{
+	PLATFORM_SHARED_EXPORT void Ayla__Object__BeginWriteGCHandle(void* self)
+	{
+		::Ayla::Object::s_RootCollection.m_Mutex.lock();
+	}
+
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self)
+	{
+		::Ayla::Object::s_RootCollection.m_Mutex.unlock();
+	}
+}

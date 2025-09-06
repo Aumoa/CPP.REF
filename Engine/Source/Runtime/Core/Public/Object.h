@@ -16,6 +16,12 @@
 #include <functional>
 #include <typeinfo>
 
+extern "C"
+{
+	PLATFORM_SHARED_EXPORT void Ayla__Object__BeginWriteGCHandle(void* self);
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self);
+}
+
 namespace Ayla
 {
 	template<class T>
@@ -33,6 +39,8 @@ namespace Ayla
 		friend TypeRegister;
 		friend Type;
 		friend RuntimeType;
+		friend void ::Ayla__Object__BeginWriteGCHandle(void* self);
+		friend void ::Ayla__Object__EndWriteGCHandle(void* self);
 
 	public:
 		using This = Object;
@@ -52,6 +60,8 @@ namespace Ayla
 		{
 			friend ::Ayla::GC;
 			friend Object;
+			friend void ::Ayla__Object__BeginWriteGCHandle(void* self);
+			friend void ::Ayla__Object__EndWriteGCHandle(void* self);
 
 			static constexpr size_t G1Size = 8192;
 			static constexpr size_t G2Size = 65536;
