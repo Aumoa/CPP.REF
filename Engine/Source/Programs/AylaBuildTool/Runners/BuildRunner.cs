@@ -295,6 +295,18 @@ internal static partial class BuildRunner
                     }
                 }
 
+                string nugetPackages = string.Empty;
+                if (resolver.Rules.Scriptable.NuGetPackages.Count > 0)
+                {
+                    nugetPackages += "\n";
+                    nugetPackages += "  <ItemGroup>\n";
+                    foreach (var pkg in resolver.Rules.Scriptable.NuGetPackages)
+                    {
+                        nugetPackages += $"    <PackageReference Include=\"{pkg.Id}\" Version=\"{pkg.Version}\" />\n";
+                    }
+                    nugetPackages += "  </ItemGroup>\n";
+                }
+
                 string namespaceName;
                 if (project.Group == solution.EngineGroup)
                 {
@@ -307,12 +319,14 @@ internal static partial class BuildRunner
 
                 var platforms = string.Join(';', Enum.GetValues<Architecture>().Select(p => VSUtility.GetArchitectureName(p)));
                 var configurations = string.Join(';', TargetInfo.GetAllTargets().Select(p => VSUtility.GetConfigName(p)));
+                string outputType = project.IsExecutable() ? "Exe" : "Library";
+                var outputs = project.Group.Output(buildTarget, FolderPolicy.PathType.Windows);
 
                 string csprojText = $"""
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+    <OutputType>{outputType}</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -320,11 +334,13 @@ internal static partial class BuildRunner
     <RootNamespace>{namespaceName}</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	<PublishAot>True</PublishAot>
     <Configurations>{configurations}</Configurations>
     <Platforms>{platforms}</Platforms>
+    <OutputPath>{outputs}</OutputPath>
   </PropertyGroup>
-{projectReferences}
+{nugetPackages}{projectReferences}
   <ItemGroup>
     <Using Include="Ayla.Object">
       <Alias>Object</Alias>

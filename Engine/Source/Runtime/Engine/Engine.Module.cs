@@ -7,7 +7,7 @@ public class Engine : ModuleRules
 {
     public Engine()
     {
-        Scriptable = true;
+        Scriptable.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics", "RenderCore");

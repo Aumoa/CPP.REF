@@ -27,36 +27,32 @@ internal class MSLinker : Linker
         m_CommandBuilder.Clear();
 
         var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, module.Rules.Scriptable.Enabled, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
-        switch (module.Rules.Type)
+        if (module.Rules.IsSharedLibrary())
         {
-            case ModuleType.Library:
-            case ModuleType.Game:
-                m_CommandBuilder.Append(
-                    // Suppresses display of sign-on banner.
-                    "/nologo " +
-                    // Create a DLL.
-                    "/DLL " +
-                    // Set output file name.
-                    $"/OUT:{outputFileName} " +
-                    // Create debug symbols.
-                    "/DEBUG "
-                );
-                break;
-            case ModuleType.Application:
-                m_CommandBuilder.Append(
-                    // Suppresses display of sign-on banner.
-                    "/nologo " +
-                    // Set output file name.
-                    $"/OUT:{outputFileName} " +
-                    // Create debug symbols.
-                    "/DEBUG "
-                );
-                break;
-            default:
-                throw TerminateException.Internal();
+            m_CommandBuilder.Append(
+                // Suppresses display of sign-on banner.
+                "/nologo " +
+                // Create a DLL.
+                "/DLL " +
+                // Set output file name.
+                $"/OUT:{outputFileName} " +
+                // Create debug symbols.
+                "/DEBUG "
+            );
+        }
+        else
+        {
+            m_CommandBuilder.Append(
+                // Suppresses display of sign-on banner.
+                "/nologo " +
+                // Set output file name.
+                $"/OUT:{outputFileName} " +
+                // Create debug symbols.
+                "/DEBUG "
+            );
         }
 
         for (int i = 0; i < sourceObjects.Length; ++i)

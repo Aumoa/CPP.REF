@@ -3,11 +3,11 @@
 #include "Object.h"
 #include "Type.h"
 #include "TypeNotFoundException.h"
-#include "InteropServices/Marshal.h"
 #include "Platform/PlatformAtomics.h"
 #include "Reflection/TypeRegister.h"
 #include "Reflection/TypeCollector.h"
 #include "Reflection/ReflectionMacros.h"
+#include "Reflection/Marshal.h"
 #include "GC/GCPtr.Impl.h"
 
 namespace Ayla
@@ -149,7 +149,14 @@ namespace Ayla
 	void Object::RegisterWeakReferenceHandle(ssize_t instancePtr, ssize_t gcHandle)
 	{
 		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
-		auto ptr = Marshal::IntPtrToRPtr(instancePtr);
-		ptr->m_GCHandle = gcHandle;
+		((Object*)instancePtr)->m_GCHandle = gcHandle;
+	}
+}
+
+extern "C"
+{
+	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__GetInstanceId_Injected(::Ayla::ssize_t self)
+	{
+		return reinterpret_cast<::Ayla::Object*>(self)->GetInstanceId();
 	}
 }

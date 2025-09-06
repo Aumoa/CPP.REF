@@ -104,6 +104,8 @@ namespace Ayla
 		String ToString();
 		Type* GetType() const { return m_Type; }
 
+		ssize_t GetInstanceId() const { return reinterpret_cast<ssize_t>(this); }
+
 		Object& operator =(const Object&) = delete;
 		Object& operator =(Object&&) = delete;
 

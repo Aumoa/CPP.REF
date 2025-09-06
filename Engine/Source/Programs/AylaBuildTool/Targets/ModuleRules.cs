@@ -43,9 +43,9 @@ public class ModuleRules
 
     public ModuleType Type { get; protected init; } = ModuleType.Library;
 
-    public bool Scriptable { get; protected init; }
-
     public string Name => GetType().Name;
+
+    public ScriptRule Scriptable { get; } = new();
 
     public void AddPublicIncludePaths(params string[] items)
     {
@@ -175,4 +175,6 @@ public class ModuleRules
             ConstructorArgs.s_TargetInfo.Value = null!;
         }
     }
+
+    public bool IsSharedLibrary() => Type is ModuleType.Library or ModuleType.Game || Scriptable.Enabled;
 }

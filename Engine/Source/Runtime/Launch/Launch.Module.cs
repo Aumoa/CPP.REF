@@ -7,7 +7,8 @@ public class Launch : ModuleRules
 {
     public Launch()
     {
-        Scriptable = true;
+        Scriptable.Enabled = true;
+        Scriptable.NuGetPackages.Add("CommandLineParser, Version=2.9.1");
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore", "Engine");

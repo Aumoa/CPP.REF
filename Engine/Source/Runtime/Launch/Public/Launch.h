@@ -27,6 +27,7 @@ namespace Ayla
 	public:
 		virtual ~Launch() noexcept override;
 
+		AFUNCTION()
 		virtual int32 StartApplication();
 
 		static int32 GuardedMain(std::unique_ptr<CommandLineParser> args, DynamicLibrary& api);

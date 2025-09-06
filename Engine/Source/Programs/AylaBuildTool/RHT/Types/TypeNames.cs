@@ -40,13 +40,13 @@ internal class TypeNames(TypeName[] customTypeNames)
         return found;
     }
 
-    public TypeName FindClass(STypeName typeName, SClass declaringType)
+    public TypeName FindType(STypeName typeName, SClass declaringType)
     {
         using var iterator = ((IList<STypeName.Part>)typeName.NameParts).GetEnumerator();
-        return FindClass(typeName, iterator, declaringType);
+        return FindType(typeName, iterator, declaringType);
     }
 
-    private TypeName FindClass(STypeName typeName, IEnumerator<STypeName.Part> iterator, SClass declaringType)
+    private TypeName FindType(STypeName typeName, IEnumerator<STypeName.Part> iterator, SClass declaringType)
     {
         List<STypeName.Part> parts = [];
         List<TypeName> genericArguments = [];
@@ -60,7 +60,7 @@ internal class TypeNames(TypeName[] customTypeNames)
             else if (current.Type == STypeName.PartType.TemplateBegin)
             {
                 parts.Add(current);
-                genericArguments.Add(FindClass(typeName, iterator, declaringType));
+                genericArguments.Add(FindType(typeName, iterator, declaringType));
                 parts.Add(iterator.Current);
             }
             else

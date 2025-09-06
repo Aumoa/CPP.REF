@@ -25,22 +25,14 @@ internal class GccLinker : Linker
         var linkCommands = new StringBuilder();
 
         var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, module.Rules.Scriptable.Enabled, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
-        switch (module.Rules.Type)
+        if (module.Rules.IsSharedLibrary())
         {
-            case ModuleType.Library:
-            case ModuleType.Game:
-                linkCommands.Append(
-                    "-shared "
-                );
-                break;
-            case ModuleType.Application:
-                linkCommands.Append(
-                    string.Empty
-                );
-                break;
+            linkCommands.Append(
+                "-shared "
+            );
         }
 
         for (int i = 0; i < sourceObjects.Length; ++i)

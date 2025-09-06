@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
                 string inherit = string.Empty;
                 if (@base != null)
                 {
-                    var baseClass = typeNames.FindClass(@base, aclass.Class);
+                    var baseClass = typeNames.FindType(@base, aclass.Class);
                     inherit = $" : {baseClass.CSharpName}";
                 }
 
@@ -44,21 +44,14 @@ using System.Runtime.InteropServices;
 
                 Indented(() =>
                 {
-                    foreach (var field in aclass.Properties)
+                    for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
-                        var fieldType = typeNames.FindClass(field.Variable.TypeName, aclass.Class);
-                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\")]");
-                        sourceCode += IndentedLine($"private static extern {fieldType.CSharpName} get_{field.Variable.Name}_Injected(nint self);");
-                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\")]");
-                        sourceCode += IndentedLine($"private static extern void set_{field.Variable.Name}_Injected(nint self, {fieldType.CSharpName} value);");
-                    }
-
-                    foreach (var function in aclass.Functions)
-                    {
-                        var returnType = typeNames.FindClass(function.ReturnType, aclass.Class);
-                        var parameterTypes = function.Parameters.Select(p => typeNames.FindClass(p.Variable.TypeName, aclass.Class)).ToArray();
+                        var function = aclass.Functions[i];
+                        var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
+                        var parameterTypes = function.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
                         var parameterDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
-                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\")]");
+                        string functionFullName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
+                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{functionFullName}\")]");
                         sourceCode += IndentedLine($"private static extern {returnType.CSharpName} {function.Name}_Injected(nint self{(parameterDeclare.Length > 0 ? ", " : string.Empty)}{parameterDeclare});");
                     }
                 });

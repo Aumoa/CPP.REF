@@ -58,7 +58,7 @@ internal class BuiltinTypeName : TypeName
 
     public override string BindingName => Kind switch
     {
-        Kinds.Void => throw User("A type cannot be void type."),
+        Kinds.Void => "void",
         Kinds.String => "const wchar_t*",
         Kinds.Object => "void*",
         _ => CppName

@@ -48,7 +48,7 @@ internal partial class RHTGenerator
                 headerText += $"  {{\\\n";
                 foreach (var field in aclass.Properties)
                 {
-                var fieldType = typeNames.FindClass(field.Variable.TypeName, aclass.Class);
+                var fieldType = typeNames.FindType(field.Variable.TypeName, aclass.Class);
                 headerText += $"    static consteval auto {field.Variable.Name}()\\\n";
                 headerText += $"    {{\\\n";
                 headerText += $"      /*{fieldType.Id} {field.Variable.Name}*/\\\n";
@@ -59,9 +59,9 @@ internal partial class RHTGenerator
                 for (int i = 0; i < aclass.Functions.Count; ++i)
                 {
                 var function = aclass.Functions[i];
-                var returnType = typeNames.FindClass(function.ReturnType, aclass.Class);
+                var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                 var parameterTypes = function.Parameters
-                    .Select(p => typeNames.FindClass(p.Variable.TypeName, aclass.Class))
+                    .Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class))
                     .ToArray();
                 headerText += $"    static consteval auto {function.Name}__{i}()\\\n";
                 headerText += $"    {{\\\n";

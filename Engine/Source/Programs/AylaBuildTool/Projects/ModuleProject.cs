@@ -57,7 +57,12 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
 
     public bool IsScriptable()
     {
-        return TargetInfo.GetAllTargets().Any(t => GetRule(t).Scriptable);
+        return TargetInfo.GetAllTargets().Any(t => GetRule(t).Scriptable.Enabled);
+    }
+
+    public bool IsExecutable()
+    {
+        return TargetInfo.GetAllTargets().Any(t => GetRule(t).Type == ModuleType.Application);
     }
 
     public ModuleRulesResolver GetResolver(ITargetInfo targetInfo)

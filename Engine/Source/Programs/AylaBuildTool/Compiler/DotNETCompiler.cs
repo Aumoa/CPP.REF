@@ -13,7 +13,6 @@ internal class DotNETCompiler
     {
         var allSourceFiles = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
         string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
-        var outputFile = group.OutputFileName(installation, targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
         var objDir = Path.GetFullPath(Path.Combine(sourceDirectory, "obj"));
         var binDir = Path.GetFullPath(Path.Combine(sourceDirectory, "bin"));
 
@@ -56,59 +55,6 @@ internal class DotNETCompiler
             var current = SourceCodeCache.MakeCachedSimple(sourceFile, null);
             current.SaveCached(cacheFileName);
         }
-    }
-
-    public static bool NeedCompile(Installation installation, string projectFile, GroupDescriptor group, TargetInfo targetInfo)
-    {
-        string? sourceDirectory = Path.GetDirectoryName(projectFile);
-        if (sourceDirectory == null)
-        {
-            return true;
-        }
-
-        string assemblyName = Path.GetFileNameWithoutExtension(projectFile);
-        return NeedCompile(installation, sourceDirectory, assemblyName, group, targetInfo);
-    }
-
-    public static bool NeedCompile(Installation installation, string sourceDirectory, string assemblyName, GroupDescriptor group, TargetInfo targetInfo)
-    {
-        string intDir = group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
-        var outputFile = group.OutputFileName(installation, targetInfo, assemblyName, ModuleType.Library, FolderPolicy.PathType.Current);
-        var objDir = Path.GetFullPath(Path.Combine(sourceDirectory, "obj"));
-        if (File.Exists(outputFile) == false)
-        {
-            return true;
-        }
-
-        if (Directory.Exists(intDir) == false)
-        {
-            return true;
-        }
-
-        HashSet<string> cacheFiles = [];
-        cacheFiles.AddRange(Directory.GetFiles(intDir, "*.cache", SearchOption.TopDirectoryOnly));
-
-        foreach (var sourceFile in GatherSourceCodes(installation, sourceDirectory, assemblyName, group, targetInfo))
-        {
-            var relativeFileName = Path.GetRelativePath(sourceDirectory, sourceFile);
-            var fileId = relativeFileName.Replace(Path.DirectorySeparatorChar, '_');
-            var cacheFileName = Path.Combine(intDir, fileId + ".cache");
-            if (File.Exists(cacheFileName) == false)
-            {
-                return true;
-            }
-
-            var current = SourceCodeCache.MakeCachedSimple(sourceFile, null);
-            var cache = SourceCodeCache.LoadCached(cacheFileName);
-            if (cache.IsModified(current))
-            {
-                return true;
-            }
-
-            cacheFiles.Remove(cacheFileName);
-        }
-
-        return cacheFiles.Count > 0;
     }
 
     public async Task<string> CompileAsync(Installation installation, string sourceDirectory, string assemblyName, string projectDescription, GroupDescriptor group, TargetInfo targetInfo, CancellationToken cancellationToken = default)
