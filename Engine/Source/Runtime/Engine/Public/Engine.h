@@ -39,9 +39,12 @@ namespace Ayla
 		virtual void Tick();
 
 	private:
+		AFUNCTION()
 		void InitializeActivity();
+		AFUNCTION()
 		void InitializeGraphics();
 		void InitializeGame(const CommandLineParser* args);
+		AFUNCTION()
 		void PostInitialized();
 	};
 }
