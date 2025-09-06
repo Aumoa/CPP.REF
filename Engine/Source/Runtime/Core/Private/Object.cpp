@@ -160,8 +160,9 @@ extern "C"
 		::Ayla::Object::s_RootCollection.m_Mutex.lock();
 	}
 
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self)
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self, ::Ayla::ssize_t handle)
 	{
+		((::Ayla::Object*)self)->m_GCHandle = handle;
 		::Ayla::Object::s_RootCollection.m_Mutex.unlock();
 	}
 }

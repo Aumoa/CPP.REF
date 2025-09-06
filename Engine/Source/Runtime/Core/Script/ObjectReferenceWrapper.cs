@@ -17,21 +17,25 @@ public struct ObjectReferenceWrapper
         }
 
         Object.BeginWriteGCHandle(InstanceId);
+        GCHandle handle = default;
         try
         {
-            if (Handle == 0)
+            if (Handle != 0)
             {
-                return (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [InstanceId], null);
+                handle = GCHandle.FromIntPtr(Handle);
+                if (handle.Target is T t)
+                {
+                    return t;
+                }
             }
-            else
-            {
-                var handle = GCHandle.FromIntPtr(Handle);
-                return handle.Target as T;
-            }
+
+            var inst = (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [InstanceId], null);
+            handle = GCHandle.Alloc(inst, GCHandleType.Weak);
+            return inst;
         }
         finally
         {
-            Object.EndWriteGCHandle(InstanceId);
+            Object.EndWriteGCHandle(InstanceId, (nint)handle);
         }
     }
 }

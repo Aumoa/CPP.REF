@@ -19,7 +19,7 @@
 extern "C"
 {
 	PLATFORM_SHARED_EXPORT void Ayla__Object__BeginWriteGCHandle(void* self);
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self);
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self, ::Ayla::ssize_t handle);
 }
 
 namespace Ayla
@@ -40,7 +40,7 @@ namespace Ayla
 		friend Type;
 		friend RuntimeType;
 		friend void ::Ayla__Object__BeginWriteGCHandle(void* self);
-		friend void ::Ayla__Object__EndWriteGCHandle(void* self);
+		friend void ::Ayla__Object__EndWriteGCHandle(void* self, ssize_t handle);
 
 	public:
 		using This = Object;
@@ -61,7 +61,7 @@ namespace Ayla
 			friend ::Ayla::GC;
 			friend Object;
 			friend void ::Ayla__Object__BeginWriteGCHandle(void* self);
-			friend void ::Ayla__Object__EndWriteGCHandle(void* self);
+			friend void ::Ayla__Object__EndWriteGCHandle(void* self, ssize_t handle);
 
 			static constexpr size_t G1Size = 8192;
 			static constexpr size_t G2Size = 65536;

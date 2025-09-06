@@ -15,5 +15,5 @@ public partial class Object
     internal static extern void BeginWriteGCHandle(nint instanceId);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__EndWriteGCHandle")]
-    internal static extern void EndWriteGCHandle(nint instanceId);
+    internal static extern void EndWriteGCHandle(nint instanceId, nint handle);
 }
