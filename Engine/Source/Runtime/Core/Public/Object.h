@@ -10,6 +10,7 @@
 #include "GC/RPtr.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
+#include "Reflection/ObjectReferenceWrapper.h"
 #include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>
@@ -83,7 +84,7 @@ namespace Ayla
 		int32 m_InstanceIndex = -1;
 		uint8 m_FinalizeSuppressed : 1 = false;
 		Type* m_Type;
-		size_t m_GCHandle = 0;
+		ssize_t m_GCHandle = 0;
 
 	protected:
 		static void GatherProperties(PropertyCollector& collection)
@@ -105,6 +106,7 @@ namespace Ayla
 		Type* GetType() const { return m_Type; }
 
 		ssize_t GetInstanceId() const { return reinterpret_cast<ssize_t>(this); }
+		ObjectReferenceWrapper AsWrapper() const { return ObjectReferenceWrapper{ .InstanceId = GetInstanceId(), .Handle = m_GCHandle }; }
 
 		Object& operator =(const Object&) = delete;
 		Object& operator =(Object&&) = delete;

@@ -65,6 +65,7 @@
 #include "Reflection/reflexpr.h"
 #include "Reflection/TransferFunction.h"
 #include "Reflection/Marshal.h"
+#include "Reflection/ObjectReferenceWrapper.h"
 
 #include "Diagnostics/Debug.h"
 

@@ -30,6 +30,7 @@ namespace Ayla
 		AFUNCTION()
 		virtual int32 StartApplication();
 
-		static int32 GuardedMain(std::unique_ptr<CommandLineParser> args, DynamicLibrary& api);
+		AFUNCTION()
+		static RPtr<Launch> CreateInstance(std::vector<String> args);
 	};
 }

@@ -15,9 +15,11 @@ internal class ArrayTypeName : TypeName
 
     public override string CppRootName => $"::std::vector<{ElementType.CppRootName}>";
 
-    public override string BindingName => "void*";
+    public override string CppBindingName => "void*";
 
-    public override string CSharpName => $"global::System.Collections.Generic.List<{ElementType.CSharpName}>";
+    public override string CSharpName => $"{ElementType.CSharpName}[]";
+
+    public override string CSharpBindingName => "nint";
 
     public override string Id => $"global::std.vector<{ElementType.Id}>";
 

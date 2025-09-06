@@ -44,15 +44,148 @@ using System.Runtime.InteropServices;
 
                 Indented(() =>
                 {
+                    sourceCode += IndentedLine($"protected {@class.Name}(nint instanceId) : base(instanceId)");
+                    sourceCode += IndentedLine($"{{");
+                    sourceCode += IndentedLine($"}}");
+                    sourceCode += IndentedLine($"");
+
                     for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
                         var function = aclass.Functions[i];
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var parameterTypes = function.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
-                        var parameterDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
-                        string functionFullName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
-                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{functionFullName}\")]");
-                        sourceCode += IndentedLine($"private static extern {returnType.CSharpName} {function.Name}_Injected(nint self{(parameterDeclare.Length > 0 ? ", " : string.Empty)}{parameterDeclare});");
+                        bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
+
+                        var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {function.Parameters[i].Variable.Name}"));
+                        string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
+                        if (isStatic == false)
+                        {
+                            injectParamsDeclare = "nint self" + (injectParamsDeclare.Length > 0 ? ", " : string.Empty) + injectParamsDeclare;
+                        }
+                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
+                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}_Injected({injectParamsDeclare});");
+
+                        var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
+                        var returnStmt = returnType is RPtrTypeName or PPtrTypeName ? $"{returnType.CSharpName}?" : returnType.CSharpName;
+                        sourceCode += IndentedLine($"private unsafe{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}_Internal({internalParamsDeclare})");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            List<string> allocateStatements = [];
+                            List<string> fixedStatements = [];
+                            List<string> arguments = [];
+                            List<string> releaseStatements = [];
+
+                            for (int j = 0; j < parameterTypes.Length; ++j)
+                            {
+                                var paramType = parameterTypes[j];
+                                var parameter = function.Parameters[j].Variable;
+                                if (paramType == TypeName.String)
+                                {
+                                    fixedStatements.Add($"fixed (char* {parameter.Name}_ptr = {parameter.Name})");
+                                    arguments.Add($"(nint){parameter.Name}_ptr");
+                                }
+                                else if (paramType is ArrayTypeName arrayType)
+                                {
+                                    if (arrayType.ElementType == TypeName.String)
+                                    {
+                                        allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.StringArrayToNative({parameter.Name});");
+                                        releaseStatements.Add($"Marshaller.ReleaseStringArray({parameter.Name}_ptr, {parameter.Name}.Length);");
+                                        arguments.Add(parameter.Name + "_ptr");
+                                    }
+                                    else if (arrayType.ElementType is RPtrTypeName or PPtrTypeName)
+                                    {
+                                        allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.ObjectArrayToNative({parameter.Name});");
+                                        releaseStatements.Add($"Marshaller.ReleaseObjectArray({parameter.Name}_ptr);");
+                                        arguments.Add(parameter.Name + "_ptr");
+                                    }
+                                    else
+                                    {
+                                        fixedStatements.Add($"fixed ({arrayType.ElementType.CSharpBindingName}* {parameter.Name}_ptr = {parameter.Name})");
+                                        arguments.Add("(nint)" + parameter.Name + "_ptr");
+                                    }
+                                }
+                                else
+                                {
+                                    arguments.Add(parameter.Name);
+                                }
+                            }
+
+                            if (allocateStatements.Count > 0)
+                            {
+                                foreach (var stmt in allocateStatements)
+                                {
+                                    sourceCode += IndentedLine(stmt);
+                                }
+                                sourceCode += IndentedLine($"try");
+                                sourceCode += IndentedLine($"{{");
+                                ++indent;
+                            }
+                            try
+                            {
+                                if (fixedStatements.Count > 0)
+                                {
+                                    foreach (var stmt in fixedStatements)
+                                    {
+                                        sourceCode += IndentedLine(stmt);
+                                    }
+
+                                    sourceCode += IndentedLine($"{{");
+                                    ++indent;
+                                }
+
+                                try
+                                {
+                                    if (isStatic == false)
+                                    {
+                                        arguments.Insert(0, "InstanceId");
+                                    }
+
+                                    string bodyStmt = $"{function.Name}_Injected({string.Join(", ", arguments)})";
+
+                                    if (returnType == TypeName.Void)
+                                    {
+                                        sourceCode += IndentedLine(bodyStmt + ";");
+                                    }
+                                    else if (returnType is RPtrTypeName or PPtrTypeName)
+                                    {
+                                        sourceCode += IndentedLine($"return {bodyStmt}.As<{returnType.CSharpName}>();");
+                                    }
+                                    else
+                                    {
+                                        sourceCode += IndentedLine($"return {bodyStmt};");
+                                    }
+                                }
+                                finally
+                                {
+                                    if (fixedStatements.Count > 0)
+                                    {
+                                        --indent;
+                                        sourceCode += IndentedLine($"}}");
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                if (allocateStatements.Count > 0)
+                                {
+                                    --indent;
+                                    sourceCode += IndentedLine($"}}");
+                                    sourceCode += IndentedLine($"finally");
+                                    sourceCode += IndentedLine($"{{");
+                                    Indented(() =>
+                                    {
+                                        foreach (var stmt in releaseStatements)
+                                        {
+                                            sourceCode += IndentedLine(stmt);
+                                        }
+                                    });
+                                    sourceCode += IndentedLine($"}}");
+                                }
+                            }
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
                     }
                 });
 

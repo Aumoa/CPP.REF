@@ -5,6 +5,9 @@
 #include "StaticClass.h"
 #include "GC/PPtr.h"
 #include "GC/RPtr.h"
+#include "Reflection/ObjectReferenceWrapper.h"
+#include "String_.h"
+#include <ranges>
 
 namespace Ayla
 {
@@ -12,33 +15,33 @@ namespace Ayla
 	{
 	private:
 		template<class T>
-		static T MarshalToBinding(T&& value, short)
+		static T ToBinding(T&& value, short)
 		{
 			return std::forward<T>(value);
 		}
 
 		template<class T>
-		static void* MarshalToBinding(T&& ptr, int) requires std::derived_from<std::remove_reference_t<T>, BasePtr>
+		static ObjectReferenceWrapper ToBinding(T&& ptr, int) requires std::derived_from<std::remove_reference_t<T>, BasePtr>
 		{
-			return (Object*)ptr.Get();
+			return ptr->AsWrapper();
 		}
 
 	public:
 		template<class T>
-		static auto MarshalToBinding(T&& value)
+		static auto ToBinding(T&& value)
 		{
-			return MarshalToBinding(std::forward<T>(value), 0);
+			return ToBinding(std::forward<T>(value), 0);
 		}
 
 	private:
-		template<class TBinding, class TNative>
-		static TNative MarshalToNative(TBinding&& value, short)
+		template<class TNative, class TBinding>
+		static TNative ToNative(TBinding&& value, short)
 		{
 			return std::forward<TBinding>(value);
 		}
 
-		template<class TBinding, class TNative>
-		static TNative MarshalToNative(TBinding&& value, int) requires
+		template<class TNative, class TBinding>
+		static TNative ToNative(TBinding&& value, int) requires
 			std::derived_from<TNative, BasePtr> &&
 			std::same_as<std::remove_reference_t<TBinding>, void*>
 		{
@@ -46,11 +49,31 @@ namespace Ayla
 			return TNative(ptr);
 		}
 
-	public:
-		template<class TBinding, class TNative>
-		static auto MarshalToNative(TBinding&& value)
+		template<class TNative, class TBinding>
+		static TNative ToNative(TBinding&& value, int) requires std::same_as<TNative, String>
 		{
-			return MarshalToNative<TBinding, TNative>(std::forward<TBinding>(value), 0);
+			return std::wstring_view(value);
+		}
+
+		template<std::ranges::input_range TNative, class TBinding>
+		static TNative ToNative(TBinding&& value, int) requires std::same_as<std::ranges::range_value_t<TNative>, String>
+		{
+			ssize_t* array = (ssize_t*)value;
+			ssize_t count = array[0];
+			std::vector<String> result;
+			result.reserve(count);
+			for (ssize_t i = 0; i < count; ++i)
+			{
+				result.emplace_back(String((const wchar_t*)array[i + 1]));
+			}
+			return result;
+		}
+
+	public:
+		template<class TNative, class TBinding>
+		static auto ToNative(TBinding&& value)
+		{
+			return ToNative<TNative>(std::forward<TBinding>(value), 0);
 		}
 	};
 }

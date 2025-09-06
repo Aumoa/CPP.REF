@@ -15,9 +15,11 @@ internal class PPtrTypeName : TypeName
 
     public override string CppRootName => $"::Ayla::RPtr<{ElementType.CppRootName}>";
 
-    public override string BindingName => "void*";
+    public override string CppBindingName => "::Ayla::ObjectReferenceWrapper";
 
     public override string CSharpName => ElementType.CSharpName;
+
+    public override string CSharpBindingName => "global::Ayla.ObjectReferenceWrapper";
 
     public override string Id => $"global::Ayla.PPtr<{ElementType.Id}>";
 

@@ -66,7 +66,8 @@ internal partial class RHTGenerator
                 headerText += $"    static consteval auto {function.Name}__{i}()\\\n";
                 headerText += $"    {{\\\n";
                 headerText += $"      /*{returnType.Id}({aclass.Class.Name}::*{function.Name})({string.Join(", ", parameterTypes.Select(p => p.Id))})*/\\\n";
-                headerText += $"      using signature_t = {function.ReturnType.FullName}({aclass.Class.Name}::*)({string.Join(", ", function.Parameters.Select(p => p.Variable.TypeName.FullName))});\\\n";
+                var owned = function.Flags.HasFlag(SFunction.FFlags.Static) ? string.Empty : $"{aclass.Class.Name}::";
+                headerText += $"      using signature_t = {function.ReturnType.FullName}({owned}*)({string.Join(", ", function.Parameters.Select(p => p.Variable.TypeName.FullName))});\\\n";
                 headerText += $"      return ::std::experimental::reflect::reflexpr_method<signature_t, (signature_t)&{aclass.Class.Name}::{function.Name}>();\\\n";
                 headerText += $"    }}\\\n";
                 headerText += $"    \\\n";

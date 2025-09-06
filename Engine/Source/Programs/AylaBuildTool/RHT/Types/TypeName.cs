@@ -8,9 +8,11 @@ internal abstract class TypeName
     
     public abstract string CppRootName { get; }
 
-    public abstract string BindingName { get; }
+    public abstract string CppBindingName { get; }
 
     public abstract string CSharpName { get; }
+
+    public abstract string CSharpBindingName { get; }
 
     public abstract string Id { get; }
 

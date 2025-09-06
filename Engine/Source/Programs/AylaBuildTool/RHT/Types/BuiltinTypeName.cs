@@ -56,11 +56,11 @@ internal class BuiltinTypeName : TypeName
         _ => CppName
     };
 
-    public override string BindingName => Kind switch
+    public override string CppBindingName => Kind switch
     {
         Kinds.Void => "void",
         Kinds.String => "const wchar_t*",
-        Kinds.Object => "void*",
+        Kinds.Object => "::Ayla::ObjectReferenceWrapper",
         _ => CppName
     };
 
@@ -78,6 +78,23 @@ internal class BuiltinTypeName : TypeName
         Kinds.Single => "float",
         Kinds.Double => "double",
         Kinds.Object => "global::Ayla.Object",
+        _ => throw TerminateException.Arguments()
+    };
+
+    public override string CSharpBindingName => Kind switch
+    {
+        Kinds.Void => "void",
+        Kinds.Boolean => "bool",
+        Kinds.Int32 => "int",
+        Kinds.Int64 => "long",
+        Kinds.UInt32 => "uint",
+        Kinds.UInt64 => "ulong",
+        Kinds.IntPtr => "nint",
+        Kinds.UIntPtr => "nuint",
+        Kinds.String => "nint",
+        Kinds.Single => "float",
+        Kinds.Double => "double",
+        Kinds.Object => "global::Ayla.ObjectReferenceWrapper",
         _ => throw TerminateException.Arguments()
     };
 

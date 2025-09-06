@@ -152,11 +152,3 @@ namespace Ayla
 		((Object*)instancePtr)->m_GCHandle = gcHandle;
 	}
 }
-
-extern "C"
-{
-	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__GetInstanceId_Injected(::Ayla::ssize_t self)
-	{
-		return reinterpret_cast<::Ayla::Object*>(self)->GetInstanceId();
-	}
-}

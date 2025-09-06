@@ -21,9 +21,11 @@ internal class ClassName : TypeName
 
     public override string CppRootName => $"::Ayla::RPtr<{CppName}>";
 
-    public override string BindingName => "void*";
+    public override string CppBindingName => "void*";
 
     public override string CSharpName => Namespace.CSharp(Name);
+
+    public override string CSharpBindingName => "global::Ayla.ObjectReferenceWrapper";
 
     public override string Id => CSharpName;
 

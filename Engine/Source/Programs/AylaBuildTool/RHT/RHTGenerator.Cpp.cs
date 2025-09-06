@@ -15,12 +15,21 @@ internal partial class RHTGenerator
         List<string> headers = [];
         foreach (var aclass in Classes)
         {
-            foreach (var property in aclass.Properties)
+            foreach (var type in aclass.Properties.Select(p => p.Variable.TypeName)
+                .Concat(aclass.Functions.Select(f => f.ReturnType)))
             {
-                var type = typeNames.FindType(property.Variable.TypeName, aclass.Class);
-                if (type is ClassName className)
+                var typeName = typeNames.FindType(type, aclass.Class);
+                if (typeName is ClassName className)
                 {
                     headers.Add(className.Source.SourceCode.FilePath);
+                }
+                else if (typeName is RPtrTypeName rptr)
+                {
+                    headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
+                }
+                else if (typeName is PPtrTypeName pptr)
+                {
+                    headers.Add(((ClassName)pptr.ElementType).Source.SourceCode.FilePath);
                 }
             }
         }
@@ -78,7 +87,7 @@ internal partial class RHTGenerator
                         .ToArray();
                     string parameters = string.Join(", ", parameterTypes.Select((p, i) =>
                     {
-                        return $"{p.BindingName} {function.Parameters[i].Variable.Name}";
+                        return $"{p.CppBindingName} {function.Parameters[i].Variable.Name}";
                     }));
                     if (function.Flags.HasFlag(SFunction.FFlags.Static) == false)
                     {
@@ -92,18 +101,24 @@ internal partial class RHTGenerator
                         }
                     }
                     string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
-                    string arguments = string.Join(", ", function.Parameters.Select(p => p.Variable.Name));
-                    string bodyStatement = $"(({classType.CppName}*)(::Ayla::Object*)self)->{function.Name}({arguments})";
+                    string arguments = string.Join(", ", function.Parameters.Select(p =>
+                    {
+                        var argumentType = typeNames.FindType(p.Variable.TypeName, aclass.Class);
+                        return $"::Ayla::Marshal::ToNative<{argumentType.CppName}>({p.Variable.Name})";
+                    }));
+                    bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
+                    var caller = isStatic ? $"{classType.CppName}::" : $"(({classType.CppName}*)(::Ayla::Object*)self)->";
+                    string bodyStatement = $"{caller}{function.Name}({arguments})";
                     string returnStatement;
                     if (returnType != BuiltinTypeName.Void)
                     {
-                        returnStatement = $"return ::Ayla::Marshal::MarshalToBinding({bodyStatement})";
+                        returnStatement = $"return ::Ayla::Marshal::ToBinding({bodyStatement})";
                     }
                     else
                     {
                         returnStatement = $"{bodyStatement}";
                     }
-                    sourceCodeText += $"  PLATFORM_SHARED_EXPORT {returnType.BindingName} {functionFullName}({parameters})\n";
+                    sourceCodeText += $"  PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({parameters})\n";
                     sourceCodeText += $"  {{\n";
                     sourceCodeText += $"    {returnStatement};\n";
                     sourceCodeText += $"  }}\n";

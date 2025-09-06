@@ -1,4 +1,4 @@
 ﻿using Ayla;
 
-using var launch = new Launch();
+using var launch = Launch.CreateInstance(args);
 launch.StartApplication();
