@@ -53,4 +53,10 @@ public record PlatformInfo
         Group = PlatformGroup.Linux,
         Architecture = Architecture.X64
     };
+
+    public static IEnumerable<PlatformInfo> GetAllPlatforms()
+    {
+        yield return Win64;
+        yield return Linux64;
+    }
 }

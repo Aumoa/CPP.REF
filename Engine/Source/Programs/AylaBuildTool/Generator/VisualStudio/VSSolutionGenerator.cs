@@ -147,8 +147,11 @@ internal class VSSolutionGenerator : Generator
                         case ModuleProject mp:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", mp.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
                             builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", mp.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", mp.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
-                            builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", mp.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), VSUtility.GetArchitectureName(buildConfig));
+                            if (mp.IsScriptable())
+                            {
+                                builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|{4}\n", mp.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), buildConfig.Platform.Name);
+                                builder.AppendFormat("\t\t{0}.{1}|{2}.Build.0 = {3}|{4}\n", mp.Decl.ScriptGuid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), VSUtility.GetConfigName(buildConfig), buildConfig.Platform.Name);
+                            }
                             break;
                         case ProgramProject:
                             builder.AppendFormat("\t\t{0}.{1}|{2}.ActiveCfg = {3}|Any CPU\n", project.Decl.Guid.ToString("B").ToUpper(), VSUtility.GetConfigName(buildConfig), GetPlatformName(buildConfig.Platform), GetCSharpConfigName(buildConfig.Config));

@@ -12,6 +12,8 @@ internal class VSUtility
         _ => throw new InvalidOperationException()
     };
 
+    public static string RemapPlatformName(TargetInfo value) => value.Platform.Name == "Win64" ? "x64" : value.Platform.Name;
+
     public static string GetConfigName(TargetInfo value)
     {
         return value.Config.ToString() + (value.Editor ? " Editor" : string.Empty);

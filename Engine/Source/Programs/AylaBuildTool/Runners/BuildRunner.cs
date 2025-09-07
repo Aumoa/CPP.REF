@@ -1,4 +1,5 @@
-﻿using AylaEngine.RHT;
+﻿using AylaEngine.Installations;
+using AylaEngine.RHT;
 using AylaEngine.RHT.Types;
 using static AylaEngine.CppCompiler;
 
@@ -120,6 +121,9 @@ internal static partial class BuildRunner
         }
 
         await DispatchGenerateHeaderWorkers();
+        Dictionary<ModuleProject, int> buildGraph = [];
+        await BuildScriptProjects(buildGraph, targetProjects);
+
         List<ModuleTask> moduleTasks = [];
 
         foreach (var project in targetProjects)
@@ -256,6 +260,7 @@ internal static partial class BuildRunner
             }
 
             var projects = results.Where(p => p.Generator != null || p.Project.Name == "Core").GroupBy(p => p.Project);
+            List<string> buildTargets = [];
             foreach (var g in projects)
             {
                 var project = g.Key;
@@ -317,10 +322,32 @@ internal static partial class BuildRunner
                     namespaceName = project.Group.Name;
                 }
 
-                var platforms = string.Join(';', Enum.GetValues<Architecture>().Select(p => VSUtility.GetArchitectureName(p)));
-                var configurations = string.Join(';', TargetInfo.GetAllTargets().Select(p => VSUtility.GetConfigName(p)));
+                var platforms = string.Join(';', PlatformInfo.GetAllPlatforms().Select(p => p.Name));
+                var configurations = string.Join(';', TargetInfo.GetAllTargets().Select(p => VSUtility.GetConfigName(p)).Distinct());
                 string outputType = project.IsExecutable() ? "Exe" : "Library";
-                var outputs = project.Group.Output(buildTarget, FolderPolicy.PathType.Windows);
+
+                List<string> propertyGroups = [];
+                foreach (var targetInfo in TargetInfo.GetAllTargets())
+                {
+                    bool isOptimize = targetInfo.Config.IsOptimized();
+                    List<string> defineConstants = ["$(DefineConstants)"];
+                    if (targetInfo.Editor)
+                    {
+                        defineConstants.Add("WITH_EDITOR");
+                    }
+                    var outputPath = project.Group.Output(targetInfo, FolderPolicy.PathType.Windows);
+                    string propertyGroup = $"""
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{VSUtility.GetConfigName(targetInfo)}|{targetInfo.Platform.Name}'">
+    <OutputPath>{outputPath}</OutputPath>
+    <Optimize>{(isOptimize ? "true" : "false")}</Optimize>
+    <DefineConstants>$(DefineConstants);{(targetInfo.Editor ? "WITH_EDITOR" : string.Empty)};</DefineConstants>
+  </PropertyGroup>
+
+""";
+
+                    propertyGroups.Add(propertyGroup);
+                }
 
                 string csprojText = $"""
 <Project Sdk="Microsoft.NET.Sdk">
@@ -338,9 +365,8 @@ internal static partial class BuildRunner
 	<PublishAot>True</PublishAot>
     <Configurations>{configurations}</Configurations>
     <Platforms>{platforms}</Platforms>
-    <OutputPath>{outputs}</OutputPath>
   </PropertyGroup>
-{nugetPackages}{projectReferences}
+{string.Concat(propertyGroups)}{nugetPackages}{projectReferences}
   <ItemGroup>
     <Using Include="Ayla.Object">
       <Alias>Object</Alias>
@@ -355,6 +381,44 @@ internal static partial class BuildRunner
             }
 
             Console.WriteLine(" Done.");
+        }
+
+        async Task BuildScriptProjects(Dictionary<ModuleProject, int> buildGraph, IEnumerable<ModuleProject> projects)
+        {
+            foreach (var project in projects)
+            {
+                BuildGraph(project, 0);
+            }
+
+            foreach (var target in buildGraph.Where(p => p.Value == 0).Select(p => p.Key))
+            {
+                await DotNET.BuildAsync(target.ScriptProjectFileName, buildTarget, cancellationToken);
+            }
+
+            void BuildGraph(ModuleProject target, int depth)
+            {
+                var rule = target.GetRule(buildTarget);
+                if (rule.Scriptable.Enabled)
+                {
+                    if (buildGraph.TryGetValue(target, out var existingDepth))
+                    {
+                        if (depth > existingDepth)
+                        {
+                            buildGraph[target] = depth;
+                        }
+                    }
+                    else
+                    {
+                        buildGraph.Add(target, depth);
+                    }
+                }
+
+                var children = solution.FindDepends(target.GetResolver(buildTarget).DependencyModuleNames).OfType<ModuleProject>();
+                foreach (var child in children)
+                {
+                    BuildGraph(child, depth + 1);
+                }
+            }
         }
 
         void DispatchLinkWorkers()
