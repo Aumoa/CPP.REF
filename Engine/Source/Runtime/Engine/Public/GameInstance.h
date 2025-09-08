@@ -23,6 +23,7 @@ namespace Ayla
 		GameInstance();
 		virtual ~GameInstance() noexcept override;
 
+		AFUNCTION()
 		virtual RPtr<Scene> GetEntryScene();
 	};
 }

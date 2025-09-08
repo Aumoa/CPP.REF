@@ -84,6 +84,9 @@
 
 #include "Localizational/Name.h"
 
+#include "ScriptingBackend/ScriptingBackend.h"
+#include "ScriptingBackend/CoreCLR/CoreCLRScriptingBackend.h"
+
 // additional standard libraries.
 #include <set>
 #include <variant>

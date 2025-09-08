@@ -342,6 +342,7 @@ internal static partial class BuildRunner
     <OutputPath>{outputPath}</OutputPath>
     <Optimize>{(isOptimize ? "true" : "false")}</Optimize>
     <DefineConstants>$(DefineConstants);{(targetInfo.Editor ? "WITH_EDITOR" : string.Empty)};</DefineConstants>
+    <PlatformTarget>{VSUtility.GetArchitectureName(targetInfo.Platform.Architecture)}</PlatformTarget>
   </PropertyGroup>
 
 """;
@@ -362,7 +363,6 @@ internal static partial class BuildRunner
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-	<PublishAot>True</PublishAot>
     <Configurations>{configurations}</Configurations>
     <Platforms>{platforms}</Platforms>
   </PropertyGroup>

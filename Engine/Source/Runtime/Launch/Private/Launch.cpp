@@ -18,49 +18,46 @@ namespace Ayla
 
     int32 Launch::StartApplication()
     {
-#if PLATFORM_WINDOWS
-        auto api = DynamicLibrary(TEXT("WindowsAPI"));
-#elif PLATFORM_LINUX
-        auto api = DynamicLibrary(TEXT("LinuxAPI"));
-#else
-#error Unsupported platform.
-#endif
+        auto& app = GenericApplication::Get();
 
+        m_Engine = Object::New<Engine>();
+        m_Engine->PreInitialize();
+        m_Engine->Initialize(m_Args.get());
+
+        std::vector<GenericPlatformInputEvent> inputEvents;
+        while (true)
+        {
+            app.PumpMessages(inputEvents);
+            if (app.IsQuitRequested())
+            {
+                break;
+            }
+            m_Engine->Tick();
+        }
+
+        m_Engine->Shutdown();
+        return app.GetExitCode();
+    }
+
+    int32 Launch::GuardedMain(std::unique_ptr<CommandLineParser> args, const DynamicLibrary& apiSet)
+    {
         ThreadPool::Initialize();
 
-        if (api.IsValid() == false)
+        if (apiSet.IsValid() == false)
         {
             throw InvalidOperationException(TEXT("Failed to load Platform API set."));
         }
 
-        auto loader = api.LoadFunction<GenericApplication*>(NAMEOF_CREATE_GENERIC_APPLICATION);
+        auto loader = apiSet.LoadFunction<GenericApplication*>(NAMEOF_CREATE_GENERIC_APPLICATION);
         if (loader == nullptr)
         {
             throw InvalidOperationException(TEXT("Failed to load signature for create generic application."));
         }
 
-        auto app = std::unique_ptr<GenericApplication>{ loader() };
-
         return try__
         {
-            
-            m_Engine = New<Engine>();
-            m_Engine->PreInitialize();
-            m_Engine->Initialize(m_Args.get());
-
-            std::vector<GenericPlatformInputEvent> inputEvents;
-            while (true)
-            {
-                app->PumpMessages(inputEvents);
-                if (app->IsQuitRequested())
-                {
-                    break;
-			    }
-                m_Engine->Tick();
-            }
-
-            m_Engine->Shutdown();
-            return app->GetExitCode();
+            auto app = std::unique_ptr<GenericApplication>(loader());
+			return std::make_unique<Launch>(std::move(args))->StartApplication();
         }
         catch (const Exception& e)
         {
@@ -70,14 +67,9 @@ namespace Ayla
         finally__
         {
             GC::Collect();
-            GC::WaitForCompleteToFinalize();            
+            GC::WaitForCompleteToFinalize();
             ThreadPool::Shutdown();
         }
         end_try__;
-    }
-
-    RPtr<Launch> Launch::CreateInstance(std::vector<String> args)
-    {
-		return New<Launch>(std::make_unique<CommandLineParser>(args));
-    }
+	}
 }

@@ -85,7 +85,7 @@ namespace Ayla
 		return *this;
 	}
 
-	void (*DynamicLibrary::InternalLoadFunction(String Signature))()
+	void (*DynamicLibrary::InternalLoadFunction(String Signature) const)()
 	{
 		return Impl->LoadFunction(Signature);
 	}

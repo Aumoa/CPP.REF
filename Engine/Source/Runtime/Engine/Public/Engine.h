@@ -13,6 +13,7 @@ namespace Ayla
 	class RenderThread;
 	class GameInstance;
 	class CommandLineParser;
+	class ScriptingBackend;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -24,6 +25,7 @@ namespace Ayla
 		std::shared_ptr<Graphics> m_Graphics;
 		std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 		std::unique_ptr<RenderThread> m_RenderThread;
+		std::unique_ptr<ScriptingBackend> m_ScriptingBackend;
 
 		APROPERTY()
 		PPtr<GameInstance> m_GameInstance;

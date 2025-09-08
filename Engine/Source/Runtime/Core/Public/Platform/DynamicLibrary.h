@@ -29,7 +29,7 @@ namespace Ayla
 		void Detach();
 
 		template<class... TArgs>
-		Action<TArgs...> LoadAction(String Signature)
+		Action<TArgs...> LoadAction(String Signature) const
 		{
 			void (*Ptr)() = InternalLoadFunction(Signature);
 			if (Ptr == nullptr)
@@ -41,7 +41,7 @@ namespace Ayla
 		}
 
 		template<class... TArgs>
-		Func<TArgs...> LoadFunction(String Signature)
+		Func<TArgs...> LoadFunction(String Signature) const
 		{
 			void (*Ptr)() = InternalLoadFunction(Signature);
 			if (Ptr == nullptr)
@@ -52,9 +52,21 @@ namespace Ayla
 			return Func<TArgs...>::FromAnonymous(Ptr);
 		}
 
+		template<class T>
+		T LoadDelegate(String signature) const
+		{
+			void (*ptr)() = InternalLoadFunction(signature);
+			if (ptr == nullptr)
+			{
+				return {};
+			}
+
+			return reinterpret_cast<T>(ptr);
+		}
+
 		DynamicLibrary& operator =(DynamicLibrary&& rhs) noexcept;
 
 	private:
-		void (*InternalLoadFunction(String Signature))();
+		void (*InternalLoadFunction(String Signature) const)();
 	};
 }

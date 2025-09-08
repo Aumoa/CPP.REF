@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Launch.gen.h"
 
 namespace Ayla
 {
@@ -11,26 +10,18 @@ namespace Ayla
 	class DynamicLibrary;
 	class CommandLineParser;
 
-	ACLASS()
-	class LAUNCH_API Launch : public Object
+	class LAUNCH_API Launch
 	{
-		GENERATED_BODY()
-
 	private:
 		std::unique_ptr<CommandLineParser> m_Args;
-		APROPERTY()
-		PPtr<Engine> m_Engine;
-
-	protected:
-		Launch(std::unique_ptr<CommandLineParser> args);
+		RPtr<Engine> m_Engine;
 
 	public:
-		virtual ~Launch() noexcept override;
+		Launch(std::unique_ptr<CommandLineParser> args);
+		virtual ~Launch() noexcept;
 
-		AFUNCTION()
 		virtual int32 StartApplication();
 
-		AFUNCTION()
-		static RPtr<Launch> CreateInstance(std::vector<String> args);
+		static int32 GuardedMain(std::unique_ptr<CommandLineParser> args, const DynamicLibrary& apiSet);
 	};
 }

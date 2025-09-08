@@ -86,28 +86,15 @@ namespace Ayla
 		if (it != options.end())
 		{
 			auto gameAssembly = it->second[0].value();
-			auto lib = DynamicLibrary(gameAssembly);
-			if (lib.IsValid() == false)
-			{
-				throw ModuleNotFoundException(gameAssembly);
-			}
+			m_ScriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
+			m_ScriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
 
-			auto loader = lib.LoadFunction<RPtr<GameInstance>*>(TEXT("CreateGameInstance__"));
-			if (loader == nullptr)
-			{
-				throw InvalidOperationException(String::Format(TEXT("Failed to load game instance from {0}. Ensure that the GameInstance class is exposed in the assembly via the DEFINE_GAME_INSTANCE_CLASS() macro."), gameAssembly));
-			}
-
-			auto rptrPtr = loader();
-			m_GameInstance = *rptrPtr;
-			delete rptrPtr;
-			lib.Detach();
-		}
-		else
-		{
-			m_GameInstance = New<GameInstance>();
+			using InitializeGame_ManagedFunc = void(*)(const wchar_t*);
+			auto scriptInitialize = (InitializeGame_ManagedFunc)m_ScriptingBackend->GetFunctionPointer(TEXT("Engine.Script"), TEXT("Ayla.Engine"), TEXT("InitializeGame_Managed"));
+			scriptInitialize(gameAssembly.c_str());
 		}
 
+		m_GameInstance = New<GameInstance>();
 		std::ignore = SceneManager::LoadSceneAsync(m_GameInstance->GetEntryScene());
 	}
 

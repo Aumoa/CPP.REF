@@ -58,7 +58,7 @@ internal static class VSCppProjectGenerator
                         }
                         else
                         {
-                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.Script.exe</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows));
+                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows));
                         }
 
                         if (rules.Type == ModuleType.Game)
