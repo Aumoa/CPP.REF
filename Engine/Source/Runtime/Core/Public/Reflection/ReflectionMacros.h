@@ -69,6 +69,8 @@ public: \
 
 #define AFUNCTION(...)
 
+#define ACONSTRUCTOR(...)
+
 #define rthis (::Ayla::RPtr{ this })
 
 namespace Ayla::Reflection

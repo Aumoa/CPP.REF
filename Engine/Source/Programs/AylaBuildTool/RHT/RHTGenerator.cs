@@ -104,6 +104,20 @@ internal partial class RHTGenerator
                 aclass.AddFunction(afunction);
                 continue;
             }
+            else if (SConstructor.TryAccept(context, out var aconstructor))
+            {
+                aclass = syntaxes.OfType<SAClass>().LastOrDefault();
+                if (aclass == null)
+                {
+                    throw aconstructor.Context.ParsingError("Syntax Error: A class definition is required before ACONSTRUCTOR().");
+                }
+                if (aclass.Class.Name != aconstructor.Name)
+                {
+                    throw aconstructor.Context.ParsingError($"Syntax Error: The constructor name '{aconstructor.Name}' does not match the class name '{aclass.Class.Name}'.");
+                }
+                aclass.AddConstructor(aconstructor);
+                continue;
+            }
             else if (SBracket.TryAccept(context, out var unknownBracket))
             {
                 syntaxes.Add(unknownBracket);

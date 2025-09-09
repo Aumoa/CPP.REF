@@ -82,7 +82,8 @@ namespace Ayla
 	private:
 		enum class CreationFlags
 		{
-			FromNative
+			FromNative,
+			FromScript
 		};
 
 		GENERATE_BITMASK_ENUM_OPERATORS_FRIEND(::Ayla::Object::CreationFlags);
@@ -127,6 +128,18 @@ namespace Ayla
 		{
 			std::optional<RPtr<T>> ptr;
 			ConfigureNew(typeid(T), CreationFlags::FromNative, [&]()
+			{
+				ptr.emplace(new T(std::forward<TArgs>(args)...));
+				return ptr->Get();
+			});
+			return std::move(ptr).value();
+		}
+
+		template<std::derived_from<Object> T, class... TArgs>
+		static RPtr<T> ScriptNew(TArgs&&... args)
+		{
+			std::optional<RPtr<T>> ptr;
+			ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
 			{
 				ptr.emplace(new T(std::forward<TArgs>(args)...));
 				return ptr->Get();

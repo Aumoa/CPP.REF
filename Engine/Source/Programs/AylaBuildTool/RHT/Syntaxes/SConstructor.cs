@@ -1,50 +1,24 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using static AylaEngine.RHTGenerator;
 
 namespace AylaEngine.RHT.Syntaxes;
 
-internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags Flags, STypeName ReturnType, SParameter[] Parameters) : SMember(Context, null, Name)
+internal record SConstructor(CapturedContext Context, string Name, SParameter[] Parameters) : SMember(Context, null, Name)
 {
-    [Flags]
-    public enum FFlags
-    {
-        None = 0,
-        Static = 1 << 0,
-        Virtual = 1 << 1,
-        Const = 1 << 2
-    }
-
     public override string ToString()
     {
         return FormatLineNumber() + "AFUNCTION()";
     }
 
-    public static bool TryAccept(Context context, [NotNullWhen(true)] out SFunction? afunction)
+    public static bool TryAccept(Context context, [NotNullWhen(true)] out SConstructor? constructor)
     {
-        if (context.WholeEquals("AFUNCTION()") == false)
+        if (context.WholeEquals("ACONSTRUCTOR()") == false)
         {
-            afunction = null;
+            constructor = null;
             return false;
         }
 
         var capture = context.Capture();
-        context.Advance("AFUNCTION()".Length);
-        context.SkipWhiteSpace(true);
-        FFlags flags = FFlags.None;
-
-        if (context.WholeEquals("virtual"))
-        {
-            flags |= FFlags.Virtual;
-            context.WholeAdvance("virtual");
-        }
-
-        if (context.WholeEquals("static"))
-        {
-            flags |= FFlags.Static;
-            context.WholeAdvance("static");
-        }
-
-        var returnType = STypeName.Accept(context);
+        context.Advance("ACONSTRUCTOR()".Length);
         context.SkipWhiteSpace(true);
 
         if (IsNumber(context.CurrentChar))
@@ -73,14 +47,8 @@ internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags
             }
         }
 
-        if (context.WholeEquals("const"))
-        {
-            flags |= FFlags.Const;
-            context.WholeAdvance("const");
-        }
-
         context.ExportWhile(c => c != ';' && c != '{');
-        afunction = new SFunction(capture, name.ToString(), flags, returnType, parameters.ToArray());
+        constructor = new SConstructor(capture, name.ToString(), parameters.ToArray());
         return true;
 
         bool IsNumber(char c) => c >= '0' && c <= '9';

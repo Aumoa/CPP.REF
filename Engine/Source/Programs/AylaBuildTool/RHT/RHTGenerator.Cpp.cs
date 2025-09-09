@@ -1,10 +1,7 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
 using AylaEngine.RHT.Syntaxes;
 using AylaEngine.RHT.Types;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AylaEngine;
 
@@ -78,6 +75,29 @@ internal partial class RHTGenerator
                 sourceCodeText +=  "}\n\n";
                 sourceCodeText +=  "extern \"C\"\n";
                 sourceCodeText +=  "{\n";
+                for (int i = 0; i < aclass.Constructors.Count; ++i)
+                {
+                    var constructor = aclass.Constructors[i];
+                    var parameterTypes = constructor.Parameters
+                        .Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class))
+                        .ToArray();
+                    string parameters = string.Join(", ", parameterTypes.Select((p, i) =>
+                    {
+                        return $"{p.CppBindingName} {constructor.Parameters[i].Variable.Name}";
+                    }));
+                    string constructorFullName = $"{@namespace.Replace("::", "__")}__{@class}__{constructor.Name}__{i}__Injected";
+                    string arguments = string.Join(", ", constructor.Parameters.Select(p =>
+                    {
+                        var argumentType = typeNames.FindType(p.Variable.TypeName, aclass.Class);
+                        return $"::Ayla::Marshal::ToNative<{argumentType.CppName}>({p.Variable.Name})";
+                    }));
+                    string bodyStatement = $"::Ayla::Object::ScriptNew<{classType.CppName}>({arguments})";
+                    string returnStatement = $"return ::Ayla::Marshal::ToBinding({bodyStatement})";
+                    sourceCodeText += $"  PLATFORM_SHARED_EXPORT {TypeName.Object.CppBindingName} {constructorFullName}({parameters})\n";
+                    sourceCodeText += $"  {{\n";
+                    sourceCodeText += $"    {returnStatement};\n";
+                    sourceCodeText += $"  }}\n";
+                }
                 for (int i = 0; i < aclass.Functions.Count; ++i)
                 {
                     var function = aclass.Functions[i];

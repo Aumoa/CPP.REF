@@ -89,9 +89,9 @@ namespace Ayla
 			m_ScriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
 			m_ScriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
 
-			using InitializeGame_ManagedFunc = void(*)(const wchar_t*);
+			using InitializeGame_ManagedFunc = ObjectReferenceWrapper(*)(const wchar_t*);
 			auto scriptInitialize = (InitializeGame_ManagedFunc)m_ScriptingBackend->GetFunctionPointer(TEXT("Engine.Script"), TEXT("Ayla.Engine"), TEXT("InitializeGame_Managed"));
-			scriptInitialize(gameAssembly.c_str());
+			auto objectReferenceWrapper = scriptInitialize(gameAssembly.c_str());
 		}
 
 		m_GameInstance = New<GameInstance>();

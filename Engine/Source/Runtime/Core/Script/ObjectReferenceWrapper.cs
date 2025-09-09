@@ -6,8 +6,14 @@ namespace Ayla;
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 public struct ObjectReferenceWrapper
 {
-    public nint InstanceId;
-    public nint Handle;
+    public readonly nint InstanceId;
+    public readonly nint Handle;
+
+    public ObjectReferenceWrapper(nint instanceId, nint handle)
+    {
+        InstanceId = instanceId;
+        Handle = handle;
+    }
 
     public T? As<T>() where T : Object
     {
@@ -38,4 +44,6 @@ public struct ObjectReferenceWrapper
             Object.EndWriteGCHandle(InstanceId, (nint)handle);
         }
     }
+
+    public static implicit operator ObjectReferenceWrapper(Object @object) => new(@object.InstanceId, (nint)GCHandle.Alloc(@object));
 }

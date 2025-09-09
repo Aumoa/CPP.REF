@@ -1,5 +1,6 @@
 ﻿using AylaEngine.RHT.Syntaxes;
 using AylaEngine.RHT.Types;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AylaEngine;
 
@@ -49,6 +50,29 @@ using System.Runtime.InteropServices;
                     sourceCode += IndentedLine($"}}");
                     sourceCode += IndentedLine($"");
 
+                    for (int i = 0; i < aclass.Constructors.Count; ++i)
+                    {
+                        var constructor = aclass.Constructors[i];
+                        var returnType = (RPtrTypeName)Activator.CreateInstance(typeof(RPtrTypeName), @class)!;
+                        var parameterTypes = constructor.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
+
+                        var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {constructor.Parameters[i].Variable.Name}"));
+                        string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
+                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
+                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {constructor.Name}_Injected({injectParamsDeclare});");
+
+                        var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {constructor.Parameters[i].Variable.Name}"));
+                        var returnStmt = returnType.CSharpName;
+                        sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {constructor.Name}_Internal({internalParamsDeclare})");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            GenerateFunctionBody(constructor, parameterTypes, constructor.Parameters, returnType, true, true);
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+                    }
+
                     for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
                         var function = aclass.Functions[i];
@@ -71,121 +95,126 @@ using System.Runtime.InteropServices;
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
-                            List<string> allocateStatements = [];
-                            List<string> fixedStatements = [];
-                            List<string> arguments = [];
-                            List<string> releaseStatements = [];
+                            GenerateFunctionBody(function, parameterTypes, function.Parameters, returnType, isStatic, false);
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+                    }
 
-                            for (int j = 0; j < parameterTypes.Length; ++j)
+                    void GenerateFunctionBody(SMember member, TypeName[] parameterTypes, SParameter[] parameters, TypeName returnType, bool isStatic, bool returnAsBinding)
+                    {
+                        List<string> allocateStatements = [];
+                        List<string> fixedStatements = [];
+                        List<string> arguments = [];
+                        List<string> releaseStatements = [];
+
+                        for (int j = 0; j < parameterTypes.Length; ++j)
+                        {
+                            var paramType = parameterTypes[j];
+                            var parameter = parameters[j].Variable;
+                            if (paramType == TypeName.String)
                             {
-                                var paramType = parameterTypes[j];
-                                var parameter = function.Parameters[j].Variable;
-                                if (paramType == TypeName.String)
+                                fixedStatements.Add($"fixed (char* {parameter.Name}_ptr = {parameter.Name})");
+                                arguments.Add($"(nint){parameter.Name}_ptr");
+                            }
+                            else if (paramType is ArrayTypeName arrayType)
+                            {
+                                if (arrayType.ElementType == TypeName.String)
                                 {
-                                    fixedStatements.Add($"fixed (char* {parameter.Name}_ptr = {parameter.Name})");
-                                    arguments.Add($"(nint){parameter.Name}_ptr");
+                                    allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.StringArrayToNative({parameter.Name});");
+                                    releaseStatements.Add($"Marshaller.ReleaseStringArray({parameter.Name}_ptr, {parameter.Name}.Length);");
+                                    arguments.Add(parameter.Name + "_ptr");
                                 }
-                                else if (paramType is ArrayTypeName arrayType)
+                                else if (arrayType.ElementType is RPtrTypeName or PPtrTypeName)
                                 {
-                                    if (arrayType.ElementType == TypeName.String)
-                                    {
-                                        allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.StringArrayToNative({parameter.Name});");
-                                        releaseStatements.Add($"Marshaller.ReleaseStringArray({parameter.Name}_ptr, {parameter.Name}.Length);");
-                                        arguments.Add(parameter.Name + "_ptr");
-                                    }
-                                    else if (arrayType.ElementType is RPtrTypeName or PPtrTypeName)
-                                    {
-                                        allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.ObjectArrayToNative({parameter.Name});");
-                                        releaseStatements.Add($"Marshaller.ReleaseObjectArray({parameter.Name}_ptr);");
-                                        arguments.Add(parameter.Name + "_ptr");
-                                    }
-                                    else
-                                    {
-                                        fixedStatements.Add($"fixed ({arrayType.ElementType.CSharpBindingName}* {parameter.Name}_ptr = {parameter.Name})");
-                                        arguments.Add("(nint)" + parameter.Name + "_ptr");
-                                    }
+                                    allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.ObjectArrayToNative({parameter.Name});");
+                                    releaseStatements.Add($"Marshaller.ReleaseObjectArray({parameter.Name}_ptr);");
+                                    arguments.Add(parameter.Name + "_ptr");
                                 }
                                 else
                                 {
-                                    arguments.Add(parameter.Name);
+                                    fixedStatements.Add($"fixed ({arrayType.ElementType.CSharpBindingName}* {parameter.Name}_ptr = {parameter.Name})");
+                                    arguments.Add("(nint)" + parameter.Name + "_ptr");
                                 }
                             }
-
-                            if (allocateStatements.Count > 0)
+                            else
                             {
-                                foreach (var stmt in allocateStatements)
+                                arguments.Add(parameter.Name);
+                            }
+                        }
+
+                        if (allocateStatements.Count > 0)
+                        {
+                            foreach (var stmt in allocateStatements)
+                            {
+                                sourceCode += IndentedLine(stmt);
+                            }
+                            sourceCode += IndentedLine($"try");
+                            sourceCode += IndentedLine($"{{");
+                            ++indent;
+                        }
+                        try
+                        {
+                            if (fixedStatements.Count > 0)
+                            {
+                                foreach (var stmt in fixedStatements)
                                 {
                                     sourceCode += IndentedLine(stmt);
                                 }
-                                sourceCode += IndentedLine($"try");
+
                                 sourceCode += IndentedLine($"{{");
                                 ++indent;
                             }
+
                             try
                             {
-                                if (fixedStatements.Count > 0)
+                                if (isStatic == false)
                                 {
-                                    foreach (var stmt in fixedStatements)
-                                    {
-                                        sourceCode += IndentedLine(stmt);
-                                    }
-
-                                    sourceCode += IndentedLine($"{{");
-                                    ++indent;
+                                    arguments.Insert(0, "InstanceId");
                                 }
 
-                                try
+                                string bodyStmt = $"{member.Name}_Injected({string.Join(", ", arguments)})";
+
+                                if (returnType == TypeName.Void)
                                 {
-                                    if (isStatic == false)
-                                    {
-                                        arguments.Insert(0, "InstanceId");
-                                    }
-
-                                    string bodyStmt = $"{function.Name}_Injected({string.Join(", ", arguments)})";
-
-                                    if (returnType == TypeName.Void)
-                                    {
-                                        sourceCode += IndentedLine(bodyStmt + ";");
-                                    }
-                                    else if (returnType is RPtrTypeName or PPtrTypeName)
-                                    {
-                                        sourceCode += IndentedLine($"return {bodyStmt}.As<{returnType.CSharpName}>();");
-                                    }
-                                    else
-                                    {
-                                        sourceCode += IndentedLine($"return {bodyStmt};");
-                                    }
+                                    sourceCode += IndentedLine(bodyStmt + ";");
                                 }
-                                finally
+                                else if (returnType is RPtrTypeName or PPtrTypeName && returnAsBinding == false)
                                 {
-                                    if (fixedStatements.Count > 0)
-                                    {
-                                        --indent;
-                                        sourceCode += IndentedLine($"}}");
-                                    }
+                                    sourceCode += IndentedLine($"return {bodyStmt}.As<{returnType.CSharpName}>();");
+                                }
+                                else
+                                {
+                                    sourceCode += IndentedLine($"return {bodyStmt};");
                                 }
                             }
                             finally
                             {
-                                if (allocateStatements.Count > 0)
+                                if (fixedStatements.Count > 0)
                                 {
                                     --indent;
                                     sourceCode += IndentedLine($"}}");
-                                    sourceCode += IndentedLine($"finally");
-                                    sourceCode += IndentedLine($"{{");
-                                    Indented(() =>
-                                    {
-                                        foreach (var stmt in releaseStatements)
-                                        {
-                                            sourceCode += IndentedLine(stmt);
-                                        }
-                                    });
-                                    sourceCode += IndentedLine($"}}");
                                 }
                             }
-                        });
-                        sourceCode += IndentedLine($"}}");
-                        sourceCode += IndentedLine($"");
+                        }
+                        finally
+                        {
+                            if (allocateStatements.Count > 0)
+                            {
+                                --indent;
+                                sourceCode += IndentedLine($"}}");
+                                sourceCode += IndentedLine($"finally");
+                                sourceCode += IndentedLine($"{{");
+                                Indented(() =>
+                                {
+                                    foreach (var stmt in releaseStatements)
+                                    {
+                                        sourceCode += IndentedLine(stmt);
+                                    }
+                                });
+                                sourceCode += IndentedLine($"}}");
+                            }
+                        }
                     }
                 });
 

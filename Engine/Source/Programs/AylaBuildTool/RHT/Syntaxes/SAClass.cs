@@ -8,6 +8,7 @@ internal record SAClass(CapturedContext Context, SClass Class) : Syntax(Context,
     private SGeneratedBody? m_Body;
     private readonly List<SProperty> m_Properties = [];
     private readonly List<SFunction> m_Functions = [];
+    private readonly List<SConstructor> m_Constructors = [];
 
     public override string ToString()
     {
@@ -40,6 +41,13 @@ internal record SAClass(CapturedContext Context, SClass Class) : Syntax(Context,
     public void AddFunction(SFunction function)
     {
         m_Functions.Add(function);
+    }
+
+    public IReadOnlyList<SConstructor> Constructors => m_Constructors;
+
+    public void AddConstructor(SConstructor constructor)
+    {
+        m_Constructors.Add(constructor);
     }
 
     public static bool TryAccept(Context context, List<Syntax> bracketStack, [NotNullWhen(true)] out SAClass? aclass)

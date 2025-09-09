@@ -5,7 +5,7 @@ namespace Ayla;
 
 public partial class Engine
 {
-    public static void InitializeGame_Managed([MarshalAs(UnmanagedType.LPWStr)] string gameAssemblyPath)
+    public static ObjectReferenceWrapper InitializeGame_Managed([MarshalAs(UnmanagedType.LPWStr)] string gameAssemblyPath)
     {
         var assembly = Assembly.Load(Path.GetFileNameWithoutExtension(gameAssemblyPath) + ".Script");
         var defaultGameInstance = assembly.GetTypes().Where(p => p.IsAssignableTo(typeof(GameInstance))).FirstOrDefault();
@@ -13,5 +13,8 @@ public partial class Engine
         {
             throw new InvalidOperationException();
         }
+
+        var gi = (GameInstance)Activator.CreateInstance(defaultGameInstance)!;
+        return gi;
     }
 }
