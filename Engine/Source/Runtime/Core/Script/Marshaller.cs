@@ -42,4 +42,9 @@ public static unsafe class Marshaller
     {
         Marshal.FreeHGlobal(array);
     }
+
+    public static ObjectReferenceWrapper AsBinding(Object? aylaObject)
+    {
+        return aylaObject?.AsWrapper() ?? default;
+    }
 }

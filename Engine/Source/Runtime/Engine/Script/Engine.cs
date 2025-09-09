@@ -5,16 +5,16 @@ namespace Ayla;
 
 public partial class Engine
 {
-    public static ObjectReferenceWrapper InitializeGame_Managed([MarshalAs(UnmanagedType.LPWStr)] string gameAssemblyPath)
+    private readonly Assembly m_GameAssembly;
+
+    private Engine(Assembly gameAssembly) : this(Engine__Internal())
+    {
+        m_GameAssembly = gameAssembly;
+    }
+
+    public static ObjectReferenceWrapper CreateByNative([MarshalAs(UnmanagedType.LPWStr)] string gameAssemblyPath)
     {
         var assembly = Assembly.Load(Path.GetFileNameWithoutExtension(gameAssemblyPath) + ".Script");
-        var defaultGameInstance = assembly.GetTypes().Where(p => p.IsAssignableTo(typeof(GameInstance))).FirstOrDefault();
-        if (defaultGameInstance == null)
-        {
-            throw new InvalidOperationException();
-        }
-
-        var gi = (GameInstance)Activator.CreateInstance(defaultGameInstance)!;
-        return gi;
+        return new Engine(assembly).AsWrapper();
     }
 }

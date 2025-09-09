@@ -9,11 +9,13 @@ namespace Ayla
 	class Engine;
 	class DynamicLibrary;
 	class CommandLineParser;
+	class ScriptingBackend;
 
 	class LAUNCH_API Launch
 	{
 	private:
 		std::unique_ptr<CommandLineParser> m_Args;
+		std::unique_ptr<ScriptingBackend> m_ScriptingBackend;
 		RPtr<Engine> m_Engine;
 
 	public:

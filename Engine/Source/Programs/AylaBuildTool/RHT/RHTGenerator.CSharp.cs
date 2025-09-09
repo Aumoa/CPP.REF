@@ -45,9 +45,18 @@ using System.Runtime.InteropServices;
 
                 Indented(() =>
                 {
-                    sourceCode += IndentedLine($"protected {@class.Name}(nint instanceId) : base(instanceId)");
+sourceCode += "#pragma warning disable CS8618\n";
+
+                    sourceCode += IndentedLine($"protected {@class.Name}(nint instanceId, global::Ayla.Object.CreationFlags flags) : base(instanceId, flags)");
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
+                    sourceCode += IndentedLine($"");
+                    sourceCode += IndentedLine($"private {@class.Name}(global::Ayla.ObjectReferenceWrapper wrapper) : base(wrapper.InstanceId, wrapper.Flags)");
+                    sourceCode += IndentedLine($"{{");
+                    sourceCode += IndentedLine($"}}");
+
+sourceCode += "#pragma warning restore CS8618\n";
+
                     sourceCode += IndentedLine($"");
 
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
@@ -59,11 +68,11 @@ using System.Runtime.InteropServices;
                         var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {constructor.Parameters[i].Variable.Name}"));
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {constructor.Name}_Injected({injectParamsDeclare});");
+                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {constructor.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {constructor.Parameters[i].Variable.Name}"));
                         var returnStmt = returnType.CSharpName;
-                        sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {constructor.Name}_Internal({internalParamsDeclare})");
+                        sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {constructor.Name}__Internal({internalParamsDeclare})");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
@@ -79,6 +88,7 @@ using System.Runtime.InteropServices;
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var parameterTypes = function.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
                         bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
+                        bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
 
                         var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {function.Parameters[i].Variable.Name}"));
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
@@ -87,17 +97,40 @@ using System.Runtime.InteropServices;
                             injectParamsDeclare = "nint self" + (injectParamsDeclare.Length > 0 ? ", " : string.Empty) + injectParamsDeclare;
                         }
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}_Injected({injectParamsDeclare});");
+                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
                         var returnStmt = returnType is RPtrTypeName or PPtrTypeName ? $"{returnType.CSharpName}?" : returnType.CSharpName;
-                        sourceCode += IndentedLine($"private unsafe{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}_Internal({internalParamsDeclare})");
+                        sourceCode += IndentedLine($"private unsafe{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}__Internal({internalParamsDeclare})");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
                             GenerateFunctionBody(function, parameterTypes, function.Parameters, returnType, isStatic, false);
                         });
                         sourceCode += IndentedLine($"}}");
+                        if (isVirtual)
+                        {
+                            sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Override(global::Ayla.ObjectReferenceWrapper self_)");
+                            sourceCode += IndentedLine($"{{");
+                            Indented(() =>
+                            {
+                                sourceCode += IndentedLine($"var self = self_.As<{aclass.Class.Name}>()!;");
+                                string bodyStatement = $"self.{function.Name}()";
+                                if (returnType == TypeName.Void)
+                                {
+                                    sourceCode += IndentedLine(bodyStatement + ';');
+                                }
+                                else if (returnType is RPtrTypeName or PPtrTypeName)
+                                {
+                                    sourceCode += IndentedLine($"return global::Ayla.Marshaller.AsBinding({bodyStatement});");
+                                }
+                                else
+                                {
+                                    sourceCode += IndentedLine($"return {bodyStatement};");
+                                }
+                            });
+                            sourceCode += IndentedLine($"}}");
+                        }
                         sourceCode += IndentedLine($"");
                     }
 
@@ -173,7 +206,7 @@ using System.Runtime.InteropServices;
                                     arguments.Insert(0, "InstanceId");
                                 }
 
-                                string bodyStmt = $"{member.Name}_Injected({string.Join(", ", arguments)})";
+                                string bodyStmt = $"{member.Name}__Injected({string.Join(", ", arguments)})";
 
                                 if (returnType == TypeName.Void)
                                 {

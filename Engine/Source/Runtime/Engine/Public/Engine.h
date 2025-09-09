@@ -31,6 +31,7 @@ namespace Ayla
 		PPtr<GameInstance> m_GameInstance;
 
 	public:
+		ACONSTRUCTOR()
 		Engine();
 		virtual ~Engine() noexcept override;
 

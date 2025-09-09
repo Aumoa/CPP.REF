@@ -3,16 +3,22 @@
 #pragma once
 
 #include "IntegralTypes.h"
+#include "GC/RPtr.h"
 
 namespace Ayla
 {
 	class Object;
-	enum Object::CreationFlags;
 
 	struct ObjectReferenceWrapper
 	{
 		ssize_t InstanceId;
 		ssize_t Handle;
-		Object::CreationFlags Flags;
+		int32 Flags;
+
+		template<class T>
+		inline RPtr<T> Resolve() const
+		{
+			return RPtr<T>(dynamic_cast<T*>(reinterpret_cast<Object*>(InstanceId)));
+		}
 	};
 }

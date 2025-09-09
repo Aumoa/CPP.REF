@@ -18,8 +18,8 @@
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT void Ayla__Object__BeginWriteGCHandle(void* self);
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self, ::Ayla::ssize_t handle);
+	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self);
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle);
 }
 
 namespace Ayla
@@ -39,8 +39,8 @@ namespace Ayla
 		friend TypeRegister;
 		friend Type;
 		friend RuntimeType;
-		friend void ::Ayla__Object__BeginWriteGCHandle(void* self);
-		friend void ::Ayla__Object__EndWriteGCHandle(void* self, ssize_t handle);
+		friend ::Ayla::ssize_t (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self);
+		friend void ::Ayla__Object__EndWriteGCHandle__Injected(void* self, ssize_t handle);
 
 	public:
 		using This = Object;
@@ -60,8 +60,8 @@ namespace Ayla
 		{
 			friend ::Ayla::GC;
 			friend Object;
-			friend void ::Ayla__Object__BeginWriteGCHandle(void* self);
-			friend void ::Ayla__Object__EndWriteGCHandle(void* self, ssize_t handle);
+			friend ::Ayla::ssize_t (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self);
+			friend void ::Ayla__Object__EndWriteGCHandle__Injected(void* self, ssize_t handle);
 
 			static constexpr size_t G1Size = 8192;
 			static constexpr size_t G2Size = 65536;
@@ -124,7 +124,7 @@ namespace Ayla
 			{
 				.InstanceId = GetInstanceId(),
 				.Handle = m_GCHandle,
-				.Flags = m_Flags
+				.Flags = (int32)m_Flags
 			};
 		}
 

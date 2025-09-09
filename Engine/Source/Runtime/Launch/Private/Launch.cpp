@@ -5,6 +5,7 @@
 #include "GenericApplication.h"
 #include "CommandLineParser.h"
 #include "Platform/DynamicLibrary.h"
+#include "ScriptingBackend/CoreCLR/CoreCLRScriptingBackend.h"
 
 namespace Ayla
 {
@@ -19,8 +20,21 @@ namespace Ayla
     int32 Launch::StartApplication()
     {
         auto& app = GenericApplication::Get();
+        auto& options = m_Args->Options();
+        
+        auto it = options.find(TEXT("gameassembly"));
+        if (it == options.end())
+        {
+			throw InvalidOperationException(TEXT("No game assembly specified."));
+        }
 
-        m_Engine = Object::New<Engine>();
+        auto gameAssembly = it->second[0].value();
+        m_ScriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
+        m_ScriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
+        
+        using CreateByNativeDelegate = ObjectReferenceWrapper(*)(const wchar_t*);
+        auto* createByNative = reinterpret_cast<CreateByNativeDelegate>(m_ScriptingBackend->GetFunctionPointer(TEXT("Engine.Script"), TEXT("Ayla.Engine"), TEXT("CreateByNative")));
+        m_Engine = createByNative(gameAssembly.c_str()).Resolve<Engine>();
         m_Engine->PreInitialize();
         m_Engine->Initialize(m_Args.get());
 

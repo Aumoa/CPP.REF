@@ -12,20 +12,6 @@
 
 namespace Ayla
 {
-	using CreateManagedInstanceCallbackDelegate = ssize_t(*)(const wchar_t* bindingTypeName);
-	static CreateManagedInstanceCallbackDelegate g_CreateManagedInstance;
-}
-
-extern "C"
-{
-	PLATFORM_SHARED_EXPORT void Ayla__RegisterBindingCallbacks(Ayla::CreateManagedInstanceCallbackDelegate createManagedInstanceCallback)
-	{
-		Ayla::g_CreateManagedInstance = createManagedInstanceCallback;;
-	}
-}
-
-namespace Ayla
-{
 	struct Object::CreationHack
 	{
 		static thread_local CreationHack s_Hack;
@@ -156,14 +142,20 @@ namespace Ayla
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT void Ayla__Object__BeginWriteGCHandle(void* self)
+	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self)
 	{
 		::Ayla::Object::s_RootCollection.m_Mutex.lock();
+		return ((::Ayla::Object*)self)->m_GCHandle;
 	}
 
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle(void* self, ::Ayla::ssize_t handle)
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle)
 	{
 		((::Ayla::Object*)self)->m_GCHandle = handle;
 		::Ayla::Object::s_RootCollection.m_Mutex.unlock();
+	}
+
+	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper Ayla__Object__AsWrapper__Injected(void* self)
+	{
+		return ((::Ayla::Object*)self)->AsWrapper();
 	}
 }
