@@ -54,7 +54,7 @@ internal static partial class BuildRunner
             var headerText = Generator.GenerateHeader(collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
 
-            var sourceCodeText = Generator.GenerateSourceCode(collection).Replace("\r\n", "\n");
+            var sourceCodeText = Generator.GenerateSourceCode(Project, collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
             var csText = Generator.GenerateCSharp(collection).Replace("\r\n", "\n");

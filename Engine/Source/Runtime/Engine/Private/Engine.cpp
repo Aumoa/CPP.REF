@@ -22,17 +22,17 @@ namespace Ayla
 	{
 	}
 
-	void Engine::PreInitialize()
+	void Engine::PreInitialize_Implementation()
 	{
 	}
 
-	void Engine::Initialize(const CommandLineParser* args)
+	void Engine::Initialize_Implementation()
 	{
 		try
 		{
 			InitializeActivity();
 			InitializeGraphics();
-			InitializeGame(args);
+			InitializeGame();
 			PostInitialized();
 		}
 		catch (...)
@@ -42,7 +42,7 @@ namespace Ayla
 		}
 	}
 
-	void Engine::Shutdown()
+	void Engine::Shutdown_Implementation()
 	{
 		m_RenderThread->RequestStop();
 
@@ -79,7 +79,7 @@ namespace Ayla
 		m_RenderThread = std::make_unique<RenderThread>(m_Graphics);
 	}
 
-	void Engine::InitializeGame(const CommandLineParser* args)
+	void Engine::InitializeGame()
 	{
 	}
 

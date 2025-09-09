@@ -114,7 +114,7 @@ namespace Ayla
 		m_Hosting.reset();
 	}
 
-	void* CoreCLRScriptingBackend::GetFunctionPointer(String assemblyName, String className, String methodName)
+	void* CoreCLRScriptingBackend::GetFunctionPointer(std::string_view assemblyName, std::string_view className, std::string_view methodName)
 	{
 		if (m_HostHandle == nullptr)
 		{
@@ -122,15 +122,12 @@ namespace Ayla
 		}
 
 		void* functionPtr = nullptr;
-		auto assemblyName_a = assemblyName.string();
-		auto className_a = className.string();
-		auto methodName_a = methodName.string();
 		int hr = m_Functions->coreclr_create_delegate(
 			m_HostHandle,
 			m_DomainId,
-			assemblyName_a.c_str(),
-			className_a.c_str(),
-			methodName_a.c_str(),
+			assemblyName.data(),
+			className.data(),
+			methodName.data(),
 			&functionPtr);
 		if (hr < 0 || functionPtr == nullptr)
 		{

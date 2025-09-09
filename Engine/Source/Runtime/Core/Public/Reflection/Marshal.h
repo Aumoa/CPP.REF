@@ -69,6 +69,13 @@ namespace Ayla
 			return result;
 		}
 
+		template<class TNative>
+		static TNative ToNative(ObjectReferenceWrapper value, int) requires
+			std::derived_from<TNative, BasePtr>
+		{
+			return value.Resolve<typename TNative::element_type>();
+		}
+
 	public:
 		template<class TNative, class TBinding>
 		static auto ToNative(TBinding&& value)

@@ -23,6 +23,6 @@ namespace Ayla
 
 		virtual void LoadAssembly(String assemblyBasePath, String assemblyName) override;
 		virtual void UnloadAssembly() override;
-		virtual void* GetFunctionPointer(String assemblyName, String className, String methodName) override;
+		virtual void* GetFunctionPointer(std::string_view assemblyName, std::string_view className, std::string_view methodName) override;
 	};
 }

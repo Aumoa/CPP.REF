@@ -40,23 +40,17 @@ using System.Runtime.InteropServices;
                     inherit = $" : {baseClass.CSharpName}";
                 }
 
-                sourceCode += IndentedLine($"public partial class {@class.Name}{inherit}");
+                sourceCode += IndentedLine($"public class {@class.Name}__Injected{inherit}");
                 sourceCode += IndentedLine($"{{");
-
                 Indented(() =>
                 {
-sourceCode += "#pragma warning disable CS8618\n";
-
-                    sourceCode += IndentedLine($"protected {@class.Name}(nint instanceId, global::Ayla.Object.CreationFlags flags) : base(instanceId, flags)");
+                    sourceCode += IndentedLine($"protected {@class.Name}__Injected(nint instanceId, global::Ayla.Object.CreationFlags flags) : base(instanceId, flags)");
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
                     sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"private {@class.Name}(global::Ayla.ObjectReferenceWrapper wrapper) : base(wrapper.InstanceId, wrapper.Flags)");
+                    sourceCode += IndentedLine($"private {@class.Name}__Injected(global::Ayla.ObjectReferenceWrapper wrapper) : base(wrapper.InstanceId, wrapper.Flags)");
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
-
-sourceCode += "#pragma warning restore CS8618\n";
-
                     sourceCode += IndentedLine($"");
 
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
@@ -68,15 +62,15 @@ sourceCode += "#pragma warning restore CS8618\n";
                         var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {constructor.Parameters[i].Variable.Name}"));
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {constructor.Name}__Injected({injectParamsDeclare});");
+                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} ctor_{constructor.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {constructor.Parameters[i].Variable.Name}"));
                         var returnStmt = returnType.CSharpName;
-                        sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {constructor.Name}__Internal({internalParamsDeclare})");
+                        // TODO: support parameters
+                        sourceCode += IndentedLine($"public unsafe {constructor.Name}__Injected({internalParamsDeclare}) : this(ctor_{constructor.Name}__Injected())");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
-                            GenerateFunctionBody(constructor, parameterTypes, constructor.Parameters, returnType, true, true);
                         });
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
@@ -101,16 +95,16 @@ sourceCode += "#pragma warning restore CS8618\n";
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
                         var returnStmt = returnType is RPtrTypeName or PPtrTypeName ? $"{returnType.CSharpName}?" : returnType.CSharpName;
-                        sourceCode += IndentedLine($"private unsafe{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}__Internal({internalParamsDeclare})");
+                        sourceCode += IndentedLine($"public unsafe{(isVirtual ? " virtual" : string.Empty)}{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}({internalParamsDeclare})");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
-                            GenerateFunctionBody(function, parameterTypes, function.Parameters, returnType, isStatic, false);
+                            GenerateFunctionBody(function, string.Empty, parameterTypes, function.Parameters, returnType, isStatic, false);
                         });
                         sourceCode += IndentedLine($"}}");
                         if (isVirtual)
                         {
-                            sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Override(global::Ayla.ObjectReferenceWrapper self_)");
+                            sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Invoke(global::Ayla.ObjectReferenceWrapper self_)");
                             sourceCode += IndentedLine($"{{");
                             Indented(() =>
                             {
@@ -134,7 +128,7 @@ sourceCode += "#pragma warning restore CS8618\n";
                         sourceCode += IndentedLine($"");
                     }
 
-                    void GenerateFunctionBody(SMember member, TypeName[] parameterTypes, SParameter[] parameters, TypeName returnType, bool isStatic, bool returnAsBinding)
+                    void GenerateFunctionBody(SMember member, string prefix, TypeName[] parameterTypes, SParameter[] parameters, TypeName returnType, bool isStatic, bool returnAsBinding)
                     {
                         List<string> allocateStatements = [];
                         List<string> fixedStatements = [];
@@ -206,7 +200,7 @@ sourceCode += "#pragma warning restore CS8618\n";
                                     arguments.Insert(0, "InstanceId");
                                 }
 
-                                string bodyStmt = $"{member.Name}__Injected({string.Join(", ", arguments)})";
+                                string bodyStmt = $"{prefix}{member.Name}__Injected({string.Join(", ", arguments)})";
 
                                 if (returnType == TypeName.Void)
                                 {
@@ -249,6 +243,26 @@ sourceCode += "#pragma warning restore CS8618\n";
                             }
                         }
                     }
+                });
+                sourceCode += IndentedLine($"}}");
+                sourceCode += IndentedLine($"");
+
+                sourceCode += IndentedLine($"public partial class {@class.Name} : {@class.Name}__Injected");
+                sourceCode += IndentedLine($"{{");
+
+                Indented(() =>
+                {
+sourceCode += "#pragma warning disable CS8618\n";
+
+                    sourceCode += IndentedLine($"protected {@class.Name}(nint instanceId, global::Ayla.Object.CreationFlags flags) : base(instanceId, flags)");
+                    sourceCode += IndentedLine($"{{");
+                    sourceCode += IndentedLine($"}}");
+                    sourceCode += IndentedLine($"");
+                    sourceCode += IndentedLine($"private {@class.Name}(global::Ayla.ObjectReferenceWrapper wrapper) : base(wrapper.InstanceId, wrapper.Flags)");
+                    sourceCode += IndentedLine($"{{");
+                    sourceCode += IndentedLine($"}}");
+
+sourceCode += "#pragma warning restore CS8618\n";
                 });
 
                 sourceCode += IndentedLine($"}}");

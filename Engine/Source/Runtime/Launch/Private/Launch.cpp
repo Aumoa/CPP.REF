@@ -36,7 +36,7 @@ namespace Ayla
         auto* createByNative = reinterpret_cast<CreateByNativeDelegate>(m_ScriptingBackend->GetFunctionPointer(TEXT("Engine.Script"), TEXT("Ayla.Engine"), TEXT("CreateByNative")));
         m_Engine = createByNative(gameAssembly.c_str()).Resolve<Engine>();
         m_Engine->PreInitialize();
-        m_Engine->Initialize(m_Args.get());
+        m_Engine->Initialize();
 
         std::vector<GenericPlatformInputEvent> inputEvents;
         while (true)

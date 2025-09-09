@@ -25,7 +25,6 @@ namespace Ayla
 		std::shared_ptr<Graphics> m_Graphics;
 		std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 		std::unique_ptr<RenderThread> m_RenderThread;
-		std::unique_ptr<ScriptingBackend> m_ScriptingBackend;
 
 		APROPERTY()
 		PPtr<GameInstance> m_GameInstance;
@@ -35,19 +34,19 @@ namespace Ayla
 		Engine();
 		virtual ~Engine() noexcept override;
 
+		AFUNCTION()
 		virtual void PreInitialize();
-		virtual void Initialize(const CommandLineParser* args);
+		AFUNCTION()
+		virtual void Initialize();
+		AFUNCTION()
 		virtual void Shutdown();
 
 		virtual void Tick();
 
 	private:
-		AFUNCTION()
 		void InitializeActivity();
-		AFUNCTION()
 		void InitializeGraphics();
-		void InitializeGame(const CommandLineParser* args);
-		AFUNCTION()
+		void InitializeGame();
 		void PostInitialized();
 	};
 }

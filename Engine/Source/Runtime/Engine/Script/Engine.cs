@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Ayla;
@@ -7,7 +8,7 @@ public partial class Engine
 {
     private readonly Assembly m_GameAssembly;
 
-    private Engine(Assembly gameAssembly) : this(Engine__Internal())
+    private Engine(Assembly gameAssembly)
     {
         m_GameAssembly = gameAssembly;
     }

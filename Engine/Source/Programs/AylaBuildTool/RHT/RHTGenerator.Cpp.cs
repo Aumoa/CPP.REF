@@ -2,12 +2,13 @@
 
 using AylaEngine.RHT.Syntaxes;
 using AylaEngine.RHT.Types;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
-    public string GenerateSourceCode(TypeNames typeNames)
+    public string GenerateSourceCode(ModuleProject project, TypeNames typeNames)
     {
         List<string> headers = [];
         foreach (var aclass in Classes)
@@ -72,6 +73,31 @@ internal partial class RHTGenerator
                 sourceCodeText +=  "    Super::GatherProperties(collector);\n";
                 sourceCodeText += $"    Transfer(collector);\n";
                 sourceCodeText +=  "  }\n";
+                for (int i = 0; i < aclass.Functions.Count; ++i)
+                {
+                    var function = aclass.Functions[i];
+                    bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
+                    if (isVirtual == false)
+                    {
+                        continue;
+                    }
+
+                    var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
+                    sourceCodeText += $"  {function.ReturnType.FullName} {@class}::{function.Name}()\n";
+                    sourceCodeText += $"  {{\n";
+                    sourceCodeText += $"    using signature_t = {function.ReturnType.FullName}(*)(::Ayla::ObjectReferenceWrapper);\n";
+                    sourceCodeText += $"    static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Injected\", \"{function.Name}__Invoke\"));\n";
+                    string callStatement = $"callable(AsWrapper())";
+                    if (returnType == TypeName.Void)
+                    {
+                        sourceCodeText += $"    {callStatement};\n";
+                    }
+                    else
+                    {
+                        sourceCodeText += $"    return ::Ayla::Marshal::ToNative<{function.ReturnType.FullName}>({callStatement});\n";
+                    }
+                    sourceCodeText += $"  }}\n";
+                }
                 sourceCodeText +=  "}\n\n";
                 sourceCodeText +=  "extern \"C\"\n";
                 sourceCodeText +=  "{\n";
@@ -127,8 +153,10 @@ internal partial class RHTGenerator
                         return $"::Ayla::Marshal::ToNative<{argumentType.CppName}>({p.Variable.Name})";
                     }));
                     bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
+                    bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
                     var caller = isStatic ? $"{classType.CppName}::" : $"(({classType.CppName}*)(::Ayla::Object*)self)->";
-                    string bodyStatement = $"{caller}{function.Name}({arguments})";
+                    string suffix = isVirtual ? "_Implementation" : string.Empty;
+                    string bodyStatement = $"{caller}{function.Name}{suffix}({arguments})";
                     string returnStatement;
                     if (returnType != BuiltinTypeName.Void)
                     {
@@ -138,6 +166,7 @@ internal partial class RHTGenerator
                     {
                         returnStatement = $"{bodyStatement}";
                     }
+
                     sourceCodeText += $"  PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({parameters})\n";
                     sourceCodeText += $"  {{\n";
                     sourceCodeText += $"    {returnStatement};\n";

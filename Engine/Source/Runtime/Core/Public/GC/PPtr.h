@@ -21,6 +21,9 @@ namespace Ayla
 		template<class U>
 		friend class PPtr;
 
+	public:
+		using element_type = T;
+
 	private:
 		T* m_Ptr = nullptr;
 

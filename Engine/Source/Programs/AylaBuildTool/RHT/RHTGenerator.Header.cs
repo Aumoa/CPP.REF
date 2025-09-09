@@ -183,11 +183,29 @@ internal partial class RHTGenerator
                 });
                 headerText += Indented_Line($"}};");
                 headerText += Indented_Line($"");
+                headerText += IndentedMLine($"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__script_table ");
+                Indented(() =>
+                {
+                    for (int i = 0; i < aclass.Functions.Count; ++i)
+                    {
+                        var function = aclass.Functions[i];
+                        if (function.Flags.HasFlag(SFunction.FFlags.Virtual) == false)
+                        {
+                            continue;
+                        }
+
+                        var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
+                        var @params = string.Join(", ", function.Parameters.Select(p => $"{p.Variable.TypeName.FullName} {p.Variable.Name}"));
+                        headerText += IndentedMLine($"{function.ReturnType.FullName} {function.Name}_Implementation({@params});");
+                    }
+                });
+                headerText += Indented_Line($"");
                 headerText += IndentedMLine($"#define GENERATED_BODY__IMPL__{m_FileId}__{lineNumber} ");
                 Indented(() =>
                 {
                     headerText += IndentedMLine($"GENERATED_BODY__DEFAULT_BODY({aclass.Class.Name}) ");
                     headerText += IndentedMLine($"GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__reflexpr_class");
+                    headerText += IndentedMLine($"GENERATED_BODY__IMPL__{m_FileId}__{lineNumber}__script_table");
                     foreach (var friend in friends)
                     {
                         headerText += IndentedMLine(friend);
