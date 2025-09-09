@@ -79,11 +79,11 @@ namespace Ayla
 			RootMark& GetMark(Object* object);
 		};
 
-	private:
+	public:
 		enum class CreationFlags
 		{
-			FromNative,
-			FromScript
+			None,
+			FromScript = 1 << 0
 		};
 
 		GENERATE_BITMASK_ENUM_OPERATORS_FRIEND(::Ayla::Object::CreationFlags);
@@ -95,6 +95,7 @@ namespace Ayla
 		int32 m_InstanceIndex = -1;
 		uint8 m_FinalizeSuppressed : 1 = false;
 		Type* m_Type;
+		CreationFlags m_Flags;
 		ssize_t m_GCHandle = 0;
 
 	protected:
@@ -117,7 +118,15 @@ namespace Ayla
 		Type* GetType() const { return m_Type; }
 
 		ssize_t GetInstanceId() const { return reinterpret_cast<ssize_t>(this); }
-		ObjectReferenceWrapper AsWrapper() const { return ObjectReferenceWrapper{ .InstanceId = GetInstanceId(), .Handle = m_GCHandle }; }
+		ObjectReferenceWrapper AsWrapper() const
+		{
+			return ObjectReferenceWrapper
+			{
+				.InstanceId = GetInstanceId(),
+				.Handle = m_GCHandle,
+				.Flags = m_Flags
+			};
+		}
 
 		Object& operator =(const Object&) = delete;
 		Object& operator =(Object&&) = delete;
@@ -127,7 +136,7 @@ namespace Ayla
 		static RPtr<T> New(TArgs&&... args)
 		{
 			std::optional<RPtr<T>> ptr;
-			ConfigureNew(typeid(T), CreationFlags::FromNative, [&]()
+			ConfigureNew(typeid(T), CreationFlags::None, [&]()
 			{
 				ptr.emplace(new T(std::forward<TArgs>(args)...));
 				return ptr->Get();

@@ -6,9 +6,13 @@
 
 namespace Ayla
 {
+	class Object;
+	enum Object::CreationFlags;
+
 	struct ObjectReferenceWrapper
 	{
 		ssize_t InstanceId;
 		ssize_t Handle;
+		Object::CreationFlags Flags;
 	};
 }

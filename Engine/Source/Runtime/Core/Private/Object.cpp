@@ -107,6 +107,7 @@ namespace Ayla
 
 	Object::Object()
 		: m_Type(CreationHack::s_Hack.ObjectType)
+		, m_Flags(CreationHack::s_Hack.Flags)
 	{
 		if (CreationHack::s_Hack.AllowConstruct == false)
 		{

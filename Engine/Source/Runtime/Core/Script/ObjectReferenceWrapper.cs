@@ -8,11 +8,13 @@ public struct ObjectReferenceWrapper
 {
     public readonly nint InstanceId;
     public readonly nint Handle;
+    public readonly Object.CreationFlags Flags;
 
-    public ObjectReferenceWrapper(nint instanceId, nint handle)
+    public ObjectReferenceWrapper(nint instanceId, nint handle, Object.CreationFlags flags)
     {
         InstanceId = instanceId;
         Handle = handle;
+        Flags = flags;
     }
 
     public T? As<T>() where T : Object

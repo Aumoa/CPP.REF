@@ -4,6 +4,13 @@ namespace Ayla;
 
 public partial class Object : IDisposable
 {
+    [Flags]
+    public enum CreationFlags
+    {
+        None,
+        FromScript = 1 << 0
+    }
+
     protected Object(nint instanceId)
     {
         InstanceId = instanceId;
