@@ -35,6 +35,11 @@ namespace Ayla
 		virtual ~Engine() noexcept override;
 
 		AFUNCTION()
+		virtual void GuardedStartup();
+		AFUNCTION()
+		virtual void GuardedLoop();
+
+		AFUNCTION()
 		virtual void PreInitialize();
 		AFUNCTION()
 		virtual void Initialize();
@@ -43,10 +48,12 @@ namespace Ayla
 
 		virtual void Tick();
 
-	private:
+	protected:
+		AFUNCTION()
 		void InitializeActivity();
+		AFUNCTION()
 		void InitializeGraphics();
-		void InitializeGame();
+		AFUNCTION()
 		void PostInitialized();
 	};
 }

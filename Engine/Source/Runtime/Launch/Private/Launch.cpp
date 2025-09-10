@@ -19,7 +19,6 @@ namespace Ayla
 
     int32 Launch::StartApplication()
     {
-        auto& app = GenericApplication::Get();
         auto& options = m_Args->Options();
         
         auto it = options.find(TEXT("gameassembly"));
@@ -35,22 +34,9 @@ namespace Ayla
         using CreateByNativeDelegate = ObjectReferenceWrapper(*)(const wchar_t*);
         auto* createByNative = reinterpret_cast<CreateByNativeDelegate>(m_ScriptingBackend->GetFunctionPointer(TEXT("Engine.Script"), TEXT("Ayla.Engine"), TEXT("CreateByNative")));
         m_Engine = createByNative(gameAssembly.c_str()).Resolve<Engine>();
-        m_Engine->PreInitialize();
-        m_Engine->Initialize();
-
-        std::vector<GenericPlatformInputEvent> inputEvents;
-        while (true)
-        {
-            app.PumpMessages(inputEvents);
-            if (app.IsQuitRequested())
-            {
-                break;
-            }
-            m_Engine->Tick();
-        }
-
-        m_Engine->Shutdown();
-        return app.GetExitCode();
+        m_Engine->GuardedStartup();
+        m_Engine->GuardedLoop();
+        return GenericApplication::Get().GetExitCode();
     }
 
     int32 Launch::GuardedMain(std::unique_ptr<CommandLineParser> args, const DynamicLibrary& apiSet)

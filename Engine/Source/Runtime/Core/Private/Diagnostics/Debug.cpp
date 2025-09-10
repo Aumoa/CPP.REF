@@ -3,6 +3,7 @@
 #include "Diagnostics/Debug.h"
 #include "Platform/PlatformProcess.h"
 #include "Console.h"
+#include "Reflection/ManagedStringWrapper.h"
 
 namespace Ayla
 {
@@ -21,5 +22,13 @@ namespace Ayla
 		auto output = String::Format(TEXT("{}: {}: {}"), category, LogVerbosityStr[(int32)logLevel], message);
 		PlatformProcess::OutputDebugString(String::Format(TEXT("{}\n"), output));
 		Console::WriteLine(output);
+	}
+}
+
+extern "C"
+{
+	PLATFORM_SHARED_EXPORT void Ayla__Debug__Log(::Ayla::ManagedStringWrapper category, ::Ayla::LogVerbosity logLevel, ::Ayla::ManagedStringWrapper message)
+	{
+		::Ayla::Debug::Log(category.AsStringView(), logLevel, message.AsStringView());
 	}
 }

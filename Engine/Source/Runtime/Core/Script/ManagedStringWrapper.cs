@@ -5,6 +5,6 @@ namespace Ayla;
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 public struct ManagedStringWrapper
 {
-    public nint Buffer;
+    public nint C_str;
     public int Length;
 }

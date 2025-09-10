@@ -22,24 +22,35 @@ namespace Ayla
 	{
 	}
 
+	void Engine::GuardedStartup_Implementation()
+	{
+		PreInitialize();
+		Initialize();
+	}
+
+	void Engine::GuardedLoop_Implementation()
+	{
+		auto& app = GenericApplication::Get();
+		std::vector<GenericPlatformInputEvent> inputEvents;
+		while (true)
+		{
+			app.PumpMessages(inputEvents);
+			if (app.IsQuitRequested())
+			{
+				break;
+			}
+			Tick();
+		}
+
+		Shutdown();
+	}
+
 	void Engine::PreInitialize_Implementation()
 	{
 	}
 
 	void Engine::Initialize_Implementation()
 	{
-		try
-		{
-			InitializeActivity();
-			InitializeGraphics();
-			InitializeGame();
-			PostInitialized();
-		}
-		catch (...)
-		{
-			Shutdown();
-			throw;
-		}
 	}
 
 	void Engine::Shutdown_Implementation()
@@ -77,10 +88,6 @@ namespace Ayla
 		m_Graphics = Graphics::CreateGraphics(RenderFeatures::Vulkan);
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
 		m_RenderThread = std::make_unique<RenderThread>(m_Graphics);
-	}
-
-	void Engine::InitializeGame()
-	{
 	}
 
 	void Engine::PostInitialized()
