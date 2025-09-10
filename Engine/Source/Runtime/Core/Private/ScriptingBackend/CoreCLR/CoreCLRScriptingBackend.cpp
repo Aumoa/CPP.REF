@@ -5,6 +5,7 @@
 #include "IO/Directory.h"
 #include "IO/File.h"
 #include "Path.h"
+#include "Version.h"
 #include "InvalidOperationException.h"
 
 namespace Ayla
@@ -33,7 +34,23 @@ namespace Ayla
 		}
 
 #if PLATFORM_WINDOWS
-		String coreclr = TEXT("C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\9.0.8\\coreclr");
+		String coreclr = TEXT("C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App");
+		std::vector<Version> versions;
+		for (auto& versionDirectory : Directory::GetDirectories(coreclr))
+		{
+			auto versionStr = Path::GetFileName(versionDirectory);
+			Version version;
+			if (Version::TryParse(versionStr, version) && version.Major == 9)
+			{
+				versions.emplace_back(version);
+			}
+		}
+		if (versions.size() == 0)
+		{
+			throw InvalidOperationException(TEXT("No suitable CoreCLR version found."));
+		}
+		std::ranges::sort(versions, std::greater<>());
+		coreclr = Path::Combine(coreclr, versions.front().ToString(), TEXT("coreclr"));
 #else
 #error TODO: Add other platform support.
 #endif
