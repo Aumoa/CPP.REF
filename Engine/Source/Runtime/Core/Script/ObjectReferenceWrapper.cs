@@ -45,4 +45,6 @@ public struct ObjectReferenceWrapper
             Object.EndWriteGCHandle__Injected(InstanceId, (nint)handle);
         }
     }
+
+    public static implicit operator ObjectReferenceWrapper(Object obj) => obj.AsWrapper();
 }

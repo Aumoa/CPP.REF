@@ -21,6 +21,7 @@ namespace Ayla
 		bool m_Disposed = false;
 
 	public:
+		ACONSTRUCTOR()
 		Scene();
 		virtual ~Scene() noexcept override;
 
