@@ -2,10 +2,12 @@
 
 public partial class Launch
 {
-    public void StartApplication()
-    {
-        StartApplication_Internal();
-    }
+    private Engine m_Engine;
 
-    public static Launch CreateInstance(string[] args) => CreateInstance_Internal(args) ?? throw new InvalidOperationException();
+    public override void StartApplication()
+    {
+        m_Engine = new Engine();
+        m_Engine.GuardedStartup();
+        m_Engine.GuardedLoop();
+    }
 }

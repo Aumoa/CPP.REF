@@ -1160,7 +1160,7 @@ namespace Ayla
 		return ToStringView(Ch).Clone();
 	}
 
-#define TEXT(X) (String::FromLiteral(L ## X))
+#define TEXT(X) (::Ayla::String::FromLiteral(L ## X))
 }
 
 template<>

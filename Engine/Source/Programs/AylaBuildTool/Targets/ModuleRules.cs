@@ -176,5 +176,5 @@ public class ModuleRules
         }
     }
 
-    public bool IsSharedLibrary() => Type is ModuleType.Library or ModuleType.Game || Scriptable.Enabled;
+    public bool IsSharedLibrary() => Type is ModuleType.Library or ModuleType.Game;
 }

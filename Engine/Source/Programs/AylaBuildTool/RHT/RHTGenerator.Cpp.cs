@@ -8,9 +8,10 @@ namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
-    public string GenerateSourceCode(ModuleProject project, TypeNames typeNames)
+    public string GenerateSourceCode(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
     {
         List<string> headers = [];
+        var rule = project.GetRule(buildTarget);
         foreach (var aclass in Classes)
         {
             foreach (var type in aclass.Properties.Select(p => p.Variable.TypeName)
@@ -93,6 +94,13 @@ internal partial class RHTGenerator
                         sourceCodeText += $"    return ::Ayla::Marshal::ToNative<{function.ReturnType.FullName}>({callStatement});\n";
                     }
                     sourceCodeText += $"  }}\n";
+                    if (rule.Type == ModuleType.Application)
+                    {
+                        sourceCodeText += $"  {function.ReturnType.FullName} {@class}::{function.Name}_Implementation()\n";
+                        sourceCodeText += $"  {{\n";
+                        sourceCodeText += $"    throw ::Ayla::AccessViolationException(TEXT(\"Assemblies of the Application type cannot directly invoke native functions.\"));\n";
+                        sourceCodeText += $"  }}\n";
+                    }
                 }
                 sourceCodeText +=  "}\n\n";
                 sourceCodeText +=  "extern \"C\"\n";
@@ -143,6 +151,8 @@ internal partial class RHTGenerator
                         }
                     }
                     string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
+
+                    string returnStatement;
                     string arguments = string.Join(", ", function.Parameters.Select(p =>
                     {
                         var argumentType = typeNames.FindType(p.Variable.TypeName, aclass.Class);
@@ -153,7 +163,6 @@ internal partial class RHTGenerator
                     var caller = isStatic ? $"{classType.CppName}::" : $"(({classType.CppName}*)(::Ayla::Object*)self)->";
                     string suffix = isVirtual ? "_Implementation" : string.Empty;
                     string bodyStatement = $"{caller}{function.Name}{suffix}({arguments})";
-                    string returnStatement;
                     if (returnType != BuiltinTypeName.Void)
                     {
                         returnStatement = $"return ::Ayla::Marshal::ToBinding({bodyStatement})";

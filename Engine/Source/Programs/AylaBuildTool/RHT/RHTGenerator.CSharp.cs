@@ -6,7 +6,7 @@ namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
-    public string GenerateCSharp(TypeNames typeNames)
+    public string GenerateCSharp(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
     {
         string sourceCode = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
@@ -126,6 +126,13 @@ using System.Runtime.InteropServices;
 
                     void GenerateFunctionBody(SMember member, string prefix, TypeName[] parameterTypes, SParameter[] parameters, TypeName returnType, bool isStatic, bool returnAsBinding)
                     {
+                        var rule = project.GetRule(buildTarget);
+                        if (rule.Type == ModuleType.Application)
+                        {
+                            sourceCode += IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application type cannot directly invoke native functions.\");");
+                            return;
+                        }
+
                         List<string> allocateStatements = [];
                         List<string> fixedStatements = [];
                         List<string> arguments = [];

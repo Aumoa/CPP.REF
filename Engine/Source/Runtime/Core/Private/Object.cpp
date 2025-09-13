@@ -37,7 +37,6 @@ namespace Ayla
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
 	size_t Object::s_LiveObjects;
-	Spinlock Object::s_Spinlock;
 
 	Object::Object()
 		: m_Type{ CreationHack::s_Hack.ObjectType }
@@ -97,14 +96,16 @@ extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self)
 	{
-		::Ayla::Object::s_Spinlock.lock();
-		return ((::Ayla::Object*)self)->m_GCHandle;
+		auto self_ = (::Ayla::Object*)self;
+		self_->m_Spinlock.lock();
+		return self_->m_GCHandle;
 	}
 
 	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle)
 	{
-		((::Ayla::Object*)self)->m_GCHandle = handle;
-		::Ayla::Object::s_Spinlock.unlock();
+		auto self_ = (::Ayla::Object*)self;
+		self_->m_GCHandle = handle;
+		self_->m_Spinlock.unlock();
 	}
 
 	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper Ayla__Object__AsWrapper__Injected(::Ayla::Object* self)

@@ -17,28 +17,6 @@ namespace Ayla
     {
     }
 
-    int32 Launch::StartApplication()
-    {
-        auto& options = m_Args->Options();
-        
-        auto it = options.find(TEXT("gameassembly"));
-        if (it == options.end())
-        {
-			throw InvalidOperationException(TEXT("No game assembly specified."));
-        }
-
-        auto gameAssembly = it->second[0].value();
-        m_ScriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
-        m_ScriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
-        
-        using CreateByNativeDelegate = ObjectReferenceWrapper(*)(const wchar_t*);
-        auto* createByNative = reinterpret_cast<CreateByNativeDelegate>(m_ScriptingBackend->GetFunctionPointer(TEXT("Engine.Script"), TEXT("Ayla.Engine"), TEXT("CreateByNative")));
-        m_Engine = createByNative(gameAssembly.c_str()).Resolve<Engine>();
-        m_Engine->GuardedStartup();
-        m_Engine->GuardedLoop();
-        return GenericApplication::Get().GetExitCode();
-    }
-
     int32 Launch::GuardedMain(std::unique_ptr<CommandLineParser> args, const DynamicLibrary& apiSet)
     {
         ThreadPool::Initialize();
@@ -54,10 +32,22 @@ namespace Ayla
             throw InvalidOperationException(TEXT("Failed to load signature for create generic application."));
         }
 
+        auto& options = args->Options();
+        auto it = options.find(TEXT("gameassembly"));
+        if (it == options.end())
+        {
+            throw InvalidOperationException(TEXT("No game assembly specified."));
+        }
+
+        auto gameAssembly = it->second[0].value();
+        auto scriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
+        scriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
+
         return try__
         {
             auto app = std::unique_ptr<GenericApplication>(loader());
-			return std::make_unique<Launch>(std::move(args))->StartApplication();
+			New<Launch>(std::move(args))->StartApplication();
+            return GenericApplication::Get().GetExitCode();
         }
         catch (const Exception& e)
         {

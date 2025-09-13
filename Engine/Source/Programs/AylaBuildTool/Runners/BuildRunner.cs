@@ -209,7 +209,7 @@ internal static partial class BuildRunner
                 {
                     if (sourceCode.Type == SourceCodeType.Header)
                     {
-                        var ght = new GenerateReflectionHeaderTask(project, sourceCode);
+                        var ght = new GenerateReflectionHeaderTask(project, buildTarget, sourceCode);
                         tasks.Add(ght.ParseAsync(cancellationToken));
                     }
                 }
@@ -283,7 +283,9 @@ internal static partial class BuildRunner
                     projectReferences += "  <ItemGroup>\n";
                     foreach (var depend in GetParents(depends.Select(p => p.Name)).Distinct())
                     {
-                        projectReferences += $"    <ProjectReference Include=\"{depend.ScriptProjectFileName}\" />\n";
+                        projectReferences += $"    <ProjectReference Include=\"{depend.ScriptProjectFileName}\">\n";
+                        projectReferences += $"      <Private>false</Private>\n";
+                        projectReferences += $"    </ProjectReference>\n";
                     }
                     projectReferences += "  </ItemGroup>\n";
 

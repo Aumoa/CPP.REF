@@ -1,33 +1,52 @@
-﻿using System.Reflection.Metadata;
+﻿using System;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 
 namespace Ayla;
 
 public partial class Object : IDisposable
 {
-    private ObjectReferenceLocker m_Locker;
-
-    [Flags]
-    public enum CreationFlags
+    internal class InternalCreation
     {
-        None,
-        FromScript = 1 << 0
+        public static ThreadLocal<InternalCreation> ThreadLocal = new(() => new InternalCreation());
+
+        public bool CreatedByResolver;
     }
+        
+
+    private ObjectReferenceLocker m_Locker;
 
     protected Object(ObjectReferenceLocker locker)
     {
         m_Locker = locker;
         NativePointer = ObjectReferenceLocker.GetRawPointer__Injected(ref locker);
 
-        var handle = BeginWriteGCHandle__Injected(NativePointer);
-        if (handle != default)
+        GCHandle gch = default;
+        try
         {
-            throw new InvalidOperationException("The instance is already managed by C#.");
-        }
+            if (InternalCreation.ThreadLocal.Value!.CreatedByResolver == false)
+            {
+                var handle = BeginWriteGCHandle__Injected(NativePointer);
+                if (handle != default)
+                {
+                    throw new InvalidOperationException("The instance is already managed by C#.");
+                }
 
-        var gch = GCHandle.Alloc(this, GCHandleType.Weak);
-        handle = (nint)gch;
-        EndWriteGCHandle__Injected(NativePointer, (nint)gch);
+                gch = GCHandle.Alloc(this, GCHandleType.Weak);
+                handle = (nint)gch;
+            }
+        }
+        finally
+        {
+            if (InternalCreation.ThreadLocal.Value!.CreatedByResolver)
+            {
+                InternalCreation.ThreadLocal.Value.CreatedByResolver = false;
+            }
+            else
+            {
+                EndWriteGCHandle__Injected(NativePointer, (nint)gch);
+            }
+        }
     }
 
     ~Object()

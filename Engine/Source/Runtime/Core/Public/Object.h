@@ -55,8 +55,8 @@ namespace Ayla
 
 	private:
 		static size_t s_LiveObjects;
-		static Spinlock s_Spinlock;
 
+		Spinlock m_Spinlock;
 		Type* m_Type;
 		CreationFlags m_Flags;
 		ssize_t m_GCHandle = 0;

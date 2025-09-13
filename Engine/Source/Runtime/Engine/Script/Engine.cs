@@ -6,41 +6,8 @@ namespace Ayla;
 
 public partial class Engine
 {
-    private readonly Assembly m_GameAssembly;
-
-    private Engine(Assembly gameAssembly)
+    public Engine()
     {
-        m_GameAssembly = gameAssembly;
-    }
-
-    public static ObjectReferenceWrapper CreateByNative([MarshalAs(UnmanagedType.LPWStr)] string gameAssemblyPath)
-    {
-        var assembly = Assembly.Load(Path.GetFileNameWithoutExtension(gameAssemblyPath) + ".Script");
-        return new Engine(assembly).AsWrapper();
-    }
-
-    public override void GuardedStartup()
-    {
-        try
-        {
-            base.GuardedStartup();
-        }
-        catch (Exception e)
-        {
-            Debug.LogCritical("Engine", "Unhandled exception during startup: {0}", e);
-        }
-    }
-
-    public override void GuardedLoop()
-    {
-        try
-        {
-            base.GuardedLoop();
-        }
-        catch (Exception e)
-        {
-            Debug.LogCritical("Engine", "Unhandled exception during loop: {0}", e);
-        }
     }
 
     public override void Initialize()
@@ -65,7 +32,7 @@ public partial class Engine
 
     private void InitializeGame()
     {
-        ConstructorInfo? primaryConstructor = m_GameAssembly.GetTypes()
+        ConstructorInfo? primaryConstructor = AppDomain.CurrentDomain.GetAssemblies().SelectMany(p => p.GetTypes())
             .Where(p => p.IsAssignableTo(typeof(GameInstance)))
             .Select(p => p.GetConstructor(BindingFlags.Public, []))
             .FirstOrDefault(p => p != null);

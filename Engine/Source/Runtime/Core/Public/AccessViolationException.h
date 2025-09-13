@@ -10,10 +10,8 @@ namespace Ayla
 	class CORE_API AccessViolationException : public Exception
 	{
 	public:
-		AccessViolationException(MemoryAccessMode InAccessMode, int64 MemoryLocation)
-			: Exception(FormatMessage(InAccessMode, MemoryLocation))
-		{
-		}
+		AccessViolationException(String message);
+		AccessViolationException(MemoryAccessMode InAccessMode, int64 MemoryLocation);
 
 	private:
 		static String FormatMessage(MemoryAccessMode InAccessMode, int64 MemoryLocation)

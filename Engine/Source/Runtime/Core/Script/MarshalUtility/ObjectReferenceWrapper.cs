@@ -36,7 +36,9 @@ public struct ObjectReferenceWrapper
             }
 
             var locker = Object.CreateLocker__Injected(Ptr);
+            Object.InternalCreation.ThreadLocal.Value!.CreatedByResolver = true;
             var inst = (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
+            handle = GCHandle.Alloc(inst, GCHandleType.Weak);
             return inst;
         }
         finally

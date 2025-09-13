@@ -6,7 +6,8 @@ extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::Object* Ayla__ObjectReferenceLocker__GetRawPointer__Injected(::Ayla::ObjectReferenceLocker* self)
 	{
-		return reinterpret_cast<::std::shared_ptr<::Ayla::Object>*>(self->Ref)->get();
+		auto pptr = reinterpret_cast<::std::shared_ptr<::Ayla::Object>*>(self->Ref);
+		return pptr->get();
 	}
 
 	PLATFORM_SHARED_EXPORT void Ayla__ObjectReferenceLocker__Destroy__Injected(::Ayla::ObjectReferenceLocker* self)

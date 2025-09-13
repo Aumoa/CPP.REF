@@ -4,9 +4,11 @@
 #include "ScriptingBackend/CoreCLR/coreclrhost.h"
 #include "IO/Directory.h"
 #include "IO/File.h"
+#include "Linq/Concat.h"
 #include "Path.h"
 #include "Version.h"
 #include "InvalidOperationException.h"
+#include "Environment.h"
 
 namespace Ayla
 {
@@ -71,7 +73,9 @@ namespace Ayla
 		}
 
 		std::vector<String> tpaList;
-		for (auto& file : Directory::GetFiles(assemblyBasePath, SearchOption::AllDirectories))
+		auto files = Directory::GetFiles(assemblyBasePath, SearchOption::TopDirectoryOnly)
+			| Linq::Concat(Directory::GetFiles(Environment::GetCurrentDirectory(), SearchOption::TopDirectoryOnly));
+		for (const auto& file : files)
 		{
 			if (file.EndsWith(TEXT("Script.dll"), StringComparison::CurrentCultureIgnoreCase))
 			{

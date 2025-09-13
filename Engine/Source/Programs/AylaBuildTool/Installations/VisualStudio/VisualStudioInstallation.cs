@@ -200,7 +200,7 @@ internal class VisualStudioInstallation : Installation
         {
             ModuleType.Library => ".dll",
             ModuleType.Game => ".dll",
-            ModuleType.Application => scriptable ? ".dll" : ".exe",
+            ModuleType.Application => ".exe",
             _ => string.Empty
         };
     }

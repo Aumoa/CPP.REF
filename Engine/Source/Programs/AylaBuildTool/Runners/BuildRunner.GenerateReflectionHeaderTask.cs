@@ -9,11 +9,13 @@ internal static partial class BuildRunner
     private class GenerateReflectionHeaderTask
     {
         public readonly ModuleProject Project;
+        public readonly TargetInfo BuildTarget;
         private readonly SourceCodeDescriptor m_SourceCode;
 
-        public GenerateReflectionHeaderTask(ModuleProject project, SourceCodeDescriptor sourceCode)
+        public GenerateReflectionHeaderTask(ModuleProject project, TargetInfo buildTarget, SourceCodeDescriptor sourceCode)
         {
             Project = project;
+            BuildTarget = buildTarget;
             m_SourceCode = sourceCode;
         }
 
@@ -54,10 +56,10 @@ internal static partial class BuildRunner
             var headerText = Generator.GenerateHeader(collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedHeader, headerText, cancellationToken);
 
-            var sourceCodeText = Generator.GenerateSourceCode(Project, collection).Replace("\r\n", "\n");
+            var sourceCodeText = Generator.GenerateSourceCode(Project, BuildTarget, collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedSourceCode, sourceCodeText, cancellationToken);
 
-            var csText = Generator.GenerateCSharp(collection).Replace("\r\n", "\n");
+            var csText = Generator.GenerateCSharp(Project, BuildTarget, collection).Replace("\r\n", "\n");
             await TextFileHelper.WriteIfChangedAsync(generatedBindingCode, csText, cancellationToken);
 
             GeneratedSourceCode = SourceCodeDescriptor.Get(Project.Group, Project.Name, generatedSourceCode, Project.Group.IntermediateDirectory);
