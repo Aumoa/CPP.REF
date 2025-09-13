@@ -27,7 +27,7 @@ namespace Ayla
 		std::unique_ptr<RenderThread> m_RenderThread;
 
 		APROPERTY()
-		PPtr<GameInstance> m_GameInstance;
+		std::shared_ptr<GameInstance> m_GameInstance;
 
 	public:
 		ACONSTRUCTOR()

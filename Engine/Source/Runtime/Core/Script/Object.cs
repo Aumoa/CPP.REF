@@ -1,9 +1,12 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 
 namespace Ayla;
 
 public partial class Object : IDisposable
 {
+    private ObjectReferenceLocker m_Locker;
+
     [Flags]
     public enum CreationFlags
     {
@@ -11,20 +14,20 @@ public partial class Object : IDisposable
         FromScript = 1 << 0
     }
 
-    protected Object(nint instanceId, CreationFlags flags)
+    protected Object(ObjectReferenceLocker locker)
     {
-        InstanceId = instanceId;
-        if (flags.HasFlag(CreationFlags.FromScript))
-        {
-            var handle = BeginWriteGCHandle__Injected(InstanceId);
-            if (handle != default)
-            {
-                throw new InvalidOperationException("The instance is already managed by C#.");
-            }
+        m_Locker = locker;
+        NativePointer = ObjectReferenceLocker.GetRawPointer__Injected(ref locker);
 
-            var gch = GCHandle.Alloc(this, GCHandleType.Weak);
-            EndWriteGCHandle__Injected(InstanceId, (nint)gch);
+        var handle = BeginWriteGCHandle__Injected(NativePointer);
+        if (handle != default)
+        {
+            throw new InvalidOperationException("The instance is already managed by C#.");
         }
+
+        var gch = GCHandle.Alloc(this, GCHandleType.Weak);
+        handle = (nint)gch;
+        EndWriteGCHandle__Injected(NativePointer, (nint)gch);
     }
 
     ~Object()
@@ -40,15 +43,16 @@ public partial class Object : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        var iid = InstanceId;
-        InstanceId = 0;
+        var iid = NativePointer;
+        NativePointer = 0;
         BeginWriteGCHandle__Injected(iid);
         EndWriteGCHandle__Injected(iid, 0);
+        ObjectReferenceLocker.Destroy__Injected(ref m_Locker);
     }
 
-    public nint InstanceId { get; private set; }
+    public nint NativePointer { get; private set; }
 
-    public ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(InstanceId);
+    public ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__BeginWriteGCHandle__Injected")]
     internal static extern nint BeginWriteGCHandle__Injected(nint instanceId);
@@ -58,4 +62,7 @@ public partial class Object : IDisposable
 
     [DllImport("Core", EntryPoint = "Ayla__Object__AsWrapper__Injected")]
     internal static extern ObjectReferenceWrapper AsWrapper__Injected(nint instanceId);
+
+    [DllImport("Core", EntryPoint = "Ayla__Object__CreateLocker__Injected")]
+    internal static extern ObjectReferenceLocker CreateLocker__Injected(nint instanceId);
 }

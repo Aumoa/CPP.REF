@@ -15,6 +15,6 @@ namespace Ayla
 		GENERATED_BODY()
 
 	public:
-		static RPtr<StreamableAsset> Load(String filePath);
+		static std::shared_ptr<StreamableAsset> Load(String filePath);
 	};
 }

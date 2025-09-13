@@ -66,8 +66,6 @@ namespace Ayla
         }
         finally__
         {
-            GC::Collect();
-            GC::WaitForCompleteToFinalize();
             ThreadPool::Shutdown();
         }
         end_try__;

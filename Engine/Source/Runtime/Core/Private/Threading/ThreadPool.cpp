@@ -3,7 +3,6 @@
 #include "Threading/ThreadPool.h"
 #include "Threading/Thread.h"
 #include "Platform/PlatformIO.h"
-#include "GC/GC.h"
 
 namespace Ayla
 {

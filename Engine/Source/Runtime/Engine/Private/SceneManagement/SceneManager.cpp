@@ -5,21 +5,18 @@
 
 namespace Ayla
 {
-	RPtr<Scene> SceneManager::s_ActiveScene;
-	std::vector<RPtr<Scene>> SceneManager::s_AdditiveScenes;
-
-	Task<> SceneManager::LoadSceneAsync(RPtr<Scene> scene, LoadSceneMode mode, CancellationToken cancellationToken)
+	Task<> SceneManager::LoadSceneAsync(std::shared_ptr<Scene> scene, LoadSceneMode mode, CancellationToken cancellationToken)
 	{
-		if (s_ActiveScene)
+		if (m_ActiveScene)
 		{
-			s_ActiveScene->Destroy();
+			m_ActiveScene->Destroy();
 		}
 
-		s_ActiveScene = scene;
+		m_ActiveScene = scene;
 
-		if (s_ActiveScene)
+		if (m_ActiveScene)
 		{
-			s_ActiveScene->Activate();
+			m_ActiveScene->Activate();
 		}
 
 		return Task<>::CompletedTask();

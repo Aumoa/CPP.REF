@@ -17,22 +17,13 @@ namespace Ayla
 
 	private:
 		APROPERTY()
-		PPtr<Scene> m_EntryScene;
+		std::shared_ptr<Scene> m_EntryScene;
 
 	public:
 		GameInstance();
 		virtual ~GameInstance() noexcept override;
 
 		AFUNCTION()
-		virtual RPtr<Scene> GetEntryScene();
+		virtual std::shared_ptr<Scene> GetEntryScene();
 	};
-}
-
-#define DEFINE_GAME_INSTANCE_CLASS(Namespace, ClassName) \
-extern "C" \
-{ \
-	PLATFORM_SHARED_EXPORT ::Ayla::RPtr<::Ayla::GameInstance>* CreateGameInstance__() \
-	{ \
-		return new ::Ayla::RPtr<::Ayla::GameInstance>(::Ayla::Object::New<::Namespace::ClassName>()); \
-	} \
 }

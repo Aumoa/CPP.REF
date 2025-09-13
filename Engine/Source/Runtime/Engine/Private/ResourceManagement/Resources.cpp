@@ -5,7 +5,7 @@
 
 namespace Ayla
 {
-	RPtr<StreamableAsset> Resources::Load(String filePath)
+	std::shared_ptr<StreamableAsset> Resources::Load(String filePath)
 	{
 		return nullptr;
 	}

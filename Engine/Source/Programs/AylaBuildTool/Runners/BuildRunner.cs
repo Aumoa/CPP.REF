@@ -38,9 +38,16 @@ internal static partial class BuildRunner
                 throw TerminateException.User();
             }
 
-            string[] requiredProjects = ["Engine", "Launch", "VulkanAPI", "WindowsAPI"];
-
+            List<string> requiredProjects = [];
             var resolver = mp.GetResolver(buildTarget);
+            if (mp.GetRule(buildTarget).Type == ModuleType.Game)
+            {
+                requiredProjects.Add("Engine");
+                requiredProjects.Add("Launch");
+                requiredProjects.Add("VulkanAPI");
+                requiredProjects.Add("WindowsAPI");
+            }
+
             var depends = solution.FindDepends(resolver.DependencyModuleNames.Concat(requiredProjects)).OfType<ModuleProject>();
             targetProjects = depends.Append(targetProject).Distinct();
         }
@@ -324,7 +331,6 @@ internal static partial class BuildRunner
 
                 var platforms = string.Join(';', PlatformInfo.GetAllPlatforms().Select(p => p.Name));
                 var configurations = string.Join(';', TargetInfo.GetAllTargets().Select(p => VSUtility.GetConfigName(p)).Distinct());
-                string outputType = project.IsExecutable() ? "Exe" : "Library";
 
                 List<string> propertyGroups = [];
                 foreach (var targetInfo in TargetInfo.GetAllTargets())
@@ -354,7 +360,7 @@ internal static partial class BuildRunner
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>{outputType}</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

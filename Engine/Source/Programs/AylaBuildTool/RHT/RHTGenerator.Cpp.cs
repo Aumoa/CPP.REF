@@ -21,13 +21,9 @@ internal partial class RHTGenerator
                 {
                     headers.Add(className.Source.SourceCode.FilePath);
                 }
-                else if (typeName is RPtrTypeName rptr)
+                else if (typeName is SharedPtrTypeName rptr)
                 {
                     headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
-                }
-                else if (typeName is PPtrTypeName pptr)
-                {
-                    headers.Add(((ClassName)pptr.ElementType).Source.SourceCode.FilePath);
                 }
             }
         }
@@ -118,8 +114,8 @@ internal partial class RHTGenerator
                         return $"::Ayla::Marshal::ToNative<{argumentType.CppName}>({p.Variable.Name})";
                     }));
                     string bodyStatement = $"::Ayla::Object::ScriptNew<{classType.CppName}>({arguments})";
-                    string returnStatement = $"return ::Ayla::Marshal::ToBinding({bodyStatement})";
-                    sourceCodeText += $"  PLATFORM_SHARED_EXPORT {TypeName.Object.CppBindingName} {constructorFullName}({parameters})\n";
+                    string returnStatement = $"return {bodyStatement}->CreateLocker()";
+                    sourceCodeText += $"  PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceLocker {constructorFullName}({parameters})\n";
                     sourceCodeText += $"  {{\n";
                     sourceCodeText += $"    {returnStatement};\n";
                     sourceCodeText += $"  }}\n";

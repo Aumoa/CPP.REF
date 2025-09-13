@@ -6,25 +6,23 @@ namespace Ayla;
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 public struct ObjectReferenceWrapper
 {
-    public nint InstanceId;
+    public nint Ptr;
     public nint Handle;
-    public Object.CreationFlags Flags;
 
-    public ObjectReferenceWrapper(nint instanceId, nint handle, Object.CreationFlags flags)
+    public ObjectReferenceWrapper(nint ptr, nint handle)
     {
-        InstanceId = instanceId;
+        Ptr = ptr;
         Handle = handle;
-        Flags = flags;
     }
 
     public T? As<T>() where T : Object
     {
-        if (InstanceId == 0)
+        if (Ptr == 0)
         {
             return null;
         }
 
-        Object.BeginWriteGCHandle__Injected(InstanceId);
+        Object.BeginWriteGCHandle__Injected(Ptr);
         GCHandle handle = default;
         try
         {
@@ -37,12 +35,13 @@ public struct ObjectReferenceWrapper
                 }
             }
 
-            var inst = (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [InstanceId], null);
+            var locker = Object.CreateLocker__Injected(Ptr);
+            var inst = (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
             return inst;
         }
         finally
         {
-            Object.EndWriteGCHandle__Injected(InstanceId, (nint)handle);
+            Object.EndWriteGCHandle__Injected(Ptr, (nint)handle);
         }
     }
 

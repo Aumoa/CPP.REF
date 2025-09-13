@@ -3,22 +3,24 @@
 #pragma once
 
 #include "IntegralTypes.h"
-#include "GC/RPtr.h"
+#include <memory>
 
 namespace Ayla
 {
 	class Object;
 
-	struct ObjectReferenceWrapper
+	struct CORE_API ObjectReferenceWrapper
 	{
-		ssize_t InstanceId;
+		ssize_t Ptr;
 		ssize_t Handle;
-		int32 Flags;
 
 		template<class T>
-		inline RPtr<T> Resolve() const
+		inline std::shared_ptr<T> Resolve() const
 		{
-			return RPtr<T>(dynamic_cast<T*>(reinterpret_cast<Object*>(InstanceId)));
+			return std::dynamic_pointer_cast<T>(Resolve_Internal());
 		}
+
+	private:
+		std::shared_ptr<Object> Resolve_Internal() const;
 	};
 }

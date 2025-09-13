@@ -13,8 +13,8 @@ namespace Ayla
 	{
 	}
 
-	RPtr<Scene> GameInstance::GetEntryScene_Implementation()
+	std::shared_ptr<Scene> GameInstance::GetEntryScene_Implementation()
 	{
-		return m_EntryScene ? (RPtr<Scene>)m_EntryScene : New<Scene>();
+		return m_EntryScene ? m_EntryScene : New<Scene>();
 	}
 }

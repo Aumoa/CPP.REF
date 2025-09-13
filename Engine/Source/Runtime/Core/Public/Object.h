@@ -5,16 +5,17 @@
 #include "InvalidOperationException.h"
 #include "AssertionMacros.h"
 #include "LanguageSupportMacros.h"
+#include "Referencer.h"
 #include "Platform/PlatformMacros.h"
-#include "GC/PPtr.h"
-#include "GC/RPtr.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/ObjectReferenceWrapper.h"
+#include "Reflection/ObjectReferenceLocker.h"
 #include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>
 #include <typeinfo>
+#include <memory>
 
 extern "C"
 {
@@ -24,18 +25,13 @@ extern "C"
 
 namespace Ayla
 {
-	template<class T>
-	struct PropertyGather;
-
-	class GC;
 	struct TypeRegister;
 	class Type;
 	class RuntimeType;
 
 	ACLASS()
-	class CORE_API Object
+	class CORE_API Object : public std::enable_shared_from_this<Object>
 	{
-		friend GC;
 		friend TypeRegister;
 		friend Type;
 		friend RuntimeType;
@@ -48,37 +44,6 @@ namespace Ayla
 	private:
 		struct CreationHack;
 
-	private:
-		struct RootMark
-		{
-			Object* Ptr;
-			int16 Refs;
-			int32 Version;
-		};
-
-		class RootCollection
-		{
-			friend ::Ayla::GC;
-			friend Object;
-			friend ::Ayla::ssize_t (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self);
-			friend void ::Ayla__Object__EndWriteGCHandle__Injected(void* self, ssize_t handle);
-
-			static constexpr size_t G1Size = 8192;
-			static constexpr size_t G2Size = 65536;
-			static_assert(G2Size > G1Size);
-
-			Spinlock m_Mutex;
-			std::vector<RootMark> m_Roots;
-			std::vector<int32> m_InstanceIndexPool[3];
-
-		public:
-			RootCollection();
-
-			int32 AddObject(Object* object);
-			Object* FinalizeObject(RootMark& mark);
-			RootMark& GetMark(Object* object);
-		};
-
 	public:
 		enum class CreationFlags
 		{
@@ -90,10 +55,8 @@ namespace Ayla
 
 	private:
 		static size_t s_LiveObjects;
-		static RootCollection s_RootCollection;
+		static Spinlock s_Spinlock;
 
-		int32 m_InstanceIndex = -1;
-		uint8 m_FinalizeSuppressed : 1 = false;
 		Type* m_Type;
 		CreationFlags m_Flags;
 		ssize_t m_GCHandle = 0;
@@ -102,10 +65,6 @@ namespace Ayla
 		static void GatherProperties(PropertyCollector& collection)
 		{
 			PLATFORM_UNREFERENCED_PARAMETER(collection);
-		}
-
-		virtual void Finalize()
-		{
 		}
 
 	public:
@@ -117,49 +76,56 @@ namespace Ayla
 		String ToString();
 		Type* GetType() const { return m_Type; }
 
-		ssize_t GetInstanceId() const { return reinterpret_cast<ssize_t>(this); }
-		ObjectReferenceWrapper AsWrapper() const
-		{
-			return ObjectReferenceWrapper
-			{
-				.InstanceId = GetInstanceId(),
-				.Handle = m_GCHandle,
-				.Flags = (int32)m_Flags
-			};
-		}
+		ObjectReferenceLocker CreateLocker();
+		ObjectReferenceWrapper AsWrapper();
 
 		Object& operator =(const Object&) = delete;
 		Object& operator =(Object&&) = delete;
 
 	public:
 		template<std::derived_from<Object> T, class... TArgs>
-		static RPtr<T> New(TArgs&&... args)
+		static std::shared_ptr<T> New(TArgs&&... args)
 		{
-			std::optional<RPtr<T>> ptr;
+			std::optional<std::shared_ptr<T>> ptr;
 			ConfigureNew(typeid(T), CreationFlags::None, [&]()
 			{
-				ptr.emplace(new T(std::forward<TArgs>(args)...));
-				return ptr->Get();
+				ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
 			});
 			return std::move(ptr).value();
 		}
 
 		template<std::derived_from<Object> T, class... TArgs>
-		static RPtr<T> ScriptNew(TArgs&&... args)
+		static std::shared_ptr<T> ScriptNew(TArgs&&... args)
 		{
-			std::optional<RPtr<T>> ptr;
+			std::optional<std::shared_ptr<T>> ptr;
 			ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
 			{
-				ptr.emplace(new T(std::forward<TArgs>(args)...));
-				return ptr->Get();
+				ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
 			});
 			return std::move(ptr).value();
 		}
 
-	private:
-		static void ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<Object*()> action);
+	protected:
+		template<class U>
+		std::shared_ptr<U> SharedFromThis(this U&& u)
+		{
+			return std::static_pointer_cast<U>(u.shared_from_this());
+		}
 
-		AFUNCTION()
-		static void RegisterWeakReferenceHandle(ssize_t instancePtr, ssize_t gcHandle);
+	private:
+		static void ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<void()> action);
 	};
+
+	template<class T>
+	struct is_shared_object : public std::false_type
+	{
+	};
+
+	template<std::derived_from<Object> T>
+	struct is_shared_object<std::shared_ptr<T>> : public std::true_type
+	{
+	};
+
+	template<class T>
+	concept object_reference = is_shared_object<T>::value;
 }

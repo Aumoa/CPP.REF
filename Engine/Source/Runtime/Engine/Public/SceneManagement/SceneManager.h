@@ -16,10 +16,10 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		static RPtr<Scene> s_ActiveScene;
-		static std::vector<RPtr<Scene>> s_AdditiveScenes;
+		std::shared_ptr<Scene> m_ActiveScene;
+		std::vector<std::shared_ptr<Scene>> m_AdditiveScenes;
 
 	public:
-		static Task<> LoadSceneAsync(RPtr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
+		Task<> LoadSceneAsync(std::shared_ptr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
 	};
 }

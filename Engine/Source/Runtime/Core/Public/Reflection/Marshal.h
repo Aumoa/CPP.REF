@@ -3,10 +3,9 @@
 #pragma once
 
 #include "StaticClass.h"
-#include "GC/PPtr.h"
-#include "GC/RPtr.h"
 #include "Reflection/ObjectReferenceWrapper.h"
 #include "String_.h"
+#include "Object.h"
 #include <ranges>
 
 namespace Ayla
@@ -20,8 +19,7 @@ namespace Ayla
 			return std::forward<T>(value);
 		}
 
-		template<class T>
-		static ObjectReferenceWrapper ToBinding(T&& ptr, int) requires std::derived_from<std::remove_reference_t<T>, BasePtr>
+		static ObjectReferenceWrapper ToBinding(object_reference auto&& ptr, int)
 		{
 			return ptr->AsWrapper();
 		}
@@ -40,10 +38,8 @@ namespace Ayla
 			return std::forward<TBinding>(value);
 		}
 
-		template<class TNative, class TBinding>
-		static TNative ToNative(TBinding&& value, int) requires
-			std::derived_from<TNative, BasePtr> &&
-			std::same_as<std::remove_reference_t<TBinding>, void*>
+		template<object_reference TNative, class TBinding>
+		static TNative ToNative(TBinding&& value, int) requires std::same_as<std::remove_reference_t<TBinding>, void*>
 		{
 			auto ptr = (Object*)value;
 			return TNative(ptr);
@@ -69,9 +65,8 @@ namespace Ayla
 			return result;
 		}
 
-		template<class TNative>
-		static TNative ToNative(ObjectReferenceWrapper value, int) requires
-			std::derived_from<TNative, BasePtr>
+		template<object_reference TNative>
+		static TNative ToNative(ObjectReferenceWrapper value, int)
 		{
 			return value.Resolve<typename TNative::element_type>();
 		}

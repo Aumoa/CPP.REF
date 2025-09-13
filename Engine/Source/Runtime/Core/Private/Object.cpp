@@ -3,12 +3,12 @@
 #include "Object.h"
 #include "Type.h"
 #include "TypeNotFoundException.h"
+#include "try_finally.h"
 #include "Platform/PlatformAtomics.h"
 #include "Reflection/TypeRegister.h"
 #include "Reflection/TypeCollector.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/Marshal.h"
-#include "GC/GCPtr.Impl.h"
 
 namespace Ayla
 {
@@ -19,7 +19,7 @@ namespace Ayla
 		Type* ObjectType;
 		CreationFlags Flags;
 
-		static inline CreationHack& BeginLock(Type* type, CreationFlags flags)
+		static inline CreationHack& Begin(Type* type, CreationFlags flags)
 		{
 			s_Hack.AllowConstruct = true;
 			s_Hack.ObjectType = type;
@@ -27,7 +27,7 @@ namespace Ayla
 			return s_Hack;
 		}
 
-		inline void EndLock()
+		inline void End()
 		{
 			AllowConstruct = false;
 			ObjectType = nullptr;
@@ -37,63 +37,11 @@ namespace Ayla
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
 	size_t Object::s_LiveObjects;
-	Object::RootCollection Object::s_RootCollection;
-
-	Object::RootCollection::RootCollection()
-		: m_Roots(G1Size + G2Size)
-		, m_InstanceIndexPool{ std::vector<int32>(G1Size, (int32)0), std::vector<int32>(G2Size, (int32)0) }
-	{
-		for (size_t i = 0; i < G1Size; ++i)
-		{
-			m_InstanceIndexPool[0][i] = (int32)i;
-		}
-
-		for (size_t i = 0; i < G2Size; ++i)
-		{
-			m_InstanceIndexPool[1][i] = (int32)(i + G1Size);
-		}
-	}
-
-	int32 Object::RootCollection::AddObject(Object* object)
-	{
-		auto lock = std::unique_lock(m_Mutex);
-		if (m_InstanceIndexPool[0].empty())
-		{
-			GC::InternalCollect(0, true);
-		}
-
-		auto rb = m_InstanceIndexPool[0].rbegin();
-		int32 instanceIndex = *rb;
-		m_InstanceIndexPool[0].erase((rb + 1).base());
-		RootMark& mark = m_Roots[instanceIndex];
-
-		mark.Ptr = object;
-		mark.Version = 0;
-		PlatformAtomics::InterlockedExchange(&mark.Refs, 1);
-
-		return instanceIndex;
-	}
-
-	Object* Object::RootCollection::FinalizeObject(RootMark& mark)
-	{
-		check(mark.Refs == 0);
-		auto* ptr = mark.Ptr;
-		size_t generation = mark.Ptr->m_InstanceIndex < G1Size ? 0 : (mark.Ptr->m_InstanceIndex < G1Size + G2Size ? 1 : 2);
-		m_InstanceIndexPool[generation].emplace_back(mark.Ptr->m_InstanceIndex);
-		mark.Ptr->m_InstanceIndex = -1;
-		mark.Ptr = nullptr;
-		mark.Version = 0;
-		return ptr;
-	}
-
-	Object::RootMark& Object::RootCollection::GetMark(Object* object)
-	{
-		return m_Roots[object->m_InstanceIndex];
-	}
+	Spinlock Object::s_Spinlock;
 
 	Object::Object()
-		: m_Type(CreationHack::s_Hack.ObjectType)
-		, m_Flags(CreationHack::s_Hack.Flags)
+		: m_Type{ CreationHack::s_Hack.ObjectType }
+		, m_Flags{ CreationHack::s_Hack.Flags }
 	{
 		if (CreationHack::s_Hack.AllowConstruct == false)
 		{
@@ -101,13 +49,10 @@ namespace Ayla
 		}
 
 		PlatformAtomics::InterlockedIncrement(&s_LiveObjects);
-		m_InstanceIndex = s_RootCollection.AddObject(this);
 	}
 
 	Object::~Object() noexcept
 	{
-		checkf(m_InstanceIndex == -1, TEXT("Object is not managed by the GC."));
-		checkf(m_FinalizeSuppressed, TEXT("Object was deleted outside the GC system."));
 		PlatformAtomics::InterlockedDecrement(&s_LiveObjects);
 	}
 
@@ -116,7 +61,25 @@ namespace Ayla
 		return String::Format(TEXT("{}"), String::FromLiteral(typeid(*this).name()));
 	}
 
-	void Object::ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<Object*()> action)
+	ObjectReferenceLocker Object::CreateLocker()
+	{
+		return ObjectReferenceLocker
+		{
+			.Ref = reinterpret_cast<ssize_t>(new std::shared_ptr<Object>(shared_from_this())),
+			.Flags =(int32)m_Flags
+		};
+	}
+
+	ObjectReferenceWrapper Object::AsWrapper()
+	{
+		return ObjectReferenceWrapper
+		{
+			.Ptr = reinterpret_cast<ssize_t>(this),
+			.Handle = m_GCHandle
+		};
+	}
+
+	void Object::ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<void()> action)
 	{
 		auto type = TypeCollector::FindType(typeInfo);
 		if (type == nullptr)
@@ -124,19 +87,9 @@ namespace Ayla
 			throw new TypeNotFoundException(String::FromLiteral(typeInfo.name()));
 		}
 
-		auto& hack = CreationHack::BeginLock(type, flags);
-		auto object = action();
-		auto typeName = String::Format(TEXT("{0}.{1}"), type->GetNamespace(), type->GetName());
-		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
-		lock.unlock();
-		GC::Release(object);  // This corresponds to the AddRef called in the Object constructor.
-		hack.EndLock();
-	}
-
-	void Object::RegisterWeakReferenceHandle(ssize_t instancePtr, ssize_t gcHandle)
-	{
-		auto lock = std::unique_lock(s_RootCollection.m_Mutex);
-		((Object*)instancePtr)->m_GCHandle = gcHandle;
+		auto& hack = CreationHack::Begin(type, flags);
+		action();
+		hack.End();
 	}
 }
 
@@ -144,18 +97,23 @@ extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self)
 	{
-		::Ayla::Object::s_RootCollection.m_Mutex.lock();
+		::Ayla::Object::s_Spinlock.lock();
 		return ((::Ayla::Object*)self)->m_GCHandle;
 	}
 
 	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle)
 	{
 		((::Ayla::Object*)self)->m_GCHandle = handle;
-		::Ayla::Object::s_RootCollection.m_Mutex.unlock();
+		::Ayla::Object::s_Spinlock.unlock();
 	}
 
-	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper Ayla__Object__AsWrapper__Injected(void* self)
+	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper Ayla__Object__AsWrapper__Injected(::Ayla::Object* self)
 	{
-		return ((::Ayla::Object*)self)->AsWrapper();
+		return self->AsWrapper();
+	}
+
+	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceLocker Ayla__Object__CreateLocker__Injected(::Ayla::Object* self)
+	{
+		return self->CreateLocker();
 	}
 }

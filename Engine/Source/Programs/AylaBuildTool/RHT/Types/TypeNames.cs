@@ -20,8 +20,7 @@ internal class TypeNames(TypeName[] customTypeNames)
         TypeName.Double,
         TypeName.Object,
         ArrayTypeName.GenericTypeDefinition,
-        PPtrTypeName.GenericTypeDefinition,
-        RPtrTypeName.GenericTypeDefinition,
+        SharedPtrTypeName.GenericTypeDefinition,
         .. customTypeNames
     ];
 

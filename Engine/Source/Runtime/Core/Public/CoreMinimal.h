@@ -53,13 +53,7 @@
 #include "Type.h"
 #include "try_finally.h"
 
-#include "GC/GC.h"
-#include "GC/RPtr.h"
-#include "GC/PPtr.h"
-#include "GC/GCPtr.Impl.h"
-
 #include "Reflection/PropertyCollector.h"
-#include "Reflection/PPtrGather.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/TypeRegister.h"
 #include "Reflection/reflexpr.h"

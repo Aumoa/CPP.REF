@@ -44,11 +44,7 @@ using System.Runtime.InteropServices;
                 sourceCode += IndentedLine($"{{");
                 Indented(() =>
                 {
-                    sourceCode += IndentedLine($"protected {@class.Name}__Injected(nint instanceId, global::Ayla.Object.CreationFlags flags) : base(instanceId, flags)");
-                    sourceCode += IndentedLine($"{{");
-                    sourceCode += IndentedLine($"}}");
-                    sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"private {@class.Name}__Injected(global::Ayla.ObjectReferenceWrapper wrapper) : base(wrapper.InstanceId, wrapper.Flags)");
+                    sourceCode += IndentedLine($"protected {@class.Name}__Injected(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
                     sourceCode += IndentedLine($"");
@@ -56,13 +52,13 @@ using System.Runtime.InteropServices;
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
                     {
                         var constructor = aclass.Constructors[i];
-                        var returnType = (RPtrTypeName)Activator.CreateInstance(typeof(RPtrTypeName), @class)!;
+                        var returnType = (SharedPtrTypeName)Activator.CreateInstance(typeof(SharedPtrTypeName), @class)!;
                         var parameterTypes = constructor.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
 
                         var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {constructor.Parameters[i].Variable.Name}"));
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} ctor_{constructor.Name}__Injected({injectParamsDeclare});");
+                        sourceCode += IndentedLine($"private static extern global::Ayla.ObjectReferenceLocker ctor_{constructor.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {constructor.Parameters[i].Variable.Name}"));
                         var returnStmt = returnType.CSharpName;
@@ -94,7 +90,7 @@ using System.Runtime.InteropServices;
                         sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
-                        var returnStmt = returnType is RPtrTypeName or PPtrTypeName ? $"{returnType.CSharpName}?" : returnType.CSharpName;
+                        var returnStmt = returnType is SharedPtrTypeName ? $"{returnType.CSharpName}?" : returnType.CSharpName;
                         sourceCode += IndentedLine($"public unsafe{(isVirtual ? " virtual" : string.Empty)}{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}({internalParamsDeclare})");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
@@ -114,7 +110,7 @@ using System.Runtime.InteropServices;
                                 {
                                     sourceCode += IndentedLine(bodyStatement + ';');
                                 }
-                                else if (returnType is RPtrTypeName or PPtrTypeName)
+                                else if (returnType is SharedPtrTypeName)
                                 {
                                     sourceCode += IndentedLine($"return global::Ayla.Marshaller.AsBinding({bodyStatement});");
                                 }
@@ -152,7 +148,7 @@ using System.Runtime.InteropServices;
                                     releaseStatements.Add($"Marshaller.ReleaseStringArray({parameter.Name}_ptr, {parameter.Name}.Length);");
                                     arguments.Add(parameter.Name + "_ptr");
                                 }
-                                else if (arrayType.ElementType is RPtrTypeName or PPtrTypeName)
+                                else if (arrayType.ElementType is SharedPtrTypeName)
                                 {
                                     allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.ObjectArrayToNative({parameter.Name});");
                                     releaseStatements.Add($"Marshaller.ReleaseObjectArray({parameter.Name}_ptr);");
@@ -197,7 +193,7 @@ using System.Runtime.InteropServices;
                             {
                                 if (isStatic == false)
                                 {
-                                    arguments.Insert(0, "InstanceId");
+                                    arguments.Insert(0, "this.NativePointer");
                                 }
 
                                 string bodyStmt = $"{prefix}{member.Name}__Injected({string.Join(", ", arguments)})";
@@ -206,7 +202,7 @@ using System.Runtime.InteropServices;
                                 {
                                     sourceCode += IndentedLine(bodyStmt + ";");
                                 }
-                                else if (returnType is RPtrTypeName or PPtrTypeName && returnAsBinding == false)
+                                else if (returnType is SharedPtrTypeName && returnAsBinding == false)
                                 {
                                     sourceCode += IndentedLine($"return {bodyStmt}.As<{returnType.CSharpName}>();");
                                 }
@@ -254,11 +250,7 @@ using System.Runtime.InteropServices;
                 {
 sourceCode += "#pragma warning disable CS8618\n";
 
-                    sourceCode += IndentedLine($"protected {@class.Name}(nint instanceId, global::Ayla.Object.CreationFlags flags) : base(instanceId, flags)");
-                    sourceCode += IndentedLine($"{{");
-                    sourceCode += IndentedLine($"}}");
-                    sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"private {@class.Name}(global::Ayla.ObjectReferenceWrapper wrapper) : base(wrapper.InstanceId, wrapper.Flags)");
+                    sourceCode += IndentedLine($"protected {@class.Name}(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
 

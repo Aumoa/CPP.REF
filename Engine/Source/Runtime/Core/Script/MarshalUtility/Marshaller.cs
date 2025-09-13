@@ -22,7 +22,7 @@ public static unsafe class Marshaller
         array[0] = (nint)values.Count;
         for (int i = 0; i < values.Count; ++i)
         {
-            array[i + 1] = values[i].InstanceId;
+            array[i + 1] = values[i].NativePointer;
         }
 
         return (nint)array;

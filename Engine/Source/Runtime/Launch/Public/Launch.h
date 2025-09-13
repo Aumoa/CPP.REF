@@ -16,7 +16,7 @@ namespace Ayla
 	private:
 		std::unique_ptr<CommandLineParser> m_Args;
 		std::unique_ptr<ScriptingBackend> m_ScriptingBackend;
-		RPtr<Engine> m_Engine;
+		std::shared_ptr<Engine> m_Engine;
 
 	public:
 		Launch(std::unique_ptr<CommandLineParser> args);
