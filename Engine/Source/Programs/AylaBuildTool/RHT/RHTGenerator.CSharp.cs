@@ -1,8 +1,4 @@
-﻿using AylaEngine.RHT.Syntaxes;
-using AylaEngine.RHT.Types;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace AylaEngine;
+﻿namespace AylaEngine;
 
 internal partial class RHTGenerator
 {

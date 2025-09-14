@@ -1,4 +1,4 @@
-﻿namespace AylaEngine.RHT.Syntaxes;
+﻿namespace AylaEngine;
 
 internal record struct CapturedContext(
     string FilePath,

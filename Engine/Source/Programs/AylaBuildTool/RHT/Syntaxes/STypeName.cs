@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AylaEngine.RHT.Syntaxes;
+namespace AylaEngine;
 
 internal record STypeName(CapturedContext Context, STypeName.Part[] NameParts) : Syntax(Context, null)
 {

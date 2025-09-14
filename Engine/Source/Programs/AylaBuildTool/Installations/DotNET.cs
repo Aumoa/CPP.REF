@@ -1,4 +1,4 @@
-﻿namespace AylaEngine.Installations;
+﻿namespace AylaEngine;
 
 internal static class DotNET
 {

@@ -1,4 +1,4 @@
-﻿namespace AylaEngine.RHT.Syntaxes;
+﻿namespace AylaEngine;
 
 internal interface ICapturedContext
 {

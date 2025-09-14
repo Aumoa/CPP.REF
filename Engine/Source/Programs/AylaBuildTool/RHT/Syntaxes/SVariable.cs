@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace AylaEngine.RHT.Syntaxes;
+namespace AylaEngine;
 
 internal record SVariable(CapturedContext Context, STypeName TypeName, string Name, string? DefaultValue) : Syntax(Context, null)
 {

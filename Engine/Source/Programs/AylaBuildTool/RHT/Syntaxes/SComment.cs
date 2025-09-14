@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AylaEngine.RHT.Syntaxes;
+namespace AylaEngine;
 
 internal record SComment(CapturedContext Context, string Text) : Syntax(Context, null)
 {

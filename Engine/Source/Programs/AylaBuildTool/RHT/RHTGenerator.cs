@@ -1,6 +1,4 @@
-﻿using AylaEngine.RHT.Syntaxes;
-
-namespace AylaEngine;
+﻿namespace AylaEngine;
 
 internal partial class RHTGenerator
 {

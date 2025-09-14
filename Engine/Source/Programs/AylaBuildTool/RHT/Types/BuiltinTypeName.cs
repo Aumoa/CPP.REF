@@ -1,4 +1,4 @@
-﻿namespace AylaEngine.RHT.Types;
+﻿namespace AylaEngine;
 
 internal class BuiltinTypeName : TypeName
 {

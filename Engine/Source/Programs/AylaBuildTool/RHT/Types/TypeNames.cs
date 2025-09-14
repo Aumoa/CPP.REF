@@ -1,7 +1,4 @@
-﻿using System.Reflection.Metadata;
-using AylaEngine.RHT.Syntaxes;
-
-namespace AylaEngine.RHT.Types;
+﻿namespace AylaEngine;
 
 internal class TypeNames(TypeName[] customTypeNames)
 {

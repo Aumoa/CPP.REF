@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AylaEngine.RHT.Syntaxes;
+namespace AylaEngine;
 
 internal record SInclude(CapturedContext Context, string Path) : Syntax(Context, null)
 {

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using static AylaEngine.RHTGenerator;
 
-namespace AylaEngine.RHT.Syntaxes;
+namespace AylaEngine;
 
 internal record SBracket(CapturedContext Context, char? EscapeBracket) : Syntax(Context, EscapeBracket)
 {

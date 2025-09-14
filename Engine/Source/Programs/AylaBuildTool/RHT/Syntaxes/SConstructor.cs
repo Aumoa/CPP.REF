@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AylaEngine.RHT.Syntaxes;
+namespace AylaEngine;
 
 internal record SConstructor(CapturedContext Context, string Name, SParameter[] Parameters) : SMember(Context, null, Name)
 {

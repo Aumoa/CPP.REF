@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using static AylaEngine.RHTGenerator;
 
-namespace AylaEngine.RHT.Syntaxes;
+namespace AylaEngine;
 
 internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags Flags, STypeName ReturnType, SParameter[] Parameters) : SMember(Context, null, Name)
 {

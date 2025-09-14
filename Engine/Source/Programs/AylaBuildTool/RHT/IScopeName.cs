@@ -1,4 +1,4 @@
-﻿namespace AylaEngine.RHT;
+﻿namespace AylaEngine;
 
 internal interface IScopeName
 {
