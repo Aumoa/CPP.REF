@@ -9,11 +9,14 @@ internal partial class RHTGenerator
 
     public SAClass[] Classes { get; }
 
+    public SAEnum[] Enums { get; }
+
     private RHTGenerator(SourceCodeDescriptor sourceCode, Syntax[] syntaxes)
     {
         SourceCode = sourceCode;
         m_Syntaxes = syntaxes;
         Classes = syntaxes.OfType<SAClass>().ToArray();
+        Enums = syntaxes.OfType<SAEnum>().ToArray();
         var sourceRelativePath = Path.GetRelativePath(SourceCode.Group.SourceDirectory, SourceCode.FilePath);
         m_FileId = sourceRelativePath
             .Replace('/', '_')
@@ -115,6 +118,10 @@ internal partial class RHTGenerator
                 }
                 aclass.AddConstructor(aconstructor);
                 continue;
+            }
+            else if (SAEnum.TryAccept(context, bracketStack, out var aenum))
+            {
+                syntaxes.Add(aenum);
             }
             else if (SBracket.TryAccept(context, out var unknownBracket))
             {

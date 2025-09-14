@@ -18,6 +18,42 @@ using System.Runtime.InteropServices;
 
         foreach (var syntax in m_Syntaxes)
         {
+            if (syntax is SAEnum aenum)
+            {
+                var @enum = typeNames.FindEnum(aenum);
+                if (@enum.Namespace.Names.Length > 0)
+                {
+                    sourceCode += IndentedLine($"namespace {string.Join(".", @enum.Namespace.Names)}");
+                    sourceCode += IndentedLine($"{{");
+                    ++indent;
+                }
+                sourceCode += IndentedLine($"public enum {@enum.Name}");
+                sourceCode += IndentedLine($"{{");
+                Indented(() =>
+                {
+                    for (int i = 0; i < aenum.Defines.Length; ++i)
+                    {
+                        var value = aenum.Defines[i];
+                        string comma = i < aenum.Defines.Length - 1 ? "," : string.Empty;
+                        if (value.Value == null)
+                        {
+                            sourceCode += IndentedLine($"{value.Name}{comma}");
+                        }
+                        else
+                        {
+                            sourceCode += IndentedLine($"{value.Name} = {value.Value}{comma}");
+                        }
+                    }
+                });
+                sourceCode += IndentedLine($"}}");
+                sourceCode += IndentedLine($"");
+                if (@enum.Namespace.Names.Length > 0)
+                {
+                    --indent;
+                    sourceCode += IndentedLine($"}}");
+                }
+            }
+
             if (syntax is SAClass aclass)
             {
                 var @class = typeNames.FindClass(aclass.Class);

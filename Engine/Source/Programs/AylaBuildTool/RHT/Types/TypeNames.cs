@@ -36,6 +36,21 @@ internal class TypeNames(TypeName[] customTypeNames)
         return found;
     }
 
+    public EnumName FindEnum(SAEnum @enum)
+    {
+        string tid = @enum.Namespaces.Length == 0
+            ? "global::" + @enum.Name
+            : "global::" + string.Join(".", @enum.Namespaces.Select(p => p.Name)) + "." + @enum.Name;
+
+        var found = All.OfType<EnumName>().FirstOrDefault(t => t.Id == tid);
+        if (found == null)
+        {
+            throw @enum.Context.ParsingError($"Type Error: The type '{tid}' is not registered as a known type.");
+        }
+
+        return found;
+    }
+
     public TypeName FindType(STypeName typeName, SClass declaringType)
     {
         using var iterator = ((IList<STypeName.Part>)typeName.NameParts).GetEnumerator();

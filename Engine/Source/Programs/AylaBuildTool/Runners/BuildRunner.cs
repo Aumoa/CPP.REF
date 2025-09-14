@@ -237,6 +237,15 @@ internal static partial class BuildRunner
                                 result.Generator
                             ));
                         }
+
+                        foreach (var @enum in result.Generator.Enums)
+                        {
+                            typeNames.Add(new EnumName(
+                                new NamespaceName(@enum.Namespaces.Select(p => p.Name).ToArray()),
+                                @enum.Name,
+                                result.Generator
+                            ));
+                        }
                     }
                 }
 

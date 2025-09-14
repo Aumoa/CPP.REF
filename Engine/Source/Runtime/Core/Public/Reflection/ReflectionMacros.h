@@ -80,3 +80,5 @@ namespace Ayla::Reflection
 }
 
 #define reflexpr(T) ::Ayla::Reflection::reflexpr_t<T>
+
+#define AENUM(...)

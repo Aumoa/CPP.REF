@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LoadSceneMode.gen.h"
 
 namespace Ayla
 {
-	enum class LoadSceneMode
+	AENUM()
+	enum struct LoadSceneMode
 	{
 		Single,
 		Additive

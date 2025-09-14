@@ -164,6 +164,11 @@ internal class Context : ICapturedContext
 
     private static ReadOnlySpan<char> ReplaceNewLine(ReadOnlySpan<char> source)
     {
+        if (source.Length == 0)
+        {
+            return source;
+        }
+
         if (source[0] == '\n')
         {
             source = source[1..];
