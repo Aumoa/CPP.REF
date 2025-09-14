@@ -6,14 +6,14 @@ namespace Ayla;
 
 public partial class Engine
 {
+    private GameInstance? m_GameInstance;
+
     public Engine()
     {
     }
 
-    public override void Initialize()
+    public void Initialize()
     {
-        base.Initialize();
-
         try
         {
             InitializeActivity();
@@ -28,7 +28,21 @@ public partial class Engine
         }
     }
 
-    private GameInstance? m_GameInstance;
+    public override void GuardedLoop()
+    {
+        while (true)
+        {
+            try
+            {
+                base.GuardedLoop();
+                break;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Engine", "Exception caught in main loop: {0}", e);
+            }
+        }
+    }
 
     private void InitializeGame()
     {

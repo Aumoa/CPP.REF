@@ -22,12 +22,6 @@ namespace Ayla
 	{
 	}
 
-	void Engine::GuardedStartup_Implementation()
-	{
-		PreInitialize();
-		Initialize();
-	}
-
 	void Engine::GuardedLoop_Implementation()
 	{
 		auto& app = GenericApplication::Get();
@@ -43,27 +37,6 @@ namespace Ayla
 		}
 
 		Shutdown();
-	}
-
-	void Engine::PreInitialize_Implementation()
-	{
-	}
-
-	void Engine::Initialize_Implementation()
-	{
-	}
-
-	void Engine::Shutdown_Implementation()
-	{
-		m_RenderThread->RequestStop();
-
-		for (auto& swapchain : m_SwapchainExtensions)
-		{
-			swapchain->Destroy();
-		}
-
-		m_SwapchainExtensions.clear();
-		m_Graphics.reset();
 	}
 
 	void Engine::Tick()
@@ -93,5 +66,18 @@ namespace Ayla
 	void Engine::PostInitialized()
 	{
 		m_MainActivity->AfterInitialize();
+	}
+
+	void Engine::Shutdown()
+	{
+		m_RenderThread->RequestStop();
+
+		for (auto& swapchain : m_SwapchainExtensions)
+		{
+			swapchain->Destroy();
+		}
+
+		m_SwapchainExtensions.clear();
+		m_Graphics.reset();
 	}
 }

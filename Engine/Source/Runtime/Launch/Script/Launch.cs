@@ -7,7 +7,8 @@ public partial class Launch
     public override void StartApplication()
     {
         m_Engine = new Engine();
-        m_Engine.GuardedStartup();
+        m_Engine.Initialize();
+
         m_Engine.GuardedLoop();
     }
 }

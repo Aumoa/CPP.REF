@@ -35,17 +35,7 @@ namespace Ayla
 		virtual ~Engine() noexcept override;
 
 		AFUNCTION()
-		virtual void GuardedStartup();
-		AFUNCTION()
 		virtual void GuardedLoop();
-
-		AFUNCTION()
-		virtual void PreInitialize();
-		AFUNCTION()
-		virtual void Initialize();
-		AFUNCTION()
-		virtual void Shutdown();
-
 		virtual void Tick();
 
 	protected:
@@ -55,5 +45,8 @@ namespace Ayla
 		void InitializeGraphics();
 		AFUNCTION()
 		void PostInitialized();
+
+		AFUNCTION()
+		void Shutdown();
 	};
 }
