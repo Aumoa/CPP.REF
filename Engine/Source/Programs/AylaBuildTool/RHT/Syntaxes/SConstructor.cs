@@ -2,14 +2,15 @@
 
 namespace AylaEngine;
 
-internal record SConstructor(CapturedContext Context, string Name, SParameter[] Parameters) : SMember(Context, null, Name)
+internal record SConstructor(CapturedContext Context, string Name, SParameter[] Parameters, SAccessSpecifier.Types Access)
+    : SMember(Context, null, Name, Access)
 {
     public override string ToString()
     {
         return FormatLineNumber() + "AFUNCTION()";
     }
 
-    public static bool TryAccept(Context context, [NotNullWhen(true)] out SConstructor? constructor)
+    public static bool TryAccept(Context context, List<Syntax> syntaxes, [NotNullWhen(true)] out SConstructor? constructor)
     {
         if (context.WholeEquals("ACONSTRUCTOR()") == false)
         {
@@ -18,6 +19,7 @@ internal record SConstructor(CapturedContext Context, string Name, SParameter[] 
         }
 
         var capture = context.Capture();
+        var lastAccess = GetLastAccessSpecifier(capture, syntaxes);
         context.Advance("ACONSTRUCTOR()".Length);
         context.SkipWhiteSpace(true);
 
@@ -48,7 +50,7 @@ internal record SConstructor(CapturedContext Context, string Name, SParameter[] 
         }
 
         context.ExportWhile(c => c != ';' && c != '{');
-        constructor = new SConstructor(capture, name.ToString(), parameters.ToArray());
+        constructor = new SConstructor(capture, name.ToString(), parameters.ToArray(), lastAccess);
         return true;
 
         bool IsNumber(char c) => c >= '0' && c <= '9';

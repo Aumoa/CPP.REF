@@ -38,6 +38,12 @@ namespace Ayla
 		virtual void GuardedLoop();
 		virtual void Tick();
 
+		AFUNCTION()
+		std::shared_ptr<Engine> CSharpToNative(int32 i, std::vector<int32> ii, String s, std::vector<String> ss, std::shared_ptr<Engine> p, std::vector<std::shared_ptr<Engine>> pp);
+
+		AFUNCTION()
+		virtual std::shared_ptr<Engine> NativeToCSharp(int32 i, std::vector<int32> ii, String s, std::vector<String> ss, std::shared_ptr<Engine> p, std::vector<std::shared_ptr<Engine>> pp);
+
 	protected:
 		AFUNCTION()
 		void InitializeActivity();

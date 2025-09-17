@@ -1,4 +1,6 @@
-﻿namespace AylaEngine;
+﻿using AylaEngine.RHT.Types;
+
+namespace AylaEngine;
 
 internal abstract class TypeName
 {
@@ -32,4 +34,5 @@ internal abstract class TypeName
     public static readonly TypeName Single = new BuiltinTypeName(BuiltinTypeName.Kinds.Single);
     public static readonly TypeName Double = new BuiltinTypeName(BuiltinTypeName.Kinds.Double);
     public static readonly TypeName Object = new BuiltinTypeName(BuiltinTypeName.Kinds.Object);
+    public static readonly CancellationTokenTypeName CancellationToken = new CancellationTokenTypeName();
 }

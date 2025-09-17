@@ -15,7 +15,7 @@ public struct ObjectReferenceWrapper
         Handle = handle;
     }
 
-    public T? As<T>() where T : Object
+    public T? AsManaged<T>() where T : Object
     {
         if (Ptr == 0)
         {
@@ -47,5 +47,5 @@ public struct ObjectReferenceWrapper
         }
     }
 
-    public static implicit operator ObjectReferenceWrapper(Object obj) => obj.AsWrapper();
+    public static implicit operator ObjectReferenceWrapper(Object? obj) => obj?.AsWrapper() ?? default;
 }

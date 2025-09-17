@@ -1,4 +1,6 @@
-﻿namespace AylaEngine;
+﻿using AylaEngine.RHT.CodeGen;
+
+namespace AylaEngine;
 
 internal partial class RHTGenerator
 {
@@ -7,6 +9,8 @@ internal partial class RHTGenerator
         string sourceCode = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.
+
+#pragma warning disable CS8604
 
 using System.Runtime.InteropServices;
 
@@ -84,22 +88,34 @@ using System.Runtime.InteropServices;
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
                     {
                         var constructor = aclass.Constructors[i];
+                        var access = constructor.Access.ToString().ToLower();
                         var returnType = (SharedPtrTypeName)Activator.CreateInstance(typeof(SharedPtrTypeName), @class)!;
-                        var parameterTypes = constructor.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
+                        var parameters = new ParameterCollection();
+                        foreach (var param in constructor.Parameters)
+                        {
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
 
-                        var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {constructor.Parameters[i].Variable.Name}"));
+                        var injectParamsDeclare = ParametersGenerator.GenerateCSharpInjected(parameters);
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
                         sourceCode += IndentedLine($"private static extern global::Ayla.ObjectReferenceLocker ctor_{constructor.Name}__Injected({injectParamsDeclare});");
 
-                        var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {constructor.Parameters[i].Variable.Name}"));
-                        var returnStmt = returnType.CSharpName;
-                        // TODO: support parameters
-                        sourceCode += IndentedLine($"public unsafe {constructor.Name}__Injected({internalParamsDeclare}) : this(ctor_{constructor.Name}__Injected())");
+                        var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
+                        sourceCode += IndentedLine($"private static unsafe global::Ayla.ObjectReferenceLocker ctor_{constructor.Name}__CallInjected({csharpParamsDeclare})");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
+                            var codegen = new FunctionBodyGenerator(parameters, $"ctor_{constructor.Name}__Injected", TypeName.Object);
+                            codegen.GenerateCSharpCSharpToNative(ref sourceCode, ref indent, IndentedLine);
                         });
+                        sourceCode += IndentedLine($"}}");
+
+                        var returnStmt = returnType.CSharpName;
+                        var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters);
+                        sourceCode += IndentedLine($"{access} unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(ctor_{constructor.Name}__CallInjected({callArguments}))");
+                        sourceCode += IndentedLine($"{{");
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
                     }
@@ -107,176 +123,76 @@ using System.Runtime.InteropServices;
                     for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
                         var function = aclass.Functions[i];
+                        var access = function.Access.ToString().ToLower();
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var parameterTypes = function.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
                         bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
                         bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
+                        var parameters = new ParameterCollection();
 
-                        var injectParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpBindingName} {function.Parameters[i].Variable.Name}"));
-                        string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
-                        if (isStatic == false)
+                        for (int j = 0; j < parameterTypes.Length; ++j)
                         {
-                            injectParamsDeclare = "nint self" + (injectParamsDeclare.Length > 0 ? ", " : string.Empty) + injectParamsDeclare;
+                            var paramType = parameterTypes[j];
+                            var parameter = function.Parameters[j].Variable;
+                            parameters.Add(paramType, parameter.Name);
                         }
+
+                        string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
+                        string injectParamsDeclare;
+                        if (isStatic)
+                        {
+                            injectParamsDeclare = ParametersGenerator.GenerateCSharpInjected(parameters);
+                        }
+                        else
+                        {
+                            injectParamsDeclare = ParametersGenerator.GenerateCSharpInjected(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+                        }
+
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
                         sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
                         var returnStmt = returnType is SharedPtrTypeName ? $"{returnType.CSharpName}?" : returnType.CSharpName;
-                        sourceCode += IndentedLine($"public unsafe{(isVirtual ? " virtual" : string.Empty)}{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}({internalParamsDeclare})");
+                        sourceCode += IndentedLine($"{access} unsafe{(isVirtual ? " virtual" : string.Empty)}{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}({internalParamsDeclare})");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
-                            GenerateFunctionBody(function, string.Empty, parameterTypes, function.Parameters, returnType, isStatic, false);
+                            var rule = project.GetRule(buildTarget);
+                            if (rule.Type == ModuleType.Application)
+                            {
+                                sourceCode += IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application type cannot directly invoke native functions.\");");
+                                return;
+                            }
+
+                            FunctionBodyGenerator bodyGen;
+                            string callable = $"{function.Name}__Injected";
+                            if (isStatic == false)
+                            {
+                                bodyGen = new FunctionBodyGenerator(parameters.AddFirstTemp(TypeName.IntPtr, "this.NativePointer"), callable, returnType);
+                            }
+                            else
+                            {
+                                bodyGen = new FunctionBodyGenerator(parameters, callable, returnType);
+                            }
+
+                            bodyGen.GenerateCSharpCSharpToNative(ref sourceCode, ref indent, IndentedLine);
                         });
                         sourceCode += IndentedLine($"}}");
                         if (isVirtual)
                         {
-                            sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Invoke(global::Ayla.ObjectReferenceWrapper self_)");
+                            var invokeParamsDeclare = ParametersGenerator.GenerateCSharpInvoke(parameters.AddFirstTemp(TypeName.Object, "self_"));
+                            sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Invoke({invokeParamsDeclare})");
                             sourceCode += IndentedLine($"{{");
                             Indented(() =>
                             {
-                                sourceCode += IndentedLine($"var self = self_.As<{aclass.Class.Name}>()!;");
-                                string bodyStatement = $"self.{function.Name}()";
-                                if (returnType == TypeName.Void)
-                                {
-                                    sourceCode += IndentedLine(bodyStatement + ';');
-                                }
-                                else if (returnType is SharedPtrTypeName)
-                                {
-                                    sourceCode += IndentedLine($"return global::Ayla.Marshaller.AsBinding({bodyStatement});");
-                                }
-                                else
-                                {
-                                    sourceCode += IndentedLine($"return {bodyStatement};");
-                                }
+                                sourceCode += IndentedLine($"var self = self_.AsManaged<{aclass.Class.Name}>()!;");
+                                string callable = $"self.{function.Name}";
+                                var codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
+                                codeGen.GenerateCSharpNativeToCSharp(ref sourceCode, ref indent, IndentedLine);
                             });
                             sourceCode += IndentedLine($"}}");
                         }
                         sourceCode += IndentedLine($"");
-                    }
-
-                    void GenerateFunctionBody(SMember member, string prefix, TypeName[] parameterTypes, SParameter[] parameters, TypeName returnType, bool isStatic, bool returnAsBinding)
-                    {
-                        var rule = project.GetRule(buildTarget);
-                        if (rule.Type == ModuleType.Application)
-                        {
-                            sourceCode += IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application type cannot directly invoke native functions.\");");
-                            return;
-                        }
-
-                        List<string> allocateStatements = [];
-                        List<string> fixedStatements = [];
-                        List<string> arguments = [];
-                        List<string> releaseStatements = [];
-
-                        for (int j = 0; j < parameterTypes.Length; ++j)
-                        {
-                            var paramType = parameterTypes[j];
-                            var parameter = parameters[j].Variable;
-                            if (paramType == TypeName.String)
-                            {
-                                fixedStatements.Add($"fixed (char* {parameter.Name}_ptr = {parameter.Name})");
-                                arguments.Add($"(nint){parameter.Name}_ptr");
-                            }
-                            else if (paramType is ArrayTypeName arrayType)
-                            {
-                                if (arrayType.ElementType == TypeName.String)
-                                {
-                                    allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.StringArrayToNative({parameter.Name});");
-                                    releaseStatements.Add($"Marshaller.ReleaseStringArray({parameter.Name}_ptr, {parameter.Name}.Length);");
-                                    arguments.Add(parameter.Name + "_ptr");
-                                }
-                                else if (arrayType.ElementType is SharedPtrTypeName)
-                                {
-                                    allocateStatements.Add($"nint {parameter.Name}_ptr = Marshaller.ObjectArrayToNative({parameter.Name});");
-                                    releaseStatements.Add($"Marshaller.ReleaseObjectArray({parameter.Name}_ptr);");
-                                    arguments.Add(parameter.Name + "_ptr");
-                                }
-                                else
-                                {
-                                    fixedStatements.Add($"fixed ({arrayType.ElementType.CSharpBindingName}* {parameter.Name}_ptr = {parameter.Name})");
-                                    arguments.Add("(nint)" + parameter.Name + "_ptr");
-                                }
-                            }
-                            else
-                            {
-                                arguments.Add(parameter.Name);
-                            }
-                        }
-
-                        if (allocateStatements.Count > 0)
-                        {
-                            foreach (var stmt in allocateStatements)
-                            {
-                                sourceCode += IndentedLine(stmt);
-                            }
-                            sourceCode += IndentedLine($"try");
-                            sourceCode += IndentedLine($"{{");
-                            ++indent;
-                        }
-                        try
-                        {
-                            if (fixedStatements.Count > 0)
-                            {
-                                foreach (var stmt in fixedStatements)
-                                {
-                                    sourceCode += IndentedLine(stmt);
-                                }
-
-                                sourceCode += IndentedLine($"{{");
-                                ++indent;
-                            }
-
-                            try
-                            {
-                                if (isStatic == false)
-                                {
-                                    arguments.Insert(0, "this.NativePointer");
-                                }
-
-                                string bodyStmt = $"{prefix}{member.Name}__Injected({string.Join(", ", arguments)})";
-
-                                if (returnType == TypeName.Void)
-                                {
-                                    sourceCode += IndentedLine(bodyStmt + ";");
-                                }
-                                else if (returnType is SharedPtrTypeName && returnAsBinding == false)
-                                {
-                                    sourceCode += IndentedLine($"return {bodyStmt}.As<{returnType.CSharpName}>();");
-                                }
-                                else
-                                {
-                                    sourceCode += IndentedLine($"return {bodyStmt};");
-                                }
-                            }
-                            finally
-                            {
-                                if (fixedStatements.Count > 0)
-                                {
-                                    --indent;
-                                    sourceCode += IndentedLine($"}}");
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            if (allocateStatements.Count > 0)
-                            {
-                                --indent;
-                                sourceCode += IndentedLine($"}}");
-                                sourceCode += IndentedLine($"finally");
-                                sourceCode += IndentedLine($"{{");
-                                Indented(() =>
-                                {
-                                    foreach (var stmt in releaseStatements)
-                                    {
-                                        sourceCode += IndentedLine(stmt);
-                                    }
-                                });
-                                sourceCode += IndentedLine($"}}");
-                            }
-                        }
                     }
                 });
                 sourceCode += IndentedLine($"}}");

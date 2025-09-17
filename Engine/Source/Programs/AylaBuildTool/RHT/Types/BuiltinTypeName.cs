@@ -59,7 +59,7 @@ internal class BuiltinTypeName : TypeName
     public override string CppBindingName => Kind switch
     {
         Kinds.Void => "void",
-        Kinds.String => "const wchar_t*",
+        Kinds.String => "::Ayla::ManagedStringWrapper",
         Kinds.Object => "::Ayla::ObjectReferenceWrapper",
         _ => CppName
     };
@@ -91,7 +91,7 @@ internal class BuiltinTypeName : TypeName
         Kinds.UInt64 => "ulong",
         Kinds.IntPtr => "nint",
         Kinds.UIntPtr => "nuint",
-        Kinds.String => "nint",
+        Kinds.String => "global::Ayla.ManagedStringWrapper",
         Kinds.Single => "float",
         Kinds.Double => "double",
         Kinds.Object => "global::Ayla.ObjectReferenceWrapper",

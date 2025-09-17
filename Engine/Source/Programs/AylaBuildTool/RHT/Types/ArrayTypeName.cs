@@ -15,11 +15,11 @@ internal class ArrayTypeName : TypeName
 
     public override string CppRootName => $"::std::vector<{ElementType.CppRootName}>";
 
-    public override string CppBindingName => "void*";
+    public override string CppBindingName => "::Ayla::ManagedArrayWrapper";
 
     public override string CSharpName => $"{ElementType.CSharpName}[]";
 
-    public override string CSharpBindingName => "nint";
+    public override string CSharpBindingName => "global::Ayla.ManagedArrayWrapper";
 
     public override string Id => $"global::std.vector<{ElementType.Id}>";
 

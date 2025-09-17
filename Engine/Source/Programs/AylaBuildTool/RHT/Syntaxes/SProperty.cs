@@ -2,14 +2,15 @@
 
 namespace AylaEngine;
 
-internal record SProperty(CapturedContext Context, SVariable Variable) : Syntax(Context, null)
+internal record SProperty(CapturedContext Context, SVariable Variable, SAccessSpecifier.Types Access)
+    : SMember(Context, null, Variable.Name, Access)
 {
     public override string ToString()
     {
         return FormatLineNumber() + "APROPERTY()";
     }
 
-    public static bool TryAccept(Context context, [NotNullWhen(true)] out SProperty? aproperty)
+    public static bool TryAccept(Context context, List<Syntax> syntaxes, [NotNullWhen(true)] out SProperty? aproperty)
     {
         if (context.WholeEquals("APROPERTY()") == false)
         {
@@ -18,10 +19,11 @@ internal record SProperty(CapturedContext Context, SVariable Variable) : Syntax(
         }
 
         var capture = context.Capture();
+        var lastAccess = GetLastAccessSpecifier(capture, syntaxes);
         context.Advance("APROPERTY()".Length);
         context.SkipWhiteSpace(true);
         var vinfo = SVariable.Accept(context, c => c == ';');
-        aproperty = new SProperty(capture, vinfo);
+        aproperty = new SProperty(capture, vinfo, lastAccess);
         return true;
     }
 }

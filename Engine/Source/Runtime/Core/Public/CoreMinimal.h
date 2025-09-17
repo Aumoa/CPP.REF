@@ -60,6 +60,8 @@
 #include "Reflection/TransferFunction.h"
 #include "Reflection/Marshal.h"
 #include "Reflection/ObjectReferenceWrapper.h"
+#include "Reflection/ManagedStringWrapper.h"
+#include "Reflection/ManagedArrayWrapper.h"
 
 #include "Diagnostics/Debug.h"
 

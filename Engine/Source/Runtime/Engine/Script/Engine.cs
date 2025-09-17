@@ -28,6 +28,11 @@ public partial class Engine
         }
     }
 
+    public override Engine? NativeToCSharp(int i, int[] ii, string s, string[] ss, Engine p, Engine[] pp)
+    {
+        return base.NativeToCSharp(i, ii, s, ss, p, pp);
+    }
+
     public override void GuardedLoop()
     {
         while (true)

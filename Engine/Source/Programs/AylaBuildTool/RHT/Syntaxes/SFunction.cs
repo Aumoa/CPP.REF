@@ -3,7 +3,8 @@ using static AylaEngine.RHTGenerator;
 
 namespace AylaEngine;
 
-internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags Flags, STypeName ReturnType, SParameter[] Parameters) : SMember(Context, null, Name)
+internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags Flags, STypeName ReturnType, SParameter[] Parameters, SAccessSpecifier.Types Access)
+    : SMember(Context, null, Name, Access)
 {
     [Flags]
     public enum FFlags
@@ -19,7 +20,7 @@ internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags
         return FormatLineNumber() + "AFUNCTION()";
     }
 
-    public static bool TryAccept(Context context, [NotNullWhen(true)] out SFunction? afunction)
+    public static bool TryAccept(Context context, List<Syntax> syntaxes, [NotNullWhen(true)] out SFunction? afunction)
     {
         if (context.WholeEquals("AFUNCTION()") == false)
         {
@@ -28,6 +29,7 @@ internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags
         }
 
         var capture = context.Capture();
+        var lastAccess = GetLastAccessSpecifier(capture, syntaxes);
         context.Advance("AFUNCTION()".Length);
         context.SkipWhiteSpace(true);
         FFlags flags = FFlags.None;
@@ -80,7 +82,7 @@ internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags
         }
 
         context.ExportWhile(c => c != ';' && c != '{');
-        afunction = new SFunction(capture, name.ToString(), flags, returnType, parameters.ToArray());
+        afunction = new SFunction(capture, name.ToString(), flags, returnType, parameters.ToArray(), lastAccess);
         return true;
 
         bool IsNumber(char c) => c >= '0' && c <= '9';

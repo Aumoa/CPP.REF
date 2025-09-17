@@ -85,7 +85,7 @@ internal partial class RHTGenerator
                 aclass.Body = generatedBody;
                 continue;
             }
-            else if (SProperty.TryAccept(context, out var aproperty))
+            else if (SProperty.TryAccept(context, syntaxes, out var aproperty))
             {
                 aclass = syntaxes.OfType<SAClass>().LastOrDefault();
                 if (aclass == null)
@@ -95,7 +95,7 @@ internal partial class RHTGenerator
                 aclass.AddProperty(aproperty);
                 continue;
             }
-            else if (SFunction.TryAccept(context, out var afunction))
+            else if (SFunction.TryAccept(context, syntaxes, out var afunction))
             {
                 aclass = syntaxes.OfType<SAClass>().LastOrDefault();
                 if (aclass == null)
@@ -105,7 +105,7 @@ internal partial class RHTGenerator
                 aclass.AddFunction(afunction);
                 continue;
             }
-            else if (SConstructor.TryAccept(context, out var aconstructor))
+            else if (SConstructor.TryAccept(context, syntaxes, out var aconstructor))
             {
                 aclass = syntaxes.OfType<SAClass>().LastOrDefault();
                 if (aclass == null)
@@ -126,6 +126,10 @@ internal partial class RHTGenerator
             else if (SBracket.TryAccept(context, out var unknownBracket))
             {
                 syntaxes.Add(unknownBracket);
+            }
+            else if (SAccessSpecifier.TryAccept(context, out var accessSpecifier))
+            {
+                syntaxes.Add(accessSpecifier);
             }
             else
             {

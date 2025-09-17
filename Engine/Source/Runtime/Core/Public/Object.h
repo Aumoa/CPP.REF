@@ -107,9 +107,9 @@ namespace Ayla
 
 	protected:
 		template<class U>
-		std::shared_ptr<U> SharedFromThis(this U&& u)
+		std::shared_ptr<std::remove_reference_t<U>> SharedFromThis(this U&& u)
 		{
-			return std::static_pointer_cast<U>(u.shared_from_this());
+			return std::static_pointer_cast<std::remove_reference_t<U>>(u.shared_from_this());
 		}
 
 	private:

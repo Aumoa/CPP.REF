@@ -1,4 +1,6 @@
-﻿namespace AylaEngine;
+﻿using AylaEngine.RHT.Types;
+
+namespace AylaEngine;
 
 internal class TypeNames(TypeName[] customTypeNames)
 {
@@ -18,6 +20,7 @@ internal class TypeNames(TypeName[] customTypeNames)
         TypeName.Object,
         ArrayTypeName.GenericTypeDefinition,
         SharedPtrTypeName.GenericTypeDefinition,
+        TypeName.CancellationToken,
         .. customTypeNames
     ];
 
