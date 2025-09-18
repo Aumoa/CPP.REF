@@ -79,7 +79,7 @@ public readonly struct ManagedArrayWrapper : IDisposable
         var output = (ObjectReferenceWrapper*)Marshal.AllocHGlobal(sizeof(ObjectReferenceWrapper) * array.Length);
         for (int i = 0; i < array.Length; ++i)
         {
-            output[i] = array[i].AsWrapper();
+            output[i] = array[i]?.AsWrapper() ?? default;
         }
 
         return new ManagedArrayWrapper((nint)output, array.Length);
@@ -91,7 +91,7 @@ public readonly struct ManagedArrayWrapper : IDisposable
         for (int i = 0; i < array.Length; ++i)
         {
             length += sizeof(int);
-            length += sizeof(char) * array[i].Length;
+            length += sizeof(char) * (array[i]?.Length ?? 0);
         }
 
         var output = (byte*)Marshal.AllocHGlobal(length);
@@ -102,11 +102,12 @@ public readonly struct ManagedArrayWrapper : IDisposable
 
         for (int i = 0; i < array.Length; ++i)
         {
-            BitConverter.TryWriteBytes(new Span<byte>(output + seekpos, sizeof(int)), array[i].Length);
+            int sl = array[i]?.Length ?? 0;
+            BitConverter.TryWriteBytes(new Span<byte>(output + seekpos, sizeof(int)), sl);
             seekpos += sizeof(int);
             fixed (char* p = array[i])
             {
-                int copySize = sizeof(char) * array[i].Length;
+                int copySize = sizeof(char) * sl;
                 Buffer.MemoryCopy(p, output + seekpos, copySize, copySize);
                 seekpos += copySize;
             }

@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using AylaEngine.RHT.CodeGen;
+
 namespace AylaEngine;
 
 internal partial class RHTGenerator
@@ -45,27 +47,24 @@ internal partial class RHTGenerator
                     {
                         var function = aclass.Functions[i];
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
-                        var parameterTypes = function.Parameters
-                            .Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class))
-                            .ToArray();
-                        string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
-                        string parameters = string.Join(", ", parameterTypes.Select((p, i) =>
+                        var parameters = new ParameterCollection();
+                        foreach (var param in function.Parameters)
                         {
-                            return $"{p.CppBindingName} {function.Parameters[i].Variable.Name}";
-                        }));
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
+                        string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
+                        string paramsDeclare;
                         if (function.Flags.HasFlag(SFunction.FFlags.Static) == false)
                         {
-                            if (string.IsNullOrEmpty(parameters))
-                            {
-                                parameters = "void* self";
-                            }
-                            else
-                            {
-                                parameters = string.Join(", ", "void* self", parameters);
-                            }
+                            paramsDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
                         }
-                        headerText += Indented_Line($"PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({parameters});");
-                        friends.Add($"friend {returnType.CppBindingName} (::{functionFullName})({parameters});");
+                        else
+                        {
+                            paramsDeclare = ParametersGenerator.GenerateCppBindings(parameters);
+                        }
+                        headerText += Indented_Line($"PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({paramsDeclare});");
+                        friends.Add($"friend {returnType.CppBindingName} (::{functionFullName})({paramsDeclare});");
                     }
                 });
                 headerText += Indented_Line($"}}");
@@ -105,6 +104,12 @@ internal partial class RHTGenerator
                     for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
                         var function = aclass.Functions[i];
+                        var parameters = new ParameterCollection();
+                        foreach (var param in function.Parameters)
+                        {
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var parameterTypes = function.Parameters
                             .Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class))

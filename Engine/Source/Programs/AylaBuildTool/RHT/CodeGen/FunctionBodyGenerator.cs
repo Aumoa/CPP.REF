@@ -17,7 +17,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             if (typeName == TypeName.String)
             {
                 scoped.Add($"fixed (char* {name}_ptr = {name})");
-                arguments.Add($"new global::Ayla.ManagedStringWrapper({name}_ptr, {name}.Length)");
+                arguments.Add($"new global::Ayla.ManagedStringWrapper({name}_ptr, {name}?.Length ?? 0)");
             }
             else if (typeName is ArrayTypeName arrayType)
             {
@@ -206,7 +206,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (typeName is SharedPtrTypeName ptype)
             {
-                arguments.Add($"{name}.AsObject<{ptype.ElementType.CppName}>()");
+                arguments.Add($"{name}.AsNative<{ptype.ElementType.CppName}>()");
             }
             else
             {
@@ -223,7 +223,11 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (returnType_ is SharedPtrTypeName)
             {
-                formatLine($"return {bodyStmt}.AsNative<{returnType_.CppName}>();");
+                formatLine($"return ::Ayla::ObjectReferenceWrapper::FromObject({bodyStmt});");
+            }
+            else if (returnType_ is PlaceholderName)
+            {
+                formatLine($"return {bodyStmt}->CreateLocker();");
             }
             else
             {

@@ -8,8 +8,7 @@ public partial class Engine
 {
     private GameInstance? m_GameInstance;
 
-    public Engine(int i, int[] ii, string s, string[] ss, Engine? p, Engine?[] pp)
-        : base(i, ii, s, ss, p, pp)
+    public Engine()
     {
     }
 
@@ -27,11 +26,6 @@ public partial class Engine
             Shutdown();
             throw;
         }
-    }
-
-    public override Engine? NativeToCSharp(int i, int[] ii, string s, string[] ss, Engine p, Engine[] pp)
-    {
-        return base.NativeToCSharp(i, ii, s, ss, p, pp);
     }
 
     public override void GuardedLoop()

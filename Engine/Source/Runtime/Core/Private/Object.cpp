@@ -8,7 +8,6 @@
 #include "Reflection/TypeRegister.h"
 #include "Reflection/TypeCollector.h"
 #include "Reflection/ReflectionMacros.h"
-#include "Reflection/Marshal.h"
 
 namespace Ayla
 {
@@ -65,7 +64,7 @@ namespace Ayla
 		return ObjectReferenceLocker
 		{
 			.Ref = reinterpret_cast<ssize_t>(new std::shared_ptr<Object>(shared_from_this())),
-			.Flags =(int32)m_Flags
+			.Flags = (int32)m_Flags
 		};
 	}
 

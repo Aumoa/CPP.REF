@@ -11,11 +11,25 @@ namespace Ayla
 	struct ManagedStringWrapper
 	{
 		const wchar_t* C_str;
-		size_t Length;
+		int32 Length;
+
+		inline String AsString() const
+		{
+			return String{ C_str, (size_t)Length };
+		}
 
 		inline String AsStringView() const
 		{
-			return String::FromLiteral(std::wstring_view{ C_str, Length });
+			return String::FromLiteral(std::wstring_view{ C_str, (size_t)Length });
+		}
+
+		static ManagedStringWrapper FromString(String str)
+		{
+			return ManagedStringWrapper
+			{
+				.C_str = str.c_str(),
+				.Length = (int32)str.length()
+			};
 		}
 	};
 }

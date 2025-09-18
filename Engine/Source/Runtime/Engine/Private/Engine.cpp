@@ -14,7 +14,7 @@
 
 namespace Ayla
 {
-	Engine::Engine(int32 i, std::vector<int32> ii, String s, std::vector<String> ss, std::shared_ptr<Engine> p, std::vector<std::shared_ptr<Engine>> pp)
+	Engine::Engine()
 	{
 	}
 
@@ -48,16 +48,6 @@ namespace Ayla
 				swapchainExt->Present();
 			}
 		});
-	}
-
-	std::shared_ptr<Engine> Engine::CSharpToNative(int32 i, std::vector<int32> ii, String s, std::vector<String> ss, std::shared_ptr<Engine> p, std::vector<std::shared_ptr<Engine>> pp)
-	{
-		return NativeToCSharp(i, ii, s, ss, p, pp);
-	}
-
-	std::shared_ptr<Engine> Engine::NativeToCSharp_Implementation(int32 i, std::vector<int32> ii, String s, std::vector<String> ss, std::shared_ptr<Engine> p, std::vector<std::shared_ptr<Engine>> pp)
-	{
-		return SharedFromThis();
 	}
 
 	void Engine::InitializeActivity()
