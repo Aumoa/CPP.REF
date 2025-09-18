@@ -6,10 +6,6 @@ internal class CancellationTokenTypeName : TypeName
 
     public override string CppName => "::Ayla::CancellationToken";
 
-    public override string CppMemberName => CppName;
-
-    public override string CppRootName => CppName;
-
     public override string CppBindingName => CppName;
 
     public override string CSharpName => "global::System.Threading.CancellationToken";

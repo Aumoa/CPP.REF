@@ -9,11 +9,7 @@ internal class ArrayTypeName : TypeName
         ElementType = elementType;
     }
 
-    public override string CppName => $"::std::vector<{ElementType.CppRootName}>";
-
-    public override string CppMemberName => $"::std::vector<{ElementType.CppMemberName}>";
-
-    public override string CppRootName => $"::std::vector<{ElementType.CppRootName}>";
+    public override string CppName => $"::std::vector<{ElementType.CppName}>";
 
     public override string CppBindingName => "::Ayla::ManagedArrayWrapper";
 

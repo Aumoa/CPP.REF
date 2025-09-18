@@ -9,11 +9,7 @@ internal class SharedPtrTypeName : TypeName
         ElementType = elementType;
     }
 
-    public override string CppName => $"::std::shared_ptr<{ElementType.CppRootName}>";
-
-    public override string CppMemberName => $"::std::shared_ptr<{ElementType.CppMemberName}>";
-
-    public override string CppRootName => $"::std::shared_ptr<{ElementType.CppRootName}>";
+    public override string CppName => $"::std::shared_ptr<{ElementType.CppName}>";
 
     public override string CppBindingName => "::Ayla::ObjectReferenceWrapper";
 
@@ -26,4 +22,6 @@ internal class SharedPtrTypeName : TypeName
     public override bool IsGenericTypeDefinition => ElementType is PlaceholderName;
 
     public static readonly SharedPtrTypeName GenericTypeDefinition = new(PlaceholderName.Value);
+
+    public static readonly SharedPtrTypeName SharedObject = new(TypeName.Object);
 }

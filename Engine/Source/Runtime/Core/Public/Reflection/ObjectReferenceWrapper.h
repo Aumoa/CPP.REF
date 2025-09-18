@@ -15,12 +15,12 @@ namespace Ayla
 		ssize_t Handle;
 
 		template<class T>
-		inline std::shared_ptr<T> Resolve() const
+		inline std::shared_ptr<T> AsNative() const
 		{
-			return std::dynamic_pointer_cast<T>(Resolve_Internal());
+			return std::dynamic_pointer_cast<T>(AsNative_Internal());
 		}
 
 	private:
-		std::shared_ptr<Object> Resolve_Internal() const;
+		std::shared_ptr<Object> AsNative_Internal() const;
 	};
 }

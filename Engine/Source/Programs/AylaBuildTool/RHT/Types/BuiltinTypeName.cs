@@ -40,20 +40,8 @@ internal class BuiltinTypeName : TypeName
         Kinds.String => "::Ayla::String",
         Kinds.Single => "float",
         Kinds.Double => "double",
+        Kinds.Object => "::Ayla::Object",
         _ => throw TerminateException.Arguments()
-    };
-
-    public override string CppMemberName => Kind switch
-    {
-        Kinds.Void => throw User("A type cannot be void type."),
-        Kinds.Object => "::std::shared_ptr<::Ayla::Object>",
-        _ => CppName
-    };
-
-    public override string CppRootName => Kind switch
-    {
-        Kinds.Object => "::std::shared_ptr<::Ayla::Object>",
-        _ => CppName
     };
 
     public override string CppBindingName => Kind switch

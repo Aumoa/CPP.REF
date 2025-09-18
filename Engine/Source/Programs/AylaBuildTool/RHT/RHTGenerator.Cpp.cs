@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using AylaEngine.RHT.CodeGen;
+
 namespace AylaEngine;
 
 internal partial class RHTGenerator
@@ -41,6 +43,8 @@ internal partial class RHTGenerator
 
 """;
 
+        int indent = 0;
+
         foreach (var syntax in m_Syntaxes)
         {
             if (syntax is SAClass aclass)
@@ -51,134 +55,163 @@ internal partial class RHTGenerator
                 string @class = aclass.Class.Name;
                 var classType = typeNames.FindClass(aclass.Class);
 
-                sourceCodeText += $"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {@class});\n";
-                sourceCodeText += $"\n";
+                WriteIndentedLine($"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {@class});");
+                WriteIndentedLine($"");
 
                 if (@class == "Object")
                 {
                     continue;
                 }
 
-                sourceCodeText += $"namespace {@namespace}\n";
-                sourceCodeText +=  "{\n";
-                sourceCodeText += $"  void {@class}::GatherProperties(::Ayla::PropertyCollector& collector)\n";
-                sourceCodeText +=  "  {\n";
-                sourceCodeText +=  "    Super::GatherProperties(collector);\n";
-                sourceCodeText += $"    Transfer(collector);\n";
-                sourceCodeText +=  "  }\n";
-                for (int i = 0; i < aclass.Functions.Count; ++i)
+                WriteIndentedLine($"namespace {@namespace}");
+                WriteIndentedLine($"{{");
+                Indented(() =>
                 {
-                    var function = aclass.Functions[i];
-                    bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
-                    if (isVirtual == false)
+                    WriteIndentedLine($"void {@class}::GatherProperties(::Ayla::PropertyCollector& collector)");
+                    WriteIndentedLine($"  {{");
+                    Indented(() =>
                     {
-                        continue;
-                    }
+                        WriteIndentedLine($"Super::GatherProperties(collector);");
+                        WriteIndentedLine($"Transfer(collector);");
+                    });
+                    WriteIndentedLine($"}}");
 
-                    var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
-                    sourceCodeText += $"  {function.ReturnType.FullName} {@class}::{function.Name}()\n";
-                    sourceCodeText += $"  {{\n";
-                    sourceCodeText += $"    using signature_t = {function.ReturnType.FullName}(*)(::Ayla::ObjectReferenceWrapper);\n";
-                    sourceCodeText += $"    static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Injected\", \"{function.Name}__Invoke\"));\n";
-                    string callStatement = $"callable(AsWrapper())";
-                    if (returnType == TypeName.Void)
+                    for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
-                        sourceCodeText += $"    {callStatement};\n";
-                    }
-                    else
-                    {
-                        sourceCodeText += $"    return ::Ayla::Marshal::ToNative<{function.ReturnType.FullName}>({callStatement});\n";
-                    }
-                    sourceCodeText += $"  }}\n";
-                    if (rule.Type == ModuleType.Application)
-                    {
-                        sourceCodeText += $"  {function.ReturnType.FullName} {@class}::{function.Name}_Implementation()\n";
-                        sourceCodeText += $"  {{\n";
-                        sourceCodeText += $"    throw ::Ayla::AccessViolationException(TEXT(\"Assemblies of the Application type cannot directly invoke native functions.\"));\n";
-                        sourceCodeText += $"  }}\n";
-                    }
-                }
-                sourceCodeText +=  "}\n\n";
-                sourceCodeText +=  "extern \"C\"\n";
-                sourceCodeText +=  "{\n";
-                for (int i = 0; i < aclass.Constructors.Count; ++i)
-                {
-                    var constructor = aclass.Constructors[i];
-                    var parameterTypes = constructor.Parameters
-                        .Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class))
-                        .ToArray();
-                    string parameters = string.Join(", ", parameterTypes.Select((p, i) =>
-                    {
-                        return $"{p.CppBindingName} {constructor.Parameters[i].Variable.Name}";
-                    }));
-                    string constructorFullName = $"{@namespace.Replace("::", "__")}__{@class}__{constructor.Name}__{i}__Injected";
-                    string arguments = string.Join(", ", constructor.Parameters.Select(p =>
-                    {
-                        var argumentType = typeNames.FindType(p.Variable.TypeName, aclass.Class);
-                        return $"::Ayla::Marshal::ToNative<{argumentType.CppName}>({p.Variable.Name})";
-                    }));
-                    string bodyStatement = $"::Ayla::Object::ScriptNew<{classType.CppName}>({arguments})";
-                    string returnStatement = $"return {bodyStatement}->CreateLocker()";
-                    sourceCodeText += $"  PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceLocker {constructorFullName}({parameters})\n";
-                    sourceCodeText += $"  {{\n";
-                    sourceCodeText += $"    {returnStatement};\n";
-                    sourceCodeText += $"  }}\n";
-                }
-                for (int i = 0; i < aclass.Functions.Count; ++i)
-                {
-                    var function = aclass.Functions[i];
-                    var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
-                    var parameterTypes = function.Parameters
-                        .Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class))
-                        .ToArray();
-                    string parameters = string.Join(", ", parameterTypes.Select((p, i) =>
-                    {
-                        return $"{p.CppBindingName} {function.Parameters[i].Variable.Name}";
-                    }));
-                    if (function.Flags.HasFlag(SFunction.FFlags.Static) == false)
-                    {
-                        if (string.IsNullOrEmpty(parameters))
+                        var function = aclass.Functions[i];
+                        bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
+                        if (isVirtual == false)
                         {
-                            parameters = "void* self";
+                            continue;
+                        }
+
+                        var parameters = new ParameterCollection();
+                        foreach (var param in function.Parameters)
+                        {
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
+
+                        var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
+                        var parametersDeclare = ParametersGenerator.GenerateCpp(parameters);
+                        WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}({parametersDeclare})");
+                        WriteIndentedLine($"{{\n");
+                        Indented(() =>
+                        {
+                            var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
+                            WriteIndentedLine($"using signature_t = {returnType.CppBindingName}(*)({invokeParametersDeclare});");
+                            WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Injected\", \"{function.Name}__Invoke\"));");
+                            WriteIndentedLine($"auto self = SharedFromThis();");
+                            string callable = $"callable";
+                            var codeGen = new FunctionBodyGenerator(parameters.AddFirstTemp(SharedPtrTypeName.SharedObject, "self"), callable, returnType);
+                            codeGen.GenerateCppNativeToCSharp(WriteIndentedLine);
+                        });
+                        WriteIndentedLine($"}}");
+                        if (rule.Type == ModuleType.Application)
+                        {
+                            WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}_Implementation()");
+                            WriteIndentedLine($"{{");
+                            Indented(() =>
+                            {
+                                WriteIndentedLine($"throw ::Ayla::AccessViolationException(TEXT(\"Assemblies of the Application type cannot directly invoke native functions.\"));");
+                            });
+                            WriteIndentedLine($"}}");
+                        }
+                    }
+                });
+                WriteIndentedLine($"}}");
+                WriteIndentedLine($"");
+                WriteIndentedLine($"extern \"C\"");
+                WriteIndentedLine($"{{");
+                Indented(() =>
+                {
+                    for (int i = 0; i < aclass.Constructors.Count; ++i)
+                    {
+                        var constructor = aclass.Constructors[i];
+                        var parameters = new ParameterCollection();
+                        foreach (var param in constructor.Parameters)
+                        {
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
+                        var parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters);
+                        string constructorFullName = $"{@namespace.Replace("::", "__")}__{@class}__{constructor.Name}__{i}__Injected";
+                        string arguments = string.Join(", ", constructor.Parameters.Select(p =>
+                        {
+                            var argumentType = typeNames.FindType(p.Variable.TypeName, aclass.Class);
+                            return $"::Ayla::Marshal::ToNative<{argumentType.CppName}>({p.Variable.Name})";
+                        }));
+                        string callable = $"::Ayla::Object::ScriptNew<{classType.CppName}>";
+                        var codeGen = new FunctionBodyGenerator(parameters, callable, PlaceholderName.Value);
+                        string bodyStatement = $"::Ayla::Object::ScriptNew<{classType.CppName}>({arguments})";
+                        string returnStatement = $"return {bodyStatement}";
+                        WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceLocker {constructorFullName}({parametersDeclare})");
+                        WriteIndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            codeGen.GenerateCppCSharpToNative(WriteIndentedLine);
+                        });
+                        WriteIndentedLine($"}}");
+                    }
+                    for (int i = 0; i < aclass.Functions.Count; ++i)
+                    {
+                        var function = aclass.Functions[i];
+                        var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
+                        var parameters = new ParameterCollection();
+                        foreach (var param in function.Parameters)
+                        {
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
+
+                        string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
+                        bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
+                        bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
+                        var caller = isStatic ? $"{classType.CppName}::" : $"(({classType.CppName}*)(::Ayla::Object*)self)->";
+                        string suffix = isVirtual ? "_Implementation" : string.Empty;
+                        string callable = $"{caller}{function.Name}{suffix}";
+                        FunctionBodyGenerator codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
+                        string parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters);
+                        if (function.Flags.HasFlag(SFunction.FFlags.Static) == false)
+                        {
+                            parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
                         }
                         else
                         {
-                            parameters = string.Join(", ", "void* self", parameters);
+                            parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters);
                         }
+                        WriteIndentedLine($"PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({parametersDeclare})");
+                        WriteIndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            codeGen.GenerateCppCSharpToNative(WriteIndentedLine);
+                        });
+                        WriteIndentedLine($"}}");
                     }
-                    string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
-
-                    string returnStatement;
-                    string arguments = string.Join(", ", function.Parameters.Select(p =>
-                    {
-                        var argumentType = typeNames.FindType(p.Variable.TypeName, aclass.Class);
-                        return $"::Ayla::Marshal::ToNative<{argumentType.CppName}>({p.Variable.Name})";
-                    }));
-                    bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
-                    bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
-                    var caller = isStatic ? $"{classType.CppName}::" : $"(({classType.CppName}*)(::Ayla::Object*)self)->";
-                    string suffix = isVirtual ? "_Implementation" : string.Empty;
-                    string bodyStatement = $"{caller}{function.Name}{suffix}({arguments})";
-                    if (returnType != BuiltinTypeName.Void)
-                    {
-                        returnStatement = $"return ::Ayla::Marshal::ToBinding({bodyStatement})";
-                    }
-                    else
-                    {
-                        returnStatement = $"{bodyStatement}";
-                    }
-
-                    sourceCodeText += $"  PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({parameters})\n";
-                    sourceCodeText += $"  {{\n";
-                    sourceCodeText += $"    {returnStatement};\n";
-                    sourceCodeText += $"  }}\n";
-                }
-                sourceCodeText +=  "}\n";
-                
-                sourceCodeText +=  "\n";
+                });
+                WriteIndentedLine($"}}");
+                WriteIndentedLine($"");
             }
         }
 
         return sourceCodeText;
+
+        void Indented(Action body)
+        {
+            ++indent;
+            try
+            {
+                body();
+            }
+            finally
+            {
+                --indent;
+            }
+        }
+
+        void WriteIndentedLine(string text)
+        {
+            sourceCodeText += new string(' ', indent * 2) + text + "\n";
+        }
     }
 }

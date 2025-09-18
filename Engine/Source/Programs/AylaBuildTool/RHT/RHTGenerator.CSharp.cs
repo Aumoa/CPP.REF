@@ -10,7 +10,7 @@ internal partial class RHTGenerator
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.
 
-#pragma warning disable CS8604
+#nullable disable
 
 using System.Runtime.InteropServices;
 
@@ -97,7 +97,7 @@ using System.Runtime.InteropServices;
                             parameters.Add(paramType, param.Variable.Name);
                         }
 
-                        var injectParamsDeclare = ParametersGenerator.GenerateCSharpInjected(parameters);
+                        var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters);
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
                         sourceCode += IndentedLine($"private static extern global::Ayla.ObjectReferenceLocker ctor_{constructor.Name}__Injected({injectParamsDeclare});");
@@ -141,18 +141,18 @@ using System.Runtime.InteropServices;
                         string injectParamsDeclare;
                         if (isStatic)
                         {
-                            injectParamsDeclare = ParametersGenerator.GenerateCSharpInjected(parameters);
+                            injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters);
                         }
                         else
                         {
-                            injectParamsDeclare = ParametersGenerator.GenerateCSharpInjected(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+                            injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
                         }
 
                         sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
                         sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
-                        var returnStmt = returnType is SharedPtrTypeName ? $"{returnType.CSharpName}?" : returnType.CSharpName;
+                        var returnStmt = returnType is SharedPtrTypeName ? $"{returnType.CSharpName}" : returnType.CSharpName;
                         sourceCode += IndentedLine($"{access} unsafe{(isVirtual ? " virtual" : string.Empty)}{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}({internalParamsDeclare})");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
@@ -180,7 +180,7 @@ using System.Runtime.InteropServices;
                         sourceCode += IndentedLine($"}}");
                         if (isVirtual)
                         {
-                            var invokeParamsDeclare = ParametersGenerator.GenerateCSharpInvoke(parameters.AddFirstTemp(TypeName.Object, "self_"));
+                            var invokeParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
                             sourceCode += IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Invoke({invokeParamsDeclare})");
                             sourceCode += IndentedLine($"{{");
                             Indented(() =>

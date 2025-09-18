@@ -2,6 +2,11 @@
 
 internal readonly struct FunctionBodyGenerator(IParameterCollection collection, string callable, TypeName returnType)
 {
+    public static string GeneratePassArguments<T>(T parameters) where T : IParameterCollection
+    {
+        return string.Join(", ", parameters.Parameters.Select(p => p.N));
+    }
+
     public void GenerateCSharpCSharpToNative(ref string sourceCode, ref int indent, Func<string, string> formatLine)
     {
         List<string> scoped = [];
@@ -40,7 +45,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         }
 
         var returnType_ = returnType;
-        GenerateDefaultBody(ref sourceCode, ref indent, formatLine, scoped, arguments, bodyStmt =>
+        GenerateCSharpBodyDefault(ref sourceCode, ref indent, formatLine, scoped, arguments, bodyStmt =>
         {
             if (returnType_ == TypeName.Void)
             {
@@ -95,7 +100,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         }
 
         var returnType_ = returnType;
-        GenerateDefaultBody(ref sourceCode, ref indent, formatLine, scoped, arguments, bodyStmt =>
+        GenerateCSharpBodyDefault(ref sourceCode, ref indent, formatLine, scoped, arguments, bodyStmt =>
         {
             if (returnType_ == TypeName.Void)
             {
@@ -112,12 +117,136 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         });
     }
 
-    public static string GeneratePassArguments<T>(T parameters) where T : IParameterCollection
+    public void GenerateCppNativeToCSharp(Action<string> formatLine)
     {
-        return string.Join(", ", parameters.Parameters.Select(p => p.N));
+        List<string> scoped = [];
+        List<string> arguments = [];
+
+        foreach (var (typeName, name) in collection.Parameters)
+        {
+            if (typeName == TypeName.String)
+            {
+                scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedStringWrapper::FromString({name});");
+                arguments.Add($"{name}__wrapper");
+            }
+            else if (typeName is ArrayTypeName arrayType)
+            {
+                var elementType = arrayType.ElementType;
+                if (elementType == TypeName.String)
+                {
+                    scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedArrayWrapper::FromStringArray({name});");
+                    arguments.Add($"{name}__wrapper");
+                }
+                else if (elementType is SharedPtrTypeName)
+                {
+                    scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedArrayWrapper::FromObjectArray({name});");
+                    arguments.Add($"{name}__wrapper");
+                }
+                else
+                {
+                    scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedArrayWrapper::FromArray({name});");
+                    arguments.Add($"{name}__wrapper");
+                }
+            }
+            else if (typeName is SharedPtrTypeName)
+            {
+                scoped.Add($"auto {name}__wrapper = ::Ayla::ObjectReferenceWrapper::FromObject({name});");
+                arguments.Add($"{name}__wrapper");
+            }
+            else
+            {
+                arguments.Add(name);
+            }
+        }
+
+        var returnType_ = returnType;
+        GenerateCppBodyDefault(formatLine, scoped, arguments, bodyStmt =>
+        {
+            if (returnType_ == TypeName.Void)
+            {
+                formatLine(bodyStmt + ";");
+            }
+            else if (returnType_ is SharedPtrTypeName ptype)
+            {
+                formatLine($"return {bodyStmt}.AsNative<{ptype.ElementType.CppName}>();");
+            }
+            else
+            {
+                formatLine($"return {bodyStmt};");
+            }
+        });
     }
 
-    private void GenerateDefaultBody(ref string sourceCode, ref int indent, Func<string, string> formatLine, List<string> scoped, List<string> arguments, Func<string, string> formatBodyStatement)
+    public void GenerateCppCSharpToNative(Action<string> formatLine)
+    {
+        List<string> scoped = [];
+        List<string> arguments = [];
+
+        foreach (var (typeName, name) in collection.Parameters)
+        {
+            if (typeName == TypeName.String)
+            {
+                arguments.Add($"{name}.AsString()");
+            }
+            else if (typeName is ArrayTypeName arrayType)
+            {
+                var elementType = arrayType.ElementType;
+                if (elementType == TypeName.String)
+                {
+                    arguments.Add($"{name}.AsStringArray()");
+                }
+                else if (elementType is SharedPtrTypeName ptype)
+                {
+                    arguments.Add($"{name}.AsObjectArray<{ptype.ElementType.CppName}>()");
+                }
+                else
+                {
+                    arguments.Add($"{name}.AsArray<{elementType.CppName}>()");
+                }
+            }
+            else if (typeName is SharedPtrTypeName ptype)
+            {
+                arguments.Add($"{name}.AsObject<{ptype.ElementType.CppName}>()");
+            }
+            else
+            {
+                arguments.Add(name);
+            }
+        }
+
+        var returnType_ = returnType;
+        GenerateCppBodyDefault(formatLine, scoped, arguments, bodyStmt =>
+        {
+            if (returnType_ == TypeName.Void)
+            {
+                formatLine(bodyStmt + ";");
+            }
+            else if (returnType_ is SharedPtrTypeName)
+            {
+                formatLine($"return {bodyStmt}.AsNative<{returnType_.CppName}>();");
+            }
+            else
+            {
+                formatLine($"return {bodyStmt};");
+            }
+        });
+    }
+
+    private void GenerateCppBodyDefault(Action<string> formatLine, List<string> scoped, List<string> arguments, Action<string> formatBodyStatement)
+    {
+        if (scoped.Count > 0)
+        {
+            foreach (var stmt in scoped)
+            {
+                formatLine(stmt);
+            }
+        }
+
+        string bodyStmt = $"{callable}({string.Join(", ", arguments)})";
+        formatBodyStatement(bodyStmt);
+    }
+
+    private void GenerateCSharpBodyDefault(ref string sourceCode, ref int indent, Func<string, string> formatLine, List<string> scoped, List<string> arguments, Func<string, string> formatBodyStatement)
     {
         int localIndent = 0;
 

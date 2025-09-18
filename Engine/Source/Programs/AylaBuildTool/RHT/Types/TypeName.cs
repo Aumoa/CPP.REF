@@ -6,10 +6,6 @@ internal abstract class TypeName
 {
     public abstract string CppName { get; }
 
-    public abstract string CppMemberName { get; }
-    
-    public abstract string CppRootName { get; }
-
     public abstract string CppBindingName { get; }
 
     public abstract string CSharpName { get; }

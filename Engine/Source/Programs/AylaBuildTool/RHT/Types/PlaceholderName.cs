@@ -4,10 +4,6 @@ internal class PlaceholderName : TypeName
 {
     public override string CppName => string.Empty;
 
-    public override string CppMemberName => string.Empty;
-
-    public override string CppRootName => string.Empty;
-
     public override string CppBindingName => string.Empty;
 
     public override string CSharpName => string.Empty;

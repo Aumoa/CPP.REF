@@ -8,7 +8,8 @@ public partial class Engine
 {
     private GameInstance? m_GameInstance;
 
-    public Engine()
+    public Engine(int i, int[] ii, string s, string[] ss, Engine? p, Engine?[] pp)
+        : base(i, ii, s, ss, p, pp)
     {
     }
 

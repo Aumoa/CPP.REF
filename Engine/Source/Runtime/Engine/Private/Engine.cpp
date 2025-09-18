@@ -14,7 +14,7 @@
 
 namespace Ayla
 {
-	Engine::Engine()
+	Engine::Engine(int32 i, std::vector<int32> ii, String s, std::vector<String> ss, std::shared_ptr<Engine> p, std::vector<std::shared_ptr<Engine>> pp)
 	{
 	}
 

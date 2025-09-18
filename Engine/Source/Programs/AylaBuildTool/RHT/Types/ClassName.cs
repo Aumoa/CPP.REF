@@ -17,11 +17,7 @@ internal class ClassName : TypeName
 
     public override string CppName => Namespace.Cpp(Name);
 
-    public override string CppMemberName => $"::std::shared_ptr<{CppName}>";
-
-    public override string CppRootName => $"::std::shared_ptr<{CppName}>";
-
-    public override string CppBindingName => "void*";
+    public override string CppBindingName => "::Ayla::ObjectReferenceWrapper";
 
     public override string CSharpName => Namespace.CSharp(Name);
 

@@ -17,10 +17,6 @@ internal class EnumName : TypeName
 
     public override string CppName => Namespace.Cpp(Name);
 
-    public override string CppMemberName => CppName;
-
-    public override string CppRootName => CppName;
-
     public override string CppBindingName => CppName;
 
     public override string CSharpName => Namespace.CSharp(Name);
