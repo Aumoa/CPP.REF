@@ -12,10 +12,8 @@
 INT APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	using namespace ::Ayla;
-	DynamicLibrary apiSet(TEXT("WindowsAPI"));
 	auto args = String::FromLiteral(lpCmdLine);
-
-	return Launch::GuardedMain(std::make_unique<CommandLineParser>(args), apiSet);
+	return Launch::Main(std::make_unique<CommandLineParser>(args), TEXT("WindowsAPI"));
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__

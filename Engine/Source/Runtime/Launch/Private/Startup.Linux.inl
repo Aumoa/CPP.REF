@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 		args[i] = String::FromLiteral(std::string_view(argv[i]));
 	}
 
-	int32 exitCode = Launch::GuardedMain(std::make_unique<CommandLineParser>(std::move(args)), apiSet);
+	int32 exitCode = Launch::Main(std::make_unique<CommandLineParser>(std::move(args)), apiSet);
 	return exitCode;
 }
 

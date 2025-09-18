@@ -9,13 +9,17 @@
 #include "Threading/Spinlock.h"
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include "LinuxApplication.gen.h"
 
 namespace Ayla
 {
     class LinuxWindow;
 
+    ACLASS()
     class LinuxApplication : public GenericApplication
     {
+        GENERATED_BODY()
+
     private:
         Display* m_Display = nullptr;
         Spinlock m_Spinlock;

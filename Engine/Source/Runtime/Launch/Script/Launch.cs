@@ -1,13 +1,29 @@
-﻿namespace Ayla;
+﻿using System.Reflection;
+
+namespace Ayla;
 
 public partial class Launch
 {
-    public override void StartApplication()
+    private GenericApplication m_App;
+
+    public override int GuardedMain(string platform)
     {
-        using (var engine = new Engine())
+        LoadPlatformAssembly(platform);
+        return 0;
+    }
+
+    private void LoadPlatformAssembly(string platform)
+    {
+        var assembly = Assembly.Load(platform + ".Script");
+        var constructor = assembly.GetTypes()
+            .Where(p => p.IsAssignableTo(typeof(GenericApplication)))
+            .Select(p => p.GetConstructor([])!)
+            .FirstOrDefault();
+        if (constructor == null)
         {
-            engine.Initialize();
-            engine.GuardedLoop();
+            throw new InvalidOperationException();
         }
+        
+        m_App = (GenericApplication)constructor.Invoke([]);
     }
 }

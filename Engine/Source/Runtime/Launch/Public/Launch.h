@@ -19,15 +19,14 @@ namespace Ayla
 
 	private:
 		std::unique_ptr<CommandLineParser> m_Args;
-		std::shared_ptr<Engine> m_Engine;
 
 	public:
 		Launch(std::unique_ptr<CommandLineParser> args);
 		virtual ~Launch() noexcept;
 
 		AFUNCTION()
-		virtual void StartApplication();
+		virtual int32 GuardedMain(String platform);
 
-		static int32 GuardedMain(std::unique_ptr<CommandLineParser> args, const DynamicLibrary& apiSet);
+		static int32 Main(std::unique_ptr<CommandLineParser> args, String platform);
 	};
 }

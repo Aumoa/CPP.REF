@@ -26,6 +26,10 @@ namespace Ayla
 
 	CoreCLRScriptingBackend::~CoreCLRScriptingBackend() noexcept
 	{
+		if (m_Hosting)
+		{
+			m_Hosting->Detach();
+		}
 	}
 
 	void CoreCLRScriptingBackend::LoadAssembly(String assemblyBasePath, String assemblyName)

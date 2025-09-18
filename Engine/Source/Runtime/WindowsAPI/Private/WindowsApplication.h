@@ -9,12 +9,17 @@
 #include "CoreMinimal.h"
 #include "GenericApplication.h"
 #include "Platform/PlatformCommon.h"
+#include "WindowsApplication.gen.h"
 
 namespace Ayla
 {
+	ACLASS()
 	class WindowsApplication : public GenericApplication
 	{
+		GENERATED_BODY()
+
 	public:
+		ACONSTRUCTOR()
 		WindowsApplication();
 		virtual ~WindowsApplication() noexcept override;
 

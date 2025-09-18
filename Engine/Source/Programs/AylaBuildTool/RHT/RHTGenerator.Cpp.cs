@@ -109,7 +109,7 @@ internal partial class RHTGenerator
                         WriteIndentedLine($"}}");
                         if (rule.Type == ModuleType.Application)
                         {
-                            WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}_Implementation()");
+                            WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}_Implementation({parametersDeclare})");
                             WriteIndentedLine($"{{");
                             Indented(() =>
                             {

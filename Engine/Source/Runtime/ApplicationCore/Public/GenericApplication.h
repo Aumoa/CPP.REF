@@ -7,20 +7,25 @@
 #include "GenericPlatformInputEvent.h"
 #include "GenericWindow.h"
 #include "IO/DirectoryReference.h"
+#include "GenericApplication.gen.h"
 
 namespace Ayla
 {
     class GenericWindow;
     class GenericActivity;
 
-    class APPLICATIONCORE_API GenericApplication
+    ACLASS()
+    class APPLICATIONCORE_API GenericApplication : public Object
     {
+        GENERATED_BODY()
+
     private:
         static GenericApplication* sApp;
         bool bFreezed = false;
         std::optional<int32> ExitCode;
 
     protected:
+        ACONSTRUCTOR()
         GenericApplication();
 
     public:

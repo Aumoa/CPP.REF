@@ -7,6 +7,7 @@ public class LinuxAPI : ModuleRules
 {
 	public LinuxAPI()
 	{
+		Scriptable.Enabled = true;
 		AddPublicIncludePaths("Public");
 		AddPrivateIncludePaths("Private");
 		AddPublicDependencyModuleNames("ApplicationCore");

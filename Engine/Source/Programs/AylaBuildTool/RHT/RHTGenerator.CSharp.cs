@@ -207,7 +207,12 @@ sourceCode += "#pragma warning disable CS8618\n";
 
                     sourceCode += IndentedLine($"protected {@class.Name}(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
                     sourceCode += IndentedLine($"{{");
+                    Indented(() =>
+                    {
+                        sourceCode += IndentedLine($"OnConstructed();");
+                    });
                     sourceCode += IndentedLine($"}}");
+                    sourceCode += IndentedLine($"partial void OnConstructed();");
 
 sourceCode += "#pragma warning restore CS8618\n";
                 });

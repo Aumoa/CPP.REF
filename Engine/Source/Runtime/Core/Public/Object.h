@@ -98,10 +98,13 @@ namespace Ayla
 		static std::shared_ptr<T> ScriptNew(TArgs&&... args)
 		{
 			std::optional<std::shared_ptr<T>> ptr;
-			ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
+			if constexpr (std::constructible_from<T, TArgs...>)
 			{
-				ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
-			});
+				ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
+				{
+					ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
+				});
+			}
 			return std::move(ptr).value();
 		}
 
