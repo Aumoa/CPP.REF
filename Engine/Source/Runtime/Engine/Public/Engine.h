@@ -36,6 +36,9 @@ namespace Ayla
 
 		AFUNCTION()
 		virtual void GuardedLoop();
+		AFUNCTION()
+		void Shutdown();
+
 		virtual void Tick();
 
 	protected:
@@ -45,8 +48,5 @@ namespace Ayla
 		void InitializeGraphics();
 		AFUNCTION()
 		void PostInitialized();
-
-		AFUNCTION()
-		void Shutdown();
 	};
 }

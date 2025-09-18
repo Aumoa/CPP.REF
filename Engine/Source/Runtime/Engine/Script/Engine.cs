@@ -14,18 +14,10 @@ public partial class Engine
 
     public void Initialize()
     {
-        try
-        {
-            InitializeActivity();
-            InitializeGraphics();
-            InitializeGame();
-            PostInitialized();
-        }
-        catch
-        {
-            Shutdown();
-            throw;
-        }
+        InitializeActivity();
+        InitializeGraphics();
+        InitializeGame();
+        PostInitialized();
     }
 
     public override void GuardedLoop()

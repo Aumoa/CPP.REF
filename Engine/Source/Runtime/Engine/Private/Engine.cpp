@@ -35,8 +35,19 @@ namespace Ayla
 			}
 			Tick();
 		}
+	}
 
-		Shutdown();
+	void Engine::Shutdown()
+	{
+		m_RenderThread->RequestStop();
+
+		for (auto& swapchain : m_SwapchainExtensions)
+		{
+			swapchain->Destroy();
+		}
+
+		m_SwapchainExtensions.clear();
+		m_Graphics.reset();
 	}
 
 	void Engine::Tick()
@@ -66,18 +77,5 @@ namespace Ayla
 	void Engine::PostInitialized()
 	{
 		m_MainActivity->AfterInitialize();
-	}
-
-	void Engine::Shutdown()
-	{
-		m_RenderThread->RequestStop();
-
-		for (auto& swapchain : m_SwapchainExtensions)
-		{
-			swapchain->Destroy();
-		}
-
-		m_SwapchainExtensions.clear();
-		m_Graphics.reset();
 	}
 }
