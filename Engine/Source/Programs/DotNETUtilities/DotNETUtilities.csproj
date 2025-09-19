@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputPath>..\..\..\Binaries\DotNET\</OutputPath>
+    <EnableDefaultNamespace>false</EnableDefaultNamespace>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<RootNamespace>AylaEngine</RootNamespace>
   </PropertyGroup>

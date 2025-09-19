@@ -3,9 +3,13 @@
 #include "Threading/ThreadPool.h"
 #include "Threading/Thread.h"
 #include "Platform/PlatformIO.h"
+#include "ScriptingBackend/ScriptingBackend.h"
 
 namespace Ayla
 {
+	void (*ThreadPool::coreclr__QueueUserWorkItem)();
+	void (*ThreadPool::coreclr__GetMaxThreads)(int32* workerThreads, int32* completionPortThreads);
+
 	size_t ThreadPool::NumWorkerThreads;
 	size_t ThreadPool::NumCompletionPortThreads;
 
@@ -24,6 +28,9 @@ namespace Ayla
 
 	void ThreadPool::Initialize(size_t InNumWorkerThreads, size_t InNumCompletionPortThreads)
 	{
+		coreclr__QueueUserWorkItem = reinterpret_cast<void(*)()>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.ThreadPool", "QueueUserWorkItem"));
+		coreclr__GetMaxThreads = reinterpret_cast<void(*)(int32*, int32*)>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.ThreadPool", "GetMaxThreads"));
+
 		static int Init = ([&]()
 		{
 			check(IO == nullptr);
@@ -40,11 +47,6 @@ namespace Ayla
 
 			NumWorkerThreads = InNumWorkerThreads;
 			NumCompletionPortThreads = InNumCompletionPortThreads;
-
-			while (Workers < NumWorkerThreads)
-			{
-				Threads.emplace_back(std::bind(Worker, Workers++));
-			}
 			
 			while (IOCPWorkers < NumCompletionPortThreads)
 			{
@@ -93,9 +95,11 @@ namespace Ayla
 	void ThreadPool::QueueUserWorkItem(Action<> InWork)
 	{
 		check(IO);
-		std::unique_lock ScopedLock(Lck);
+		std::unique_lock lock{ Lck };
 		Works.emplace(std::move(InWork));
-		Cv.NotifyOne();
+		lock.unlock();
+		coreclr__QueueUserWorkItem();
+		//Cv.NotifyOne();
 	}
 
 	void ThreadPool::QueueSignal()
@@ -124,7 +128,9 @@ namespace Ayla
 
 	void ThreadPool::GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads)
 	{
-		OutWorkerThreads = NumWorkerThreads;
+		int32 workerThreads, completionPortThreads;
+		coreclr__GetMaxThreads(&workerThreads, &completionPortThreads);
+		OutWorkerThreads = (size_t)workerThreads;
 		OutCompletionPortThreads = NumCompletionPortThreads;
 	}
 
@@ -241,5 +247,22 @@ namespace Ayla
 		}
 		
 		PlatformProcess::OutputDebugString(String::Format(TEXT("{0} closed."), name));
+	}
+
+	void ThreadPool::HandleUserWorkItem()
+	{
+		auto lock = std::unique_lock{ Lck };
+		auto work = std::move(Works.front());
+		Works.pop();
+		lock.unlock();
+		work();
+	}
+}
+
+extern "C"
+{
+	PLATFORM_SHARED_EXPORT void Ayla__ThreadPool__HandleUserWorkItem()
+	{
+		::Ayla::ThreadPool::HandleUserWorkItem();
 	}
 }

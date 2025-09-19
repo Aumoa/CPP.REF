@@ -4,17 +4,28 @@
 
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
+#include "Platform/PlatformMacros.h"
 #include "Action.h"
 #include <functional>
 #include <chrono>
 #include <queue>
 #include <map>
 
+extern "C"
+{
+	PLATFORM_SHARED_EXPORT void Ayla__ThreadPool__HandleUserWorkItem();
+}
+
 namespace Ayla
 {
 	class CORE_API ThreadPool
 	{
+		friend void ::Ayla__ThreadPool__HandleUserWorkItem();
+
 	private:
+		static void (*coreclr__QueueUserWorkItem)();
+		static void (*coreclr__GetMaxThreads)(int32* workerThreads, int32* completionPortThreads);
+
 		static size_t NumWorkerThreads;
 		static size_t NumCompletionPortThreads;
 
@@ -49,5 +60,6 @@ namespace Ayla
 		static void Worker(size_t Index);
 		static void IOCPWorker(size_t Index);
 		static void DelayedWorker();
+		static void HandleUserWorkItem();
 	};
 }

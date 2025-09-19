@@ -375,6 +375,8 @@ internal static partial class BuildRunner
     <AssemblyName>{project.ScriptAssemblyName}</AssemblyName>
     <RootNamespace>{namespaceName}</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableRuntimeMarshalling>true</EnableRuntimeMarshalling>
+    <EnableDefaultNamespace>false</EnableDefaultNamespace>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Configurations>{configurations}</Configurations>

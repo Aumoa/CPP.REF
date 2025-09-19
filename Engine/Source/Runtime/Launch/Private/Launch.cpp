@@ -31,6 +31,8 @@ namespace Ayla
         auto scriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
         scriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
 
+        ThreadPool::Initialize();
+
         auto launch = New<Launch>(std::move(args));
         return launch->GuardedMain(platform);
 	}
