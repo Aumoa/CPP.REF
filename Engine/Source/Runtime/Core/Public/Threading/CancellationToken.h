@@ -3,16 +3,17 @@
 #pragma once
 
 #include "Platform/PlatformMacros.h"
+#include "Threading/CancellationTokenSource.h"
 #include <stop_token>
 #include <memory>
 
 namespace Ayla
 {
-	struct CORE_API CancellationToken
+	class CORE_API CancellationToken
 	{
 	private:
 		friend class CancellationTokenSource;
-		std::shared_ptr<std::stop_source> m_Source;
+		std::shared_ptr<CancellationTokenSource::managed_stop_source> m_Source;
 		std::stop_token m_Token;
 
 	public:
@@ -49,6 +50,8 @@ namespace Ayla
 				ThrowOperationCanceledException();
 			}
 		}
+
+		ManagedCancellationTokenWrapper AsManaged();
 
 		inline CancellationToken& operator =(const CancellationToken& rhs) noexcept
 		{

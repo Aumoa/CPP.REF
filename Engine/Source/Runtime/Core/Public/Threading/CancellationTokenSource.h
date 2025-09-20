@@ -3,18 +3,44 @@
 #pragma once
 
 #include <stop_token>
-#include "Threading/CancellationToken.h"
+#include "Threading/Spinlock.h"
+#include "Reflection/ManagedCancellationTokenWrapper.h"
 #include "TimeSpan.h"
 
 namespace Ayla
 {
 	class CORE_API CancellationTokenSource
 	{
-		std::shared_ptr<std::stop_source> m_Source;
+		friend class CancellationToken;
+		static ssize_t(*coreclr__create_cancellation_token_source)();
+		static void(*coreclr__free_cancellation_token_source)(ssize_t);
+		static void(*coreclr__cancel)(ssize_t);
+		static void static__CancellationTokenSource();
+
+	private:
+		class managed_stop_source
+		{
+		public:
+			managed_stop_source() = default;
+			managed_stop_source(const managed_stop_source&) = delete;
+			managed_stop_source(managed_stop_source&&) = delete;
+			~managed_stop_source() noexcept;
+
+			std::stop_source m_Source;
+			Spinlock m_MarshalLock;
+			ssize_t m_GCHandle;
+			std::stop_callback<std::function<void()>>* m_Callback;
+
+			void Cancel();
+			void CancelManaged();
+		};
+
+	private:
+		std::shared_ptr<managed_stop_source> m_Source;
 
 	private:
 		inline CancellationTokenSource(std::in_place_t)
-			: m_Source{ std::make_shared<std::stop_source>() }
+			: m_Source{ std::make_shared<managed_stop_source>() }
 		{
 		}
 
@@ -35,32 +61,10 @@ namespace Ayla
 
 		inline ~CancellationTokenSource() noexcept
 		{
-			m_Source.reset();
 		}
 
-		inline CancellationToken GetToken() const
-		{
-			if (m_Source == nullptr)
-			{
-				ThrowInvalidOperationException();
-			}
-
-			CancellationToken token;
-			token.m_Source = m_Source;
-			token.m_Token = m_Source->get_token();
-			return token;
-		}
-
-		inline void Cancel()
-		{
-			if (m_Source == nullptr)
-			{
-				ThrowInvalidOperationException();
-			}
-
-			m_Source->request_stop();
-		}
-
+		CancellationToken GetToken() const;
+		void Cancel();
 		void CancelAfter(const TimeSpan& delay);
 
 		inline CancellationTokenSource& operator =(const CancellationTokenSource& rhs)
@@ -85,6 +89,9 @@ namespace Ayla
 		{
 			return CancellationTokenSource(std::in_place);
 		}
+
+	private:
+		void Invoke__Cancel();
 
 	private:
 		[[noreturn]]

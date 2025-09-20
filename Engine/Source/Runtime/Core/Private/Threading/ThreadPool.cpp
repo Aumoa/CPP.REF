@@ -28,8 +28,8 @@ namespace Ayla
 
 	void ThreadPool::Initialize(size_t InNumWorkerThreads, size_t InNumCompletionPortThreads)
 	{
-		coreclr__QueueUserWorkItem = reinterpret_cast<void(*)()>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.ThreadPool", "QueueUserWorkItem"));
-		coreclr__GetMaxThreads = reinterpret_cast<void(*)(int32*, int32*)>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.ThreadPool", "GetMaxThreads"));
+		coreclr__QueueUserWorkItem = reinterpret_cast<void(*)()>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.ThreadPoolMarshal", "QueueUserWorkItem"));
+		coreclr__GetMaxThreads = reinterpret_cast<void(*)(int32*, int32*)>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.ThreadPoolMarshal", "GetMaxThreads"));
 
 		static int Init = ([&]()
 		{
