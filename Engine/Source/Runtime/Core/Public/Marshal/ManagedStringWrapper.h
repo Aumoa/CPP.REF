@@ -12,6 +12,7 @@ namespace Ayla
 	{
 		const wchar_t* C_str;
 		int32 Length;
+		ssize_t IntRef;
 
 		inline String AsString() const
 		{
@@ -28,7 +29,19 @@ namespace Ayla
 			return ManagedStringWrapper
 			{
 				.C_str = str.c_str(),
-				.Length = (int32)str.length()
+				.Length = (int32)str.length(),
+				.IntRef = 0
+			};
+		}
+
+		static ManagedStringWrapper FromIntString(String str)
+		{
+			auto intRef = new String(str);
+			return ManagedStringWrapper
+			{
+				.C_str = intRef->c_str(),
+				.Length = (int32)intRef->length(),
+				.IntRef = (ssize_t)intRef
 			};
 		}
 	};

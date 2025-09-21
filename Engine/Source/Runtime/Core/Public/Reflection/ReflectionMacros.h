@@ -68,6 +68,7 @@ public: \
 #define APROPERTY(...)
 
 #define AFUNCTION(...)
+#define APURE final
 
 #define ACONSTRUCTOR(...)
 

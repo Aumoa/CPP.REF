@@ -12,7 +12,8 @@ internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags
         None = 0,
         Static = 1 << 0,
         Virtual = 1 << 1,
-        Const = 1 << 2
+        Const = 1 << 2,
+        Pure = 1 << 3
     }
 
     public override string ToString()
@@ -75,10 +76,25 @@ internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags
             }
         }
 
-        if (context.WholeEquals("const"))
+        context.WholeAdvance(")");
+
+        context.SkipWhiteSpace(true);
+        if (context.Current.StartsWith("const", StringComparison.Ordinal))
         {
             flags |= FFlags.Const;
-            context.WholeAdvance("const");
+            context.Advance(5);
+        }
+
+        if (context.WholeEquals("="))
+        {
+            throw capture.ParsingError("Syntax Error: '= 0' is not supported in AFUNCTION(). Use 'APURE' keyword instead.");
+        }
+
+        context.SkipWhiteSpace(true);
+        if (context.Current.StartsWith("APURE", StringComparison.Ordinal))
+        {
+            flags |= FFlags.Pure;
+            context.Advance(5);
         }
 
         context.ExportWhile(c => c != ';' && c != '{');

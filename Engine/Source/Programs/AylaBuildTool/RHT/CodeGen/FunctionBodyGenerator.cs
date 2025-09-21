@@ -51,6 +51,10 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             {
                 return formatLine(bodyStmt + ";");
             }
+            else if (returnType_ == TypeName.String)
+            {
+                return formatLine($"return {bodyStmt}.AsManaged();");
+            }
             else if (returnType_ is SharedPtrTypeName)
             {
                 return formatLine($"return {bodyStmt}.AsManaged<{returnType_.CSharpName}>();");
@@ -220,6 +224,10 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             if (returnType_ == TypeName.Void)
             {
                 formatLine(bodyStmt + ";");
+            }
+            else if (returnType_ == TypeName.String)
+            {
+                formatLine($"return ::Ayla::ManagedStringWrapper::FromIntString({bodyStmt});");
             }
             else if (returnType_ is SharedPtrTypeName)
             {

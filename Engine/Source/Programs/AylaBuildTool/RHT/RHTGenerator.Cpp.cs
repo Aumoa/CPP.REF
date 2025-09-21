@@ -107,8 +107,9 @@ internal partial class RHTGenerator
 
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var parametersDeclare = ParametersGenerator.GenerateCpp(parameters);
-                        WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}({parametersDeclare})");
-                        WriteIndentedLine($"{{\n");
+                        var suffix = function.Flags.HasFlag(SFunction.FFlags.Const) ? " const" : string.Empty;
+                        WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}({parametersDeclare}){suffix}");
+                        WriteIndentedLine($"{{");
                         Indented(() =>
                         {
                             var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));

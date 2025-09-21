@@ -70,8 +70,10 @@ namespace Ayla
 
 	ObjectReferenceWrapper Object::AsWrapper()
 	{
+		auto lock = std::unique_lock{ m_Spinlock };
 		return ObjectReferenceWrapper
 		{
+			.IntRef = m_GCHandle == 0 ? (ssize_t)new std::shared_ptr<Object>(shared_from_this()) : 0,
 			.Ptr = reinterpret_cast<ssize_t>(this),
 			.Handle = m_GCHandle
 		};
@@ -93,6 +95,11 @@ namespace Ayla
 
 extern "C"
 {
+	PLATFORM_SHARED_EXPORT void Ayla__Object__DeleteIntermediateRef__Injected(void* self)
+	{
+		delete reinterpret_cast<std::shared_ptr<::Ayla::Object>*>(self);
+	}
+
 	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self)
 	{
 		auto self_ = (::Ayla::Object*)self;

@@ -197,7 +197,9 @@ internal partial class RHTGenerator
 
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var @params = string.Join(", ", function.Parameters.Select(p => $"{p.Variable.TypeName.FullName} {p.Variable.Name}"));
-                        headerText += IndentedMLine($"{function.ReturnType.FullName} {function.Name}_Implementation({@params});");
+                        var suffix = function.Flags.HasFlag(SFunction.FFlags.Const) ? " const" : string.Empty;
+                        suffix += function.Flags.HasFlag(SFunction.FFlags.Pure) ? " = 0" : string.Empty;
+                        headerText += IndentedMLine($"virtual {function.ReturnType.FullName} {function.Name}_Implementation({@params}){suffix};");
                     }
                 });
                 headerText += Indented_Line($"");

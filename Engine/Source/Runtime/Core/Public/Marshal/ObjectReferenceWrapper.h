@@ -11,6 +11,7 @@ namespace Ayla
 
 	struct CORE_API ObjectReferenceWrapper
 	{
+		ssize_t IntRef;
 		ssize_t Ptr;
 		ssize_t Handle;
 

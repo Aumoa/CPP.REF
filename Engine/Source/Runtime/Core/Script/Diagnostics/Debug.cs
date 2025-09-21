@@ -13,8 +13,8 @@ public static class Debug
         fixed (char* categoryPtr = category)
         fixed (char* messagePtr = message)
         {
-            var category_wrapper = new ManagedStringWrapper { C_str = (nint)categoryPtr, Length = category.Length };
-            var message_wrapper = new ManagedStringWrapper { C_str = (nint)messagePtr, Length = message.Length };
+            var category_wrapper = new ManagedStringWrapper(categoryPtr, category.Length);
+            var message_wrapper = new ManagedStringWrapper(messagePtr, message.Length);
             Log__Injected(category_wrapper, logLevel, message_wrapper);
         }
     }

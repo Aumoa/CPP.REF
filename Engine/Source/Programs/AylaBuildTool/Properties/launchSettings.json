@@ -2,7 +2,7 @@
   "profiles": {
     "AylaBuildTool": {
       "commandName": "Project",
-      "commandLineArgs": "build -g VisualStudio --project \"F:\\SampleGame\\SampleGame.aproject\" --target \"GameAssembly\" --config Debug --editor  --clean CleanOnly"
+      "commandLineArgs": "build -g VisualStudio --project \"F:\\SampleGame\\SampleGame.aproject\" --target \"GameAssembly\" --config Debug --editor  --clean GenerateOnly"
     }
   }
 }

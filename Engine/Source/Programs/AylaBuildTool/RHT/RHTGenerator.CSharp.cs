@@ -76,7 +76,7 @@ using System.Runtime.InteropServices;
                     inherit = $" : {baseClass.CSharpName}";
                 }
 
-                sourceCode += IndentedLine($"public class {@class.Name}__Injected{inherit}");
+                sourceCode += IndentedLine($"public abstract class {@class.Name}__Injected{inherit}");
                 sourceCode += IndentedLine($"{{");
                 Indented(() =>
                 {
@@ -114,7 +114,7 @@ using System.Runtime.InteropServices;
 
                         var returnStmt = returnType.CSharpName;
                         var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters);
-                        sourceCode += IndentedLine($"{access} unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(ctor_{constructor.Name}__CallInjected({callArguments}))");
+                        sourceCode += IndentedLine($"protected unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(ctor_{constructor.Name}__CallInjected({callArguments}))");
                         sourceCode += IndentedLine($"{{");
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");

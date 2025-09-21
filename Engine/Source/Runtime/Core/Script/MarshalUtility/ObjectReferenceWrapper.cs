@@ -4,16 +4,11 @@ using System.Runtime.InteropServices;
 namespace Ayla;
 
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
-public struct ObjectReferenceWrapper
+public readonly struct ObjectReferenceWrapper
 {
-    public nint Ptr;
-    public nint Handle;
-
-    public ObjectReferenceWrapper(nint ptr, nint handle)
-    {
-        Ptr = ptr;
-        Handle = handle;
-    }
+    public readonly nint IntRef;
+    public readonly nint Ptr;
+    public readonly nint Handle;
 
     public T? AsManaged<T>() where T : Object
     {
@@ -43,6 +38,11 @@ public struct ObjectReferenceWrapper
         }
         finally
         {
+            if (IntRef > 0)
+            {
+                Object.DeleteIntermediateRef__Injected(IntRef);
+            }
+
             Object.EndWriteGCHandle__Injected(Ptr, (nint)handle);
         }
     }

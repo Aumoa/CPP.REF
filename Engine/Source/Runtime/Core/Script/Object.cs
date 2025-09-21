@@ -73,6 +73,9 @@ public partial class Object : IDisposable
 
     public ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer);
 
+    [DllImport("Core", EntryPoint = "Ayla__Object__DeleteIntermediateRef__Injected")]
+    internal static extern void DeleteIntermediateRef__Injected(nint self);
+
     [DllImport("Core", EntryPoint = "Ayla__Object__BeginWriteGCHandle__Injected")]
     internal static extern nint BeginWriteGCHandle__Injected(nint instanceId);
 
