@@ -4,7 +4,7 @@
 
 #include <stop_token>
 #include "Threading/Spinlock.h"
-#include "Reflection/ManagedCancellationTokenWrapper.h"
+#include "Marshal/ManagedCancellationTokenWrapper.h"
 #include "TimeSpan.h"
 
 namespace Ayla

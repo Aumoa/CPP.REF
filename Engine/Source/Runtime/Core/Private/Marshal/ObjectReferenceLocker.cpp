@@ -1,6 +1,6 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "Reflection/ObjectReferenceLocker.h"
+#include "Marshal/ObjectReferenceLocker.h"
 
 extern "C"
 {

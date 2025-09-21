@@ -3,7 +3,7 @@
 #include "Diagnostics/Debug.h"
 #include "Platform/PlatformProcess.h"
 #include "Console.h"
-#include "Reflection/ManagedStringWrapper.h"
+#include "Marshal/ManagedStringWrapper.h"
 
 namespace Ayla
 {

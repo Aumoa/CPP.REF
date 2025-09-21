@@ -9,8 +9,8 @@
 #include "Platform/PlatformMacros.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
-#include "Reflection/ObjectReferenceWrapper.h"
-#include "Reflection/ObjectReferenceLocker.h"
+#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceLocker.h"
 #include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>

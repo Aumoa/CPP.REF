@@ -1,6 +1,6 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "Reflection/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrapper.h"
 #include "Object.h"
 
 namespace Ayla

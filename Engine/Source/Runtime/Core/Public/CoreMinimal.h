@@ -58,9 +58,9 @@
 #include "Reflection/TypeRegister.h"
 #include "Reflection/reflexpr.h"
 #include "Reflection/TransferFunction.h"
-#include "Reflection/ObjectReferenceWrapper.h"
-#include "Reflection/ManagedStringWrapper.h"
-#include "Reflection/ManagedArrayWrapper.h"
+#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ManagedStringWrapper.h"
+#include "Marshal/ManagedArrayWrapper.h"
 
 #include "Diagnostics/Debug.h"
 
