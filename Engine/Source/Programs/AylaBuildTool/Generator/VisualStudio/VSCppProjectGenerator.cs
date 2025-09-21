@@ -316,6 +316,19 @@ internal static class VSCppProjectGenerator
                         AppendFormatLine("""<IncludePath>{0};$(IncludePath)</IncludePath>""", includes);
                     });
                     AppendFormatLine("""</PropertyGroup>""");
+
+                    AppendFormatLine("""<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
+                    Indent(() =>
+                    {
+                        var buildCommand = $"\"{engineGroup.BinariesDirectory}\\DotNET\\AylaBuildTool.dll\" build -g VisualStudio {projectPath}--target \"{project.Name}\" --config {buildTarget.Config} {(buildTarget.Editor ? "--editor " : string.Empty)}";
+                        AppendFormatLine("""<NMakeCompile>""");
+                        Indent(() =>
+                        {
+                            AppendFormatLine("""<NMakeCompileFileCommandLine>dotnet {0} --clean GenerateOnly</NMakeCompileFileCommandLine>""", buildCommand);
+                        });
+                        AppendFormatLine("""</NMakeCompile>""");
+                    });
+                    AppendFormatLine("""</ItemDefinitionGroup>""");
                 }
 
                 AppendFormatLine("""<ItemGroup>""");

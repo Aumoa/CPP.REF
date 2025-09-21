@@ -4,5 +4,6 @@ public enum CleanOptions
 {
     None,
     Rebuild,
-    CleanOnly
+    CleanOnly,
+    GenerateOnly
 }

@@ -114,7 +114,10 @@ internal static partial class BuildRunner
                     Directory.Delete(primaryOutput, true);
                 }
             }
+        }
 
+        if (options.Clean is CleanOptions.GenerateOnly or CleanOptions.CleanOnly)
+        {
             await DispatchGenerateHeaderWorkers();
             await GenerateRunner.RunAsync(new GenerateOptions
             {
