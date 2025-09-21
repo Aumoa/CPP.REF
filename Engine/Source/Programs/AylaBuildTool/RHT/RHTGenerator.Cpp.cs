@@ -18,13 +18,24 @@ internal partial class RHTGenerator
                 .Concat(aclass.Functions.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName).Append(f.ReturnType))))
             {
                 var typeName = typeNames.FindType(type, aclass.Class);
-                if (typeName is ClassName className)
+                HandleElementType(typeName);
+
+                continue;
+
+                void HandleElementType(TypeName typeName)
                 {
-                    headers.Add(className.Source.SourceCode.FilePath);
-                }
-                else if (typeName is SharedPtrTypeName rptr)
-                {
-                    headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
+                    if (typeName is ClassName className)
+                    {
+                        headers.Add(className.Source.SourceCode.FilePath);
+                    }
+                    else if (typeName is SharedPtrTypeName rptr)
+                    {
+                        headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
+                    }
+                    else if (typeName is ArrayTypeName array)
+                    {
+                        HandleElementType(array.ElementType);
+                    }
                 }
             }
         }
