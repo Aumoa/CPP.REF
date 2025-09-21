@@ -39,43 +39,27 @@ namespace Ayla
 
 	void Engine::Shutdown()
 	{
-		m_RenderThread->RequestStop();
-
 		for (auto& swapchain : m_SwapchainExtensions)
 		{
 			swapchain->Destroy();
 		}
 
 		m_SwapchainExtensions.clear();
-		m_Graphics.reset();
 	}
 
 	void Engine::Tick()
 	{
-		m_RenderThread->Dispatch([swapchainExtensions = m_SwapchainExtensions, graphics = m_Graphics]()
-		{
-			for (auto& swapchainExt : swapchainExtensions)
-			{
-				swapchainExt->Present();
-			}
-		});
+		//m_RenderThread->Dispatch([swapchainExtensions = m_SwapchainExtensions, graphics = m_Graphics]()
+		//{
+		//	for (auto& swapchainExt : swapchainExtensions)
+		//	{
+		//		swapchainExt->Present();
+		//	}
+		//});
 	}
 
-	void Engine::InitializeActivity()
+	void Engine::SetupSwapchainExtensions(std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> extensions)
 	{
-		m_MainActivity = GenericApplication::Get().CreateMainActivity();
-		m_MainActivity->BeforeInitialize();
-	}
-
-	void Engine::InitializeGraphics()
-	{
-		m_Graphics = Graphics::CreateGraphics(RenderFeatures::Vulkan);
-		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
-		m_RenderThread = std::make_unique<RenderThread>(m_Graphics);
-	}
-
-	void Engine::PostInitialized()
-	{
-		m_MainActivity->AfterInitialize();
+		m_SwapchainExtensions = std::move(extensions);
 	}
 }

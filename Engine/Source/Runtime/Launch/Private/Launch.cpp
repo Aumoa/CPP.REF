@@ -4,13 +4,13 @@
 #include "Engine.h"
 #include "GenericApplication.h"
 #include "CommandLineParser.h"
+#include "LaunchOptions.h"
 #include "Platform/DynamicLibrary.h"
 #include "ScriptingBackend/CoreCLR/CoreCLRScriptingBackend.h"
 
 namespace Ayla
 {
-    Launch::Launch(std::unique_ptr<CommandLineParser> args)
-        : m_Args(std::move(args))
+    Launch::Launch()
     {
     }
 
@@ -31,7 +31,7 @@ namespace Ayla
         auto scriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
         scriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
 
-        auto launch = New<Launch>(std::move(args));
-        return launch->GuardedMain(platform);
+        auto launch = New<Launch>();
+        return launch->GuardedMain(New<LaunchOptions>(platform, std::move(args)));
 	}
 }

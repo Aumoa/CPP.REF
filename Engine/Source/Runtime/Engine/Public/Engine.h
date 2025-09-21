@@ -21,13 +21,7 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::shared_ptr<GenericActivity> m_MainActivity;
-		std::shared_ptr<Graphics> m_Graphics;
 		std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
-		std::unique_ptr<RenderThread> m_RenderThread;
-
-		APROPERTY()
-		std::shared_ptr<GameInstance> m_GameInstance;
 
 	public:
 		ACONSTRUCTOR()
@@ -43,10 +37,6 @@ namespace Ayla
 
 	protected:
 		AFUNCTION()
-		void InitializeActivity();
-		AFUNCTION()
-		void InitializeGraphics();
-		AFUNCTION()
-		void PostInitialized();
+		void SetupSwapchainExtensions(std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> extensions);
 	};
 }

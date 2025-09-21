@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LaunchOptions.h"
 #include "Launch.gen.h"
 
 namespace Ayla
@@ -17,15 +18,12 @@ namespace Ayla
 	{
 		GENERATED_BODY()
 
-	private:
-		std::unique_ptr<CommandLineParser> m_Args;
-
 	public:
-		Launch(std::unique_ptr<CommandLineParser> args);
+		Launch();
 		virtual ~Launch() noexcept;
 
 		AFUNCTION()
-		virtual int32 GuardedMain(String platform);
+		virtual int32 GuardedMain(std::shared_ptr<LaunchOptions> options);
 
 		static int32 Main(std::unique_ptr<CommandLineParser> args, String platform);
 	};

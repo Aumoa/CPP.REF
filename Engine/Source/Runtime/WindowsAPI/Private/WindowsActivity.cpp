@@ -19,23 +19,23 @@ namespace Ayla
 			.DesiredScreenSize = Vector2N(-1, -1),
 		}));
 
-		m_MainWindow->AddExtension(std::make_shared<GenericMainWindowDefaultExt>());
+		m_MainWindow->AddExtension(New<GenericMainWindowDefaultExt>());
 	}
 
 	WindowsActivity::~WindowsActivity() noexcept
 	{
 	}
 
-	void WindowsActivity::BeforeInitialize()
+	void WindowsActivity::BeforeInitialize_Implementation()
 	{
 	}
 
-	void WindowsActivity::AfterInitialize()
+	void WindowsActivity::AfterInitialize_Implementation()
 	{
 		m_MainWindow->Show();
 	}
 
-	std::shared_ptr<GenericWindow> WindowsActivity::GetMainWindow() const
+	std::shared_ptr<GenericWindow> WindowsActivity::GetMainWindow_Implementation() const
 	{
 		return m_MainWindow;
 	}

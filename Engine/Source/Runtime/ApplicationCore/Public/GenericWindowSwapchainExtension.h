@@ -4,11 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GenericWindowExtension.h"
+#include "GenericWindowSwapchainExtension.gen.h"
 
 namespace Ayla
 {
+    ACLASS()
     class APPLICATIONCORE_API GenericWindowSwapchainExtension : public GenericWindowExtension
     {
+        GENERATED_BODY()
+
     protected:
         GenericWindowSwapchainExtension() noexcept;
 

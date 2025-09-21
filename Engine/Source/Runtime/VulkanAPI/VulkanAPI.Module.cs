@@ -8,6 +8,7 @@ public class VulkanAPI : ModuleRules
 {
     public VulkanAPI()
     {
+        Scriptable.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("RenderCore", "ApplicationCore");

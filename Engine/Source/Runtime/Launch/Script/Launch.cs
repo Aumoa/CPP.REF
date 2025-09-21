@@ -6,9 +6,13 @@ public partial class Launch
 {
     private GenericApplication m_App;
 
-    public override int GuardedMain(string platform)
+    public override int GuardedMain(LaunchOptions options)
     {
-        LoadPlatformAssembly(platform);
+        LoadPlatformAssembly(options.GetPlatformAssemblyName());
+        using (var engine = new Engine(options))
+        {
+            engine.GuardedLoop();
+        }
         return 0;
     }
 
@@ -16,12 +20,12 @@ public partial class Launch
     {
         var assembly = Assembly.Load(platform + ".Script");
         var constructor = assembly.GetTypes()
-            .Where(p => p.IsAssignableTo(typeof(GenericApplication)))
-            .Select(p => p.GetConstructor([])!)
+            .Where(p => p.IsAbstract == false && p.IsAssignableTo(typeof(GenericApplication)))
+            .Select(p => p.GetConstructor([]))
             .FirstOrDefault();
         if (constructor == null)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("No non-abstract GenericApplication constructor found in the platform assembly.");
         }
         
         m_App = (GenericApplication)constructor.Invoke([]);

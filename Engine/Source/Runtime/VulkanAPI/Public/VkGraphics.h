@@ -5,13 +5,17 @@
 #include "CoreMinimal.h"
 #include "Graphics.h"
 #include "VkCommon.h"
+#include "VkGraphics.gen.h"
 
 namespace Ayla
 {
     class GenericApplication;
 
+    ACLASS()
     class VULKANAPI_API VkGraphics : public Graphics
     {
+        GENERATED_BODY()
+
     private:
         VkInstanceRef m_Instance;
         VkPhysicalDevice m_PhysicalDevice{ nullptr };
@@ -23,10 +27,11 @@ namespace Ayla
         VkSemaphore m_Semaphore{ nullptr };
 
     public:
+        ACONSTRUCTOR()
         VkGraphics();
         virtual ~VkGraphics() noexcept override;
 
-        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) override;
+        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(std::shared_ptr<GenericWindow> targetWindow) override;
         virtual void BeginRenderThread() override;
         virtual void EndRenderThread() override;
 

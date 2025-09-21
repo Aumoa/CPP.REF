@@ -3,11 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericWindowExtension.gen.h"
 
 namespace Ayla
 {
-    class APPLICATIONCORE_API GenericWindowExtension
+    ACLASS()
+    class APPLICATIONCORE_API GenericWindowExtension : public Object
     {
+        GENERATED_BODY()
+
     protected:
         GenericWindowExtension() noexcept;
 

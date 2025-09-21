@@ -5,11 +5,15 @@
 #include "CoreMinimal.h"
 #include "GenericWindowExtension.h"
 #include "IGenericWindowDestroyEventHandler.h"
+#include "GenericMainWindowDefaultExt.gen.h"
 
 namespace Ayla
 {
+    ACLASS()
     class APPLICATIONCORE_API GenericMainWindowDefaultExt : public GenericWindowExtension, public IGenericWindowDestroyEventHandler
     {
+        GENERATED_BODY()
+
     public:
         GenericMainWindowDefaultExt();
         virtual ~GenericMainWindowDefaultExt() noexcept override;

@@ -7,13 +7,17 @@
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include "Numerics/VectorInterface/Vector.h"
+#include "GenericWindow.gen.h"
 
 namespace Ayla
 {
     class GenericWindowExtension;
 
-    class APPLICATIONCORE_API GenericWindow
+    ACLASS()
+    class APPLICATIONCORE_API GenericWindow : public Object
     {
+        GENERATED_BODY()
+
     private:
         Spinlock m_Lock;
         std::vector<std::shared_ptr<GenericWindowExtension>> m_Extensions;

@@ -205,7 +205,7 @@ namespace Ayla
         }
     }
 
-    std::shared_ptr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow)
+    std::shared_ptr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(std::shared_ptr<GenericWindow> targetWindow)
     {
 #if PLATFORM_LINUX
         auto* display = reinterpret_cast<Display*>(GenericApplication::Get().GetApplicationPointer());
@@ -298,7 +298,7 @@ namespace Ayla
         VkSwapchainKHR swapchain;
         VKR(vkCreateSwapchainKHR(m_Device, &swapchainCreateInfo, nullptr, &swapchain));
 
-        auto extension = std::make_shared<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo, suitableQueue);
+        auto extension = New<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo, suitableQueue);
         targetWindow->AddExtension(extension);
         return extension;
     }
@@ -312,5 +312,3 @@ namespace Ayla
     {
     }
 }
-
-DEFINE_CREATE_GRAPHICS(::Ayla::VkGraphics);

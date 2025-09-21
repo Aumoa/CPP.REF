@@ -3,13 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RenderThread.gen.h"
 
 namespace Ayla
 {
 	class Graphics;
 
-	class ENGINE_API RenderThread
+	ACLASS()
+	class ENGINE_API RenderThread : public Object
 	{
+		GENERATED_BODY()
+
 	private:
 		std::thread m_Thread;
 		std::mutex m_Mtx;

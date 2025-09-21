@@ -9,11 +9,16 @@
 #include "CoreMinimal.h"
 #include "GenericWindow.h"
 #include "Platform/PlatformCommon.h"
+#include "WindowsWindow.gen.h"
 
 namespace Ayla
 {
+	ACLASS()
 	class WindowsWindow : public GenericWindow
 	{
+		GENERATED_BODY()
+
+	private:
 		GenericWindowDefinition m_CachedDefinition;
 		HWND m_WindowHandle = nullptr;
 

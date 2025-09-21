@@ -20,14 +20,14 @@ namespace Ayla
 	{
 	}
 
-	std::shared_ptr<GenericActivity> WindowsApplication::CreateMainActivity()
+	std::shared_ptr<GenericActivity> WindowsApplication::CreateMainActivity_Implementation()
 	{
-		return std::make_shared<WindowsActivity>();
+		return New<WindowsActivity>();
 	}
 
 	std::shared_ptr<GenericWindow> WindowsApplication::MakeWindow(const GenericWindowDefinition& winDef)
 	{
-		return std::make_shared<WindowsWindow>(winDef);
+		return New<WindowsWindow>(winDef);
 	}
 
 	Vector2N WindowsApplication::GetScreenResolution()

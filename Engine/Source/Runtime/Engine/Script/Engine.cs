@@ -6,18 +6,33 @@ namespace Ayla;
 
 public partial class Engine
 {
-    private GameInstance? m_GameInstance;
+    private GenericActivity m_MainActivity = null!;
+    private Graphics m_Graphics = null!;
+    private List<GenericWindowSwapchainExtension> m_SwapchainExtensions = [];
+    private GameInstance m_GameInstance;
 
-    public Engine()
+    public Engine(LaunchOptions options)
     {
+        m_MainActivity = GenericApplication.Get().CreateMainActivity();
+        m_MainActivity.BeforeInitialize();
+
+        m_Graphics = Graphics.CreateGraphics(RenderFeatures.Vulkan);
+        m_SwapchainExtensions.Add(m_Graphics.InstallSwapChain(m_MainActivity.GetMainWindow()));
+
+        m_GameInstance = InitializeGame(options);
+
+        m_MainActivity.AfterInitialize();
+        SetupSwapchainExtensions([.. m_SwapchainExtensions]);
     }
 
-    public void Initialize()
+    protected override void Dispose(bool disposing)
     {
-        InitializeActivity();
-        InitializeGraphics();
-        InitializeGame();
-        PostInitialized();
+        if (disposing)
+        {
+            Shutdown();
+        }
+
+        base.Dispose(disposing);
     }
 
     public override void GuardedLoop()
@@ -36,19 +51,27 @@ public partial class Engine
         }
     }
 
-    private void InitializeGame()
+    private GameInstance InitializeGame(LaunchOptions options)
     {
-        ConstructorInfo? primaryConstructor = AppDomain.CurrentDomain.GetAssemblies().SelectMany(p => p.GetTypes())
-            .Where(p => p.IsAssignableTo(typeof(GameInstance)))
-            .Select(p => p.GetConstructor(BindingFlags.Public, []))
-            .FirstOrDefault(p => p != null);
-        if (primaryConstructor == null)
+        var gameAssemblyName = options.GetGameAssemblyName();
+        var gameAssembly = Assembly.Load(gameAssemblyName + ".Script");
+
+        var gameInstanceType = gameAssembly.GetTypes()
+            .Where(p => p.IsAbstract == false && p.IsAssignableTo(typeof(GameInstance)))
+            .FirstOrDefault();
+        if (gameInstanceType == null)
         {
-            Debug.LogCritical("Engine", "No public constructor found for GameInstance derived class.");
-            return;
+            throw new InvalidOperationException("No GameInstance derived type found in loaded assemblies.");
         }
 
-        m_GameInstance = (GameInstance)primaryConstructor.Invoke([]);
-        Debug.LogInformation("Engine", "GameInstance created: {0}", m_GameInstance.GetType().FullName);
+        var primaryConstructor = gameInstanceType.GetConstructor([]);
+        if (primaryConstructor == null)
+        {
+            throw new InvalidOperationException("No public constructor found for GameInstance derived class.");
+        }
+
+        var gameInstance = (GameInstance)primaryConstructor.Invoke([]);
+        Debug.LogInformation("Engine", "GameInstance created: {0}", gameInstance.GetType().FullName);
+        return gameInstance;
     }
 }

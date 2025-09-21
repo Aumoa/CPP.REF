@@ -31,7 +31,8 @@ namespace Ayla
     public:
         virtual ~GenericApplication() noexcept;
 
-        virtual std::shared_ptr<GenericActivity> CreateMainActivity() = 0;
+        AFUNCTION()
+        virtual std::shared_ptr<GenericActivity> CreateMainActivity() APURE;
         virtual std::shared_ptr<GenericWindow> MakeWindow(const GenericWindowDefinition& InDefinition) = 0;
         virtual Vector2N GetScreenResolution() = 0;
         virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& OutInputEvents) = 0;

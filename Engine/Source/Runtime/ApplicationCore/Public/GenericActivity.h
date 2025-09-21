@@ -3,13 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericActivity.gen.h"
 
 namespace Ayla
 {
 	class GenericWindow;
 
-	class APPLICATIONCORE_API GenericActivity
+	ACLASS()
+	class APPLICATIONCORE_API GenericActivity : public Object
 	{
+		GENERATED_BODY()
+
+	private:
 		GenericActivity(const GenericActivity&) = delete;
 		GenericActivity& operator=(const GenericActivity&) = delete;
 
@@ -17,8 +22,11 @@ namespace Ayla
 		GenericActivity();
 		virtual ~GenericActivity() noexcept;
 
-		virtual void BeforeInitialize() = 0;
-		virtual void AfterInitialize() = 0;
-		virtual std::shared_ptr<GenericWindow> GetMainWindow() const = 0;
+		AFUNCTION()
+		virtual void BeforeInitialize() APURE;
+		AFUNCTION()
+		virtual void AfterInitialize() APURE;
+		AFUNCTION()
+		virtual std::shared_ptr<GenericWindow> GetMainWindow() const APURE;
 	};
 }

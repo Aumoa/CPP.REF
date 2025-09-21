@@ -6,13 +6,17 @@
 #include "VkCommon.h"
 #include "GenericWindowSwapchainExtension.h"
 #include "IGenericWindowResizeEventHandler.h"
+#include "VkSwapchainExt.gen.h"
 
 namespace Ayla
 {
     class VkGraphics;
 
+    ACLASS()
     class VkSwapchainExt : public GenericWindowSwapchainExtension, public IGenericWindowResizeEventHandler
     {
+        GENERATED_BODY()
+
     private:
         VkGraphics* m_Owner;
         VkSurfaceKHR m_Surface;

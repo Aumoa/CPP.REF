@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RenderFeatures.h"
+#include "Graphics.gen.h"
 
 namespace Ayla
 {
@@ -11,29 +12,20 @@ namespace Ayla
     class GenericWindow;
     class GenericWindowSwapchainExtension;
 
-    class RENDERCORE_API Graphics
+    ACLASS()
+    class RENDERCORE_API Graphics : public Object
     {
+        GENERATED_BODY()
+
     protected:
         Graphics();
 
     public:
         virtual ~Graphics() noexcept;
 
-        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) = 0;
+        AFUNCTION()
+        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) APURE;
         virtual void BeginRenderThread() = 0;
         virtual void EndRenderThread() = 0;
-
-        static std::shared_ptr<Graphics> CreateGraphics(RenderFeatures api);
     };
-}
-
-#define NAMEOF_CREATE_GRAPHICS TEXT("CreateGraphics")
-
-#define DEFINE_CREATE_GRAPHICS(ClassName) \
-extern "C" \
-{ \
-    PLATFORM_SHARED_EXPORT auto CreateGraphics() \
-    { \
-        return (::Ayla::Graphics*)(new ClassName()); \
-    } \
 }
