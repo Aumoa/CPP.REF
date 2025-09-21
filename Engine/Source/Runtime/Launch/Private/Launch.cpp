@@ -27,11 +27,9 @@ namespace Ayla
             throw InvalidOperationException(TEXT("No game assembly specified."));
         }
 
-        auto gameAssembly = it->second[0].value();
+        auto& gameAssembly = it->second[0].value();
         auto scriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
         scriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
-
-        ThreadPool::Initialize();
 
         auto launch = New<Launch>(std::move(args));
         return launch->GuardedMain(platform);

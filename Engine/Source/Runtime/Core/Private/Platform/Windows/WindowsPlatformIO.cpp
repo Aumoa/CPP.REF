@@ -134,12 +134,10 @@ namespace Ayla
 		return DispatchQueuedCompletionStatus(Handle, TimeSpan::FromMilliseconds(INFINITE));
 	}
 
-	void WindowsPlatformIO::QueueInterruptSignal(void* handle) noexcept
+	void WindowsPlatformIO::QueueInterruptSignal(void* handle, int32 size) noexcept
 	{
 		check(handle);
-		size_t numWorkerThreads, numCompletionPortThreads;
-		ThreadPool::GetMaxThreads(numWorkerThreads, numCompletionPortThreads);
-		for (size_t i = 0; i < numCompletionPortThreads; ++i)
+		for (size_t i = 0; i < size; ++i)
 		{
 			PostQueuedCompletionStatus(GetHANDLE(handle), 0, 0, nullptr);
 		}

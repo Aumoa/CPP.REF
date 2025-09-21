@@ -24,9 +24,11 @@ namespace Ayla
 
 	private:
 		static void (*coreclr__QueueUserWorkItem)();
+		static void (*coreclr__GetMinThreads)(int32* workerThreads, int32* completionPortThreads);
 		static void (*coreclr__GetMaxThreads)(int32* workerThreads, int32* completionPortThreads);
+		static void (*coreclr__SetMinThreads)(int32 workerThreads, int32 completionPortThreads);
+		static void (*coreclr__SetMaxThreads)(int32 workerThreads, int32 completionPortThreads);
 
-		static size_t NumWorkerThreads;
 		static size_t NumCompletionPortThreads;
 
 		static Spinlock Lck;
@@ -38,14 +40,13 @@ namespace Ayla
 		static std::multimap<std::chrono::steady_clock::time_point, Action<>> DelayedWorks;
 
 		static void* IO;
-		static size_t Workers;
 		static size_t IOCPWorkers;
 		static std::vector<std::thread> Threads;
 
-	public:
-		static void Initialize(size_t InNumWorkerThreads = 0, size_t InNumCompletionPortThreads = 0);
-		static void Shutdown();
+	private:
+		static void static__ThreadPool();
 
+	public:
 		static void BindHandle(void* NativeHandle);
 		static void UnbindHandle(void* NativeHandle);
 
@@ -53,11 +54,12 @@ namespace Ayla
 		static void QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork);
 		static void QueueSignal();
 
-		static void GetMinThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
-		static void GetMaxThreads(size_t& OutWorkerThreads, size_t& OutCompletionPortThreads);
+		static void GetMinThreads(int32* workerThreads, int32* completionPortThreads);
+		static void GetMaxThreads(int32* workerThreads, int32* completionPortThreads);
+		static void SetMinThreads(int32 workerThreads, int32 completionPortThreads);
+		static void SetMaxThreads(int32 workerThreads, int32 completionPortThreads);
 
 	private:
-		static void Worker(size_t Index);
 		static void IOCPWorker(size_t Index);
 		static void DelayedWorker();
 		static void HandleUserWorkItem();
