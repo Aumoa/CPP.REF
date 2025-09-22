@@ -319,11 +319,11 @@ internal static partial class BuildRunner
                 }
 
                 string nugetPackages = string.Empty;
-                if (resolver.Rules.Scriptable.NuGetPackages.Count > 0)
+                if (resolver.Rules.Script.NuGetPackages.Count > 0)
                 {
                     nugetPackages += "\n";
                     nugetPackages += "  <ItemGroup>\n";
-                    foreach (var pkg in resolver.Rules.Scriptable.NuGetPackages)
+                    foreach (var pkg in resolver.Rules.Script.NuGetPackages)
                     {
                         nugetPackages += $"    <PackageReference Include=\"{pkg.Id}\" Version=\"{pkg.Version}\" />\n";
                     }
@@ -417,7 +417,7 @@ internal static partial class BuildRunner
             void BuildGraph(ModuleProject target, int depth)
             {
                 var rule = target.GetRule(buildTarget);
-                if (rule.Scriptable.Enabled)
+                if (rule.Script.Enabled)
                 {
                     if (buildGraph.TryGetValue(target, out var existingDepth))
                     {

@@ -45,7 +45,7 @@ public class ModuleRules
 
     public string Name => GetType().Name;
 
-    public ScriptRule Scriptable { get; } = new();
+    public ScriptRule Script { get; } = new();
 
     public void AddPublicIncludePaths(params string[] items)
     {

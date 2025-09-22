@@ -27,7 +27,7 @@ internal class MSLinker : Linker
         m_CommandBuilder.Clear();
 
         var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, module.Rules.Scriptable.Enabled, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
         if (module.Rules.IsSharedLibrary())

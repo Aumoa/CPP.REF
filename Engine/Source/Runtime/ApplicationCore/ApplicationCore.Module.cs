@@ -7,7 +7,7 @@ public class ApplicationCore : ModuleRules
 {
     public ApplicationCore()
     {
-        Scriptable.Enabled = true;
+        Script.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics");

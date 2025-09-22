@@ -21,9 +21,9 @@ internal static class FolderPolicy
         return PathPolicy(result, pathType);
     }
 
-    public static string OutputFileName(this GroupDescriptor descriptor, Installation installation,  ITargetInfo targetInfo, string projectName, ModuleType moduleType, bool scriptable, PathType pathType)
+    public static string OutputFileName(this GroupDescriptor descriptor, Installation installation,  ITargetInfo targetInfo, string projectName, ModuleType moduleType, PathType pathType)
     {
-        var result = Path.Combine(Output(descriptor, targetInfo, pathType), installation.OutputFileName(projectName, moduleType, scriptable));
+        var result = Path.Combine(Output(descriptor, targetInfo, pathType), installation.OutputFileName(projectName, moduleType));
         return PathPolicy(result, pathType);
     }
 

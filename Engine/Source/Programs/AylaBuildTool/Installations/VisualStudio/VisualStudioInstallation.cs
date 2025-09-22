@@ -194,7 +194,7 @@ internal class VisualStudioInstallation : Installation
         return includes!.Select(p => p!.GetValue<string>()).ToArray();
     }
 
-    public override string OutputFileName(string projectName, ModuleType moduleType, bool scriptable)
+    public override string OutputFileName(string projectName, ModuleType moduleType)
     {
         return projectName + moduleType switch
         {

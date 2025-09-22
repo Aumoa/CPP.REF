@@ -28,7 +28,7 @@ internal static partial class BuildRunner
                 return true;
             }
 
-            var outputFileName = Resolver.Group.OutputFileName(m_Installation, targetInfo, Resolver.Name, Resolver.Rules.Type, Resolver.Rules.Scriptable.Enabled, FolderPolicy.PathType.Current);
+            var outputFileName = Resolver.Group.OutputFileName(m_Installation, targetInfo, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
             if (File.Exists(outputFileName) == false)
             {
                 return true;

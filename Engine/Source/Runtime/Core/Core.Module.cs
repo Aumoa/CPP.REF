@@ -7,7 +7,7 @@ public class Core : ModuleRules
 {
     public Core()
     {
-        Scriptable.Enabled = true;
+        Script.Enabled = true;
 
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");

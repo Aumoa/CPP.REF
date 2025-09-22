@@ -7,7 +7,7 @@ public class WindowsAPI : ModuleRules
 {
     public WindowsAPI()
     {
-        Scriptable.Enabled = true;
+        Script.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("ApplicationCore");

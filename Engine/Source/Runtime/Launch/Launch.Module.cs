@@ -7,7 +7,7 @@ public class Launch : ModuleRules
 {
     public Launch()
     {
-        Scriptable.Enabled = true;
+        Script.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore", "Engine");

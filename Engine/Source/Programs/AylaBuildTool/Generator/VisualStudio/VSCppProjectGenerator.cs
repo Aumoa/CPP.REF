@@ -63,7 +63,7 @@ internal static class VSCppProjectGenerator
 
                         if (rules.Type == ModuleType.Game)
                         {
-                            var outputFileName = project.Group.OutputFileName(installation, buildConfig, project.Name, rules.Type, rules.Scriptable.Enabled, FolderPolicy.PathType.Windows);
+                            var outputFileName = project.Group.OutputFileName(installation, buildConfig, project.Name, rules.Type, FolderPolicy.PathType.Windows);
                             AppendFormatLine("""<LocalDebuggerCommandArguments>--gameassembly "{0}"</LocalDebuggerCommandArguments>""", Path.ChangeExtension(outputFileName, null));
                         }
                     });
@@ -300,7 +300,7 @@ internal static class VSCppProjectGenerator
                     var resolver = project.GetResolver(buildTarget);
                     var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                     var includes = GenerateIncludePaths(resolver);
-                    var outputFileName = installation.OutputFileName(project.Name, rules.Type, rules.Scriptable.Enabled);
+                    var outputFileName = installation.OutputFileName(project.Name, rules.Type);
 
                     AppendFormatLine("""<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{0}|{1}'">""", configName, archName);
                     Indent(() =>

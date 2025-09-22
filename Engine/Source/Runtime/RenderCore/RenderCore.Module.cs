@@ -7,7 +7,7 @@ public class RenderCore : ModuleRules
 {
     public RenderCore()
     {
-        Scriptable.Enabled = true;
+        Script.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics", "ApplicationCore");
