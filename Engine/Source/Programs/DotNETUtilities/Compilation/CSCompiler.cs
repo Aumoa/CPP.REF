@@ -65,21 +65,31 @@ public static class CSCompiler
         List<SyntaxTree> syntaxTrees = new();
         List<Diagnostic> compileErrors = new();
 
+        List<Task> tasks = [];
         foreach (var sourceFile in sourceFiles)
         {
             var source = SourceText.From(await sourceFile.ReadContentAsync(cancellationToken));
-            var syntax = await Task.Run(() => CSharpSyntaxTree.ParseText(source, parseOptions, sourceFile.FileName, cancellationToken));
+            tasks.Add(Task.Run(() => CSharpSyntaxTree.ParseText(source, parseOptions, sourceFile.FileName, cancellationToken)).ContinueWith(r =>
+            {
+                var syntax = r.Result;
 
-            // Check syntax error.
-            IEnumerable<Diagnostic> diagnostics = syntax.GetDiagnostics(cancellationToken);
-            if (diagnostics.Any())
-            {
-                compileErrors.AddRange(diagnostics);
-            }
-            else
-            {
-                syntaxTrees.Add(syntax);
-            }
+                // Check syntax error.
+                IEnumerable<Diagnostic> diagnostics = syntax.GetDiagnostics(cancellationToken);
+                if (diagnostics.Any())
+                {
+                    lock (compileErrors)
+                    {
+                        compileErrors.AddRange(diagnostics);
+                    }
+                }
+                else
+                {
+                    lock (syntaxTrees)
+                    {
+                        syntaxTrees.Add(syntax);
+                    }
+                }
+            }));
         }
 
         if (compileErrors.Any())
