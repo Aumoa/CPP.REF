@@ -2,5 +2,5 @@
 
 public abstract record CSReferenceBase(string Include) : CSElement
 {
-    public abstract string ReferencedAssemblyPath(CSCondition? condition, string configuration, string sourceDirectory);
+    public abstract string ReferencedAssemblyPath(CSCondition? condition, string projectDirectory);
 }

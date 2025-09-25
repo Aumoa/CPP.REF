@@ -1,6 +1,6 @@
 ﻿// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-using System.Reflection;
+using AylaEngine.Compilation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -10,190 +10,151 @@ namespace AylaEngine;
 
 public static class CSCompiler
 {
-    public abstract class SourceCodeProvider
+    private static readonly string[] Microsoft_NET_Sdk =
+    [
+        "System.Private.CoreLib.dll", "System.Runtime.dll", "System.Console.dll", "System.Collections.dll",
+        "System.Linq.dll", "System.Threading.dll", "System.IO.dll", "System.Net.Primitives.dll",
+        "System.Private.Uri.dll", "System.Collections.Immutable.dll", "System.ObjectModel.dll",
+        "System.Text.RegularExpressions.dll", "System.Private.Xml.dll", "System.Xml.ReaderWriter.dll"
+    ];
+
+    private static readonly string[] SdkFolders = ["Microsoft.NETCore.App", "Microsoft.AspNetCore.App", "Microsoft.WindowsDesktop.App"];
+
+    private static readonly Version Net0900 = new(9, 0);
+
+    private static LanguageVersion GetDefaultLangVersion(CSProject project)
     {
-        public readonly string FileName;
-
-        protected SourceCodeProvider(string fileName)
+        switch (project.PropertyGroup.TargetFramework)
         {
-            FileName = fileName;
+            case CSTargetFramework.Net0900:
+                return LanguageVersion.CSharp13;
         }
 
-        public abstract Task<string> ReadContentAsync(CancellationToken cancellationToken = default);
-        
-        public static SourceCodeProvider FromFile(string fileName)
-        {
-            return new FileSourceCodeProvider(fileName);
-        }
-
-        public static SourceCodeProvider FromSourceCode(string fileName, string sourceCode)
-        {
-            return new StringSourceCodeProvider(fileName, sourceCode);
-        }
+        throw new NotSupportedException($"The target framework '{project.PropertyGroup.TargetFramework}' is not supported.");
     }
 
-    private class FileSourceCodeProvider : SourceCodeProvider
+    private static IEnumerable<string> GetSharedLibraries(CSProject project)
     {
-        public FileSourceCodeProvider(string fileName) : base(fileName)
+        var sharedFolder = Path.GetFullPath(Path.Combine(typeof(object).Assembly.Location, "..", ".."));
+        string[] requiredAssemblies = project.Sdk switch
         {
-        }
+            "Microsoft.NET.Sdk" => Microsoft_NET_Sdk,
+            _ => throw new NotSupportedException($"The SDK '{project.Sdk}' is not supported."),
+        };
 
-        public override async Task<string> ReadContentAsync(CancellationToken cancellationToken = default)
+        Version targetFramework = project.PropertyGroup.TargetFramework switch
         {
-            return await File.ReadAllTextAsync(FileName, cancellationToken);
-        }
-    }
+            CSTargetFramework.Net0900 => Net0900,
+            _ => throw new NotSupportedException($"The target framework '{project.PropertyGroup.TargetFramework}' is not supported."),
+        };
 
-    private class StringSourceCodeProvider : SourceCodeProvider
-    {
-        private readonly string m_SourceCode;
-
-        public StringSourceCodeProvider(string fileName, string sourceCode) : base(fileName)
+        List<string> candidateFolders = [];
+        foreach (var sdkName in SdkFolders)
         {
-            m_SourceCode = sourceCode;
-        }
-
-        public override Task<string> ReadContentAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(m_SourceCode);
-        }
-    }
-
-    private static async Task<MemoryStream> InternalCompileAsync(string assemblyName, IEnumerable<SourceCodeProvider> sourceFiles, IEnumerable<string> referencedAssemblies, CancellationToken cancellationToken = default)
-    {
-        CSharpParseOptions parseOptions = new(LanguageVersion.CSharp13);
-        List<SyntaxTree> syntaxTrees = new();
-        List<Diagnostic> compileErrors = new();
-
-        List<Task> tasks = [];
-        foreach (var sourceFile in sourceFiles)
-        {
-            var source = SourceText.From(await sourceFile.ReadContentAsync(cancellationToken));
-            tasks.Add(Task.Run(() => CSharpSyntaxTree.ParseText(source, parseOptions, sourceFile.FileName, cancellationToken)).ContinueWith(r =>
+            var sdkFolder = Path.Combine(sharedFolder, sdkName);
+            List<Version> candidateVersions = [];
+            foreach (var versionFolder in Directory.GetDirectories(sdkFolder, "*", SearchOption.TopDirectoryOnly))
             {
-                var syntax = r.Result;
+                var folderName = Path.GetFileName(versionFolder);
+                if (Version.TryParse(folderName, out var folderVersion) == false)
+                {
+                    continue;
+                }
 
-                // Check syntax error.
-                IEnumerable<Diagnostic> diagnostics = syntax.GetDiagnostics(cancellationToken);
-                if (diagnostics.Any())
+                if (folderVersion.Major == targetFramework.Major && folderVersion.Minor == targetFramework.Minor)
                 {
-                    lock (compileErrors)
-                    {
-                        compileErrors.AddRange(diagnostics);
-                    }
+                    candidateVersions.Add(folderVersion);
                 }
-                else
-                {
-                    lock (syntaxTrees)
-                    {
-                        syntaxTrees.Add(syntax);
-                    }
-                }
-            }));
+            }
+
+            if (candidateVersions.Count > 0)
+            {
+                candidateVersions.Sort((a, b) => b.CompareTo(a));
+                candidateFolders.Add(Path.Combine(sharedFolder, sdkName, candidateVersions[0].ToString(3)));
+            }
         }
 
-        if (compileErrors.Any())
+        foreach (var requiredAssembly in requiredAssemblies)
         {
-            throw new CSCompilerError(compileErrors);
+            foreach (var candidateFolder in candidateFolders)
+            {
+                var assemblyPath = Path.Combine(candidateFolder, requiredAssembly);
+                if (File.Exists(assemblyPath))
+                {
+                    yield return assemblyPath;
+                    break;
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<string> GetReferencedLibraries(CSProject project, string projectDirectory)
+    {
+        foreach (var reference in project.ItemGroup.References)
+        {
+            yield return reference.ReferencedAssemblyPath(project.Condition, projectDirectory);
+        }
+    }
+
+    public static async ValueTask<CompileResult> CompileAsync(string assemblyName, IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, CancellationToken cancellationToken = default)
+    {
+        var langVersion = GetDefaultLangVersion(project);
+        var referencedAssemblies = GetSharedLibraries(project).Concat(GetReferencedLibraries(project, projectDirectory));
+        if (referencedAssemblies.Any(fp => File.Exists(fp) == false))
+        {
+            throw new CSCompilerError("One or more required referenced assemblies are missing.");
         }
 
-        var metadataReferences = referencedAssemblies.Select(LoadReferenceOrThrowError);
-        var compilerOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, true, optimizationLevel: OptimizationLevel.Release, nullableContextOptions: NullableContextOptions.Enable);
+        CSharpParseOptions parseOptions = new(langVersion);
+        List<Diagnostic> diagnostics = [];
+        var syntaxTrees = await Task.WhenAll(sourceCodes.Select(sourceCode => Task.Run(async () =>
+        {
+            var sourceText = SourceText.From(await sourceCode.ReadContentAsync(cancellationToken));
+            var identifier = await sourceCode.GetIdentifierAsync(cancellationToken);
+            var syntaxTree = CSharpSyntaxTree.ParseText(sourceText, parseOptions, identifier, cancellationToken);
+            var localDiagnostics = syntaxTree.GetDiagnostics(cancellationToken).ToArray();
+            lock (diagnostics)
+            {
+                diagnostics.AddRange(localDiagnostics);
+            }
+
+            return syntaxTree;
+        })));
+
+        var outputType = project.PropertyGroup.OutputType ?? OutputKind.DynamicallyLinkedLibrary;
+        var optimized = (project.PropertyGroup.Optimize ?? true) ? OptimizationLevel.Release : OptimizationLevel.Debug;
+        var metadataReferences = referencedAssemblies.Select(CreateFromFile);
+        var compilerOptions = new CSharpCompilationOptions(outputType, true, optimizationLevel: optimized, nullableContextOptions: project.PropertyGroup.Nullable ?? NullableContextOptions.Disable);
         var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, metadataReferences, compilerOptions);
 
-        MemoryStream compiledBinary = new();
+        using MemoryStream assemblyStream = new();
+        using MemoryStream pdbStream = new();
         var emitOptions = new EmitOptions(includePrivateMembers: true);
-        var emitResult = await Task.Run(() => compilation.Emit(compiledBinary, options: emitOptions, cancellationToken: cancellationToken));
+        var emitResult = await Task.Run(() => compilation.Emit(assemblyStream, pdbStream, options: emitOptions, cancellationToken: cancellationToken));
         if (emitResult.Success == false)
         {
             throw new CSCompilerError(emitResult.Diagnostics);
         }
 
-        return compiledBinary;
+        return new CompileResult(assemblyStream.ToArray(), pdbStream.ToArray());
 
-        PortableExecutableReference LoadReferenceOrThrowError(string assemblyPath)
+        PortableExecutableReference CreateFromFile(string assemblyPath)
         {
-            if (File.Exists(assemblyPath) == false)
-            {
-                Console.Error.WriteLine("{0} -> Required assembly not found: {1}", assemblyName, assemblyPath);
-                throw TerminateException.User();
-            }
-
             return MetadataReference.CreateFromFile(assemblyPath);
         }
     }
 
-    public static async Task<Assembly> CompileAsync(string assemblyName, IEnumerable<SourceCodeProvider> sourceFiles, IEnumerable<string> referencedAssemblies, CancellationToken cancellationToken = default)
+    public static async ValueTask<string> CompileAsAsync(string assemblyName, IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, CancellationToken cancellationToken = default)
     {
-        using MemoryStream compiledBinary = await InternalCompileAsync(assemblyName, sourceFiles, referencedAssemblies, cancellationToken);
-        return Assembly.Load(compiledBinary.GetBuffer());
-    }
+        var results = await CompileAsync(assemblyName, sourceCodes, project, projectDirectory, cancellationToken);
 
-    public static async Task CompileToAsync(string assemblyName, string saveTo, IEnumerable<SourceCodeProvider> sourceFiles, IEnumerable<string> referencedAssemblies, CancellationToken cancellationToken = default)
-    {
-        using MemoryStream compiledBinary = await InternalCompileAsync(assemblyName, sourceFiles, referencedAssemblies, cancellationToken);
-        await File.WriteAllBytesAsync(saveTo, compiledBinary.GetBuffer(), cancellationToken);
-    }
-
-    public static async Task CompileToAsync(string assemblyName, string saveTo, IEnumerable<SourceCodeProvider> sourceFiles, IEnumerable<string> referencedAssemblies, bool includeBaseAssemblies = true, CancellationToken cancellationToken = default)
-    {
-        if (includeBaseAssemblies)
-        {
-            referencedAssemblies = referencedAssemblies.Concat(GetDefaultAssemblies());
-        }
-
-        using MemoryStream compiledBinary = await InternalCompileAsync(assemblyName, sourceFiles, referencedAssemblies, cancellationToken);
-        await File.WriteAllBytesAsync(saveTo, compiledBinary.GetBuffer(), cancellationToken);
-    }
-
-    public static async Task<Assembly> CompileAsync(string assemblyName, string sourceFile, IEnumerable<string> referencedAssemblies, bool includeBaseAssemblies = true, CancellationToken cancellationToken = default)
-    {
-        if (includeBaseAssemblies)
-        {
-            referencedAssemblies = referencedAssemblies.Concat(GetDefaultAssemblies());
-        }
-
-        Assembly compiledAssembly = await CompileAsync(assemblyName, [SourceCodeProvider.FromFile(sourceFile)], referencedAssemblies, cancellationToken);
-        return compiledAssembly;
-    }
-
-    public static async Task CompileToAsync(string assemblyName, string saveTo, string sourceFile, IEnumerable<string> referencedAssemblies, bool includeBaseAssemblies = true, CancellationToken cancellationToken = default)
-    {
-        if (includeBaseAssemblies)
-        {
-            referencedAssemblies = referencedAssemblies.Concat(GetDefaultAssemblies());
-        }
-
-        await CompileToAsync(assemblyName, saveTo, [SourceCodeProvider.FromFile(sourceFile)], referencedAssemblies, cancellationToken);
-    }
-
-    public static async Task<Type> LoadClassAsync<TBaseClass>(string sourceFile, CancellationToken cancellationToken = default)
-    {
-        Type basedType = typeof(TBaseClass);
-
-        string assemblyName = Path.GetFileNameWithoutExtension(sourceFile);
-        Assembly compiledAssembly = await CompileAsync(assemblyName, sourceFile, new[] { basedType.Assembly.Location }, cancellationToken: cancellationToken);
-
-        foreach (var type in compiledAssembly.GetTypes())
-        {
-            if (type.IsAssignableTo(basedType))
-            {
-                return type;
-            }
-        }
-
-        throw new ClassNotFoundException(assemblyName, basedType);
-    }
-
-    public static string[] GetDefaultAssemblies()
-    {
-        return
-        [
-            typeof(object).Assembly.Location,
-            Assembly.Load("System.Runtime").Location,
-            Assembly.Load("System.Collections").Location,
-            Assembly.Load("System.Collections.Immutable").Location,
-            Assembly.Load("System.Linq").Location
-        ];
+        string outputPath = project.PropertyGroup.ParseOutputPath(projectDirectory);
+        string assemblyFileName = Path.Combine(outputPath, assemblyName + ".dll");
+        string pdbFileName = Path.Combine(outputPath, assemblyName + ".pdb");
+        await Task.WhenAll(
+            File.WriteAllBytesAsync(assemblyFileName, results.Assembly, cancellationToken),
+            File.WriteAllBytesAsync(pdbFileName, results.Pdb, cancellationToken)
+        );
+        return assemblyFileName;
     }
 }

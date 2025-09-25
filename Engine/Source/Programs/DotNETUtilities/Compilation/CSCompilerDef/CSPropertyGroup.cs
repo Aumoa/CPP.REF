@@ -255,4 +255,28 @@ public record CSPropertyGroup(
             platformTarget
         );
     }
+
+    public string ParseOutputPath(string projectDirectory)
+    {
+        string outputPath;
+        if (OutputPath == null)
+        {
+            var configuration = Condition?.Configuration ?? "Release";
+            var targetFramework = TargetFramework?.ToFrameworkString() ?? "net9.0";
+            outputPath = Path.Combine(projectDirectory, "bin", configuration, targetFramework);
+        }
+        else
+        {
+            if (Path.IsPathRooted(OutputPath))
+            {
+                outputPath = OutputPath;
+            }
+            else
+            {
+                outputPath = Path.Combine(projectDirectory, OutputPath);
+            }
+        }
+
+        return outputPath;
+    }
 }

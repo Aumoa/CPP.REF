@@ -11,12 +11,16 @@ public class CSCompilerError : Exception
     {
     }
 
+    public CSCompilerError(string message) : base(message)
+    {
+    }
+
     private static string FormatMessage(IEnumerable<Diagnostic> diagnostics)
     {
         List<string> messages = new();
-        foreach (var Diag in diagnostics)
+        foreach (var diag in diagnostics)
         {
-            messages.Add(Diag.ToString());
+            messages.Add(diag.ToString());
         }
         return string.Join("\n", messages);
     }

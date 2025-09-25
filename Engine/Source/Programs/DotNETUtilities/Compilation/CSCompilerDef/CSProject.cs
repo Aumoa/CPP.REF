@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace AylaEngine;
 
-public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSItemGroup[] ItemGroups) : CSElement
+public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSItemGroup[] ItemGroups, CSCondition? Condition) : CSElement
 {
     public override string GenerateXml()
     {
@@ -43,7 +43,7 @@ public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSIt
             }
         }
 
-        return new CSProject(sdk, propertyGroups.ToArray(), itemGroups.ToArray());
+        return new CSProject(sdk, propertyGroups.ToArray(), itemGroups.ToArray(), null);
     }
 
     public CSProject Freeze(CSCondition? condition)
@@ -54,7 +54,7 @@ public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSIt
         var frozenItemGroups = ItemGroups
             .Where(ig => ig.Condition == null || condition == null || ig.Condition.Contains(condition))
             .ToArray();
-        return this with { PropertyGroups = frozenPropertyGroups, ItemGroups = frozenItemGroups };
+        return this with { PropertyGroups = frozenPropertyGroups, ItemGroups = frozenItemGroups, Condition = condition };
     }
 
     public CSPropertyGroup PropertyGroup
