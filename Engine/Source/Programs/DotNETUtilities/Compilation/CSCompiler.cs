@@ -110,9 +110,10 @@ public static class CSCompiler
         var langVersion = GetDefaultLangVersion(project);
         var referencedAssemblies = GetSharedLibraries(project).ToArray();
         referencedAssemblies = referencedAssemblies.Concat(GetReferencedLibraries(project, projectDirectory, referencedAssemblies)).ToArray();
-        if (referencedAssemblies.Any(fp => File.Exists(fp) == false))
+        var notExists = referencedAssemblies.Where(fp => File.Exists(fp) == false).ToArray();
+        if (notExists.Length > 0)
         {
-            throw new CSCompilerError("One or more required referenced assemblies are missing.");
+            throw new CSCompilerError($"One or more required referenced assemblies({string.Join(", ", notExists)}) are missing.");
         }
 
         CSharpParseOptions parseOptions = new(langVersion);
