@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace AylaEngine;
 
-public record class CSProjectReference(string Include, bool? Private) : CSReferenceBase(Include)
+public record class CSProjectReference(string Include, bool? Private) : CSReference(Include)
 {
     public override string GenerateXml()
     {
@@ -23,7 +23,7 @@ public record class CSProjectReference(string Include, bool? Private) : CSRefere
         }
     }
 
-    public override string ReferencedAssemblyPath(CSCondition? condition, string projectDirectory)
+    public override string ReferencedAssemblyPath(CSCondition? condition, string projectDirectory, HashSet<string> referencedAssemblies)
     {
         XmlDocument doc = new();
         doc.LoadXml(File.ReadAllText(Include));

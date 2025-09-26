@@ -2,7 +2,7 @@
 
 namespace AylaEngine;
 
-public record CSItemGroup(CSCondition? Condition, CSReferenceBase[] References, CSUsing[] Usings) : CSElement
+public record CSItemGroup(CSCondition? Condition, CSReference[] References, CSUsing[] Usings) : CSElement
 {
     public bool IsEmpty => References.Length == 0;
 
@@ -43,7 +43,7 @@ public record CSItemGroup(CSCondition? Condition, CSReferenceBase[] References, 
             condition = CSCondition.Parse(conditionAttr.Value ?? string.Empty);
         }
 
-        var references = new List<CSReferenceBase>();
+        var references = new List<CSReference>();
         var usings = new List<CSUsing>();
         foreach (XmlElement item in xml)
         {

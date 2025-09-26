@@ -1,5 +1,6 @@
 ﻿// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+using System.Text;
 using AylaEngine.Compilation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -35,7 +36,7 @@ public static class CSCompiler
 
     private static IEnumerable<string> GetSharedLibraries(CSProject project)
     {
-        var sharedFolder = Path.GetFullPath(Path.Combine(typeof(object).Assembly.Location, "..", ".."));
+        var sharedFolder = Path.GetFullPath(Path.Combine(typeof(object).Assembly.Location, "..", "..", ".."));
         string[] requiredAssemblies = project.Sdk switch
         {
             "Microsoft.NET.Sdk" => Microsoft_NET_Sdk,
@@ -88,18 +89,26 @@ public static class CSCompiler
         }
     }
 
-    private static IEnumerable<string> GetReferencedLibraries(CSProject project, string projectDirectory)
+    private static IEnumerable<string> GetReferencedLibraries(CSProject project, string projectDirectory, string[] referencedAssemblies)
     {
+        var hashSet = referencedAssemblies.Select(r => Path.GetFileNameWithoutExtension(r)).ToHashSet();
         foreach (var reference in project.ItemGroup.References)
         {
-            yield return reference.ReferencedAssemblyPath(project.Condition, projectDirectory);
+            var referenced = reference.ReferencedAssemblyPath(project.Condition, projectDirectory, hashSet);
+            if (string.IsNullOrEmpty(referenced))
+            {
+                continue;
+            }
+
+            yield return referenced;
         }
     }
 
-    public static async ValueTask<CompileResult> CompileAsync(string assemblyName, IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, CancellationToken cancellationToken = default)
+    public static async ValueTask<CompileResult> CompileAsync(IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, string projectName, CancellationToken cancellationToken = default)
     {
         var langVersion = GetDefaultLangVersion(project);
-        var referencedAssemblies = GetSharedLibraries(project).Concat(GetReferencedLibraries(project, projectDirectory));
+        var referencedAssemblies = GetSharedLibraries(project).ToArray();
+        referencedAssemblies = referencedAssemblies.Concat(GetReferencedLibraries(project, projectDirectory, referencedAssemblies)).ToArray();
         if (referencedAssemblies.Any(fp => File.Exists(fp) == false))
         {
             throw new CSCompilerError("One or more required referenced assemblies are missing.");
@@ -109,7 +118,7 @@ public static class CSCompiler
         List<Diagnostic> diagnostics = [];
         var syntaxTrees = await Task.WhenAll(sourceCodes.Select(sourceCode => Task.Run(async () =>
         {
-            var sourceText = SourceText.From(await sourceCode.ReadContentAsync(cancellationToken));
+            var sourceText = SourceText.From(await sourceCode.ReadContentAsync(cancellationToken), Encoding.UTF8);
             var identifier = await sourceCode.GetIdentifierAsync(cancellationToken);
             var syntaxTree = CSharpSyntaxTree.ParseText(sourceText, parseOptions, identifier, cancellationToken);
             var localDiagnostics = syntaxTree.GetDiagnostics(cancellationToken).ToArray();
@@ -125,11 +134,12 @@ public static class CSCompiler
         var optimized = (project.PropertyGroup.Optimize ?? true) ? OptimizationLevel.Release : OptimizationLevel.Debug;
         var metadataReferences = referencedAssemblies.Select(CreateFromFile);
         var compilerOptions = new CSharpCompilationOptions(outputType, true, optimizationLevel: optimized, nullableContextOptions: project.PropertyGroup.Nullable ?? NullableContextOptions.Disable);
+        var assemblyName = project.PropertyGroup.AssemblyName ?? projectName;
         var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, metadataReferences, compilerOptions);
 
         using MemoryStream assemblyStream = new();
         using MemoryStream pdbStream = new();
-        var emitOptions = new EmitOptions(includePrivateMembers: true);
+        var emitOptions = new EmitOptions(includePrivateMembers: true, debugInformationFormat: DebugInformationFormat.PortablePdb);
         var emitResult = await Task.Run(() => compilation.Emit(assemblyStream, pdbStream, options: emitOptions, cancellationToken: cancellationToken));
         if (emitResult.Success == false)
         {
@@ -144,10 +154,10 @@ public static class CSCompiler
         }
     }
 
-    public static async ValueTask<string> CompileAsAsync(string assemblyName, IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, CancellationToken cancellationToken = default)
+    public static async ValueTask<string> CompileAsAsync(IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, string projectName, CancellationToken cancellationToken = default)
     {
-        var results = await CompileAsync(assemblyName, sourceCodes, project, projectDirectory, cancellationToken);
-
+        var results = await CompileAsync(sourceCodes, project, projectDirectory, projectName, cancellationToken);
+        var assemblyName = project.PropertyGroup.AssemblyName ?? projectName;
         string outputPath = project.PropertyGroup.ParseOutputPath(projectDirectory);
         string assemblyFileName = Path.Combine(outputPath, assemblyName + ".dll");
         string pdbFileName = Path.Combine(outputPath, assemblyName + ".pdb");

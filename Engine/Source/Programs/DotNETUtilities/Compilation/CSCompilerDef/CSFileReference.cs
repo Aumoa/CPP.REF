@@ -1,0 +1,32 @@
+﻿using System.Security;
+
+namespace AylaEngine;
+
+public record class CSFileReference(string AssemblyName, string HintPath) : CSReference(AssemblyName)
+{
+    public override string GenerateXml()
+    {
+        return $"""
+<Reference Include="{SecurityElement.Escape(Include)}">
+  <HintPath>{SecurityElement.Escape(HintPath)}</HintPath>
+</Reference>
+""";
+    }
+
+    public override string ReferencedAssemblyPath(CSCondition? condition, string projectDirectory, HashSet<string> referencedAssemblies)
+    {
+        if (referencedAssemblies.Contains(AssemblyName))
+        {
+            return string.Empty;
+        }
+
+        if (Path.IsPathRooted(HintPath))
+        {
+            return HintPath;
+        }
+        else
+        {
+            return Path.Combine(projectDirectory, HintPath);
+        }
+    }
+}

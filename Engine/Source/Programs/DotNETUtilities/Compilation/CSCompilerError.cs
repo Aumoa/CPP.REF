@@ -18,7 +18,7 @@ public class CSCompilerError : Exception
     private static string FormatMessage(IEnumerable<Diagnostic> diagnostics)
     {
         List<string> messages = new();
-        foreach (var diag in diagnostics)
+        foreach (var diag in diagnostics.Where(p => p.Severity is DiagnosticSeverity.Warning or DiagnosticSeverity.Error))
         {
             messages.Add(diag.ToString());
         }

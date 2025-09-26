@@ -1,4 +1,5 @@
-﻿using System.Security;
+﻿using System.Reflection;
+using System.Security;
 using System.Xml;
 
 namespace AylaEngine;
@@ -104,6 +105,57 @@ public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSIt
                 };
             }
             return builtItemGroup;
+        }
+    }
+
+    public CSSourceCode GenerateAssemblyAttribute(string? company, string? configuration, string? product, string? title, Version? version)
+    {
+        string frameworkAssemblyQualifiedName;
+        string frameworkDisplayName;
+        var targetFramework = (PropertyGroup.TargetFramework ?? CSTargetFramework.Net0900);
+        
+        switch (Sdk)
+        {
+            case "Microsoft.NET.Sdk":
+                frameworkAssemblyQualifiedName = targetFramework.ToFrameworkAssemblyQualifiedName();
+                frameworkDisplayName = targetFramework.ToFrameworkDisplayName();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(Sdk), Sdk, null);
+        }
+
+        List<string> assemblyAttributes = [];
+        if (company != null)
+        {
+            assemblyAttributes.Add(FormatAssemblyAttribute("AssemblyCompany", company));
+        }
+        if (configuration != null)
+        {
+            assemblyAttributes.Add(FormatAssemblyAttribute("AssemblyConfiguration", configuration));
+        }
+        if (product != null)
+        {
+            assemblyAttributes.Add(FormatAssemblyAttribute("AssemblyProduct", product));
+        }
+        if (title != null)
+        {
+            assemblyAttributes.Add(FormatAssemblyAttribute("AssemblyTitle", title));
+        }
+        if (version != null)
+        {
+            assemblyAttributes.Add(FormatAssemblyAttribute("AssemblyVersion", version.ToString()));
+        }
+
+        string sourceCodeText = $"""
+[assembly: global::System.Runtime.Versioning.TargetFramework("{frameworkAssemblyQualifiedName}", FrameworkDisplayName = "{frameworkDisplayName}")]
+{string.Join('\n', assemblyAttributes)}
+""";
+
+        return CSSourceCode.FromString(".AssemblyAttributes.cs", sourceCodeText);
+
+        string FormatAssemblyAttribute(string name, string value)
+        {
+            return $"[assembly: global::System.Reflection.{name}(\"{value}\")]";
         }
     }
 }

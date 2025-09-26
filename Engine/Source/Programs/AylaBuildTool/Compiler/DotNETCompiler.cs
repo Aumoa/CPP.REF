@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace AylaEngine;
 
@@ -62,29 +63,19 @@ internal class DotNETCompiler
         await m_Access.WaitAsync(cancellationToken);
         try
         {
-            var sourceFiles = GatherSourceCodes(installation, sourceDirectory, assemblyName, group, targetInfo)
-                .Select(CSCompiler.SourceCodeProvider.FromFile);
-
             var config = VSUtility.GetConfigName(targetInfo);
             var platform = VSUtility.GetArchitectureName(targetInfo);
 
-            sourceFiles = sourceFiles
-                .Append(CSharpProject.GenerateAssemblyAttribute(new Version(9, 0)))
-                .Append(CSharpProject.GenerateAssemblyInfo(null, config, null, assemblyName, new Version(1, 0, 0, 0)));
+            var condition = CSCondition.Parse($"$(Configuration)|$(Platform)=='{config}|{platform}'");
+            var projectXml = new XmlDocument();
+            projectXml.Load(projectDescription);
+            var csproj = CSProject.Parse(projectXml.ChildNodes.OfType<XmlElement>().First()).Freeze(condition);
 
-            var condition = CSharpProject.Condition.Parse($"$(Configuration)|$(Platform)=='{config}|{platform}'");
-            var csproj = CSharpProject.Parse(projectDescription).Freeze(condition);
+            var sourceFiles = GatherSourceCodes(installation, sourceDirectory, assemblyName, group, targetInfo)
+                .Select(CSSourceCode.FromFile)
+                .Append(csproj.GenerateAssemblyAttribute(null, config, null, assemblyName, Version.Parse("1.0.0.0")));
 
-            List<string> referencedAssemblies = [];
-            foreach (var referenceBase in csproj.ItemGroup.References ?? [])
-            {
-                referencedAssemblies.Add(referenceBase.ReferencedAssemblyPath(csproj.ItemGroup.Condition, sourceDirectory));
-                Console.WriteLine(referenceBase.ReferencedAssemblyPath(csproj.ItemGroup.Condition, sourceDirectory));
-            }
-
-            var outputDir = group.Output(targetInfo, FolderPolicy.PathType.Current);
-            var outputDll = Path.Combine(outputDir, assemblyName + ".dll");
-            await CSCompiler.CompileToAsync(assemblyName, outputDll, sourceFiles, CSCompiler.GetDefaultAssemblies().Concat(referencedAssemblies), cancellationToken);
+            string outputDll = await CSCompiler.CompileAsAsync(sourceFiles, csproj, Path.GetDirectoryName(projectDescription)!, assemblyName, cancellationToken);
 
             GenerateCache(installation, sourceDirectory, assemblyName, group, targetInfo);
             return outputDll;
