@@ -108,6 +108,49 @@ public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSIt
         }
     }
 
+    public CSSourceCode GenerateGlobals()
+    {
+        List<string> usings = [];
+
+        if (PropertyGroup.ImplicitUsings == true)
+        {
+            usings.Add("global::System");
+            usings.Add("global::System.Collections.Generic");
+            usings.Add("global::System.IO");
+            usings.Add("global::System.Linq");
+            usings.Add("global::System.Net.Http");
+            usings.Add("global::System.Threading");
+            usings.Add("global::System.Threading.Tasks");
+        }
+
+        foreach (var u in ItemGroup.Usings)
+        {
+            if (string.IsNullOrEmpty(u.Alias))
+            {
+                usings.Add($"global::{u.Name}");
+            }
+            else
+            {
+                usings.Add($"{u.Alias} = global::{u.Name}");
+            }
+        }
+
+        string sourceCodeText = $"""
+// Copyright 2020-2025 AylaEngine. All Rights Reserved.
+// This file is auto-generated. Do not edit it manually.
+
+{string.Join('\n', usings.Select(FormatUsing))}
+
+""";
+
+        return CSSourceCode.FromString(".g.cs", sourceCodeText);
+
+        string FormatUsing(string u)
+        {
+            return $"global using {u};";
+        }
+    }
+
     public CSSourceCode GenerateAssemblyAttribute(string? company, string? configuration, string? product, string? title, Version? version)
     {
         string frameworkAssemblyQualifiedName;
@@ -147,8 +190,12 @@ public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSIt
         }
 
         string sourceCodeText = $"""
+// Copyright 2020-2025 AylaEngine. All Rights Reserved.
+// This file is auto-generated. Do not edit it manually.
+
 [assembly: global::System.Runtime.Versioning.TargetFramework("{frameworkAssemblyQualifiedName}", FrameworkDisplayName = "{frameworkDisplayName}")]
 {string.Join('\n', assemblyAttributes)}
+
 """;
 
         return CSSourceCode.FromString(".AssemblyAttributes.cs", sourceCodeText);

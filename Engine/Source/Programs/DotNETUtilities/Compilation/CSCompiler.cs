@@ -16,7 +16,8 @@ public static class CSCompiler
         "System.Private.CoreLib.dll", "System.Runtime.dll", "System.Console.dll", "System.Collections.dll",
         "System.Linq.dll", "System.Threading.dll", "System.IO.dll", "System.Net.Primitives.dll",
         "System.Private.Uri.dll", "System.Collections.Immutable.dll", "System.ObjectModel.dll",
-        "System.Text.RegularExpressions.dll", "System.Private.Xml.dll", "System.Xml.ReaderWriter.dll"
+        "System.Text.RegularExpressions.dll", "System.Private.Xml.dll", "System.Xml.ReaderWriter.dll",
+        "System.Net.Http.dll"
     ];
 
     private static readonly string[] SdkFolders = ["Microsoft.NETCore.App", "Microsoft.AspNetCore.App", "Microsoft.WindowsDesktop.App"];
@@ -118,8 +119,9 @@ public static class CSCompiler
         List<Diagnostic> diagnostics = [];
         var syntaxTrees = await Task.WhenAll(sourceCodes.Select(sourceCode => Task.Run(async () =>
         {
-            var sourceText = SourceText.From(await sourceCode.ReadContentAsync(cancellationToken), Encoding.UTF8);
-            var identifier = await sourceCode.GetIdentifierAsync(cancellationToken);
+            var instantiated = await sourceCode.InstantiateAsync(cancellationToken);
+            var sourceText = SourceText.From(await instantiated.ReadContentAsync(cancellationToken), Encoding.UTF8);
+            var identifier = await instantiated.GetIdentifierAsync(cancellationToken);
             var syntaxTree = CSharpSyntaxTree.ParseText(sourceText, parseOptions, identifier, cancellationToken);
             var localDiagnostics = syntaxTree.GetDiagnostics(cancellationToken).ToArray();
             lock (diagnostics)
@@ -133,7 +135,12 @@ public static class CSCompiler
         var outputType = project.PropertyGroup.OutputType ?? OutputKind.DynamicallyLinkedLibrary;
         var optimized = (project.PropertyGroup.Optimize ?? true) ? OptimizationLevel.Release : OptimizationLevel.Debug;
         var metadataReferences = referencedAssemblies.Select(CreateFromFile);
-        var compilerOptions = new CSharpCompilationOptions(outputType, true, optimizationLevel: optimized, nullableContextOptions: project.PropertyGroup.Nullable ?? NullableContextOptions.Disable);
+        var compilerOptions = new CSharpCompilationOptions(
+            outputKind: outputType,
+            optimizationLevel: optimized,
+            nullableContextOptions: project.PropertyGroup.Nullable ?? NullableContextOptions.Disable,
+            allowUnsafe: project.PropertyGroup.AllowUnsafeBlocks ?? false
+            );
         var assemblyName = project.PropertyGroup.AssemblyName ?? projectName;
         var compilation = CSharpCompilation.Create(assemblyName, syntaxTrees, metadataReferences, compilerOptions);
 
@@ -159,6 +166,7 @@ public static class CSCompiler
         var results = await CompileAsync(sourceCodes, project, projectDirectory, projectName, cancellationToken);
         var assemblyName = project.PropertyGroup.AssemblyName ?? projectName;
         string outputPath = project.PropertyGroup.ParseOutputPath(projectDirectory);
+        Directory.CreateDirectory(outputPath);
         string assemblyFileName = Path.Combine(outputPath, assemblyName + ".dll");
         string pdbFileName = Path.Combine(outputPath, assemblyName + ".pdb");
         await Task.WhenAll(

@@ -17,8 +17,8 @@ public record CSUsing(string Name, string Alias) : CSElement
     public static CSUsing Parse(XmlElement xml)
     {
         var include = xml.GetAttributeNode("Include") ?? throw new FormatException("Missing 'Include' attribute.");
-        var aliasAttr = xml.GetAttributeNode("Alias");
-        var alias = aliasAttr?.Value ?? throw new FormatException("Missing 'Alias' attribute.");
+        var aliasElement = xml.ChildNodes.OfType<XmlElement>().Where(e => e.Name == "Alias").FirstOrDefault();
+        var alias = aliasElement?.InnerText ?? throw new FormatException("Missing 'Alias' attribute.");
         return new CSUsing(include.Value, alias);
     }
 }

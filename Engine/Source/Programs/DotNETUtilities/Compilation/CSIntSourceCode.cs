@@ -20,4 +20,11 @@ public class CSIntSourceCode(string identifier, string sourceCode) : CSSourceCod
     {
         return ValueTask.FromResult(sourceCode);
     }
+
+    public override async ValueTask<CSSourceCode> InstantiateAsync(CancellationToken cancellationToken = default)
+    {
+        var fileName = Path.GetTempFileName() + identifier;
+        await File.WriteAllTextAsync(fileName, sourceCode, cancellationToken);
+        return new CSFileSourceCode(fileName);
+    }
 }

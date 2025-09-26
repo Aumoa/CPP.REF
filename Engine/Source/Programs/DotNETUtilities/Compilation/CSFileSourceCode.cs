@@ -24,4 +24,9 @@ public class CSFileSourceCode : CSSourceCode
     {
         return await File.ReadAllTextAsync(m_FilePath, cancellationToken);
     }
+
+    public override ValueTask<CSSourceCode> InstantiateAsync(CancellationToken cancellationToken = default)
+    {
+        return ValueTask.FromResult<CSSourceCode>(this);
+    }
 }
