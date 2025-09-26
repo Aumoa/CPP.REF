@@ -1,9 +1,38 @@
 ﻿using System.Reflection;
+using Microsoft.CodeAnalysis;
 
 namespace AylaEngine;
 
 internal class Solution
 {
+    private static readonly CSProject ProjectTemplate = new("Microsoft.NET.Sdk",
+        [new CSPropertyGroup(
+            null,
+            OutputKind.DynamicallyLinkedLibrary,
+            CSTargetFramework.Net0900,
+            true,
+            NullableContextOptions.Enable,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [],
+            [],
+            null,
+            null,
+            [],
+            null
+            )],
+        [new CSItemGroup(
+            null,
+            [new CSFileReference("AylaBuildTool", typeof(Solution).Assembly.Location)],
+            []
+            )],
+        null);
+
     public IReadOnlyList<Project> Projects { get; private set; } = null!;
 
     public GroupDescriptor EngineGroup { get; private set; } = null!;
@@ -90,9 +119,29 @@ internal class Solution
                 var assembly = FindCachedAssembly(ruleFileName, out var dllFileName, out var cacheFileName);
                 if (assembly == null)
                 {
-                    await CSCompiler.CompileToAsync(directoryName, dllFileName, ruleFileName, [typeof(ModuleRules).Assembly.Location], cancellationToken: cancellationToken);
-                    File.Copy(ruleFileName, cacheFileName, true);
-                    assembly = await Task.Run(() => Assembly.LoadFile(dllFileName), cancellationToken);
+                    var projectName = Path.GetFileNameWithoutExtension(dllFileName);
+                    var csproj = ProjectTemplate with
+                    {
+                        PropertyGroups = [ProjectTemplate.PropertyGroup with
+                        {
+                            OutputPath = Path.GetDirectoryName(dllFileName),
+                            AssemblyName = projectName
+                        }]
+                    };
+
+                    CSSourceCode[] sourceCodes = [CSSourceCode.FromFile(ruleFileName)];
+
+                    try
+                    {
+                        await CSCompiler.CompileAsAsync(sourceCodes, csproj, currentDir, projectName, cancellationToken);
+                        File.Copy(ruleFileName, cacheFileName, true);
+                        assembly = await Task.Run(() => Assembly.LoadFile(dllFileName), cancellationToken);
+                    }
+                    catch (CSCompilerError e)
+                    {
+                        Console.Error.WriteLine(e.Message);
+                        throw TerminateException.User();
+                    }
                 }
 
                 var ruleType = assembly.GetTypes().First(p => p.Name == directoryName);

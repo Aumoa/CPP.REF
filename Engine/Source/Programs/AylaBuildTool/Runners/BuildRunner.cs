@@ -129,9 +129,9 @@ internal static partial class BuildRunner
 
         await DispatchGenerateHeaderWorkers();
         Dictionary<ModuleProject, int> buildGraph = [];
-        await BuildScriptProjects(buildGraph, targetProjects);
 
         List<ModuleTask> moduleTasks = [];
+        List<ScriptTask> scriptTasks = [];
 
         foreach (var project in targetProjects)
         {
@@ -173,9 +173,17 @@ internal static partial class BuildRunner
             }
 
             moduleTasks.Add(new ModuleTask(installation, resolver, allCompiles.ToArray(), needCompiles.ToArray()));
+            if (resolver.Rules.Script.Enabled)
+            {
+                var scriptTask = new ScriptTask(resolver);
+                if (scriptTask.NeedBuild(buildTarget))
+                {
+                    scriptTasks.Add(new ScriptTask(resolver));
+                }
+            }
         }
 
-        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length) + moduleTasks.Count(p => p.NeedLink(buildTarget));
+        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length) + moduleTasks.Count(p => p.NeedLink(buildTarget)) + scriptTasks.Count();
         log = totalActions switch
         {
             >= 0 and < 10 => 1,
@@ -188,7 +196,8 @@ internal static partial class BuildRunner
 
         DispatchCompileWorkers();
         DispatchLinkWorkers();
-        await Task.WhenAll(moduleTasks.Select(p => p.Task));
+        DispatchScriptCompileWorkers();
+        await Task.WhenAll(moduleTasks.Select(p => p.Task).Concat(scriptTasks.Select(p => p.Task)));
 
         return;
 
@@ -402,41 +411,15 @@ internal static partial class BuildRunner
             Console.WriteLine(" Done.");
         }
 
-        async Task BuildScriptProjects(Dictionary<ModuleProject, int> buildGraph, IEnumerable<ModuleProject> projects)
+        void DispatchScriptCompileWorkers()
         {
-            foreach (var project in projects)
+            foreach (var scriptTask in scriptTasks)
             {
-                BuildGraph(project, 0);
-            }
-
-            foreach (var target in buildGraph.Where(p => p.Value == 0).Select(p => p.Key))
-            {
-                await DotNET.BuildAsync(target.ScriptProjectFileName, buildTarget, cancellationToken);
-            }
-
-            void BuildGraph(ModuleProject target, int depth)
-            {
-                var rule = target.GetRule(buildTarget);
-                if (rule.Script.Enabled)
+                scriptTask.BuildAsync(scriptTasks, buildTarget, cancellationToken).ContinueWith(r =>
                 {
-                    if (buildGraph.TryGetValue(target, out var existingDepth))
-                    {
-                        if (depth > existingDepth)
-                        {
-                            buildGraph[target] = depth;
-                        }
-                    }
-                    else
-                    {
-                        buildGraph.Add(target, depth);
-                    }
-                }
-
-                var children = solution.FindDepends(target.GetResolver(buildTarget).DependencyModuleNames).OfType<ModuleProject>();
-                foreach (var child in children)
-                {
-                    BuildGraph(child, depth + 1);
-                }
+                    var output = r.Result;
+                    Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                });
             }
         }
 
