@@ -84,7 +84,7 @@ internal static partial class BuildRunner
                     .Append(csproj.GenerateGlobals());
 
                 var outputFileName = await CSCompiler.CompileAsAsync(sourceCodes, csproj, resolver.Project.ScriptSourceDirectory, resolver.Name + ".Script", cancellationToken);
-                Terminal.Log[] logs = [new() { Verbosity = Terminal.Verbose.Info, Value = outputFileName }];
+                Terminal.Log[] logs = [new() { Verbosity = Terminal.Verbose.Info, Value = "Script: " + outputFileName }];
                 GenerateCache(targetInfo);
                 m_CompletionSource.SetResult();
                 return new Terminal.Output
