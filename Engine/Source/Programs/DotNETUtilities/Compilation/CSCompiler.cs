@@ -17,7 +17,7 @@ public static class CSCompiler
         "System.Linq.dll", "System.Threading.dll", "System.IO.dll", "System.Net.Primitives.dll",
         "System.Private.Uri.dll", "System.Collections.Immutable.dll", "System.ObjectModel.dll",
         "System.Text.RegularExpressions.dll", "System.Private.Xml.dll", "System.Xml.ReaderWriter.dll",
-        "System.Net.Http.dll"
+        "System.Net.Http.dll", "System.Threading.Channels.dll"
     ];
 
     private static readonly string[] SdkFolders = ["Microsoft.NETCore.App", "Microsoft.AspNetCore.App", "Microsoft.WindowsDesktop.App"];
@@ -110,9 +110,10 @@ public static class CSCompiler
         var langVersion = GetDefaultLangVersion(project);
         var referencedAssemblies = GetSharedLibraries(project).ToArray();
         referencedAssemblies = referencedAssemblies.Concat(GetReferencedLibraries(project, projectDirectory, referencedAssemblies)).ToArray();
-        if (referencedAssemblies.Any(fp => File.Exists(fp) == false))
+        var notExists = referencedAssemblies.Where(fp => File.Exists(fp) == false).ToArray();
+        if (notExists.Length > 0)
         {
-            throw new CSCompilerError("One or more required referenced assemblies are missing.");
+            throw new CSCompilerError($"One or more required referenced assemblies({string.Join(", ", notExists)}) are missing.");
         }
 
         CSharpParseOptions parseOptions = new(langVersion);

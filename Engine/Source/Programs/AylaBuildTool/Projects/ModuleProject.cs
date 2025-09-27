@@ -1,8 +1,10 @@
-﻿using YamlDotNet.Serialization;
+﻿using System.Data;
+using Microsoft.CodeAnalysis;
+using YamlDotNet.Serialization;
 
 namespace AylaEngine;
 
-internal class ModuleProject(Solution solution, string name, GroupDescriptor descriptor, string sourceDirectory, Type ruleType, string ruleFilePath, ModuleProject.ModuleDeclaration declaration) : Project(name, descriptor, declaration)
+internal class ModuleProject(Solution Solution, string name, GroupDescriptor descriptor, string sourceDirectory, Type ruleType, string ruleFilePath, ModuleProject.ModuleDeclaration declaration) : Project(name, descriptor, declaration)
 {
     public record ModuleDeclaration : Project.Declaration
     {
@@ -20,7 +22,6 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
         };
     }
 
-    public readonly Solution Solution = solution;
     public readonly Type RuleType = ruleType;
     public readonly string RuleFilePath = ruleFilePath;
     public readonly string SourceDirectory = sourceDirectory;
@@ -115,4 +116,104 @@ internal class ModuleProject(Solution solution, string name, GroupDescriptor des
     public string ScriptAssemblyName => Name + ".Script";
 
     public string ScriptProjectFileName => Path.Combine(ScriptSourceDirectory, ScriptAssemblyName + ".csproj");
+
+    private CSProject? m_ScriptProject;
+
+    public CSProject ScriptProject
+    {
+        get
+        {
+            if (m_ScriptProject == null)
+            {
+                List<CSPropertyGroup> propertyGroups = [];
+                List<CSItemGroup> itemGroups = [];
+
+                propertyGroups.Add(new CSPropertyGroup(
+                    null,
+                    OutputKind.DynamicallyLinkedLibrary,
+                    CSTargetFramework.Net0900,
+                    true,
+                    NullableContextOptions.Enable,
+                    ScriptAssemblyName,
+                    Group.IsEngine ? "Ayla" : Group.Name,
+                    true,
+                    true,
+                    false,
+                    false,
+                    false,
+                    TargetInfo.GetAllTargets().Select(t => VSUtility.GetConfigName(t)).Distinct().ToArray(),
+                    TargetInfo.GetAllTargets().Select(t => t.Platform.Name).Distinct().ToArray(),
+                    null,
+                    null,
+                    [],
+                    null
+                ));
+
+                itemGroups.Add(new CSItemGroup(
+                    null,
+                    [],
+                    [new CSUsing("Ayla.Object", "Object")])
+                    );
+
+                foreach (var targetInfo in TargetInfo.GetAllTargets())
+                {
+                    var outputPath = Group.Output(targetInfo, FolderPolicy.PathType.Windows);
+                    var optimized = targetInfo.Config.IsOptimized();
+                    List<string> defines = ["$(DefineConstants)"];
+                    if (targetInfo.Editor)
+                    {
+                        defines.Add("WITH_EDITOR");
+                    }
+
+                    var condition = CSCondition.Parse($"$(Configuration)|$(Platform)'=='{targetInfo.Config}|{targetInfo.Platform.Name}");
+
+                    propertyGroups.Add(new CSPropertyGroup(
+                        condition,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        [],
+                        [],
+                        outputPath,
+                        optimized,
+                        [.. defines],
+                        VSUtility.GetArchitectureName(targetInfo.Platform.Architecture)
+                        ));
+
+                    var rule = GetRule(targetInfo);
+                    var resolver = new ModuleRulesResolver(targetInfo, Solution, rule, Group);
+                    var referencedProjects = resolver.DependencyModuleNames.Select(p =>
+                    {
+                        var dependProject = (ModuleProject)Solution.FindProject(p)!;
+                        if (dependProject.GetRule(targetInfo).Script.Enabled)
+                        {
+                            return new CSProjectReference(dependProject.ScriptProjectFileName, false);
+                        }
+                        else
+                        {
+                            return null!;
+                        }
+                    }).Where(p => p != null);
+
+                    itemGroups.Add(new CSItemGroup(
+                        condition,
+                        [.. referencedProjects],
+                        []
+                        ));
+                }
+
+                m_ScriptProject = new CSProject("Microsoft.NET.Sdk", [.. propertyGroups], [.. itemGroups], null);
+            }
+
+            return m_ScriptProject;
+        }
+    }
 }

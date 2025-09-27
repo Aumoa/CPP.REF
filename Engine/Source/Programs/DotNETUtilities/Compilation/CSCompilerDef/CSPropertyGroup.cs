@@ -118,7 +118,7 @@ public record CSPropertyGroup(
             attributes.Add($"  <PlatformTarget>{SecurityElement.Escape(PlatformTarget)}</PlatformTarget>");
         }
 
-        string conditionStr = Condition != null ? $" Condition=\"{SecurityElement.Escape(Condition.ToString())}\"" : "";
+        string conditionStr = Condition != null ? $" Condition=\"{Condition.ToString()}\"" : "";
         return $"""
 <PropertyGroup{conditionStr}>
 {string.Join("\n", attributes)}

@@ -51,6 +51,10 @@ internal class VSSolutionGenerator : Generator
         foreach (var project in solution.Projects.OfType<ModuleProject>())
         {
             tasks.Add(VSCppProjectGenerator.GenerateAsync(solution, vcxprojPaths, project, cancellationToken));
+            if (project.IsScriptable())
+            {
+                tasks.Add(VSScriptProjectGenerator.GenerateAsync(solution, project, cancellationToken).AsTask());
+            }
         }
 
         await Task.WhenAll(tasks);

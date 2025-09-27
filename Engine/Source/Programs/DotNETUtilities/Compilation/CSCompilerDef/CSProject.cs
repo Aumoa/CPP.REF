@@ -11,7 +11,7 @@ public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSIt
         var children = PropertyGroups.Cast<CSElement>().Concat(ItemGroups.Cast<CSElement>()).ToArray();
         var childrenXml = IndentLines(string.Join("\n\n", children.Select(child => child.GenerateXml())));
         return $"""
-<Project Sdk=\"{SecurityElement.Escape(Sdk)}\">
+<Project Sdk="{SecurityElement.Escape(Sdk)}">
             
 {childrenXml}
 

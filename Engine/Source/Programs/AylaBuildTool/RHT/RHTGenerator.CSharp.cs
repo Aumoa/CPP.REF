@@ -117,17 +117,60 @@ using System.Runtime.InteropServices;
                         sourceCode += IndentedLine($"protected unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(ctor_{constructor.Name}__CallInjected({callArguments}))");
                         sourceCode += IndentedLine($"{{");
                         sourceCode += IndentedLine($"}}");
-                        sourceCode += IndentedLine($"");
                     }
 
+                    sourceCode += IndentedLine($"");
+
+                    GenerateFunctionBodies(true);
+                });
+                sourceCode += IndentedLine($"}}");
+                sourceCode += IndentedLine($"");
+
+                sourceCode += IndentedLine($"public partial class {@class.Name} : {@class.Name}__Injected");
+                sourceCode += IndentedLine($"{{");
+
+                Indented(() =>
+                {
+sourceCode += "#pragma warning disable CS8618\n";
+
+                    sourceCode += IndentedLine($"protected {@class.Name}(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
+                    sourceCode += IndentedLine($"{{");
+                    Indented(() =>
+                    {
+                        sourceCode += IndentedLine($"OnConstructed(locker);");
+                    });
+                    sourceCode += IndentedLine($"}}");
+                    sourceCode += "#pragma warning restore CS8618\n";
+                    sourceCode += IndentedLine($"partial void OnConstructed(global::Ayla.ObjectReferenceLocker locker);");
+                    sourceCode += IndentedLine($"");
+
+                    GenerateFunctionBodies(false);
+                });
+
+                sourceCode += IndentedLine($"}}");
+
+                if (@class.Namespace.Names.Length > 0)
+                {
+                    --indent;
+                    sourceCode += IndentedLine($"}}");
+                }
+
+                void GenerateFunctionBodies(bool acceptVirtual)
+                {
                     for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
                         var function = aclass.Functions[i];
+                        bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
+
+                        if (isVirtual != acceptVirtual)
+                        {
+                            continue;
+                        }
+
                         var access = function.Access.ToString().ToLower();
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var parameterTypes = function.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
                         bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
-                        bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
                         var parameters = new ParameterCollection();
 
                         for (int j = 0; j < parameterTypes.Length; ++j)
@@ -194,35 +237,6 @@ using System.Runtime.InteropServices;
                         }
                         sourceCode += IndentedLine($"");
                     }
-                });
-                sourceCode += IndentedLine($"}}");
-                sourceCode += IndentedLine($"");
-
-                sourceCode += IndentedLine($"public partial class {@class.Name} : {@class.Name}__Injected");
-                sourceCode += IndentedLine($"{{");
-
-                Indented(() =>
-                {
-sourceCode += "#pragma warning disable CS8618\n";
-
-                    sourceCode += IndentedLine($"protected {@class.Name}(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
-                    sourceCode += IndentedLine($"{{");
-                    Indented(() =>
-                    {
-                        sourceCode += IndentedLine($"OnConstructed();");
-                    });
-                    sourceCode += IndentedLine($"}}");
-                    sourceCode += IndentedLine($"partial void OnConstructed();");
-
-sourceCode += "#pragma warning restore CS8618\n";
-                });
-
-                sourceCode += IndentedLine($"}}");
-
-                if (@class.Namespace.Names.Length > 0)
-                {
-                    --indent;
-                    sourceCode += IndentedLine($"}}");
                 }
             }
         }
