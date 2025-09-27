@@ -117,11 +117,11 @@ using System.Runtime.InteropServices;
                         sourceCode += IndentedLine($"protected unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(ctor_{constructor.Name}__CallInjected({callArguments}))");
                         sourceCode += IndentedLine($"{{");
                         sourceCode += IndentedLine($"}}");
-
-                        GenerateFunctionBodies(true);
                     }
 
                     sourceCode += IndentedLine($"");
+
+                    GenerateFunctionBodies(true);
                 });
                 sourceCode += IndentedLine($"}}");
                 sourceCode += IndentedLine($"");
