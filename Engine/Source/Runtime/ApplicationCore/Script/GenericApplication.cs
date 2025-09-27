@@ -4,7 +4,7 @@ public partial class GenericApplication
 {
     private static GenericApplication? s_App;
 
-    partial void OnConstructed()
+    partial void OnConstructed(global::Ayla.ObjectReferenceLocker locker)
     {
         s_App = this;
     }
