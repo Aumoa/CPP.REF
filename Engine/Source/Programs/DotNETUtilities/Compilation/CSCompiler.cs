@@ -17,7 +17,7 @@ public static class CSCompiler
         "System.Linq.dll", "System.Threading.dll", "System.IO.dll", "System.Net.Primitives.dll",
         "System.Private.Uri.dll", "System.Collections.Immutable.dll", "System.ObjectModel.dll",
         "System.Text.RegularExpressions.dll", "System.Private.Xml.dll", "System.Xml.ReaderWriter.dll",
-        "System.Net.Http.dll"
+        "System.Net.Http.dll", "System.Threading.Channels.dll"
     ];
 
     private static readonly string[] SdkFolders = ["Microsoft.NETCore.App", "Microsoft.AspNetCore.App", "Microsoft.WindowsDesktop.App"];
