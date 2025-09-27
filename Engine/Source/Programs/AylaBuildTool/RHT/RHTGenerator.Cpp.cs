@@ -15,7 +15,8 @@ internal partial class RHTGenerator
             foreach (var type in aclass
                 .Properties.Select(p => p.Variable.TypeName)
                 .Concat(aclass.Functions.Select(f => f.ReturnType))
-                .Concat(aclass.Functions.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName).Append(f.ReturnType))))
+                .Concat(aclass.Functions.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName)))
+                .Concat(aclass.Constructors.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName))))
             {
                 var typeName = typeNames.FindType(type, aclass.Class);
                 HandleElementType(typeName);
