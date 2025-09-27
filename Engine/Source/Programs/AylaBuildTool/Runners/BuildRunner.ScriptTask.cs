@@ -51,13 +51,22 @@ internal static partial class BuildRunner
         {
             try
             {
-                foreach (var name in resolver.DependencyModuleNames)
+                try
                 {
-                    var task = scriptTasks.Where(p => p.Resolver.Name == name).FirstOrDefault();
-                    if (task != null)
+                    foreach (var name in resolver.DependencyModuleNames)
                     {
-                        await task.Task;
+                        var task = scriptTasks.Where(p => p.Resolver.Name == name).FirstOrDefault();
+                        if (task != null)
+                        {
+                            await task.Task;
+                        }
                     }
+                }
+                catch (CSCompilerError)
+                {
+                    // ignore compilation error of dependency module
+                    m_CompletionSource.SetCanceled();
+                    throw new OperationCanceledException();
                 }
 
                 var csprojXml = new XmlDocument();
