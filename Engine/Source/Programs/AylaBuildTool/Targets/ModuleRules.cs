@@ -43,7 +43,9 @@ public class ModuleRules
 
     public ModuleType Type { get; protected init; } = ModuleType.Library;
 
-    public string Name => GetType().Name;
+    public string Name => GetType().Name.Replace('_', '.');
+
+    public string SafeName => Name.Replace('.', '_');
 
     public ScriptRule Script { get; } = new();
 

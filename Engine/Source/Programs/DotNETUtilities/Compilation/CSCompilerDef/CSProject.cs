@@ -6,10 +6,10 @@ namespace AylaEngine;
 
 public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSItemGroup[] ItemGroups, CSCondition? Condition) : CSElement
 {
-    public override string GenerateXml()
+    public override string GenerateXml(string? csprojPath)
     {
         var children = PropertyGroups.Cast<CSElement>().Concat(ItemGroups.Cast<CSElement>()).ToArray();
-        var childrenXml = IndentLines(string.Join("\n\n", children.Select(child => child.GenerateXml())));
+        var childrenXml = IndentLines(string.Join("\n\n", children.Select(child => child.GenerateXml(csprojPath))));
         return $"""
 <Project Sdk="{SecurityElement.Escape(Sdk)}">
             
@@ -95,7 +95,7 @@ public record class CSProject(string Sdk, CSPropertyGroup[] PropertyGroups, CSIt
     {
         get
         {
-            CSItemGroup builtItemGroup = new CSItemGroup(null, [], []);
+            CSItemGroup builtItemGroup = new CSItemGroup(null, [], [], []);
             foreach (var ig in ItemGroups)
             {
                 builtItemGroup = builtItemGroup with

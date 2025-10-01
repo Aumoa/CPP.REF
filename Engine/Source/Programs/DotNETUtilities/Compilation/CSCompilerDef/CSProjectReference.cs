@@ -5,7 +5,7 @@ namespace AylaEngine;
 
 public record class CSProjectReference(string Include, bool? Private) : CSReference(Include)
 {
-    public override string GenerateXml()
+    public override string GenerateXml(string? csprojPath)
     {
         if (Private.HasValue)
         {

@@ -29,6 +29,7 @@ internal class Solution
         [new CSItemGroup(
             null,
             [new CSFileReference("AylaBuildTool", typeof(Solution).Assembly.Location)],
+            [],
             []
             )],
         null);
@@ -144,7 +145,8 @@ internal class Solution
                     }
                 }
 
-                var ruleType = assembly.GetTypes().First(p => p.Name == directoryName);
+                var className = directoryName.Replace('.', '_');
+                var ruleType = assembly.GetTypes().First(p => p.Name == className);
                 ModuleProject.ModuleDeclaration declaration = await ConfigureModuleDeclarationAsync(ruleFileName);
 
                 lock (results)
@@ -166,12 +168,12 @@ internal class Solution
 
             Assembly? FindCachedAssembly(string ruleFileName, out string dllFileName, out string cacheFileName)
             {
-                var fileName = Path.GetFileName(ruleFileName);
+                var fileName = Path.GetFileName(ruleFileName).Replace('.', '_');
                 var dirName = Path.Combine(descriptor.IntermediateDirectory, "Rules");
                 Directory.CreateDirectory(dirName);
 
-                dllFileName = Path.Combine(dirName, fileName + ".dll");
-                cacheFileName = Path.Combine(dirName, fileName + ".cache");
+                dllFileName = Path.GetFullPath(Path.Combine(dirName, fileName + ".dll"));
+                cacheFileName = Path.GetFullPath(Path.Combine(dirName, fileName + ".cache"));
 
                 if (File.Exists(cacheFileName) == false)
                 {
