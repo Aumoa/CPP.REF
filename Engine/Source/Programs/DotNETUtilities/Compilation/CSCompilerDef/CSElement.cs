@@ -4,7 +4,7 @@ namespace AylaEngine;
 
 public abstract record CSElement
 {
-    public abstract string GenerateXml();
+    public abstract string GenerateXml(string? csprojPath);
 
     protected static string IndentLines(string s)
     {

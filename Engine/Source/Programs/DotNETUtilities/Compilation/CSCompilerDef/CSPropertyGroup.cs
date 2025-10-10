@@ -25,7 +25,7 @@ public record CSPropertyGroup(
     string? PlatformTarget
     ) : CSElement
 {
-    public override string GenerateXml()
+    public override string GenerateXml(string? csprojPath)
     {
         List<string> attributes = [];
         if (OutputType.HasValue)

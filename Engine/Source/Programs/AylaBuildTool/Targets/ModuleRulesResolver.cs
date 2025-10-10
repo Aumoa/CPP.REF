@@ -7,6 +7,12 @@ internal class ModuleRulesResolver
     public ModuleRulesResolver(ITargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
     {
         var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
+        if (targetProject == null)
+        {
+            Console.Error.WriteLine("BuildTool Error: The specified project could not be found. Please check the project name and search method.");
+            throw TerminateException.Internal();
+        }
+
         m_TargetInfo = targetInfo;
         Project = targetProject;
         Rules = rules;
@@ -84,11 +90,11 @@ internal class ModuleRulesResolver
         if (isPrimary)
         {
             deps = deps.Concat(WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames));
-            additionalMacros.Add(rules.Name.ToUpper() + "_API=PLATFORM_SHARED_EXPORT");
+            additionalMacros.Add(rules.SafeName.ToUpper() + "_API=PLATFORM_SHARED_EXPORT");
         }
         else
         {
-            additionalMacros.Add(rules.Name.ToUpper() + "_API=PLATFORM_SHARED_IMPORT");
+            additionalMacros.Add(rules.SafeName.ToUpper() + "_API=PLATFORM_SHARED_IMPORT");
         }
 
         foreach (var dep in deps)

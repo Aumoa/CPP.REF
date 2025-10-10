@@ -152,8 +152,9 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
                 itemGroups.Add(new CSItemGroup(
                     null,
                     [],
-                    [new CSUsing("Ayla.Object", "Object")])
-                    );
+                    [new CSUsing("Ayla.Object", "Object")],
+                    [new CSRemoveItem("**\\*.meta")]
+                    ));
 
                 foreach (var targetInfo in TargetInfo.GetAllTargets())
                 {
@@ -165,7 +166,7 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
                         defines.Add("WITH_EDITOR");
                     }
 
-                    var condition = CSCondition.Parse($"$(Configuration)|$(Platform)'=='{targetInfo.Config}|{targetInfo.Platform.Name}");
+                    var condition = CSCondition.Parse($"$(Configuration)|$(Platform)'=='{VSUtility.GetConfigName(targetInfo)}|{targetInfo.Platform.Name}");
 
                     propertyGroups.Add(new CSPropertyGroup(
                         condition,
@@ -206,6 +207,7 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
                     itemGroups.Add(new CSItemGroup(
                         condition,
                         [.. referencedProjects],
+                        [],
                         []
                         ));
                 }

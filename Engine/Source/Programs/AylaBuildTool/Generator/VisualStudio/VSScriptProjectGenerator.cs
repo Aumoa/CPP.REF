@@ -8,7 +8,8 @@ internal static class VSScriptProjectGenerator
 
         Directory.CreateDirectory(Path.GetDirectoryName(project.ScriptProjectFileName)!);
 
-        string xml = project.ScriptProject.GenerateXml();
+        var csprojPath = Path.GetDirectoryName(project.ScriptProjectFileName);
+        string xml = project.ScriptProject.GenerateXml(csprojPath);
         await File.WriteAllTextAsync(project.ScriptProjectFileName, xml, cancellationToken);
     }
 }

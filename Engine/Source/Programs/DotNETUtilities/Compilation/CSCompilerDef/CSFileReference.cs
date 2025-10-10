@@ -4,7 +4,7 @@ namespace AylaEngine;
 
 public record class CSFileReference(string AssemblyName, string HintPath) : CSReference(AssemblyName)
 {
-    public override string GenerateXml()
+    public override string GenerateXml(string? csprojPath)
     {
         return $"""
 <Reference Include="{SecurityElement.Escape(Include)}">

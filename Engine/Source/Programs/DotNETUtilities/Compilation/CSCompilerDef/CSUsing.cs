@@ -5,7 +5,7 @@ namespace AylaEngine;
 
 public record CSUsing(string Name, string Alias) : CSElement
 {
-    public override string GenerateXml()
+    public override string GenerateXml(string? csprojPath)
     {
         return $"""
 <Using Include="{SecurityElement.Escape(Name)}">
