@@ -20,7 +20,11 @@ public static class CSCompiler
         "System.Net.Http.dll", "System.Threading.Channels.dll"
     ];
 
-    private static readonly string[] SdkFolders = ["Microsoft.NETCore.App", "Microsoft.AspNetCore.App", "Microsoft.WindowsDesktop.App"];
+    private static readonly string[] SdkFolders =
+    [
+        "Microsoft.NETCore.App",
+        "Microsoft.AspNetCore.App"
+    ];
 
     private static readonly Version Net0900 = new(9, 0);
 
