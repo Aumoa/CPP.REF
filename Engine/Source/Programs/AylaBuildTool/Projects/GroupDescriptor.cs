@@ -21,7 +21,7 @@ internal record GroupDescriptor
         return new GroupDescriptor
         {
             RootDirectory = rootPath,
-            Name = Path.GetFileName(rootPath),
+            Name = Path.GetFileName(Path.GetFullPath(rootPath)),
             IsEngine = isEngine,
             SourceDirectory = Path.Combine(rootPath, "Source"),
             IntermediateDirectory = Path.Combine(rootPath, "Intermediate"),
