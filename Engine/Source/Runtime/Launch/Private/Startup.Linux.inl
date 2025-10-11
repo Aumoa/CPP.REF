@@ -12,14 +12,12 @@
 int main(int argc, char* argv[])
 {
 	using namespace ::Ayla;
-	DynamicLibrary apiSet(TEXT("LinuxAPI"));
 	std::vector<String> args{ (size_t)argc };
 	for (int i = 0; i < argc; ++i)
 	{
 		args[i] = String::FromLiteral(std::string_view(argv[i]));
 	}
-
-	int32 exitCode = Launch::Main(std::make_unique<CommandLineParser>(std::move(args)), apiSet);
+	int32 exitCode = Launch::Main(std::make_unique<CommandLineParser>(std::move(args)), TEXT("LinuxAPI"));
 	return exitCode;
 }
 

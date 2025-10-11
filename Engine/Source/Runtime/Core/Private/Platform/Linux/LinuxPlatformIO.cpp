@@ -231,7 +231,7 @@ namespace Ayla
         return DispatchQueuedCompletionStatus(Handle, TimeSpan::FromMilliseconds(0));
     }
 
-    void LinuxPlatformIO::QueueInterruptSignal(void* handle) noexcept
+    void LinuxPlatformIO::QueueInterruptSignal(void* handle, int32 size) noexcept
     {
         auto iocp = reinterpret_cast<IOCompletionPort*>(handle);
         iocp->QueueInterruptSignal();

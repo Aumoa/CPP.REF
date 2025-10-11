@@ -23,7 +23,7 @@ internal class GccCompiler : CppCompiler
 
         var compileCommands = new StringBuilder();
 
-        AddCompilerCommands("-std=c++23", "-g", "-fPIC", "-msse");
+        AddCompilerCommands("-std=c++23", "-g", "-fPIC", "-msse", "-Wno-invalid-offsetof");
 
         switch (m_TargetInfo.Config)
         {

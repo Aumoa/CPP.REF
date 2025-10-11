@@ -29,7 +29,7 @@ namespace Ayla
         LinuxApplication();
         virtual ~LinuxApplication() noexcept override;
 
-        virtual std::shared_ptr<GenericActivity> CreateMainActivity() override;
+        virtual std::shared_ptr<GenericActivity> CreateMainActivity_Implementation() override;
         virtual std::shared_ptr<GenericWindow> MakeWindow(const GenericWindowDefinition& winDef) override;
         virtual Vector2N GetScreenResolution() override;
         virtual void PumpMessages(std::vector<GenericPlatformInputEvent>& outInputEvents) override;

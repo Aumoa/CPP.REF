@@ -41,6 +41,12 @@ namespace Ayla
 
 #if PLATFORM_WINDOWS
 		String coreclr = TEXT("C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App");
+#elif PLATFORM_LINUX
+		String coreclr = TEXT("/usr/lib/dotnet/shared/Microsoft.NETCore.App");
+#else
+#error TODO: Add other platform support.
+#endif
+
 		std::vector<Version> versions;
 		for (auto& versionDirectory : Directory::GetDirectories(coreclr))
 		{
@@ -55,11 +61,8 @@ namespace Ayla
 		{
 			throw InvalidOperationException(TEXT("No suitable CoreCLR version found."));
 		}
-		std::ranges::sort(versions, std::greater<>());
+		std::sort(versions.begin(), versions.end(), std::greater<>());
 		coreclr = Path::Combine(coreclr, versions.front().ToString(), TEXT("coreclr"));
-#else
-#error TODO: Add other platform support.
-#endif
 
 		m_Hosting = std::make_unique<DynamicLibrary>(coreclr);
 		if (m_Hosting->IsValid() == false)

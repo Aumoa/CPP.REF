@@ -207,6 +207,46 @@ internal partial class RHTGenerator
                 WriteIndentedLine($"}}");
                 WriteIndentedLine($"");
             }
+
+            if (syntax is SAEnum aenum)
+            {
+                string cppnamespace = string.Join("__", aenum.Namespaces.Select(n => n.Name));
+                string fullname = "::" + string.Join("::", aenum.Namespaces.Select(p => p.Name).Append(aenum.Name));
+                string functionName = $"{cppnamespace.Replace("::", "__")}__{aenum.Name}__ToString";
+
+                WriteIndentedLine($"extern \"C\"");
+                WriteIndentedLine($"{{");
+                Indented(() =>
+                {
+                    WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::String {functionName}({fullname} value)");
+                    WriteIndentedLine($"{{");
+                    Indented(() =>
+                    {
+                        WriteIndentedLine($"switch (value)");
+                        WriteIndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            foreach (var define in aenum.Defines)
+                            {
+                                WriteIndentedLine($"case {fullname}::{define.Name}:");
+                                Indented(() =>
+                                {
+                                    WriteIndentedLine($"return TEXT(\"{define.Name}\");");
+                                });
+                            }
+
+                            WriteIndentedLine($"default:");
+                            Indented(() =>
+                            {
+                                WriteIndentedLine($"return ::Ayla::String::Format(TEXT(\"{aenum.Name}({{}})\"), (int)value);");
+                            });
+                        });
+                        WriteIndentedLine($"}}");
+                    });
+                    WriteIndentedLine($"}}");
+                });
+                WriteIndentedLine($"}}");
+            }
         }
 
         return sourceCodeText;

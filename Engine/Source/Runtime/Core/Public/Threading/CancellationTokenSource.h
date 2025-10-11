@@ -9,6 +9,8 @@
 
 namespace Ayla
 {
+	class CancellationToken;
+
 	class CORE_API CancellationTokenSource
 	{
 		friend class CancellationToken;

@@ -14,7 +14,7 @@ internal partial class RHTGenerator
 
 #pragma once
 
-#include "Reflection/ReflectionMacros.h"
+#include "CoreMinimal.h"
 
 #undef GENERATED_BODY__FILE_ID__
 #define GENERATED_BODY__FILE_ID__ {m_FileId}
@@ -223,6 +223,7 @@ internal partial class RHTGenerator
             {
                 string cppnamespace = string.Join("::", aenum.Namespaces.Select(p => p.Name));
                 string fullname = "::" + string.Join("::", aenum.Namespaces.Select(p => p.Name).Append(aenum.Name));
+                string functionName = $"{cppnamespace.Replace("::", "__")}__{aenum.Name}__ToString";
 
                 headerText += Indented_Line($"namespace {cppnamespace}");
                 headerText += Indented_Line($"{{");
@@ -232,44 +233,30 @@ internal partial class RHTGenerator
                 });
                 headerText += Indented_Line($"}}");
                 headerText += Indented_Line($"");
-                (string, string, string)[] tss = [("char", "string", ""), ("wchar_t", "wstring", "L")];
-                foreach (var (tch, twstr, tl) in tss)
+                headerText += Indented_Line($"extern \"C\"");
+                headerText += Indented_Line($"{{");
+                Indented(() =>
                 {
-                    headerText += Indented_Line($"template<>");
-                    headerText += Indented_Line($"struct ::std::formatter<{fullname}, {tch}> : public ::std::formatter<::Ayla::String, {tch}>");
+                    headerText += Indented_Line($"PLATFORM_SHARED_EXPORT ::Ayla::String {functionName}({fullname} value);");
+                });
+                headerText += Indented_Line($"}}");
+                headerText += Indented_Line($"");
+
+                headerText += Indented_Line($"template<class TChar> requires (::std::same_as<TChar, char> || ::std::same_as<TChar, wchar_t>)");
+                headerText += Indented_Line($"struct std::formatter<{fullname}, TChar> : public ::std::formatter<::Ayla::String, TChar>");
+                headerText += Indented_Line($"{{");
+                Indented(() =>
+                {
+                    headerText += Indented_Line($"template<class TFormatContext>");
+                    headerText += Indented_Line($"auto format({fullname} value, TFormatContext& ctx) const");
                     headerText += Indented_Line($"{{");
                     Indented(() =>
                     {
-                        headerText += Indented_Line($"template<class TFormatContext>");
-                        headerText += Indented_Line($"auto format({fullname} value, TFormatContext& ctx) const");
-                        headerText += Indented_Line($"{{");
-                        Indented(() =>
-                        {
-                            headerText += Indented_Line($"switch (value)");
-                            headerText += Indented_Line($"{{");
-                            Indented(() =>
-                            {
-                                foreach (var define in aenum.Defines)
-                                {
-                                    headerText += Indented_Line($"case {fullname}::{define.Name}:");
-                                    Indented(() =>
-                                    {
-                                        headerText += Indented_Line($"return ::std::formatter<::Ayla::String, {tch}>::format(TEXT(\"{define.Name}\"), ctx);");
-                                    });
-                                }
-
-                                headerText += Indented_Line($"default:");
-                                Indented(() =>
-                                {
-                                    headerText += Indented_Line($"return ::std::formatter<::Ayla::String, {tch}>::format(::Ayla::String::Format(TEXT(\"({{}}){{}}\"), TEXT(\"{aenum.Name}\"), (int)value), ctx);");
-                                });
-                            });
-                            headerText += Indented_Line($"}}");
-                        });
-                        headerText += Indented_Line($"}}");
+                        headerText += Indented_Line($"return ::std::formatter<::Ayla::String, TChar>::format({functionName}(value), ctx);");
                     });
-                    headerText += Indented_Line($"}};");
-                }
+                    headerText += Indented_Line($"}}");
+                });
+                headerText += Indented_Line($"}};");
             }
         }
 

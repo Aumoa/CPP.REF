@@ -26,16 +26,16 @@ namespace Ayla
 	{
 	}
 
-	void LinuxActivity::BeforeInitialize()
+	void LinuxActivity::BeforeInitialize_Implementation()
 	{
 	}
 
-	void LinuxActivity::AfterInitialize()
+	void LinuxActivity::AfterInitialize_Implementation()
 	{
 		m_MainWindow->Show();
 	}
 
-	std::shared_ptr<GenericWindow> LinuxActivity::GetMainWindow() const
+	std::shared_ptr<GenericWindow> LinuxActivity::GetMainWindow_Implementation() const
 	{
 		return m_MainWindow;
 	}

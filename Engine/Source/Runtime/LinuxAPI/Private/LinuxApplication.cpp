@@ -24,7 +24,7 @@ namespace Ayla
         m_Display = nullptr;
     }
 
-    std::shared_ptr<GenericActivity> LinuxApplication::CreateMainActivity()
+    std::shared_ptr<GenericActivity> LinuxApplication::CreateMainActivity_Implementation()
     {
         return std::make_shared<LinuxActivity>();
     }
