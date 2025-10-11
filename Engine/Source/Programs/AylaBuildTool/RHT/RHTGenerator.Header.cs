@@ -233,13 +233,7 @@ internal partial class RHTGenerator
                 });
                 headerText += Indented_Line($"}}");
                 headerText += Indented_Line($"");
-                headerText += Indented_Line($"extern \"C\"");
-                headerText += Indented_Line($"{{");
-                Indented(() =>
-                {
-                    headerText += Indented_Line($"PLATFORM_SHARED_EXPORT ::Ayla::String {functionName}({fullname} value);");
-                });
-                headerText += Indented_Line($"}}");
+                headerText += Indented_Line($"PLATFORM_SHARED_EXPORT ::Ayla::String {functionName}({fullname} value);");
                 headerText += Indented_Line($"");
 
                 headerText += Indented_Line($"template<class TChar> requires (::std::same_as<TChar, char> || ::std::same_as<TChar, wchar_t>)");

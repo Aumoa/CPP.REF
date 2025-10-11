@@ -279,9 +279,9 @@ internal static class VSCppProjectGenerator
                 AppendFormatLine("""<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />""");
 
                 string projectPath = string.Empty;
-                if (project.Group.IsEngine == false)
+                if (solution.ProjectFile != null)
                 {
-                    projectPath = $"--project \"{primaryGroup.RootDirectory}\\{primaryGroup.Name}.aproject\" ";
+                    projectPath = $"--project \"{solution.ProjectFile}\" ";
                 }
 
                 foreach (var buildTarget in TargetInfo.GetAllTargets())

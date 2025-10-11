@@ -187,6 +187,12 @@ internal class ClCompiler : CppCompiler
         {
             var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
             cached.SaveCached(cacheFileName);
+
+            output = output with
+            {
+                Logs = [.. output.Logs.Skip(1)],
+                StdOut = [.. output.StdOut.Skip(1)]
+            };
         }
 
         return output;

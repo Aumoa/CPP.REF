@@ -214,34 +214,28 @@ internal partial class RHTGenerator
                 string fullname = "::" + string.Join("::", aenum.Namespaces.Select(p => p.Name).Append(aenum.Name));
                 string functionName = $"{cppnamespace.Replace("::", "__")}__{aenum.Name}__ToString";
 
-                WriteIndentedLine($"extern \"C\"");
+                WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::String {functionName}({fullname} value)");
                 WriteIndentedLine($"{{");
                 Indented(() =>
                 {
-                    WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::String {functionName}({fullname} value)");
+                    WriteIndentedLine($"switch (value)");
                     WriteIndentedLine($"{{");
                     Indented(() =>
                     {
-                        WriteIndentedLine($"switch (value)");
-                        WriteIndentedLine($"{{");
-                        Indented(() =>
+                        foreach (var define in aenum.Defines)
                         {
-                            foreach (var define in aenum.Defines)
-                            {
-                                WriteIndentedLine($"case {fullname}::{define.Name}:");
-                                Indented(() =>
-                                {
-                                    WriteIndentedLine($"return TEXT(\"{define.Name}\");");
-                                });
-                            }
-
-                            WriteIndentedLine($"default:");
+                            WriteIndentedLine($"case {fullname}::{define.Name}:");
                             Indented(() =>
                             {
-                                WriteIndentedLine($"return ::Ayla::String::Format(TEXT(\"{aenum.Name}({{}})\"), (int)value);");
+                                WriteIndentedLine($"return TEXT(\"{define.Name}\");");
                             });
+                        }
+
+                        WriteIndentedLine($"default:");
+                        Indented(() =>
+                        {
+                            WriteIndentedLine($"return ::Ayla::String::Format(TEXT(\"{aenum.Name}({{}})\"), (int)value);");
                         });
-                        WriteIndentedLine($"}}");
                     });
                     WriteIndentedLine($"}}");
                 });

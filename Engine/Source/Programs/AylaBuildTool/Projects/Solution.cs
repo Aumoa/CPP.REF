@@ -81,9 +81,8 @@ internal class Solution
 
     public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? projectFile, CancellationToken cancellationToken = default)
     {
-        var solution = new Solution(projectFile);
-
-        string? gameFolder = projectFile == null ? null : Path.GetDirectoryName(projectFile);
+        var solution = new Solution(projectFile == null ? null : Path.GetFullPath(projectFile));
+        string? gameFolder = solution.ProjectFile == null ? null : Path.GetDirectoryName(solution.ProjectFile);
 
         List<Task> tasks = new();
         GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
