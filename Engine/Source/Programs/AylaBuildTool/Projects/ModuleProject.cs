@@ -158,7 +158,7 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
 
                 foreach (var targetInfo in TargetInfo.GetAllTargets())
                 {
-                    var outputPath = Group.Output(targetInfo, FolderPolicy.PathType.Windows);
+                    var outputPath = Group.Output(targetInfo, FolderPolicy.PathType.Current);
                     var optimized = targetInfo.Config.IsOptimized();
                     List<string> defines = ["$(DefineConstants)"];
                     if (targetInfo.Editor)

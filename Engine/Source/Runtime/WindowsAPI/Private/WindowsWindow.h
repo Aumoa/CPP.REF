@@ -2,8 +2,6 @@
 
 #pragma once
 
-#if PLATFORM_WINDOWS
-
 #define __ALLOW_PLATFORM_COMMON_H__
 
 #include "CoreMinimal.h"
@@ -17,7 +15,8 @@ namespace Ayla
 	class WindowsWindow : public GenericWindow
 	{
 		GENERATED_BODY()
-
+		
+		#if PLATFORM_WINDOWS
 	private:
 		GenericWindowDefinition m_CachedDefinition;
 		HWND m_WindowHandle = nullptr;
@@ -31,9 +30,8 @@ namespace Ayla
 		virtual void Show() override;
 		virtual void Hide() override;
 		virtual Vector2N GetSize() const override;
+#endif
 	};
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__
-
-#endif

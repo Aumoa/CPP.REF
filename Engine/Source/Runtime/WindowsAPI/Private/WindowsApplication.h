@@ -2,8 +2,6 @@
 
 #pragma once
 
-#if PLATFORM_WINDOWS
-
 #define __ALLOW_PLATFORM_COMMON_H__
 
 #include "CoreMinimal.h"
@@ -17,7 +15,9 @@ namespace Ayla
 	class WindowsApplication : public GenericApplication
 	{
 		GENERATED_BODY()
-
+		
+#if PLATFORM_WINDOWS
+		
 	public:
 		ACONSTRUCTOR()
 		WindowsApplication();
@@ -33,9 +33,9 @@ namespace Ayla
 
 	private:
 		static std::vector<GenericPlatformInputEvent> InputEvents;
+		
+#endif
 	};
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__
-
-#endif
