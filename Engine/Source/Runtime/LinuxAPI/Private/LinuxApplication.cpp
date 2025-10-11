@@ -26,12 +26,12 @@ namespace Ayla
 
     std::shared_ptr<GenericActivity> LinuxApplication::CreateMainActivity_Implementation()
     {
-        return std::make_shared<LinuxActivity>();
+        return New<LinuxActivity>();
     }
 
     std::shared_ptr<GenericWindow> LinuxApplication::MakeWindow(const GenericWindowDefinition& winDef)
     {
-        auto window = std::make_shared<LinuxWindow>(m_Display, winDef);
+        auto window = New<LinuxWindow>(m_Display, winDef);
         auto lock = std::unique_lock{ m_Spinlock };
         m_WeakWindows.try_emplace(window->GetOSWindowHandle(), window);
         return window;

@@ -136,7 +136,8 @@ namespace Ayla
 
 	void* LinuxPlatformProcess::LoadLibrary(String fileName) noexcept
 	{
-		fileName = TEXT("lib") + fileName + TEXT(".so");
+		auto directory = Path::GetDirectoryName(fileName);
+		fileName = String::Format(TEXT("{0}/lib{1}.so"), directory, Path::GetFileName(fileName));
 		auto handle = dlopen(fileName.AsCodepage().c_str(), RTLD_NOW | RTLD_GLOBAL);
 		if (handle == nullptr)
 		{

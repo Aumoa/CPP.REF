@@ -19,7 +19,7 @@ namespace Ayla
             .DesiredScreenSize = Vector2N(-1, -1)
         }));
 
-        m_MainWindow->AddExtension(std::make_shared<GenericMainWindowDefaultExt>());
+        m_MainWindow->AddExtension(New<GenericMainWindowDefaultExt>());
     }
 
 	LinuxActivity::~LinuxActivity() noexcept

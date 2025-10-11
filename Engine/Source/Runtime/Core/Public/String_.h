@@ -92,7 +92,8 @@ namespace Ayla
 			return std::strong_ordering::equal;
 		}
 
-		String& AllocateAssign(const char_t* InBuf, size_t InLen);
+		String& AllocateAssign(const char_t* buf, size_t len);
+		String& AllocateAssign(const char16_t* buf, size_t len);
 
 		enum class TrimType
 		{
@@ -216,6 +217,11 @@ namespace Ayla
 		inline String(const char_t* InBuf, size_t InLen)
 			: String(string_view_t(InBuf, InLen))
 		{
+		}
+
+		inline String(const char16_t* buf, size_t len)
+		{
+			this->AllocateAssign(buf, len);
 		}
 
 		inline String(char_t Ch, size_t InLen)

@@ -29,6 +29,6 @@ extern "C"
 {
 	PLATFORM_SHARED_EXPORT void Ayla__Debug__Log(::Ayla::ManagedStringWrapper category, ::Ayla::LogVerbosity logLevel, ::Ayla::ManagedStringWrapper message)
 	{
-		::Ayla::Debug::Log(category.AsStringView(), logLevel, message.AsStringView());
+		::Ayla::Debug::Log(category.AsString(), logLevel, message.AsString());
 	}
 }

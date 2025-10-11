@@ -26,6 +26,7 @@ namespace Ayla
         std::map<void*, std::weak_ptr<LinuxWindow>> m_WeakWindows;
 
     public:
+        ACONSTRUCTOR()
         LinuxApplication();
         virtual ~LinuxApplication() noexcept override;
 

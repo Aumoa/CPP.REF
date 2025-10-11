@@ -16,12 +16,32 @@ namespace Ayla
 	{
 	}
 
-	String& String::AllocateAssign(const char_t* InBuf, size_t InLen)
+	String& String::AllocateAssign(const char_t* buf, size_t len)
 	{
-		auto& Ptr = Buf.emplace<1>(std::make_shared<wchar_t[]>(InLen + 1));
-		memcpy(Ptr.get(), InBuf, sizeof(wchar_t) * InLen);
-		Ptr.get()[InLen] = 0;
-		Len = InLen;
+		auto& Ptr = Buf.emplace<1>(std::make_shared<wchar_t[]>(len + 1));
+		memcpy(Ptr.get(), buf, sizeof(wchar_t) * len);
+		Ptr.get()[len] = 0;
+		Len = len;
+		bNullTerminate = true;
+		return *this;
+	}
+
+	String& String::AllocateAssign(const char16_t* buf, size_t len)
+	{
+		auto& Ptr = Buf.emplace<1>(std::make_shared<wchar_t[]>(len + 1));
+		if constexpr (sizeof(wchar_t) == 2)
+		{
+			memcpy(Ptr.get(), buf, sizeof(wchar_t) * len);
+		}
+		else
+		{
+			for (size_t i = 0; i < len; ++i)
+			{
+				Ptr.get()[i] = static_cast<wchar_t>(buf[i]);
+			}
+		}
+		Ptr.get()[len] = 0;
+		Len = len;
 		bNullTerminate = true;
 		return *this;
 	}

@@ -10,7 +10,7 @@ namespace Ayla
 {
 	struct ManagedStringWrapper
 	{
-		const wchar_t* C_str;
+		const char16_t* C_str;
 		int32 Length;
 		ssize_t IntRef;
 
@@ -19,30 +19,32 @@ namespace Ayla
 			return String{ C_str, (size_t)Length };
 		}
 
-		inline String AsStringView() const
-		{
-			return String::FromLiteral(std::wstring_view{ C_str, (size_t)Length });
-		}
-
-		static ManagedStringWrapper FromString(String str)
-		{
-			return ManagedStringWrapper
-			{
-				.C_str = str.c_str(),
-				.Length = (int32)str.length(),
-				.IntRef = 0
-			};
-		}
-
 		static ManagedStringWrapper FromIntString(String str)
 		{
-			auto intRef = new String(str);
-			return ManagedStringWrapper
+			if constexpr (sizeof(wchar_t) == 2)
 			{
-				.C_str = intRef->c_str(),
-				.Length = (int32)intRef->length(),
-				.IntRef = (ssize_t)intRef
-			};
+				auto intRef = new String(str);
+				return ManagedStringWrapper
+				{
+					.C_str = (char16_t*)intRef->c_str(),
+					.Length = (int32)intRef->length(),
+					.IntRef = (ssize_t)intRef
+				};
+			}
+			else
+			{
+				auto c_str = new char16_t[str.length()];
+				for (size_t i = 0; i < str.length(); ++i)
+				{
+					c_str[i] = (char16_t)str[i];
+				}
+				return ManagedStringWrapper
+				{
+					.C_str = c_str,
+					.Length = (int32)str.length(),
+					.IntRef = (ssize_t)c_str
+				};
+			}
 		}
 	};
 }

@@ -94,24 +94,39 @@ namespace Ayla
 		for (auto& file : Directory::GetFiles(coreclrDir))
 		{
 			auto filePath = Path::GetFileName(file);
-			if (filePath.StartsWith(TEXT("System.")) && filePath.EndsWith(TEXT(".dll")) && filePath.Contains(TEXT("Native")) == false)
+			if ((filePath.StartsWith(TEXT("System.")) || filePath.StartsWith(TEXT("Microsoft."))) && filePath.EndsWith(TEXT(".dll")) && filePath.Contains(TEXT("Native")) == false)
 			{
 				tpaList.emplace_back(file);
 			}
 		}
 
-		std::string tpaList_a = String::Join(TEXT(";"), tpaList).string();
+#if PLATFORM_WINDOWS
+		String tpaList_s = String::Join(TEXT(";"), tpaList);
+#elif PLATFORM_LINUX
+		String tpaList_s = String::Join(TEXT(":"), tpaList);
+#else
+#error TODO: Add other platform support.
+#endif
+		std::string tpaList_a = tpaList_s.string();
 		std::string assemblyBasePath_a = assemblyBasePath.string();
 		const char* propertyKeys[] =
 		{
 			"TRUSTED_PLATFORM_ASSEMBLIES",
-			"APP_PATHS"
+			"APP_PATHS",
+			"APP_NI_PATHS",
+			"NATIVE_DLL_SEARCH_DIRECTORIES",
+			"System.Globalization.Invariant",
+			"System.Diagnostics.Debugger.IsSupported"
 		};
 
 		const char* propertyValues[] =
 		{
 			tpaList_a.c_str(),
-			assemblyBasePath_a.c_str()
+			assemblyBasePath_a.c_str(),
+			assemblyBasePath_a.c_str(),
+			assemblyBasePath_a.c_str(),
+			"true",
+			"true"
 		};
 
 		auto assemblyName_a = assemblyName.string();
@@ -159,7 +174,8 @@ namespace Ayla
 			&functionPtr);
 		if (hr < 0 || functionPtr == nullptr)
 		{
-			throw InvalidOperationException(TEXT("coreclr_create_delegate failed."));
+			String message = String::Format(TEXT("Failed to coreclr_create_delegate: {0}: {1}: {2}"), String::FromLiteral(assemblyName), String::FromLiteral(className), String::FromLiteral(methodName));
+			throw InvalidOperationException(message);
 		}
 
 		return functionPtr;
