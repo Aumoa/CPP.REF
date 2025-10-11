@@ -170,7 +170,7 @@ internal static class VSCCppProjectGenerator
                     ],
                     Group = new()
                     {
-                        Kind = "test",
+                        Kind = "generate",
                         IsDefault = false
                     },
                     ProblemMatcher = [
