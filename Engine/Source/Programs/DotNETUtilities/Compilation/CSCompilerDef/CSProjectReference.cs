@@ -23,12 +23,14 @@ public record class CSProjectReference(string Include, bool? Private) : CSRefere
         }
     }
 
-    public override string ReferencedAssemblyPath(CSCondition? condition, string projectDirectory, HashSet<string> referencedAssemblies)
+    public override string ReferencedAssemblyPath(CSCondition? condition, Dictionary<string, CSProject> virtualProjects, string projectDirectory, HashSet<string> referencedAssemblies)
     {
-        XmlDocument doc = new();
-        doc.LoadXml(File.ReadAllText(Include));
-        var includeProject = doc.ChildNodes.OfType<XmlElement>().First();
-        var depend = CSProject.Parse(includeProject).Freeze(condition);
+        if (virtualProjects.TryGetValue(Include, out var includeProject) == false)
+        {
+            throw new FileNotFoundException($"Project '{Include}' not found.");
+        }
+            
+        var depend = includeProject.Freeze(condition);
         string dependProjectPath;
         if (Path.IsPathRooted(Include))
         {

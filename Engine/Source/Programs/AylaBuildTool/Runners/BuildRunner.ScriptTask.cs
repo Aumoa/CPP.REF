@@ -47,7 +47,7 @@ internal static partial class BuildRunner
             return false;
         }
 
-        public async Task<Terminal.Output> BuildAsync(IList<ScriptTask> scriptTasks, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> BuildAsync(IList<ScriptTask> scriptTasks, Dictionary<string, CSProject> virtualProjects, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             try
             {
@@ -69,21 +69,18 @@ internal static partial class BuildRunner
                     throw new OperationCanceledException();
                 }
 
-                var csprojXml = new XmlDocument();
-                csprojXml.Load(resolver.Project.ScriptProjectFileName);
-
                 var config = VSUtility.GetConfigName(targetInfo);
                 var platform = targetInfo.Platform.Name;
                 var assemblyName = resolver.Name + ".Script";
                 var condition = CSCondition.Parse($"$(Configuration)|$(Platform)=='{config}|{platform}'");
 
-                var csproj = CSProject.Parse(csprojXml.OfType<XmlElement>().First()).Freeze(condition);
+                var csproj = resolver.Project.ScriptProject.Freeze(condition);
                 var sourceCodes = GatherSourceCodes(resolver.Project.ScriptSourceDirectory)
                     .Select(CSSourceCode.FromFile)
                     .Append(csproj.GenerateAssemblyAttribute(null, config, null, assemblyName, Version.Parse("1.0.0.0")))
                     .Append(csproj.GenerateGlobals());
 
-                var outputFileName = await CSCompiler.CompileAsAsync(sourceCodes, csproj, resolver.Project.ScriptSourceDirectory, resolver.Name + ".Script", cancellationToken);
+                var outputFileName = await CSCompiler.CompileAsAsync(sourceCodes, csproj, virtualProjects, resolver.Project.ScriptSourceDirectory, resolver.Name + ".Script", cancellationToken);
                 Terminal.Log[] logs = [new() { Verbosity = Terminal.Verbose.Info, Value = "Script: " + outputFileName }];
                 GenerateCache(targetInfo);
                 m_CompletionSource.SetResult();

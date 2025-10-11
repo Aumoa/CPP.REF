@@ -140,7 +140,7 @@ internal class Solution
 
                     try
                     {
-                        await CSCompiler.CompileAsAsync(sourceCodes, csproj, currentDir, projectName, cancellationToken);
+                        await CSCompiler.CompileAsAsync(sourceCodes, csproj, [], currentDir, projectName, cancellationToken);
                         File.Copy(ruleFileName, cacheFileName, true);
                         assembly = await Task.Run(() => Assembly.LoadFile(dllFileName), cancellationToken);
                     }

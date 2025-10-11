@@ -283,9 +283,13 @@ internal static partial class BuildRunner
 
         void DispatchScriptCompileWorkers()
         {
+            Dictionary<string, CSProject> virtualProjects = solution.Projects
+                .OfType<ModuleProject>()
+                .ToDictionary(p => p.ScriptProjectFileName, p => p.ScriptProject);
+
             foreach (var scriptTask in scriptTasks)
             {
-                scriptTask.BuildAsync(scriptTasks, buildTarget, cancellationToken).ContinueWith(r =>
+                scriptTask.BuildAsync(scriptTasks, virtualProjects, buildTarget, cancellationToken).ContinueWith(r =>
                 {
                     var output = r.Result;
                     Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));

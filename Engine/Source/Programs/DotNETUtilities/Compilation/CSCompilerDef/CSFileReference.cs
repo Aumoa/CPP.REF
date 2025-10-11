@@ -13,7 +13,7 @@ public record class CSFileReference(string AssemblyName, string HintPath) : CSRe
 """;
     }
 
-    public override string ReferencedAssemblyPath(CSCondition? condition, string projectDirectory, HashSet<string> referencedAssemblies)
+    public override string ReferencedAssemblyPath(CSCondition? condition, Dictionary<string, CSProject> virtualProjects, string projectDirectory, HashSet<string> referencedAssemblies)
     {
         if (referencedAssemblies.Contains(AssemblyName))
         {

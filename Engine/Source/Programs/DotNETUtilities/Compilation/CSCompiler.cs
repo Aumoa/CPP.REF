@@ -94,12 +94,12 @@ public static class CSCompiler
         }
     }
 
-    private static IEnumerable<string> GetReferencedLibraries(CSProject project, string projectDirectory, string[] referencedAssemblies)
+    private static IEnumerable<string> GetReferencedLibraries(CSProject project, Dictionary<string, CSProject> virtualProjects, string projectDirectory, string[] referencedAssemblies)
     {
         var hashSet = referencedAssemblies.Select(r => Path.GetFileNameWithoutExtension(r)).ToHashSet();
         foreach (var reference in project.ItemGroup.References)
         {
-            var referenced = reference.ReferencedAssemblyPath(project.Condition, projectDirectory, hashSet);
+            var referenced = reference.ReferencedAssemblyPath(project.Condition, virtualProjects, projectDirectory, hashSet);
             if (string.IsNullOrEmpty(referenced))
             {
                 continue;
@@ -109,11 +109,11 @@ public static class CSCompiler
         }
     }
 
-    public static async ValueTask<CompileResult> CompileAsync(IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, string projectName, CancellationToken cancellationToken = default)
+    public static async ValueTask<CompileResult> CompileAsync(IEnumerable<CSSourceCode> sourceCodes, CSProject project, Dictionary<string, CSProject> virtualProjects, string projectDirectory, string projectName, CancellationToken cancellationToken = default)
     {
         var langVersion = GetDefaultLangVersion(project);
         var referencedAssemblies = GetSharedLibraries(project).ToArray();
-        referencedAssemblies = referencedAssemblies.Concat(GetReferencedLibraries(project, projectDirectory, referencedAssemblies)).ToArray();
+        referencedAssemblies = referencedAssemblies.Concat(GetReferencedLibraries(project, virtualProjects, projectDirectory, referencedAssemblies)).ToArray();
         var notExists = referencedAssemblies.Where(fp => File.Exists(fp) == false).ToArray();
         if (notExists.Length > 0)
         {
@@ -166,9 +166,9 @@ public static class CSCompiler
         }
     }
 
-    public static async ValueTask<string> CompileAsAsync(IEnumerable<CSSourceCode> sourceCodes, CSProject project, string projectDirectory, string projectName, CancellationToken cancellationToken = default)
+    public static async ValueTask<string> CompileAsAsync(IEnumerable<CSSourceCode> sourceCodes, CSProject project, Dictionary<string, CSProject> virtualProjects, string projectDirectory, string projectName, CancellationToken cancellationToken = default)
     {
-        var results = await CompileAsync(sourceCodes, project, projectDirectory, projectName, cancellationToken);
+        var results = await CompileAsync(sourceCodes, project, virtualProjects, projectDirectory, projectName, cancellationToken);
         var assemblyName = project.PropertyGroup.AssemblyName ?? projectName;
         string outputPath = project.PropertyGroup.ParseOutputPath(projectDirectory);
         Directory.CreateDirectory(outputPath);
