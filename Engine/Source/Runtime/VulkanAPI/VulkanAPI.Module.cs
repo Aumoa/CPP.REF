@@ -24,19 +24,16 @@ public class VulkanAPI : ModuleRules
 
                 if (!File.Exists(libPath))
                 {
-                    throw new InvalidOperationException(
-                        $"Could not find vulkan-1.lib in the Vulkan SDK directory: {vulkanSdk}. " +
-                        "Please ensure the Vulkan SDK is installed correctly."
-                    );
+                    AddError($"Could not find vulkan-1.lib in the Vulkan SDK directory: {vulkanSdk}. Please ensure the Vulkan SDK is installed correctly.");
+                    return;
                 }
 
                 AddPrivateAdditionalLibraries(libPath);
             }
             else
             {
-                throw new InvalidOperationException(
-                    "VULKAN_SDK environment variable is not set. Please install the Vulkan SDK and ensure the environment variable is configured."
-                );
+                AddError("VULKAN_SDK environment variable is not set. Please install the Vulkan SDK and ensure the environment variable is configured.");
+                return;
             }
         }
         else

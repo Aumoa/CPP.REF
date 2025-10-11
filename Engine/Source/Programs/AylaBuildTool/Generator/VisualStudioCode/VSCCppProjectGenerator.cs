@@ -117,11 +117,60 @@ internal static class VSCCppProjectGenerator
                         .. projectArgs,
                         "--target", project.Name,
                         "--config", targetInfo.Config.ToString(),
+                        "--generator", "VisualStudioCode",
                         targetInfo.Editor ? "--editor" : string.Empty
                     ],
                     Group = new()
                     {
                         Kind = "build",
+                        IsDefault = false
+                    },
+                    ProblemMatcher = [
+                        "$gcc"
+                    ]
+                });
+
+                tasks.Add(new Task
+                {
+                    Label = project.Name + " Clean " + FormatTargetName(targetInfo),
+                    Type = "shell",
+                    Command = "dotnet",
+                    Arguments = [
+                        currentAssemblyLocation, "build",
+                        .. projectArgs,
+                        "--target", project.Name,
+                        "--config", targetInfo.Config.ToString(),
+                        "--generator", "VisualStudioCode",
+                        targetInfo.Editor ? "--editor" : string.Empty,
+                        "--clean", "CleanOnly"
+                    ],
+                    Group = new()
+                    {
+                        Kind = "clean",
+                        IsDefault = false
+                    },
+                    ProblemMatcher = [
+                        "$gcc"
+                    ]
+                });
+
+                tasks.Add(new Task
+                {
+                    Label = project.Name + " Generate " + FormatTargetName(targetInfo),
+                    Type = "shell",
+                    Command = "dotnet",
+                    Arguments = [
+                        currentAssemblyLocation, "build",
+                        .. projectArgs,
+                        "--target", project.Name,
+                        "--config", targetInfo.Config.ToString(),
+                        "--generator", "VisualStudioCode",
+                        targetInfo.Editor ? "--editor" : string.Empty,
+                        "--clean", "GenerateOnly"
+                    ],
+                    Group = new()
+                    {
+                        Kind = "test",
                         IsDefault = false
                     },
                     ProblemMatcher = [

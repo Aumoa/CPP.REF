@@ -19,6 +19,7 @@ public class ModuleRules
         ?? throw new InvalidOperationException("ModuleRules must be created using ModuleRules.New function.");
 
     private bool m_FreezeCollections;
+    private readonly List<string> m_Errors = [];
 
     public IReadOnlySet<string> PublicIncludePaths { get; private set; } = new HashSet<string>();
     public IReadOnlySet<string> PrivateIncludePaths { get; private set; } = new HashSet<string>();
@@ -48,6 +49,19 @@ public class ModuleRules
     public string SafeName => Name.Replace('.', '_');
 
     public ScriptRule Script { get; } = new();
+
+    protected void AddError(string error)
+    {
+        m_Errors.Add(error);
+    }
+
+    public void ThrowErrors()
+    {
+        if (m_Errors.Count > 0)
+        {
+            throw new InvalidOperationException(string.Join('\n', m_Errors));
+        }
+    }
 
     public void AddPublicIncludePaths(params string[] items)
     {

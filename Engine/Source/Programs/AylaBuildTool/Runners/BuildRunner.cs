@@ -326,8 +326,8 @@ internal static partial class BuildRunner
                     if (outputs.Length == 0)
                     {
                         outputs = new string[1];
-                        outputs[0] = fileText;
                     }
+                    outputs[0] = fileText;
                     for (int i = 1; i < output.Logs.Length; ++i)
                     {
                         outputs[i] = output.Logs[i].Value;
