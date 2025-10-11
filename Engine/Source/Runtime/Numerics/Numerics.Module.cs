@@ -7,6 +7,7 @@ public class Numerics : ModuleRules
 {
     public Numerics()
     {
+        Script.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core");
