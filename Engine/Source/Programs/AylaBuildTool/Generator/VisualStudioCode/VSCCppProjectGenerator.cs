@@ -105,13 +105,16 @@ internal static class VSCCppProjectGenerator
                     IntelliSenseMode = intelliSenseMode
                 });
 
+                string[] projectArgs = solution.ProjectFile == null ? [] : ["--project", solution.ProjectFile];
+
                 tasks.Add(new Task
                 {
-                    Label = project.Name + " " + FormatTargetName(targetInfo),
+                    Label = project.Name + " Build " + FormatTargetName(targetInfo),
                     Type = "shell",
                     Command = "dotnet",
                     Arguments = [
                         currentAssemblyLocation, "build",
+                        .. projectArgs,
                         "--target", project.Name,
                         "--config", targetInfo.Config.ToString(),
                         targetInfo.Editor ? "--editor" : string.Empty

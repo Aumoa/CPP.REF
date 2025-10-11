@@ -64,7 +64,7 @@ internal class GccCompiler : CppCompiler
             }
             else
             {
-                macros.Add($"-D{macro.VarName}={macro.Value}");
+                macros.Add($"-D{macro.VarName}=\"{macro.Value}\"");
             }
         }
 

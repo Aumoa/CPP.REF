@@ -6,14 +6,8 @@ internal static partial class BuildRunner
 {
     public static async ValueTask RunAsync(BuildOptions options, CancellationToken cancellationToken)
     {
-        string? projectPath = null;
-        if (options.ProjectFile != null)
-        {
-            projectPath = Path.GetDirectoryName(options.ProjectFile);
-        }
-
         var buildTarget = TargetInfo.CreateDefaultTargetInfo(options);
-        var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, projectPath, cancellationToken);
+        var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, options.ProjectFile, cancellationToken);
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
         IEnumerable<ModuleProject> targetProjects;
         if (string.IsNullOrEmpty(options.Target))
@@ -332,8 +326,8 @@ internal static partial class BuildRunner
                     if (outputs.Length == 0)
                     {
                         outputs = new string[1];
+                        outputs[0] = fileText;
                     }
-                    outputs[0] = fileText;
                     for (int i = 1; i < output.Logs.Length; ++i)
                     {
                         outputs[i] = output.Logs[i].Value;

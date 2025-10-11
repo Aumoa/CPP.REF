@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 
 namespace AylaEngine;
@@ -34,14 +35,17 @@ internal class Solution
             )],
         null);
 
+    public readonly string? ProjectFile;
+
     public IReadOnlyList<Project> Projects { get; private set; } = null!;
 
     public GroupDescriptor EngineGroup { get; private set; } = null!;
 
     public GroupDescriptor PrimaryGroup { get; private set; } = null!;
 
-    private Solution()
+    private Solution(string? projectFile)
     {
+        ProjectFile = projectFile;
     }
 
     private void Assign(IEnumerable<Project> projects, GroupDescriptor engineGroup, GroupDescriptor primaryGroup)
@@ -75,9 +79,11 @@ internal class Solution
         return results;
     }
 
-    public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? gameFolder, CancellationToken cancellationToken = default)
+    public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? projectFile, CancellationToken cancellationToken = default)
     {
-        var solution = new Solution();
+        var solution = new Solution(projectFile);
+
+        string? gameFolder = projectFile == null ? null : Path.GetDirectoryName(projectFile);
 
         List<Task> tasks = new();
         GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
