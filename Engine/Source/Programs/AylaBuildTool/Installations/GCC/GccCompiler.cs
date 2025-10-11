@@ -33,7 +33,7 @@ internal class GccCompiler : CppCompiler
                 break;
             case Configuration.Development:
             case Configuration.Shipping:
-                AddCompilerCommands("-O3", "-ffunction-sections", "-fdata", "-Wl,--gc-sections");
+                AddCompilerCommands("-O3", "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections");
                 break;
         }
 
@@ -90,7 +90,7 @@ internal class GccCompiler : CppCompiler
         {
             output = await Terminal.ExecuteCommandAsync(compileCommands.ToString(), options, cancellationToken);
         }
-        
+
         if (output.ExitCode == 0)
         {
             var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
