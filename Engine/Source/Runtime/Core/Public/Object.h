@@ -3,6 +3,7 @@
 #pragma once
 
 #include "InvalidOperationException.h"
+#include "MemberAccessException.h"
 #include "AssertionMacros.h"
 #include "LanguageSupportMacros.h"
 #include "Referencer.h"
@@ -104,6 +105,10 @@ namespace Ayla
 				{
 					ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
 				});
+			}
+			else
+			{
+				throw MemberAccessException(TEXT("Cannot create an abstract class."));
 			}
 			return std::move(ptr).value();
 		}

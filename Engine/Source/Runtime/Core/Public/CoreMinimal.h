@@ -49,6 +49,7 @@
 #include "OperationCanceledException.h"
 #include "ConstructorNotFoundException.h"
 #include "ObjectDisposedException.h"
+#include "MemberAccessException.h"
 #include "Object.h"
 #include "Type.h"
 #include "try_finally.h"
@@ -58,6 +59,8 @@
 #include "Reflection/TypeRegister.h"
 #include "Reflection/reflexpr.h"
 #include "Reflection/TransferFunction.h"
+#include "Reflection/ConstructorInfo.h"
+
 #include "Marshal/ObjectReferenceWrapper.h"
 #include "Marshal/ManagedStringWrapper.h"
 #include "Marshal/ManagedArrayWrapper.h"

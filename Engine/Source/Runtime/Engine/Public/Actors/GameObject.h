@@ -16,8 +16,8 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		APROPERTY()
-		bool m_IsActive;
+		bool m_IsActive = false;
+		std::vector<std::shared_ptr<Component>> m_Components;
 
 	public:
 		GameObject();
@@ -27,5 +27,6 @@ namespace Ayla
 		void SetActive(bool active);
 		AFUNCTION()
 		bool IsActiveSelf() const { return m_IsActive; }
+		std::shared_ptr<Component> AddComponent(Type* type);
 	};
 }

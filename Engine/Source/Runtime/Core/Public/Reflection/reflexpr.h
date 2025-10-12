@@ -36,6 +36,19 @@ namespace std::inline experimental::reflect
 	{
 	};
 
+	template<class T>
+	struct get_access
+	{
+	};
+
+	
+	enum class access_type
+	{
+		public_,
+		protected_,
+		private_
+	};
+
 
 	struct reflexpr_aliased
 	{
@@ -58,17 +71,25 @@ namespace std::inline experimental::reflect
 	};
 
 
+	template<access_type access_>
 	struct reflexpr_member
 	{
 		using is_reflexpr_member = int;
+		static constexpr access_type access = access_;
 	};
 
 	template<class T>
 	concept is_reflexpr_member = std::same_as<typename T::is_reflexpr_member, int>;
 
+	template<is_reflexpr_member T>
+	struct get_access<T>
+	{
+		static constexpr access_type value = T::access;
+	};
 
-	template<class T, size_t Off>
-	struct reflexpr_field : public reflexpr_member
+
+	template<access_type access_, class T, size_t Off>
+	struct reflexpr_field : public reflexpr_member<access_>
 	{
 		using is_reflexpr_field = int;
 		using field_type = T;
@@ -91,8 +112,8 @@ namespace std::inline experimental::reflect
 	};
 
 
-	template<class T, T Pointer>
-	struct reflexpr_method : public reflexpr_member
+	template<access_type access_, class T, T Pointer>
+	struct reflexpr_method : public reflexpr_member<access_>
 	{
 		using is_reflexpr_method = int;
 		using function_type = T;
@@ -103,10 +124,11 @@ namespace std::inline experimental::reflect
 	concept is_reflexpr_method = std::same_as<typename T::is_reflexpr_method, int>;
 
 	
-	template<class T, T Pointer>
-	struct reflexpr_constructor : public reflexpr_member
+	template<access_type access_, class T, T Pointer>
+	struct reflexpr_constructor : public reflexpr_member<access_>
 	{
 		using is_reflexpr_constructor = int;
+		using function_type = T;
 		static constexpr T pointer = Pointer;
 	};
 
@@ -150,6 +172,9 @@ namespace std::inline experimental::reflect
 
 	template<class T, typename get_field_type<T>::type* = nullptr>
 	using get_field_type_t = typename get_field_type<T>::type;
+
+	template<class T> requires requires { { get_access<T>::value } -> std::convertible_to<access_type>; }
+	constexpr access_type get_access_v = get_access<T>::value;
 
 	template<class T> requires requires { { T::name } -> std::same_as<::Ayla::String>; }
 	constexpr ::Ayla::String get_name_v = T::name;

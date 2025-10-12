@@ -82,7 +82,7 @@ internal partial class RHTGenerator
                 Indented(() =>
                 {
                     WriteIndentedLine($"void {@class}::GatherProperties(::Ayla::PropertyCollector& collector)");
-                    WriteIndentedLine($"  {{");
+                    WriteIndentedLine($"{{");
                     Indented(() =>
                     {
                         WriteIndentedLine($"Super::GatherProperties(collector);");

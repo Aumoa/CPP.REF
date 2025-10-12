@@ -5,11 +5,12 @@
 #include "Platform/PlatformMacros.h"
 #include "Object.h"
 #include <typeinfo>
+#include <span>
 
 namespace Ayla
 {
 	class GC;
-	class PropertyCollector;
+	class ConstructorInfo;
 
 	class Type
 	{
@@ -26,8 +27,6 @@ namespace Ayla
 		virtual String GetNamespace() const = 0;
 		virtual String GetFullName() const = 0;
 		virtual const std::type_info* GetTypeInfo() const = 0;
-
-	protected:
-		virtual const PropertyCollector* GetPropertyCollector() const = 0;
+		virtual std::span<const ConstructorInfo* const> GetConstructors() const = 0;
 	};
 }

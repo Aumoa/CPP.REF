@@ -10,37 +10,15 @@ namespace Ayla
 	class RuntimeType : public Type
 	{
 		const TypeRegister& m_TR;
+		std::vector<const ConstructorInfo*> m_Constructors;
 
 	public:
-		RuntimeType(const TypeRegister& tr)
-			: m_TR(tr)
-		{
-		}
+		RuntimeType(const TypeRegister& tr);
 
-		virtual String GetName() const override
-		{
-			return m_TR.Name;
-		}
-
-		virtual String GetNamespace() const override
-		{
-			return m_TR.Namespace;
-		}
-
-		virtual String GetFullName() const override
-		{
-			return m_TR.FullName;
-		}
-
-		virtual const std::type_info* GetTypeInfo() const override
-		{
-			return m_TR.TypeInfo;
-		}
-
-	protected:
-		virtual const PropertyCollector* GetPropertyCollector() const override
-		{
-			return &m_TR.PCollector;
-		}
+		virtual String GetName() const override;
+		virtual String GetNamespace() const override;
+		virtual String GetFullName() const override;
+		virtual const std::type_info* GetTypeInfo() const override;
+		virtual std::span<const ConstructorInfo* const> GetConstructors() const override;
 	};
 }

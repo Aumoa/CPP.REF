@@ -88,6 +88,7 @@ internal partial class RHTGenerator
                     foreach (var field in aclass.Properties)
                     {
                         var fieldType = typeNames.FindType(field.Variable.TypeName, aclass.Class);
+                        var access = $"::std::experimental::reflect::access_type::{field.Access.ToString().ToLower()}_";
                         Indented(() =>
                         {
                             headerText += IndentedMLine($"static consteval auto {field.Variable.Name}()");
@@ -95,7 +96,36 @@ internal partial class RHTGenerator
                             Indented(() =>
                             {
                                 headerText += IndentedMLine($"/*{fieldType.Id} {field.Variable.Name}*/");
-                                headerText += IndentedMLine($"return ::std::experimental::reflect::reflexpr_field<decltype({aclass.Class.Name}::{field.Variable.Name}), offsetof({aclass.Class.Name}, {field.Variable.Name})>();");
+                                headerText += IndentedMLine($"return ::std::experimental::reflect::reflexpr_field<{access}, decltype({aclass.Class.Name}::{field.Variable.Name}), offsetof({aclass.Class.Name}, {field.Variable.Name})>();");
+                            });
+                            headerText += IndentedMLine($"}}");
+                            headerText += IndentedMLine($"");
+                        });
+                    }
+                    for (int i = 0; i < aclass.Constructors.Count; ++i)
+                    {
+                        var constructor = aclass.Constructors[i];
+                        var access = $"::std::experimental::reflect::access_type::{constructor.Access.ToString().ToLower()}_";
+                        var returnType = TypeName.Object;
+                        Indented(() =>
+                        {
+                            var parameterDeclare1 = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName + " " + p.Variable.Name));
+                            headerText += IndentedMLine($"static std::shared_ptr<::Ayla::Object> constructor__{i}__{constructor.Name}({parameterDeclare1})");
+                            headerText += IndentedMLine($"{{");
+                            Indented(() =>
+                            {
+                                var arguments = string.Join(", ", constructor.Parameters.Select(p => p.Variable.Name));
+                                headerText += IndentedMLine($"return ::Ayla::Object::ScriptNew<{aclass.Class.Name}>({arguments});");
+                            });
+                            headerText += IndentedMLine($"}}");
+                            headerText += IndentedMLine($"");
+                            headerText += IndentedMLine($"static consteval auto {constructor.Name}__{i}()");
+                            headerText += IndentedMLine($"{{");
+                            Indented(() =>
+                            {
+                                var parameterDeclare2 = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName));
+                                headerText += IndentedMLine($"using signature_t = std::shared_ptr<::Ayla::Object>(*)({parameterDeclare2});");
+                                headerText += IndentedMLine($"return ::std::experimental::reflect::reflexpr_constructor<{access}, signature_t, (signature_t)&constructor__{i}__{constructor.Name}>();");
                             });
                             headerText += IndentedMLine($"}}");
                             headerText += IndentedMLine($"");
@@ -104,26 +134,17 @@ internal partial class RHTGenerator
                     for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
                         var function = aclass.Functions[i];
-                        var parameters = new ParameterCollection();
-                        foreach (var param in function.Parameters)
-                        {
-                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
-                            parameters.Add(paramType, param.Variable.Name);
-                        }
+                        var access = $"::std::experimental::reflect::access_type::{function.Access.ToString().ToLower()}_";
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
-                        var parameterTypes = function.Parameters
-                            .Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class))
-                            .ToArray();
                         Indented(() =>
                         {
                             headerText += IndentedMLine($"static consteval auto {function.Name}__{i}()");
                             headerText += IndentedMLine($"{{");
                             Indented(() =>
                             {
-                                headerText += IndentedMLine($"/*{returnType.Id}({aclass.Class.Name}::*{function.Name})({string.Join(", ", parameterTypes.Select(p => p.Id))})*/");
                                 var owned = function.Flags.HasFlag(SFunction.FFlags.Static) ? string.Empty : $"{aclass.Class.Name}::";
                                 headerText += IndentedMLine($"using signature_t = {function.ReturnType.FullName}({owned}*)({string.Join(", ", function.Parameters.Select(p => p.Variable.TypeName.FullName))});");
-                                headerText += IndentedMLine($"return ::std::experimental::reflect::reflexpr_method<signature_t, (signature_t)&{aclass.Class.Name}::{function.Name}>();");
+                                headerText += IndentedMLine($"return ::std::experimental::reflect::reflexpr_method<{access}, signature_t, (signature_t)&{aclass.Class.Name}::{function.Name}>();");
                             });
                             headerText += IndentedMLine($"}}");
                             headerText += IndentedMLine($"");
@@ -131,6 +152,8 @@ internal partial class RHTGenerator
                     }
                     Indented(() =>
                     {
+                        int count = 0;
+
                         headerText += IndentedMLine($"template<size_t N>");
                         headerText += IndentedMLine($"static consteval auto get() noexcept");
                         headerText += IndentedMLine($"{{");
@@ -138,7 +161,7 @@ internal partial class RHTGenerator
                         {
                             Indented(() =>
                             {
-                                headerText += IndentedMLine($"if constexpr (N == {i})");
+                                headerText += IndentedMLine($"if constexpr (N == {count++})");
                                 headerText += IndentedMLine($"{{");
                                 Indented(() =>
                                 {
@@ -147,11 +170,24 @@ internal partial class RHTGenerator
                                 headerText += IndentedMLine($"}}");
                             });
                         }
+                        for (int i = 0; i < aclass.Constructors.Count; ++i)
+                        {
+                            Indented(() =>
+                            {
+                                headerText += IndentedMLine($"if constexpr (N == {count++})");
+                                headerText += IndentedMLine($"{{");
+                                Indented(() =>
+                                {
+                                    headerText += IndentedMLine($"return {aclass.Constructors[i].Name}__{i}();");
+                                });
+                                headerText += IndentedMLine($"}}");
+                            });
+                        }
                         for (int i = 0; i < aclass.Functions.Count; ++i)
                         {
                             Indented(() =>
                             {
-                                headerText += IndentedMLine($"if constexpr (N == {(aclass.Properties.Count + i)})");
+                                headerText += IndentedMLine($"if constexpr (N == {count++})");
                                 headerText += IndentedMLine($"{{");
                                 Indented(() =>
                                 {
@@ -160,7 +196,7 @@ internal partial class RHTGenerator
                                 headerText += IndentedMLine($"}}");
                             });
                         }
-                        if (aclass.Properties.Count + aclass.Functions.Count > 0)
+                        if (count > 0)
                         {
                             Indented(() =>
                             {
@@ -172,7 +208,7 @@ internal partial class RHTGenerator
                             headerText += IndentedMLine($"{{");
                             Indented(() =>
                             {
-                                headerText += IndentedMLine($"static_assert(N < {aclass.Properties.Count + aclass.Functions.Count}, \"Invalid reflexpr index\");");
+                                headerText += IndentedMLine($"static_assert(N < {count}, \"Invalid reflexpr index\");");
                             });
                             headerText += IndentedMLine($"}}");
                         });
