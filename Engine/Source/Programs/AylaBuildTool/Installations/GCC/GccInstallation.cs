@@ -61,6 +61,7 @@ internal class GccInstallation : Installation
             ModuleType.Library => $"lib{projectName}.so",
             ModuleType.Game => $"lib{projectName}.so",
             ModuleType.Application => projectName,
+            ModuleType.ThirdParty => projectName,
             _ => string.Empty
         };
     }
