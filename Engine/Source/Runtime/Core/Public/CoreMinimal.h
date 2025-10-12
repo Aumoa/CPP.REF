@@ -63,6 +63,7 @@
 #include "Marshal/ManagedArrayWrapper.h"
 
 #include "Diagnostics/Debug.h"
+#include "Diagnostics/LogMacros.h"
 
 #include "Threading/CancellationToken.h"
 #include "Threading/CancellationTokenSource.h"

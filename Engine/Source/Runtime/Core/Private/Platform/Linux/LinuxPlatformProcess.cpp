@@ -39,7 +39,7 @@ namespace Ayla
 
 	void LinuxPlatformProcess::OutputDebugString(String InMessage) noexcept
 	{
-		Console::WriteLine(InMessage);
+		Console::Write(InMessage);
 	}
 
 	String LinuxPlatformProcess::FindEngineDirectory()

@@ -13,7 +13,7 @@ namespace Ayla
 		static void Log(String category, LogVerbosity logLevel, String message);
 
 		template<class... TArgs>
-		static inline void LogFormat(String category, LogVerbosity logLevel, String format, TArgs&&... args)
+		static inline void Log(String category, LogVerbosity logLevel, String format, TArgs&&... args)
 		{
 			Log(category, logLevel, String::Format(format, std::forward<TArgs>(args)...));
 		}
@@ -24,9 +24,9 @@ namespace Ayla
 		}
 
 		template<class... TArgs>
-		static inline void LogVerboseFormat(String category, String format, TArgs&&... args)
+		static inline void LogVerbose(String category, String format, TArgs&&... args)
 		{
-			LogFormat(category, LogVerbosity::Verbose, String::Format(format, std::forward<TArgs>(args)...));
+			Log(category, LogVerbosity::Verbose, String::Format(format, std::forward<TArgs>(args)...));
 		}
 
 		static inline void LogInfo(String category, String message)
@@ -35,9 +35,9 @@ namespace Ayla
 		}
 
 		template<class... TArgs>
-		static inline void LogInfoFormat(String category, String format, TArgs&&... args)
+		static inline void LogInfo(String category, String format, TArgs&&... args)
 		{
-			LogFormat(category, LogVerbosity::Info, String::Format(format, std::forward<TArgs>(args)...));
+			Log(category, LogVerbosity::Info, String::Format(format, std::forward<TArgs>(args)...));
 		}
 
 		static inline void LogWarning(String category, String message)
@@ -46,9 +46,9 @@ namespace Ayla
 		}
 
 		template<class... TArgs>
-		static inline void LogWarningFormat(String category, String format, TArgs&&... args)
+		static inline void LogWarning(String category, String format, TArgs&&... args)
 		{
-			LogFormat(category, LogVerbosity::Warning, String::Format(format, std::forward<TArgs>(args)...));
+			Log(category, LogVerbosity::Warning, String::Format(format, std::forward<TArgs>(args)...));
 		}
 
 		static inline void LogError(String category, String message)
@@ -57,9 +57,9 @@ namespace Ayla
 		}
 
 		template<class... TArgs>
-		static inline void LogErrorFormat(String category, String format, TArgs&&... args)
+		static inline void LogError(String category, String format, TArgs&&... args)
 		{
-			LogFormat(category, LogVerbosity::Error, String::Format(format, std::forward<TArgs>(args)...));
+			Log(category, LogVerbosity::Error, String::Format(format, std::forward<TArgs>(args)...));
 		}
 
 		static inline void LogCritical(String category, String message)
@@ -68,9 +68,9 @@ namespace Ayla
 		}
 
 		template<class... TArgs>
-		static inline void LogCriticalFormat(String category, String format, TArgs&&... args)
+		static inline void LogCritical(String category, String format, TArgs&&... args)
 		{
-			LogFormat(category, LogVerbosity::Critical, String::Format(format, std::forward<TArgs>(args)...));
+			Log(category, LogVerbosity::Critical, String::Format(format, std::forward<TArgs>(args)...));
 		}
 	};
 }

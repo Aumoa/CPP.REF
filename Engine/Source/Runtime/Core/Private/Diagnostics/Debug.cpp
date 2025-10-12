@@ -9,19 +9,8 @@ namespace Ayla
 {
 	void Debug::Log(String category, LogVerbosity logLevel, String message)
 	{
-		static String LogVerbosityStr[] =
-		{
-			TEXT("Verbose"),
-			TEXT("Info"),
-			TEXT("Warning"),
-			TEXT("Error"),
-			TEXT("Critical")
-		};
-
-		// TODO:
-		auto output = String::Format(TEXT("{}: {}: {}"), category, LogVerbosityStr[(int32)logLevel], message);
+		auto output = String::Format(TEXT("{}: {}: {}"), category, logLevel, message);
 		PlatformProcess::OutputDebugString(String::Format(TEXT("{}\n"), output));
-		Console::WriteLine(output);
 	}
 }
 

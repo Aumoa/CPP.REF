@@ -28,12 +28,12 @@ namespace Ayla
         std::vector<VkExtensionProperties> supportedExtensions(extCount);
         vkEnumerateInstanceExtensionProperties(nullptr, &extCount, supportedExtensions.data());
 
-        PlatformProcess::OutputDebugString(TEXT("Support instance extensions:\n"));
+        LogVulkan::Verbose(TEXT("Support instance extensions:"));
 
         for (size_t i = 0; i < supportedExtensions.size(); ++i)
         {
             auto& extension = supportedExtensions[i];
-            PlatformProcess::OutputDebugString(String::Format(TEXT("  #{}: {}\n"), i, String::FromLiteral(extension.extensionName)));
+            LogVulkan::Verbose(TEXT("  #{}: {}"), i, String::FromLiteral(extension.extensionName));
         }
 
         static constexpr std::array<const char*, 1> kLayers
@@ -70,7 +70,7 @@ namespace Ayla
             .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
             .pfnUserCallback = [](VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) -> VkBool32
             {
-                PlatformProcess::OutputDebugString(String::Format(TEXT("Vulkan: {}"), String::FromCodepage(pCallbackData->pMessage)));
+                LogVulkan::Verbose(String::Format(TEXT("Vulkan: {}"), String::FromCodepage(pCallbackData->pMessage)));
                 return VK_FALSE;
             }
 		};
@@ -103,7 +103,7 @@ namespace Ayla
             auto& pd = physicalDevices[i];
             VkPhysicalDeviceProperties props;
             vkGetPhysicalDeviceProperties(pd, &props);
-            PlatformProcess::OutputDebugString(String::Format(TEXT("Physical Device #{}: {} ({})"), i, String::FromLiteral(props.deviceName), formatDeviceType(props.deviceType)));
+            LogVulkan::Verbose(TEXT("Physical Device #{}: {} ({})"), i, String::FromLiteral(props.deviceName), formatDeviceType(props.deviceType));
 
             uint32_t extensionsCount = 0;
             VKR(vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, nullptr));
@@ -111,10 +111,10 @@ namespace Ayla
             std::vector<VkExtensionProperties> pdExtensions{ (size_t)extensionsCount };
             VKR(vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, pdExtensions.data()));
 
-            PlatformProcess::OutputDebugString(TEXT("  Extensions: "));
+            LogVulkan::Verbose(TEXT("  Extensions: "));
             for (auto& extension : pdExtensions)
             {
-                PlatformProcess::OutputDebugString(String::Format(TEXT("    {}"), String::FromCodepage(extension.extensionName)));
+                LogVulkan::Verbose(TEXT("    {}"), String::FromCodepage(extension.extensionName));
             }
         }
 
