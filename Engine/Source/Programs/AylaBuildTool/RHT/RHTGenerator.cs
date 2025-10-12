@@ -63,6 +63,10 @@ internal partial class RHTGenerator
             {
                 syntaxes.Add(include);
             }
+            else if (SDefineLogCategory.TryAccept(context, bracketStack, out var defineLogCategory))
+            {
+                syntaxes.Add(defineLogCategory);
+            }
             else if (SNamespace.TryAccept(context, out var @namespace))
             {
                 syntaxes.Add(@namespace);

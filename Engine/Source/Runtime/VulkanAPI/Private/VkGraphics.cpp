@@ -41,9 +41,10 @@ namespace Ayla
 			"VK_LAYER_KHRONOS_validation"
         };
 
-        static constexpr std::array<const char*, 1> kExtensions
+        static constexpr std::array<const char*, 2> kExtensions
         {
-            "VK_EXT_debug_utils"
+            "VK_EXT_debug_utils",
+            "VK_KHR_get_physical_device_properties2"
         };
 
         std::vector<const char*> extensions =
@@ -98,11 +99,14 @@ namespace Ayla
             return TEXT("UNKNOWN");
         };
 
+        std::vector<VkPhysicalDeviceProperties> physicalDeviceProps;
+        physicalDeviceProps.reserve(physicalDevices.size());
         for (size_t i = 0; i < physicalDevices.size(); ++i)
         {
             auto& pd = physicalDevices[i];
             VkPhysicalDeviceProperties props;
             vkGetPhysicalDeviceProperties(pd, &props);
+            physicalDeviceProps.emplace_back(props);
             LogVulkan::Verbose(TEXT("Physical Device #{}: {} ({})"), i, String::FromLiteral(props.deviceName), formatDeviceType(props.deviceType));
 
             uint32_t extensionsCount = 0;
@@ -157,7 +161,12 @@ namespace Ayla
             .timelineSemaphore = VK_TRUE
         };
 
-        std::vector<const char*> deviceExtensions = { "VK_KHR_swapchain", "VK_KHR_timeline_semaphore" };
+        std::vector<const char*> deviceExtensions = 
+        {
+            "VK_KHR_swapchain",
+            
+            "VK_KHR_timeline_semaphore"
+        };
         VkDeviceCreateInfo vkDeviceInfo =
         {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -168,6 +177,7 @@ namespace Ayla
             .ppEnabledExtensionNames = deviceExtensions.data()
         };
 
+        LogVulkan::Verbose(TEXT("Logical device created using {} physical device."), String::FromLiteral(physicalDeviceProps[0].deviceName));
         VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
         vkGetDeviceQueue(m_Device, m_GraphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
         m_PhysicalDevice = physicalDevices[0];
@@ -244,7 +254,6 @@ namespace Ayla
         size_t chosenFormatIndex = (size_t)-1;
         for (size_t i = 0; i < formats.size(); ++i)
         {
-            PlatformProcess::OutputDebugString(String::Format(TEXT("{}"), formats[i].format));
             if (formats[i].format == VK_FORMAT_B8G8R8A8_UNORM)
             {
                 chosenFormatIndex = i;
@@ -263,11 +272,22 @@ namespace Ayla
             compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
         }
 
+        uint32_t imageCount = caps.minImageCount;
+        if (caps.maxImageCount > 0 && imageCount > caps.maxImageCount)
+        {
+            imageCount = caps.maxImageCount;
+        }
+
+        if (caps.maxImageCount == 0 || caps.minImageCount + 1 <= caps.maxImageCount)
+        {
+            imageCount = caps.minImageCount + 1;
+        }
+
         VkSwapchainCreateInfoKHR swapchainCreateInfo
         {
             .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
             .surface = surface,
-            .minImageCount = 2,
+            .minImageCount = imageCount,
             .imageFormat = formats[chosenFormatIndex].format,
             .imageColorSpace = formats[chosenFormatIndex].colorSpace,
             .imageExtent = caps.currentExtent,

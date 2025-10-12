@@ -58,7 +58,7 @@ namespace Ayla
 
         m_SwapchainCreateInfoCache.imageExtent = newExtent;
         VKR(vkCreateSwapchainKHR(m_Owner->GetDevice(), &m_SwapchainCreateInfoCache, nullptr, &m_Swapchain));
-        PlatformProcess::OutputDebugString(String::Format(TEXT("Swapchain resized to {}"), newSize));
+        LogVulkan::Verbose(TEXT("Swapchain resized to {}"), newSize);
     }
 
     void VkSwapchainExt::CleanupSwapChain()

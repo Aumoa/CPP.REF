@@ -131,7 +131,7 @@ using System.Runtime.InteropServices;
 
                 Indented(() =>
                 {
-sourceCode += "#pragma warning disable CS8618\n";
+                    sourceCode += "#pragma warning disable CS8618\n";
 
                     sourceCode += IndentedLine($"protected {@class.Name}(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
                     sourceCode += IndentedLine($"{{");
@@ -238,6 +238,137 @@ sourceCode += "#pragma warning disable CS8618\n";
                         sourceCode += IndentedLine($"");
                     }
                 }
+            }
+            
+            if (syntax is SDefineLogCategory defineLogCategory)
+            {
+                sourceCode += IndentedLine($"namespace {string.Join(".", defineLogCategory.Namespaces.Select(n => n.Name))}");
+                sourceCode += IndentedLine($"{{");
+                Indented(() =>
+                {
+                    sourceCode += IndentedLine($"public static class {defineLogCategory.Name}");
+                    sourceCode += IndentedLine($"{{");
+                    Indented(() =>
+                    {
+                        sourceCode += IndentedLine($"public const string kCategory = \"{defineLogCategory.Name}\";");
+                        sourceCode += IndentedLine($"");
+                        
+                        // Log methods with LogVerbosity parameter
+                        sourceCode += IndentedLine($"public static void Log(global::Ayla.LogVerbosity level, string message)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.Log(kCategory, level, message);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        sourceCode += IndentedLine($"public static void Log(global::Ayla.LogVerbosity level, string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.Log(kCategory, level, format, args);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        // Verbose level methods
+                        sourceCode += IndentedLine($"public static void Verbose(string message)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogVerbose(kCategory, message);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        sourceCode += IndentedLine($"public static void Verbose(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogVerbose(kCategory, format, args);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        // Info level methods
+                        sourceCode += IndentedLine($"public static void Info(string message)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogInfo(kCategory, message);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        sourceCode += IndentedLine($"public static void Info(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogInfo(kCategory, format, args);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        // Warning level methods
+                        sourceCode += IndentedLine($"public static void Warning(string message)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogWarning(kCategory, message);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        sourceCode += IndentedLine($"public static void Warning(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogWarning(kCategory, format, args);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        // Error level methods
+                        sourceCode += IndentedLine($"public static void Error(string message)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogError(kCategory, message);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        sourceCode += IndentedLine($"public static void Error(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogError(kCategory, format, args);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        // Critical level methods
+                        sourceCode += IndentedLine($"public static void Critical(string message)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogCritical(kCategory, message);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"");
+
+                        sourceCode += IndentedLine($"public static void Critical(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"global::Ayla.Debug.LogCritical(kCategory, format, args);");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                    });
+                    sourceCode += IndentedLine($"}}");
+                });
+                sourceCode += IndentedLine($"}}");
             }
         }
 

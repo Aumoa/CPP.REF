@@ -3,6 +3,7 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include "LogVulkan.h"
 #if PLATFORM_LINUX
 #include <X11/Xlib.h>
 #include <vulkan/vulkan_xlib.h>
@@ -14,12 +15,10 @@
 #include <vulkan/vk_enum_string_helper.h>
 #include <format>
 
-DEFINE_LOG_CATEGORY(LogVulkan);
-
 #define VKR(expr, ...) \
 if (auto VKR_res__ = (expr); VkrFailure __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>) (VKR_res__)) \
 { \
-    ::LogVulkan::Critical(TEXT("{}"), VKR_res__); \
+    ::Ayla::LogVulkan::Critical(TEXT("{}"), VKR_res__); \
     throw ::Ayla::InvalidOperationException(String::Format(TEXT("{}"), VKR_res__)); \
 }
 

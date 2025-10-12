@@ -44,13 +44,13 @@ public static class Debug
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void LogInformation(string category, string message)
+    public static void LogInfo(string category, string message)
     {
         Log__Internal(category, LogVerbosity.Info, message);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void LogInformation(string category, string format, params ReadOnlySpan<object?> args)
+    public static void LogInfo(string category, string format, params ReadOnlySpan<object?> args)
     {
         Log__Internal(category, LogVerbosity.Info, string.Format(format, args));
     }

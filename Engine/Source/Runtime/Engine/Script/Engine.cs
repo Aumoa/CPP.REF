@@ -46,7 +46,7 @@ public partial class Engine
             }
             catch (Exception e)
             {
-                Debug.LogError("Engine", "Exception caught in main loop: {0}", e);
+                LogEngine.Error("Exception caught in main loop: {0}", e);
             }
         }
     }
@@ -71,7 +71,7 @@ public partial class Engine
         }
 
         var gameInstance = (GameInstance)primaryConstructor.Invoke([]);
-        Debug.LogInformation("Engine", "GameInstance created: {0}", gameInstance.GetType().FullName);
+        LogEngine.Info("GameInstance created: {0}", gameInstance.GetType().FullName);
         return gameInstance;
     }
 }
