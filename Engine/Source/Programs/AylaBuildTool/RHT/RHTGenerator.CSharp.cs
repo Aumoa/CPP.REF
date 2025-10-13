@@ -1,4 +1,4 @@
-﻿using AylaEngine.RHT.CodeGen;
+using AylaEngine.RHT.CodeGen;
 
 namespace AylaEngine;
 
@@ -142,6 +142,33 @@ using System.Runtime.InteropServices;
                     sourceCode += IndentedLine($"}}");
                     sourceCode += "#pragma warning restore CS8618\n";
                     sourceCode += IndentedLine($"partial void OnConstructed(global::Ayla.ObjectReferenceLocker locker);");
+                    sourceCode += IndentedLine($"");
+
+                    for (int i = 0; i < aclass.Constructors.Count; ++i)
+                    {
+                        var constructor = aclass.Constructors[i];
+                        var access = constructor.Access.ToString().ToLower();
+                        var returnType = (SharedPtrTypeName)Activator.CreateInstance(typeof(SharedPtrTypeName), @class)!;
+                        var parameters = new ParameterCollection();
+                        foreach (var param in constructor.Parameters)
+                        {
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
+
+                        var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
+
+                        var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters);
+                        sourceCode += IndentedLine($"{access} {constructor.Name}({csharpParamsDeclare}) : base({callArguments})");
+                        sourceCode += IndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            sourceCode += IndentedLine($"OnConstructed({callArguments});");
+                        });
+                        sourceCode += IndentedLine($"}}");
+                        sourceCode += IndentedLine($"partial void OnConstructed({csharpParamsDeclare});");
+                    }
+
                     sourceCode += IndentedLine($"");
 
                     GenerateFunctionBodies(false);

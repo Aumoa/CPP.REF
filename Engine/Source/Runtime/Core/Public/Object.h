@@ -105,12 +105,13 @@ namespace Ayla
 				{
 					ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
 				});
+
+				return std::move(ptr).value();
 			}
 			else
 			{
 				throw MemberAccessException(TEXT("Cannot create an abstract class."));
 			}
-			return std::move(ptr).value();
 		}
 
 	protected:
