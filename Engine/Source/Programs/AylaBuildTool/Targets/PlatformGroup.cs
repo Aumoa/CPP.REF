@@ -3,5 +3,6 @@
 public enum PlatformGroup
 {
     Windows,
-    Linux
+    Linux,
+    OSX
 }

@@ -34,6 +34,13 @@ public record PlatformInfo
                     return Linux64;
                 }
             }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                if (RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.X64)
+                {
+                    return OSX64;
+                }
+            }
 
             Console.Error.WriteLine("Not supported platform.");
             throw TerminateException.NotSupport();
@@ -54,9 +61,17 @@ public record PlatformInfo
         Architecture = Architecture.X64
     };
 
+    public static readonly PlatformInfo OSX64 = new()
+    {
+        Name = "OSX64",
+        Group = PlatformGroup.OSX,
+        Architecture = Architecture.X64
+    };
+
     public static IEnumerable<PlatformInfo> GetAllPlatforms()
     {
         yield return Win64;
         yield return Linux64;
+        yield return OSX64;
     }
 }

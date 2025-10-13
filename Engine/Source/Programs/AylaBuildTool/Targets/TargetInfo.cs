@@ -58,6 +58,15 @@ internal record TargetInfo : ITargetInfo
                 Config = options.Config
             };
         }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return new TargetInfo
+            {
+                Platform = PlatformInfo.OSX64,
+                Editor = options.Editor,
+                Config = options.Config
+            };
+        }
         else
         {
             Console.Error.WriteLine("Not supported platform.");

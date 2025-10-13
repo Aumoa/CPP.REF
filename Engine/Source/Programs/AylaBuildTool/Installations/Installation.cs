@@ -23,6 +23,10 @@ internal abstract class Installation
         {
             return new GccInstallation();
         }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return new GccInstallation();
+        }
         else
         {
             Console.Error.WriteLine("Not supported platform.");
