@@ -63,6 +63,9 @@ internal class ModuleRulesResolver
                 case PlatformGroup.Linux:
                     source = source.Append("LinuxAPI");
                     break;
+                case PlatformGroup.OSX:
+                    source = source.Append("OSXAPI");
+                    break;
                 default:
                     Console.Error.WriteLine("Target platform not supported yet.");
                     throw TerminateException.Internal();

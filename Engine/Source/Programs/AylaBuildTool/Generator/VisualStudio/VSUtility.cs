@@ -1,5 +1,7 @@
 ﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
+using System.Runtime.InteropServices;
+
 namespace AylaEngine;
 
 internal class VSUtility
@@ -9,6 +11,7 @@ internal class VSUtility
     public static string GetArchitectureName(Architecture value) => value switch
     {
         Architecture.X64 => "x64",
+        Architecture.Arm64 => "arm64",
         _ => throw new InvalidOperationException()
     };
 

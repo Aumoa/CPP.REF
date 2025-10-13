@@ -2,5 +2,6 @@
 
 public enum Architecture
 {
-    X64
+    X64,
+    Arm64
 }

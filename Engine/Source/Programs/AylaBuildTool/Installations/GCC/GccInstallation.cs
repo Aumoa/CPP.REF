@@ -26,6 +26,13 @@ internal class GccInstallation : Installation
                         return ValueTask.FromResult("linux-gcc-x64");
                 }
                 break;
+            case PlatformGroup.OSX:
+                switch (targetInfo.Platform.Architecture)
+                {
+                    case Architecture.Arm64:
+                        return ValueTask.FromResult("macos-gcc-arm64");
+                }
+                break;
         }
 
         Console.Error.WriteLine("Architecture({0}) not support.", targetInfo.Platform.Architecture);

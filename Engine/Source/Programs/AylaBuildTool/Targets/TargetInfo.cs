@@ -22,7 +22,9 @@ internal record TargetInfo : ITargetInfo
         return InnerGet(PlatformInfo.Win64, true)
             .Concat(InnerGet(PlatformInfo.Win64, false))
             .Concat(InnerGet(PlatformInfo.Linux64, true))
-            .Concat(InnerGet(PlatformInfo.Linux64, false));
+            .Concat(InnerGet(PlatformInfo.Linux64, false))
+            .Concat(InnerGet(PlatformInfo.OSXArm64, true))
+            .Concat(InnerGet(PlatformInfo.OSXArm64, false));
 
         IEnumerable<TargetInfo> InnerGet(PlatformInfo platform, bool editor)
         {
@@ -62,14 +64,14 @@ internal record TargetInfo : ITargetInfo
         {
             return new TargetInfo
             {
-                Platform = PlatformInfo.OSX64,
+                Platform = PlatformInfo.OSXArm64,
                 Editor = options.Editor,
                 Config = options.Config
             };
         }
         else
         {
-            Console.Error.WriteLine("Not supported platform.");
+            Console.Error.WriteLine("TargetInfo: Not supported platform. {0}", RuntimeInformation.OSDescription);
             throw TerminateException.Internal();
         }
     }

@@ -36,13 +36,13 @@ public record PlatformInfo
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                if (RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.X64)
+                if (RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.Arm64)
                 {
-                    return OSX64;
+                    return OSXArm64;
                 }
             }
 
-            Console.Error.WriteLine("Not supported platform.");
+            Console.Error.WriteLine("PlatformInfo: Not supported platform. {0} ({1})", RuntimeInformation.OSDescription, RuntimeInformation.ProcessArchitecture);
             throw TerminateException.NotSupport();
         }
     }
@@ -61,17 +61,17 @@ public record PlatformInfo
         Architecture = Architecture.X64
     };
 
-    public static readonly PlatformInfo OSX64 = new()
+    public static readonly PlatformInfo OSXArm64 = new()
     {
-        Name = "OSX64",
+        Name = "OSXArm64",
         Group = PlatformGroup.OSX,
-        Architecture = Architecture.X64
+        Architecture = Architecture.Arm64
     };
 
     public static IEnumerable<PlatformInfo> GetAllPlatforms()
     {
         yield return Win64;
         yield return Linux64;
-        yield return OSX64;
+        yield return OSXArm64;
     }
 }

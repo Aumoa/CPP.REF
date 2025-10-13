@@ -29,7 +29,7 @@ internal abstract class Installation
         }
         else
         {
-            Console.Error.WriteLine("Not supported platform.");
+            Console.Error.WriteLine("Installation: Not supported platform. {0}", RuntimeInformation.OSDescription);
             throw TerminateException.Internal();
         }
     }
