@@ -61,9 +61,10 @@ using System.Runtime.InteropServices;
             if (syntax is SAClass aclass)
             {
                 var @class = typeNames.FindClass(aclass.Class);
+                var @namespace = string.Join(".", @class.Namespace.Names);
                 if (@class.Namespace.Names.Length > 0)
                 {
-                    sourceCode += IndentedLine($"namespace {string.Join(".", @class.Namespace.Names)}");
+                    sourceCode += IndentedLine($"namespace {@namespace}");
                     sourceCode += IndentedLine($"{{");
                     ++indent;
                 }
@@ -84,6 +85,8 @@ using System.Runtime.InteropServices;
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
                     sourceCode += IndentedLine($"");
+                    sourceCode += IndentedLine($"private static global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({@class.Name});");
+                    sourceCode += IndentedLine($"private static nint GetScriptType__Invoke() => global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
 
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
                     {
@@ -170,6 +173,9 @@ using System.Runtime.InteropServices;
                     }
 
                     sourceCode += IndentedLine($"");
+                    sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper GetManagedType() => GetManagedType__Injected();");
+                    sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
+                    sourceCode += IndentedLine($"private static extern global::Ayla.ManagedTypeWrapper GetManagedType__Injected();");
 
                     GenerateFunctionBodies(false);
                 });

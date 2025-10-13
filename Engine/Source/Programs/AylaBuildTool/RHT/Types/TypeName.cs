@@ -29,6 +29,7 @@ internal abstract class TypeName
     public static readonly TypeName Double = new BuiltinTypeName(BuiltinTypeName.Kinds.Double);
     public static readonly TypeName Object = new BuiltinTypeName(BuiltinTypeName.Kinds.Object);
     public static readonly CancellationTokenTypeName CancellationToken = new CancellationTokenTypeName();
+    public static readonly ManagedTypeName ManagedType = new ManagedTypeName();
     public static readonly Vector2TypeName Vector2 = new Vector2TypeName();
     public static readonly Vector3TypeName Vector3 = new Vector3TypeName();
     public static readonly Vector4TypeName Vector4 = new Vector4TypeName();

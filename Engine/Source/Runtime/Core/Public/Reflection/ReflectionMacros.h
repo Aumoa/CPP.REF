@@ -58,6 +58,10 @@ public: \
 		} \
 	}
 
+#define GENERATED_BODY__DECLARE_MANAGED_TYPE() \
+public: \
+	inline static ::Ayla::ManagedTypeWrapper GetManagedType();
+
 #define GENERATED_BODY__GATHER_PROPERTIES_PROP(Name) \
 		collector.Add(TEXT(#Name), ::Ayla::PropertyCollector::Advance<This>(&reinterpret_cast<This*>(0)->Name), 0);
 

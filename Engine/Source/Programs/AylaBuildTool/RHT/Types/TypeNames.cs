@@ -19,6 +19,7 @@ internal class TypeNames(TypeName[] customTypeNames)
         ArrayTypeName.GenericTypeDefinition,
         SharedPtrTypeName.GenericTypeDefinition,
         TypeName.CancellationToken,
+        TypeName.ManagedType,
         TypeName.Vector2,
         TypeName.Vector3,
         TypeName.Vector4,

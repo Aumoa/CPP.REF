@@ -27,6 +27,7 @@ namespace Ayla
 		void SetActive(bool active);
 		AFUNCTION()
 		bool IsActiveSelf() const { return m_IsActive; }
-		std::shared_ptr<Component> AddComponent(Type* type);
+		AFUNCTION()
+		std::shared_ptr<Component> AddComponent(ManagedTypeWrapper componentType);
 	};
 }

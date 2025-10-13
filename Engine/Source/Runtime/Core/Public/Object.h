@@ -12,6 +12,7 @@
 #include "Reflection/ReflectionMacros.h"
 #include "Marshal/ObjectReferenceWrapper.h"
 #include "Marshal/ObjectReferenceLocker.h"
+#include "Marshal/ManagedTypeWrapper.h"
 #include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>
@@ -22,6 +23,7 @@ extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self);
 	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle);
+	PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedType__Injected();
 }
 
 namespace Ayla
@@ -38,6 +40,7 @@ namespace Ayla
 		friend RuntimeType;
 		friend ::Ayla::ssize_t (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self);
 		friend void ::Ayla__Object__EndWriteGCHandle__Injected(void* self, ssize_t handle);
+		friend ::Ayla::ManagedTypeWrapper (::Ayla__Object__GetManagedType__Injected)();
 
 	public:
 		using This = Object;
@@ -53,6 +56,9 @@ namespace Ayla
 		};
 
 		GENERATE_BITMASK_ENUM_OPERATORS_FRIEND(::Ayla::Object::CreationFlags);
+
+	public:
+		static ManagedTypeWrapper GetManagedType();
 
 	private:
 		static size_t s_LiveObjects;

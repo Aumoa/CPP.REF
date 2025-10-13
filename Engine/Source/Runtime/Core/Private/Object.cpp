@@ -8,6 +8,9 @@
 #include "Reflection/TypeRegister.h"
 #include "Reflection/TypeCollector.h"
 #include "Reflection/ReflectionMacros.h"
+#include "ScriptingBackend/ScriptingBackend.h"
+
+ACLASS__IMPL_CLASS_REGISTER(Ayla, Object);
 
 namespace Ayla
 {
@@ -36,6 +39,19 @@ namespace Ayla
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
 	size_t Object::s_LiveObjects;
+
+	ManagedTypeWrapper Object::GetManagedType()
+	{
+		using signature_t = void*(*)();
+
+		static ManagedTypeWrapper s_Type =
+		{
+			.NativeType = TypeCollector::FindType(typeid(Object)),
+			.ScriptTypeGetter = reinterpret_cast<signature_t>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.Object", "GetScriptType__Invoke"))()
+		};
+
+		return s_Type;
+	}
 
 	Object::Object()
 		: m_Type{ CreationHack::s_Hack.ObjectType }
@@ -112,6 +128,11 @@ extern "C"
 		auto self_ = (::Ayla::Object*)self;
 		self_->m_GCHandle = handle;
 		self_->m_Spinlock.unlock();
+	}
+
+	PLATFORM_SHARED_EXPORT::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedType__Injected()
+	{
+		return ::Ayla::Object::GetManagedType();
 	}
 
 	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper Ayla__Object__AsWrapper__Injected(::Ayla::Object* self)

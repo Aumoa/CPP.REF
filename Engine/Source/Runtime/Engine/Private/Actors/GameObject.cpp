@@ -17,9 +17,9 @@ namespace Ayla
 	{
 	}
 
-	std::shared_ptr<Component> GameObject::AddComponent(Type* type)
+	std::shared_ptr<Component> GameObject::AddComponent(ManagedTypeWrapper componentType)
 	{
-		for (auto& ctor : type->GetConstructors())
+		for (auto& ctor : componentType.NativeType->GetConstructors())
 		{
 			auto component = ctor->Invoke(std::span<std::any const>{});
 			if (component.has_value())

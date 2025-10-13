@@ -11,6 +11,8 @@ public partial class Engine
     private List<GenericWindowSwapchainExtension> m_SwapchainExtensions = [];
     private GameInstance m_GameInstance;
 
+    private static GetScriptTypeDelegate s_Get = () => typeof(Engine);
+
     public Engine(LaunchOptions options)
     {
         m_MainActivity = GenericApplication.Get().CreateMainActivity();
@@ -20,6 +22,7 @@ public partial class Engine
         m_SwapchainExtensions.Add(m_Graphics.InstallSwapChain(m_MainActivity.GetMainWindow()));
 
         m_GameInstance = InitializeGame(options);
+        m_GameInstance.GetEntryScene();
 
         m_MainActivity.AfterInitialize();
         SetupSwapchainExtensions([.. m_SwapchainExtensions]);

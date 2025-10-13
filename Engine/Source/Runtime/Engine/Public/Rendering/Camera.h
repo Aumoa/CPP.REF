@@ -14,6 +14,7 @@ namespace Ayla
 		GENERATED_BODY()
 
 	public:
+		ACONSTRUCTOR()
 		Camera();
 		virtual ~Camera() noexcept override;
 	};

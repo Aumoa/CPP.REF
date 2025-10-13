@@ -2,8 +2,9 @@
 
 #pragma once
 
+#include "String_.h"
 #include "Platform/PlatformMacros.h"
-#include "Object.h"
+#include "Marshal/ManagedTypeWrapper.h"
 #include <typeinfo>
 #include <span>
 

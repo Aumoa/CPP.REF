@@ -51,7 +51,8 @@ internal partial class RHTGenerator
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.
 
-#include "CoreMinimal.h"{headersInclude}
+#include "CoreMinimal.h"
+#include "Reflection/TypeCollector.h"{headersInclude}
 #include "{SourceCode.FilePath.Replace('\\', '/')}"
 
 
@@ -66,13 +67,13 @@ internal partial class RHTGenerator
                 var lineNumber = aclass.LineNumber;
 
                 string @namespace = string.Join("::", aclass.Class.Namespaces.Select(p => p.Name));
-                string @class = aclass.Class.Name;
+                string className = aclass.Class.Name;
                 var classType = typeNames.FindClass(aclass.Class);
 
-                WriteIndentedLine($"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {@class});");
+                WriteIndentedLine($"ACLASS__IMPL_CLASS_REGISTER({@namespace}, {className});");
                 WriteIndentedLine($"");
 
-                if (@class == "Object")
+                if (className == "Object")
                 {
                     continue;
                 }
@@ -81,7 +82,7 @@ internal partial class RHTGenerator
                 WriteIndentedLine($"{{");
                 Indented(() =>
                 {
-                    WriteIndentedLine($"void {@class}::GatherProperties(::Ayla::PropertyCollector& collector)");
+                    WriteIndentedLine($"void {className}::GatherProperties(::Ayla::PropertyCollector& collector)");
                     WriteIndentedLine($"{{");
                     Indented(() =>
                     {
@@ -89,6 +90,25 @@ internal partial class RHTGenerator
                         WriteIndentedLine($"Transfer(collector);");
                     });
                     WriteIndentedLine($"}}");
+                    WriteIndentedLine($"");
+                    WriteIndentedLine($"::Ayla::ManagedTypeWrapper {className}::GetManagedType()");
+                    WriteIndentedLine($"{{");
+                    Indented(() =>
+                    {
+                        WriteIndentedLine($"using signature_t = void*(*)();");
+                        WriteIndentedLine($"static ::Ayla::ManagedTypeWrapper s_Type =");
+                        WriteIndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            WriteIndentedLine($".NativeType = ::Ayla::TypeCollector::FindType(typeid({className})),");
+                            WriteIndentedLine($".ScriptTypeGetter = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Injected\", \"GetScriptType__Invoke\"))()");
+                        });
+                        WriteIndentedLine($"}};");
+                        WriteIndentedLine($"");
+                        WriteIndentedLine($"return s_Type;");
+                    });
+                    WriteIndentedLine($"}}");
+                    WriteIndentedLine($"");
 
                     for (int i = 0; i < aclass.Functions.Count; ++i)
                     {
@@ -109,7 +129,7 @@ internal partial class RHTGenerator
                         var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
                         var parametersDeclare = ParametersGenerator.GenerateCpp(parameters);
                         var suffix = function.Flags.HasFlag(SFunction.FFlags.Const) ? " const" : string.Empty;
-                        WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}({parametersDeclare}){suffix}");
+                        WriteIndentedLine($"{function.ReturnType.FullName} {className}::{function.Name}({parametersDeclare}){suffix}");
                         WriteIndentedLine($"{{");
                         Indented(() =>
                         {
@@ -124,7 +144,7 @@ internal partial class RHTGenerator
                         WriteIndentedLine($"}}");
                         if (rule.Type == ModuleType.Application)
                         {
-                            WriteIndentedLine($"{function.ReturnType.FullName} {@class}::{function.Name}_Implementation({parametersDeclare})");
+                            WriteIndentedLine($"{function.ReturnType.FullName} {className}::{function.Name}_Implementation({parametersDeclare})");
                             WriteIndentedLine($"{{");
                             Indented(() =>
                             {
@@ -140,6 +160,15 @@ internal partial class RHTGenerator
                 WriteIndentedLine($"{{");
                 Indented(() =>
                 {
+                    WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper {classType.CppName[2..].Replace("::", "__")}__GetManagedType()");
+                    WriteIndentedLine($"{{");
+                    Indented(() =>
+                    {
+                        WriteIndentedLine($"return {@namespace}::{className}::GetManagedType();");
+                    });
+                    WriteIndentedLine($"}}");
+                    WriteIndentedLine($"");
+
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
                     {
                         var constructor = aclass.Constructors[i];
@@ -150,7 +179,7 @@ internal partial class RHTGenerator
                             parameters.Add(paramType, param.Variable.Name);
                         }
                         var parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters);
-                        string constructorFullName = $"{@namespace.Replace("::", "__")}__{@class}__{constructor.Name}__{i}__Injected";
+                        string constructorFullName = $"{@namespace.Replace("::", "__")}__{className}__{constructor.Name}__{i}__Injected";
                         string arguments = string.Join(", ", constructor.Parameters.Select(p =>
                         {
                             var argumentType = typeNames.FindType(p.Variable.TypeName, aclass.Class);
@@ -179,7 +208,7 @@ internal partial class RHTGenerator
                             parameters.Add(paramType, param.Variable.Name);
                         }
 
-                        string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
+                        string functionFullName = $"{@namespace.Replace("::", "__")}__{className}__{function.Name}__{i}__Injected";
                         bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
                         bool isVirtual = function.Flags.HasFlag(SFunction.FFlags.Virtual);
                         var caller = isStatic ? $"{classType.CppName}::" : $"(({classType.CppName}*)(::Ayla::Object*)self)->";

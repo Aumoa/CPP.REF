@@ -36,7 +36,8 @@ internal partial class RHTGenerator
                 var lineNumber = aclass.Body.LineNumber;
                 var scope = string.Join("::", aclass.Class.Namespaces.Select(ns => ns.Name));
                 string @namespace = string.Join("::", aclass.Class.Namespaces.Select(p => p.Name));
-                string @class = aclass.Class.Name;
+                string className = aclass.Class.Name;
+                var @class = typeNames.FindClass(aclass.Class);
 
                 headerText += Indented_Line($"extern \"C\"");
                 headerText += Indented_Line($"{{");
@@ -53,7 +54,7 @@ internal partial class RHTGenerator
                             var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
                             parameters.Add(paramType, param.Variable.Name);
                         }
-                        string functionFullName = $"{@namespace.Replace("::", "__")}__{@class}__{function.Name}__{i}__Injected";
+                        string functionFullName = $"{@namespace.Replace("::", "__")}__{className}__{function.Name}__{i}__Injected";
                         string paramsDeclare;
                         if (function.Flags.HasFlag(SFunction.FFlags.Static) == false)
                         {
@@ -214,7 +215,7 @@ internal partial class RHTGenerator
                         });
                         headerText += IndentedMLine($"}}");
                         headerText += IndentedMLine($"");
-                        headerText += IndentedMLine($"static constexpr size_t tuple_size = {aclass.Properties.Count + aclass.Functions.Count};");
+                        headerText += IndentedMLine($"static constexpr size_t tuple_size = {count};");
                     });
                     headerText += IndentedMLine($"}};");
                 });
@@ -251,6 +252,7 @@ internal partial class RHTGenerator
                     }
                     headerText += IndentedMLine($"GENERATED_BODY__DECLARE_GATHER_PROPERTIES()");
                     headerText += IndentedMLine($"GENERATED_BODY__DECLARE_TRANSFER()");
+                    headerText += IndentedMLine($"GENERATED_BODY__DECLARE_MANAGED_TYPE()");
                 });
                 headerText += Indented_Line($"private:\n");
             }
