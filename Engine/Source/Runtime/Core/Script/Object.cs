@@ -3,7 +3,7 @@
 namespace Ayla;
 
 
-public partial class Object : IDisposable
+public partial class Object : IDisposable, IStaticObject
 {
     internal class InternalCreation
     {

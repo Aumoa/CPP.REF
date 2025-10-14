@@ -6,13 +6,13 @@ internal partial class RHTGenerator
 {
     public string GenerateCSharp(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
     {
+        const string kDllImport = "global::System.Runtime.InteropServices.DllImport";
+
         string sourceCode = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.
 
 #nullable disable
-
-using System.Runtime.InteropServices;
 
 
 """;
@@ -85,7 +85,7 @@ using System.Runtime.InteropServices;
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
                     sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"private static global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({@class.Name});");
+                    sourceCode += IndentedLine($"private static readonly global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({@class.Name});");
                     sourceCode += IndentedLine($"private static nint GetScriptType__Invoke() => global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
 
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
@@ -102,7 +102,7 @@ using System.Runtime.InteropServices;
 
                         var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters);
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
-                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
+                        sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
                         sourceCode += IndentedLine($"private static extern global::Ayla.ObjectReferenceLocker ctor_{constructor.Name}__Injected({injectParamsDeclare});");
 
                         var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
@@ -129,7 +129,7 @@ using System.Runtime.InteropServices;
                 sourceCode += IndentedLine($"}}");
                 sourceCode += IndentedLine($"");
 
-                sourceCode += IndentedLine($"public partial class {@class.Name} : {@class.Name}__Injected");
+                sourceCode += IndentedLine($"public partial class {@class.Name} : {@class.Name}__Injected, global::Ayla.IStaticObject");
                 sourceCode += IndentedLine($"{{");
 
                 Indented(() =>
@@ -174,7 +174,7 @@ using System.Runtime.InteropServices;
 
                     sourceCode += IndentedLine($"");
                     sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper GetManagedType() => GetManagedType__Injected();");
-                    sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
+                    sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
                     sourceCode += IndentedLine($"private static extern global::Ayla.ManagedTypeWrapper GetManagedType__Injected();");
 
                     GenerateFunctionBodies(false);
@@ -224,7 +224,7 @@ using System.Runtime.InteropServices;
                             injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
                         }
 
-                        sourceCode += IndentedLine($"[DllImport(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
+                        sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
                         sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}__Injected({injectParamsDeclare});");
 
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
