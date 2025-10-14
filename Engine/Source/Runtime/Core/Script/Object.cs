@@ -98,4 +98,7 @@ public partial class Object : IDisposable
 
     [DllImport("Core", EntryPoint = "Ayla__Object__CreateLocker__Injected")]
     internal static extern ObjectReferenceLocker CreateLocker__Injected(nint instanceId);
+
+    [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedTypeFromPtr__Injected")]
+    internal static extern ManagedTypeWrapper GetManagedTypeFromPtr__Injected(nint instanceId);
 }

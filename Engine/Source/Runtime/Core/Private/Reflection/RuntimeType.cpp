@@ -35,6 +35,11 @@ namespace Ayla
         return m_TR.TypeInfo;
     }
 
+    ManagedTypeWrapper RuntimeType::GetManagedType() const
+    {
+        return m_TR.ManagedTypeGetter();
+	}
+
     std::span<const ConstructorInfo* const> RuntimeType::GetConstructors() const
     {
         return m_Constructors;

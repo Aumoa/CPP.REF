@@ -17,6 +17,9 @@ public readonly struct ObjectReferenceWrapper
             return null;
         }
 
+        var managedType = Object.GetManagedTypeFromPtr__Injected(Ptr);
+        var scriptType = managedType.GetScriptType();
+
         Object.BeginWriteGCHandle__Injected(Ptr);
         GCHandle handle = default;
         try
@@ -32,7 +35,7 @@ public readonly struct ObjectReferenceWrapper
 
             var locker = Object.CreateLocker__Injected(Ptr);
             Object.InternalCreation.ThreadLocal.Value!.CreatedByResolver = true;
-            var inst = (T?)Activator.CreateInstance(typeof(T), BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
+            var inst = (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
             handle = GCHandle.Alloc(inst, GCHandleType.Weak);
             return inst;
         }

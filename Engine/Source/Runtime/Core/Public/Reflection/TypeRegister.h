@@ -8,6 +8,8 @@
 
 namespace Ayla
 {
+	struct ManagedTypeWrapper;
+
 	struct CORE_API TypeRegister
 	{
 		String Namespace;
@@ -15,6 +17,7 @@ namespace Ayla
 		String FullName;
 		const std::type_info* TypeInfo;
 		PropertyCollector PCollector;
+		ManagedTypeWrapper (*ManagedTypeGetter)();
 
 		void Register() const;
 

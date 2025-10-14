@@ -15,7 +15,8 @@ namespace Ayla \
 			.Namespace = TEXT(#NamespaceName), \
 			.Name = TEXT(#ClassName), \
 			.FullName = TEXT(#NamespaceName "." #ClassName), \
-			.TypeInfo = &typeid(NamespaceName::ClassName) \
+			.TypeInfo = &typeid(NamespaceName::ClassName), \
+			.ManagedTypeGetter = &NamespaceName::ClassName::GetManagedType \
 		}; \
  \
 		TypeRegister::GetPropertyCollector<NamespaceName::ClassName>(s_TR.PCollector); \

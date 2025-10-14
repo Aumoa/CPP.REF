@@ -19,6 +19,7 @@ namespace Ayla
 		virtual String GetNamespace() const override;
 		virtual String GetFullName() const override;
 		virtual const std::type_info* GetTypeInfo() const override;
+		virtual ManagedTypeWrapper GetManagedType() const override;
 		virtual std::span<const ConstructorInfo* const> GetConstructors() const override;
 	};
 }

@@ -144,4 +144,9 @@ extern "C"
 	{
 		return self->CreateLocker();
 	}
+
+	PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedTypeFromPtr__Injected(::Ayla::Object* self)
+	{
+		return self->GetType()->GetManagedType();
+	}
 }
