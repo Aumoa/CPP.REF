@@ -18,6 +18,7 @@ internal class TypeNames(TypeName[] customTypeNames)
         TypeName.Object,
         ArrayTypeName.GenericTypeDefinition,
         SharedPtrTypeName.GenericTypeDefinition,
+        TaskTypeName.GenericTypeDefinition,
         TypeName.CancellationToken,
         TypeName.ManagedType,
         TypeName.Vector2,

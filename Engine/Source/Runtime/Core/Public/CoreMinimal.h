@@ -65,6 +65,7 @@
 #include "Marshal/ManagedStringWrapper.h"
 #include "Marshal/ManagedArrayWrapper.h"
 #include "Marshal/ManagedTypeWrapper.h"
+#include "Marshal/ManagedTaskWrapper.h"
 
 #include "Diagnostics/Debug.h"
 #include "Diagnostics/LogMacros.h"

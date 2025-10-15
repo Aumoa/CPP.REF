@@ -20,6 +20,10 @@ namespace Ayla
 		std::vector<std::shared_ptr<Scene>> m_AdditiveScenes;
 
 	public:
-		Task<> LoadSceneAsync(std::shared_ptr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
+		ACONSTRUCTOR()
+		SceneManager();
+
+		AFUNCTION()
+		Task<void> LoadSceneAsync(std::shared_ptr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
 	};
 }

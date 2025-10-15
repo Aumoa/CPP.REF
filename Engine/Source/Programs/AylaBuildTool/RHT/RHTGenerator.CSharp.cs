@@ -296,7 +296,7 @@ internal partial class RHTGenerator
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
 
-                        sourceCode += IndentedLine($"public static void Log(global::Ayla.LogVerbosity level, string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"public static void Log(global::Ayla.LogVerbosity level, string format, params global::System.ReadOnlySpan<object> args)");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
@@ -315,7 +315,7 @@ internal partial class RHTGenerator
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
 
-                        sourceCode += IndentedLine($"public static void Verbose(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"public static void Verbose(string format, params System.ReadOnlySpan<object> args)");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
@@ -334,7 +334,7 @@ internal partial class RHTGenerator
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
 
-                        sourceCode += IndentedLine($"public static void Info(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"public static void Info(string format, params System.ReadOnlySpan<object> args)");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
@@ -353,7 +353,7 @@ internal partial class RHTGenerator
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
 
-                        sourceCode += IndentedLine($"public static void Warning(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"public static void Warning(string format, params System.ReadOnlySpan<object> args)");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
@@ -372,7 +372,7 @@ internal partial class RHTGenerator
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
 
-                        sourceCode += IndentedLine($"public static void Error(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"public static void Error(string format, params System.ReadOnlySpan<object> args)");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
@@ -391,7 +391,7 @@ internal partial class RHTGenerator
                         sourceCode += IndentedLine($"}}");
                         sourceCode += IndentedLine($"");
 
-                        sourceCode += IndentedLine($"public static void Critical(string format, params System.ReadOnlySpan<object?> args)");
+                        sourceCode += IndentedLine($"public static void Critical(string format, params System.ReadOnlySpan<object> args)");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
