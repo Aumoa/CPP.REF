@@ -116,7 +116,7 @@ internal partial class RHTGenerator
                             Indented(() =>
                             {
                                 var arguments = string.Join(", ", constructor.Parameters.Select(p => p.Variable.Name));
-                                headerText += IndentedMLine($"return ::Ayla::Object::ScriptNew<{aclass.Class.Name}>({arguments});");
+                                headerText += IndentedMLine($"return ::Ayla::Object::UnsafeNew<{aclass.Class.Name}>({arguments});");
                             });
                             headerText += IndentedMLine($"}}");
                             headerText += IndentedMLine($"");

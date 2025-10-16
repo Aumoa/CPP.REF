@@ -6,7 +6,6 @@ namespace Ayla;
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 public readonly struct ObjectReferenceWrapper
 {
-    public readonly nint IntRef;
     public readonly nint Ptr;
     public readonly nint Handle;
 
@@ -33,20 +32,19 @@ public readonly struct ObjectReferenceWrapper
                 }
             }
 
-            var locker = Object.CreateLocker__Injected(Ptr);
-            Object.InternalCreation.ThreadLocal.Value!.CreatedByResolver = true;
-            var inst = (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
-            handle = GCHandle.Alloc(inst, GCHandleType.Weak);
-            return inst;
-        }
-        finally
-        {
-            if (IntRef > 0)
+            var ptr = Ptr;
+            Func<object, nint> locker = @this =>
             {
-                Object.DeleteIntermediateRef__Injected(IntRef);
-            }
+                Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal));
+                return ptr;
+            };
 
-            Object.EndWriteGCHandle__Injected(Ptr, (nint)handle);
+            return (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
+        }
+        catch
+        {
+            Object.EndWriteGCHandle__Injected(Ptr, 0);
+            throw;
         }
     }
 

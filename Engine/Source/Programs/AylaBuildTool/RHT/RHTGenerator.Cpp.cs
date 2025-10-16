@@ -178,7 +178,7 @@ internal partial class RHTGenerator
                             var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
                             parameters.Add(paramType, param.Variable.Name);
                         }
-                        var parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters);
+                        var parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
                         string constructorFullName = $"{@namespace.Replace("::", "__")}__{className}__{constructor.Name}__{i}__Injected";
                         string arguments = string.Join(", ", constructor.Parameters.Select(p =>
                         {
@@ -187,9 +187,7 @@ internal partial class RHTGenerator
                         }));
                         string callable = $"::Ayla::Object::ScriptNew<{classType.CppName}>";
                         var codeGen = new FunctionBodyGenerator(parameters, callable, PlaceholderName.Value);
-                        string bodyStatement = $"::Ayla::Object::ScriptNew<{classType.CppName}>({arguments})";
-                        string returnStatement = $"return {bodyStatement}";
-                        WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceLocker {constructorFullName}({parametersDeclare})");
+                        WriteIndentedLine($"PLATFORM_SHARED_EXPORT void* {constructorFullName}({parametersDeclare})");
                         WriteIndentedLine($"{{");
                         Indented(() =>
                         {

@@ -11,7 +11,6 @@
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Marshal/ObjectReferenceWrapper.h"
-#include "Marshal/ObjectReferenceLocker.h"
 #include "Marshal/ManagedTypeWrapper.h"
 #include "Threading/Spinlock.h"
 #include <vector>
@@ -49,7 +48,7 @@ namespace Ayla
 		struct CreationHack;
 
 	public:
-		enum class CreationFlags
+		enum class CreationFlags : uint8
 		{
 			None,
 			FromScript = 1 << 0
@@ -66,6 +65,7 @@ namespace Ayla
 		Spinlock m_Spinlock;
 		Type* m_Type;
 		CreationFlags m_Flags;
+		int32 m_Refs = 0;
 		ssize_t m_GCHandle = 0;
 
 	protected:
@@ -83,7 +83,9 @@ namespace Ayla
 		String ToString();
 		Type* GetType() const { return m_Type; }
 
-		ObjectReferenceLocker CreateLocker();
+		void AddRef();
+		void ReleaseRef();
+		void* BindGCHandle__Unsafe(ssize_t gcHandlePtr);
 		ObjectReferenceWrapper AsWrapper();
 
 		Object& operator =(const Object&) = delete;
@@ -102,21 +104,33 @@ namespace Ayla
 		}
 
 		template<std::derived_from<Object> T, class... TArgs>
-		static std::shared_ptr<T> ScriptNew(TArgs&&... args)
+		static std::shared_ptr<T> UnsafeNew(TArgs&&... args)
 		{
-			std::optional<std::shared_ptr<T>> ptr;
-			if constexpr (std::constructible_from<T, TArgs...>)
+			if constexpr (std::is_constructible_v<T, TArgs...>)
 			{
-				ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
-				{
-					ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
-				});
-
-				return std::move(ptr).value();
+				return New<T>(std::forward<TArgs>(args)...);
 			}
 			else
 			{
-				throw MemberAccessException(TEXT("Cannot create an abstract class."));
+				throw InvalidOperationException(TEXT("The constructor is not constructible."));
+			}
+		}
+
+		template<std::derived_from<Object> T, class... TArgs>
+		static T* ScriptNew(TArgs&&... args)
+		{
+			if constexpr (std::is_constructible_v<T, TArgs...>)
+			{
+				T* ptr;
+				ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
+				{
+					ptr = new T(std::forward<TArgs>(args)...);
+				});
+				return ptr;
+			}
+			else
+			{
+				throw InvalidOperationException(TEXT("The constructor is not constructible."));
 			}
 		}
 

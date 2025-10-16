@@ -60,6 +60,7 @@
 #include "Reflection/reflexpr.h"
 #include "Reflection/TransferFunction.h"
 #include "Reflection/ConstructorInfo.h"
+#include "Reflection/ReflectionMacros.h"
 
 #include "Marshal/ObjectReferenceWrapper.h"
 #include "Marshal/ManagedStringWrapper.h"

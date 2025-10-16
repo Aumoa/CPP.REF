@@ -23,7 +23,6 @@ namespace Ayla
 		ACONSTRUCTOR()
 		SceneManager();
 
-		AFUNCTION()
 		Task<void> LoadSceneAsync(std::shared_ptr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
 	};
 }
