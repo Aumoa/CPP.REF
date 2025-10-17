@@ -13,7 +13,7 @@ namespace Ayla
 	{
 	}
 
-	std::shared_ptr<Scene> GameInstance::GetEntryScene_Implementation()
+	SharedPtr<Scene> GameInstance::GetEntryScene_Implementation()
 	{
 		return m_EntryScene ? m_EntryScene : New<Scene>();
 	}

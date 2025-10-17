@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Reflection/reflexpr.h"
+#include "SharedPtr.h"
 #include <memory>
 #include <span>
 #include <concepts>
@@ -16,7 +17,7 @@ namespace Ayla
 	private:
 		// TODO:
 		std::reflect::access_type m_DefaultConstructorAccess = std::reflect::access_type::public_;
-		std::shared_ptr<Object>(*m_DefaultConstructor)();
+		SharedPtr<Object>(*m_DefaultConstructor)();
 
 	public:
 		PropertyCollector() noexcept = default;

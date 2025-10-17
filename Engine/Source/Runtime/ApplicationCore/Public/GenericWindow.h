@@ -20,7 +20,7 @@ namespace Ayla
 
     private:
         Spinlock m_Lock;
-        std::vector<std::shared_ptr<GenericWindowExtension>> m_Extensions;
+        std::vector<SharedPtr<GenericWindowExtension>> m_Extensions;
 
     protected:
         GenericWindow();
@@ -28,10 +28,10 @@ namespace Ayla
     public:
         virtual ~GenericWindow() noexcept;
 
-        void AddExtension(std::shared_ptr<GenericWindowExtension> extension);
+        void AddExtension(SharedPtr<GenericWindowExtension> extension);
 
         template<class T>
-        std::shared_ptr<T> GetExtension()
+        SharedPtr<T> GetExtension()
         {
             auto lock = std::unique_lock{ m_Lock };
             for (auto& extension : m_Extensions)

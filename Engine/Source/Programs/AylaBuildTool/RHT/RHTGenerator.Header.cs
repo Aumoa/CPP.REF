@@ -111,7 +111,7 @@ internal partial class RHTGenerator
                         Indented(() =>
                         {
                             var parameterDeclare1 = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName + " " + p.Variable.Name));
-                            headerText += IndentedMLine($"static std::shared_ptr<::Ayla::Object> constructor__{i}__{constructor.Name}({parameterDeclare1})");
+                            headerText += IndentedMLine($"static ::Ayla::SharedPtr<::Ayla::Object> constructor__{i}__{constructor.Name}({parameterDeclare1})");
                             headerText += IndentedMLine($"{{");
                             Indented(() =>
                             {
@@ -125,7 +125,7 @@ internal partial class RHTGenerator
                             Indented(() =>
                             {
                                 var parameterDeclare2 = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName));
-                                headerText += IndentedMLine($"using signature_t = std::shared_ptr<::Ayla::Object>(*)({parameterDeclare2});");
+                                headerText += IndentedMLine($"using signature_t = ::Ayla::SharedPtr<::Ayla::Object>(*)({parameterDeclare2});");
                                 headerText += IndentedMLine($"return ::std::experimental::reflect::reflexpr_constructor<{access}, signature_t, (signature_t)&constructor__{i}__{constructor.Name}>();");
                             });
                             headerText += IndentedMLine($"}}");

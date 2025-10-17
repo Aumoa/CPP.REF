@@ -24,7 +24,7 @@ namespace Ayla
         virtual ~Graphics() noexcept;
 
         AFUNCTION()
-        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain(std::shared_ptr<GenericWindow> targetWindow) APURE;
+        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) APURE;
         virtual void BeginRenderThread() = 0;
         virtual void EndRenderThread() = 0;
     };

@@ -7,6 +7,7 @@
 #include "AssertionMacros.h"
 #include "LanguageSupportMacros.h"
 #include "Referencer.h"
+#include "SharedPtr.h"
 #include "Platform/PlatformMacros.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
@@ -32,7 +33,7 @@ namespace Ayla
 	class RuntimeType;
 
 	ACLASS()
-	class CORE_API Object : public std::enable_shared_from_this<Object>
+	class CORE_API Object
 	{
 		friend TypeRegister;
 		friend Type;
@@ -87,24 +88,33 @@ namespace Ayla
 		void ReleaseRef();
 		void* BindGCHandle__Unsafe(ssize_t gcHandlePtr);
 		ObjectReferenceWrapper AsWrapper();
+		
+		template<class T>
+		auto AsShared(this T&& self)
+		{
+			using U = std::remove_const_t<std::remove_reference_t<T>>;
+			auto& hack = const_cast<U&>(self);
+			hack.AddRef();
+			return SharedPtr<U>(&hack);
+		}
 
 		Object& operator =(const Object&) = delete;
 		Object& operator =(Object&&) = delete;
 
 	public:
 		template<std::derived_from<Object> T, class... TArgs>
-		static std::shared_ptr<T> New(TArgs&&... args)
+		static SharedPtr<T> New(TArgs&&... args)
 		{
-			std::optional<std::shared_ptr<T>> ptr;
+			std::optional<SharedPtr<T>> ptr;
 			ConfigureNew(typeid(T), CreationFlags::None, [&]()
 			{
-				ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
+				ptr.emplace((new T(std::forward<TArgs>(args)...))->AsShared());
 			});
 			return std::move(ptr).value();
 		}
 
 		template<std::derived_from<Object> T, class... TArgs>
-		static std::shared_ptr<T> UnsafeNew(TArgs&&... args)
+		static SharedPtr<T> UnsafeNew(TArgs&&... args)
 		{
 			if constexpr (std::is_constructible_v<T, TArgs...>)
 			{
@@ -132,13 +142,6 @@ namespace Ayla
 			{
 				throw InvalidOperationException(TEXT("The constructor is not constructible."));
 			}
-		}
-
-	protected:
-		template<class U>
-		std::shared_ptr<std::remove_reference_t<U>> SharedFromThis(this const U& u)
-		{
-			return std::static_pointer_cast<U>(const_cast<U&>(u).shared_from_this());
 		}
 
 	private:

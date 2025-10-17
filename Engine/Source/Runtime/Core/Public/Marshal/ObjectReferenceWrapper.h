@@ -3,6 +3,7 @@
 #pragma once
 
 #include "IntegralTypes.h"
+#include "SharedPtr.h"
 #include <memory>
 
 namespace Ayla
@@ -15,18 +16,18 @@ namespace Ayla
 		ssize_t Handle;
 
 		template<class T>
-		inline std::shared_ptr<T> AsNative() const
+		inline SharedPtr<T> AsNative() const
 		{
-			return std::dynamic_pointer_cast<T>(AsNative_Internal());
+			return AsNative_Internal().As<T>();
 		}
 
 		template<class T>
-		static ObjectReferenceWrapper FromObject(const std::shared_ptr<T>& obj)
+		static ObjectReferenceWrapper FromObject(const SharedPtr<T>& obj)
 		{
 			return obj ? obj->AsWrapper() : ObjectReferenceWrapper{};
 		}
 
 	private:
-		std::shared_ptr<Object> AsNative_Internal() const;
+		SharedPtr<Object> AsNative_Internal() const;
 	};
 }

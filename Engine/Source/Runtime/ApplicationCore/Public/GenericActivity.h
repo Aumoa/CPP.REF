@@ -27,6 +27,6 @@ namespace Ayla
 		AFUNCTION()
 		virtual void AfterInitialize() APURE;
 		AFUNCTION()
-		virtual std::shared_ptr<GenericWindow> GetMainWindow() const APURE;
+		virtual SharedPtr<GenericWindow> GetMainWindow() const APURE;
 	};
 }

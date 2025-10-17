@@ -58,7 +58,7 @@ namespace Ayla
 		//});
 	}
 
-	void Engine::SetupSwapchainExtensions(std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> extensions)
+	void Engine::SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions)
 	{
 		m_SwapchainExtensions = std::move(extensions);
 	}

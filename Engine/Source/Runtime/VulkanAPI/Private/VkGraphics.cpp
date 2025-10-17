@@ -215,7 +215,7 @@ namespace Ayla
         }
     }
 
-    std::shared_ptr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(std::shared_ptr<GenericWindow> targetWindow)
+    SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow)
     {
 #if PLATFORM_LINUX
         auto* display = reinterpret_cast<Display*>(GenericApplication::Get().GetApplicationPointer());

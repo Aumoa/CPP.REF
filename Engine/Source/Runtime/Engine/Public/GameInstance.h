@@ -16,14 +16,13 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		APROPERTY()
-		std::shared_ptr<Scene> m_EntryScene;
+		SharedPtr<Scene> m_EntryScene;
 
 	public:
 		GameInstance();
 		virtual ~GameInstance() noexcept override;
 
 		AFUNCTION()
-		virtual std::shared_ptr<Scene> GetEntryScene();
+		virtual SharedPtr<Scene> GetEntryScene();
 	};
 }

@@ -9,7 +9,7 @@ internal class SharedPtrTypeName : TypeName
         ElementType = elementType;
     }
 
-    public override string CppName => $"::std::shared_ptr<{ElementType.CppName}>";
+    public override string CppName => $"::Ayla::SharedPtr<{ElementType.CppName}>";
 
     public override string CppBindingName => "::Ayla::ObjectReferenceWrapper";
 
@@ -17,7 +17,7 @@ internal class SharedPtrTypeName : TypeName
 
     public override string CSharpBindingName => "global::Ayla.ObjectReferenceWrapper";
 
-    public override string Id => $"global::std.shared_ptr<{ElementType.Id}>";
+    public override string Id => $"global::Ayla.SharedPtr<{ElementType.Id}>";
 
     public override bool IsGenericTypeDefinition => ElementType is PlaceholderName;
 

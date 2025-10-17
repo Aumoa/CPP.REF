@@ -136,7 +136,7 @@ internal partial class RHTGenerator
                             var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
                             WriteIndentedLine($"using signature_t = {returnType.CppBindingName}(*)({invokeParametersDeclare});");
                             WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Injected\", \"{function.Name}__Invoke\"));");
-                            WriteIndentedLine($"auto self = SharedFromThis();");
+                            WriteIndentedLine($"auto self = AsShared();");
                             string callable = $"callable";
                             var codeGen = new FunctionBodyGenerator(parameters.AddFirstTemp(SharedPtrTypeName.SharedObject, "self"), callable, returnType);
                             codeGen.GenerateCppNativeToCSharp(WriteIndentedLine);

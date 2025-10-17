@@ -5,12 +5,12 @@
 
 namespace Ayla
 {
-	std::shared_ptr<Object> ObjectReferenceWrapper::AsNative_Internal() const
+	SharedPtr<Object> ObjectReferenceWrapper::AsNative_Internal() const
 	{
 		auto* ptr = reinterpret_cast<Object*>(Ptr);
 		if (ptr)
 		{
-			return ptr->shared_from_this();
+			return ptr->AsShared();
 		}
 		else
 		{
