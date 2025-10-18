@@ -7,7 +7,6 @@ namespace Ayla;
 public readonly struct ObjectReferenceWrapper
 {
     public readonly nint Ptr;
-    public readonly nint Handle;
 
     public T? AsManaged<T>() where T : Object
     {
@@ -19,13 +18,13 @@ public readonly struct ObjectReferenceWrapper
         var managedType = Object.GetManagedTypeFromPtr__Injected(Ptr);
         var scriptType = managedType.GetScriptType();
 
-        Object.BeginWriteGCHandle__Injected(Ptr);
+        nint handlePtr = Object.BeginWriteGCHandle__Injected(Ptr);
         GCHandle handle = default;
         try
         {
-            if (Handle != 0)
+            if (handlePtr != 0)
             {
-                handle = GCHandle.FromIntPtr(Handle);
+                handle = GCHandle.FromIntPtr(handlePtr);
                 if (handle.Target is T t)
                 {
                     return t;
@@ -35,7 +34,7 @@ public readonly struct ObjectReferenceWrapper
             var ptr = Ptr;
             Func<object, nint> locker = @this =>
             {
-                Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal));
+                Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal), true);
                 return ptr;
             };
 
@@ -43,7 +42,7 @@ public readonly struct ObjectReferenceWrapper
         }
         catch
         {
-            Object.EndWriteGCHandle__Injected(Ptr, 0);
+            Object.EndWriteGCHandle__Injected(Ptr, 0, true);
             throw;
         }
     }

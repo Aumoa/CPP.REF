@@ -13,7 +13,6 @@ namespace Ayla
 	struct CORE_API ObjectReferenceWrapper
 	{
 		ssize_t Ptr;
-		ssize_t Handle;
 
 		template<class T>
 		inline SharedPtr<T> AsNative() const
@@ -24,10 +23,12 @@ namespace Ayla
 		template<class T>
 		static ObjectReferenceWrapper FromObject(const SharedPtr<T>& obj)
 		{
-			return obj ? obj->AsWrapper() : ObjectReferenceWrapper{};
+			return obj ? FromObject_Internal(obj.Get()) : ObjectReferenceWrapper{};
 		}
 
 	private:
 		SharedPtr<Object> AsNative_Internal() const;
+
+		static ObjectReferenceWrapper FromObject_Internal(Object* obj);
 	};
 }

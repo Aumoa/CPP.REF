@@ -17,4 +17,10 @@ namespace Ayla
 			return nullptr;
 		}
 	}
+
+	ObjectReferenceWrapper ObjectReferenceWrapper::FromObject_Internal(Object* obj)
+	{
+		obj->AddRef();
+		return obj->AsWrapper();
+	}
 }

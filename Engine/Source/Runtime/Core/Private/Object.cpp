@@ -10,6 +10,7 @@
 #include "Reflection/ReflectionMacros.h"
 #include "ScriptingBackend/ScriptingBackend.h"
 #include "Marshal/CoreCLRFunctions.h"
+#include "Marshal/ManagedStringWrapper.h"
 
 ACLASS__IMPL_CLASS_REGISTER(Ayla, Object);
 
@@ -123,8 +124,7 @@ namespace Ayla
 		auto lock = std::unique_lock{ m_Spinlock };
 		return ObjectReferenceWrapper
 		{
-			.Ptr = reinterpret_cast<ssize_t>(this),
-			.Handle = m_GCHandle
+			.Ptr = reinterpret_cast<ssize_t>(this)
 		};
 	}
 
@@ -151,10 +151,20 @@ extern "C"
 		return self_->m_GCHandle;
 	}
 
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle)
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr)
 	{
 		auto self_ = (::Ayla::Object*)self;
 		self_->m_GCHandle = handle;
+		if (releaseIntPtr)
+		{
+			--self_->m_Refs;
+			check(self_->m_Refs != 0 || self_->m_GCHandle);
+		}
+		if (self_->m_Refs == 0 && handle == 0)
+		{
+			self_->m_Spinlock.unlock();
+			delete self_;
+		}
 		self_->m_Spinlock.unlock();
 	}
 

@@ -84,6 +84,11 @@ namespace Ayla
 			other.m_Ptr = nullptr;
 		}
 
+		inline ~SharedPtr() noexcept
+		{
+			Release();
+		}
+
 		inline void AddRef()
 		{
 			if (m_Ptr)
@@ -92,7 +97,7 @@ namespace Ayla
 			}
 		}
 
-		inline void Release()
+		inline void Release() noexcept
 		{
 			T* oldPtr = nullptr;
 			std::swap(oldPtr, m_Ptr);

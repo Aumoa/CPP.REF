@@ -31,7 +31,7 @@ public partial class Object : IDisposable, IStaticObject
         var iid = NativePointer;
         NativePointer = 0;
         var gcHandlePtr = BeginWriteGCHandle__Injected(iid);
-        EndWriteGCHandle__Injected(iid, 0);
+        EndWriteGCHandle__Injected(iid, 0, false);
         if (gcHandlePtr == 0)
         {
             throw new InvalidOperationException();
@@ -54,17 +54,20 @@ public partial class Object : IDisposable, IStaticObject
     }
 
     [DllImport("Core", EntryPoint = "Ayla__Object__BeginWriteGCHandle__Injected")]
-    internal static extern nint BeginWriteGCHandle__Injected(nint instanceId);
+    internal static extern nint BeginWriteGCHandle__Injected(nint instancePtr);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__EndWriteGCHandle__Injected")]
-    internal static extern void EndWriteGCHandle__Injected(nint instanceId, nint handle);
+    internal static extern void EndWriteGCHandle__Injected(nint instancePtr, nint handle, bool releaseIntPtr);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedType__Injected")]
     internal static extern ManagedTypeWrapper GetManagedType__Injected();
 
     [DllImport("Core", EntryPoint = "Ayla__Object__AsWrapper__Injected")]
-    internal static extern ObjectReferenceWrapper AsWrapper__Injected(nint instanceId);
+    internal static extern ObjectReferenceWrapper AsWrapper__Injected(nint instancePtr);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedTypeFromPtr__Injected")]
-    internal static extern ManagedTypeWrapper GetManagedTypeFromPtr__Injected(nint instanceId);
+    internal static extern ManagedTypeWrapper GetManagedTypeFromPtr__Injected(nint instancePtr);
+
+    [DllImport("Core", EntryPoint = "Ayla__Object__ReleaseIntermediatePtr__Injected")]
+    internal static extern void ReleaseIntermediatePtr__Injected(nint instancePtr);
 }
