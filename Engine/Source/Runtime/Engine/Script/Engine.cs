@@ -24,7 +24,7 @@ public partial class Engine
 
         m_GameInstance = InitializeGame(options);
         m_SceneManager = new SceneManager();
-        //m_SceneManager.LoadSceneAsync(m_GameInstance.GetEntryScene(), LoadSceneMode.Single, CancellationToken.None).Wait();
+        m_SceneManager.LoadSceneAsync(m_GameInstance.GetEntryScene(), LoadSceneMode.Single, CancellationToken.None);
 
         m_MainActivity.AfterInitialize();
         SetupSwapchainExtensions([.. m_SwapchainExtensions]);

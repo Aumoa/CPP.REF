@@ -16,13 +16,15 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::shared_ptr<Scene> m_ActiveScene;
-		std::vector<std::shared_ptr<Scene>> m_AdditiveScenes;
+		SharedPtr<Scene> m_ActiveScene;
+		std::vector<SharedPtr<Scene>> m_AdditiveScenes;
 
 	public:
 		ACONSTRUCTOR()
 		SceneManager();
+		virtual ~SceneManager() noexcept override;
 
-		Task<void> LoadSceneAsync(std::shared_ptr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
+		AFUNCTION()
+		void LoadSceneAsync(SharedPtr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
 	};
 }

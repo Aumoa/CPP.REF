@@ -44,7 +44,9 @@ public partial class Object : IDisposable, IStaticObject
 
     public ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer);
 
-    public static ManagedTypeWrapper GetManagedType() => GetManagedType__Injected();
+    public virtual ManagedTypeWrapper GetClass() => StaticClass();
+
+    public static ManagedTypeWrapper StaticClass() => GetManagedType__Injected();
 
     private static GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof(Object);
 

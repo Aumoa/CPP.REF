@@ -171,7 +171,9 @@ internal partial class RHTGenerator
                     }
 
                     sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper GetManagedType() => GetManagedType__Injected();");
+                    sourceCode += IndentedLine($"public override global::Ayla.ManagedTypeWrapper GetClass() => StaticClass();");
+                    sourceCode += IndentedLine($"");
+                    sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper StaticClass() => GetManagedType__Injected();");
                     sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
                     sourceCode += IndentedLine($"private static extern global::Ayla.ManagedTypeWrapper GetManagedType__Injected();");
 
