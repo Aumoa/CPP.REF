@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Ayla;
 
@@ -19,7 +20,7 @@ public unsafe struct ManagedTypeWrapper
         {
             if (s_NativeTypeMapper.TryGetValue(type, out value) == false)
             {
-                var staticClassMethod = type.GetMethod("StaticClass")!;
+                var staticClassMethod = GetStaticClassMethod(type);
                 var managedTypeWrapper = (ManagedTypeWrapper)staticClassMethod.Invoke(null, [])!;
                 value = (managedTypeWrapper.NativeType, () => type);
                 s_NativeTypeMapper.Add(type, value);
@@ -31,5 +32,21 @@ public unsafe struct ManagedTypeWrapper
             NativeType = value.Item1,
             ScriptTypeGetter = Marshal.GetFunctionPointerForDelegate(value.Item2)
         };
+    }
+
+    private static MethodInfo GetStaticClassMethod(Type? type)
+    {
+        while (type != null)
+        {
+            var methodInfo = type.GetMethod("StaticClass", BindingFlags.Public | BindingFlags.Static);
+            if (methodInfo != null)
+            {
+                return methodInfo;
+            }
+
+            type = type.BaseType;
+        }
+
+        throw new InvalidOperationException("No StaticClass method found in type hierarchy.");
     }
 }

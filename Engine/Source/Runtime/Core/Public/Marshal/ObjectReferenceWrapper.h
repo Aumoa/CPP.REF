@@ -13,6 +13,7 @@ namespace Ayla
 	struct CORE_API ObjectReferenceWrapper
 	{
 		ssize_t Ptr;
+		ssize_t IntGCHandlePtr;
 
 		template<class T>
 		inline SharedPtr<T> AsNative() const

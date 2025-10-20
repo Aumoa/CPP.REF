@@ -125,6 +125,21 @@ namespace Ayla
 			return nullptr;
 		}
 
+		template<std::derived_from<T> U>
+		inline bool Is(SharedPtr<U>* output) const
+		{
+			auto* cast = dynamic_cast<U*>(m_Ptr);
+			if (cast)
+			{
+				cast->AddRef();
+				*output = SharedPtr<U>(cast);
+				return true;
+			}
+
+			*output = nullptr;
+			return false;
+		}
+
 		template<class S>
 		constexpr auto Get(this S&& self) noexcept { return const_cast<T*>(self.m_Ptr); }
 

@@ -13,7 +13,7 @@ namespace Ayla
 	{
 	}
 
-	void SceneManager::LoadSceneAsync(SharedPtr<Scene> scene, LoadSceneMode mode, CancellationToken cancellationToken)
+	void SceneManager::LoadScene(SharedPtr<Scene> scene, LoadSceneMode mode)
 	{
 		if (m_ActiveScene)
 		{

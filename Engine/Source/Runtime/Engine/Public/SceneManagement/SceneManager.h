@@ -25,6 +25,6 @@ namespace Ayla
 		virtual ~SceneManager() noexcept override;
 
 		AFUNCTION()
-		void LoadSceneAsync(SharedPtr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single, CancellationToken cancellationToken = CancellationToken::None());
+		void LoadScene(SharedPtr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single);
 	};
 }

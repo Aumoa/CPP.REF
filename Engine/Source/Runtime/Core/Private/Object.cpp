@@ -121,10 +121,10 @@ namespace Ayla
 
 	ObjectReferenceWrapper Object::AsWrapper()
 	{
-		auto lock = std::unique_lock{ m_Spinlock };
 		return ObjectReferenceWrapper
 		{
-			.Ptr = reinterpret_cast<ssize_t>(this)
+			.Ptr = reinterpret_cast<ssize_t>(this),
+			.IntGCHandlePtr = 0
 		};
 	}
 

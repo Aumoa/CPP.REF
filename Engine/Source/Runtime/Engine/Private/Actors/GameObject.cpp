@@ -2,6 +2,8 @@
 
 #include "Actors/GameObject.h"
 #include "Components/Component.h"
+#include "Activator.h"
+#include "LogEngine.h"
 
 namespace Ayla
 {
@@ -19,6 +21,13 @@ namespace Ayla
 
 	SharedPtr<Component> GameObject::AddComponent(ManagedTypeWrapper componentType)
 	{
-		throw InvalidOperationException(TEXT("There is no valid constructor."));
+		auto obj = Activator::CreateInstance(componentType);
+		SharedPtr<Component> comp;
+		if (obj.Is(&comp) == false)
+		{
+			LogEngine::Error(TEXT("Failed to add component. The type is not a Component type."));
+		}
+
+		return comp;
 	}
 }

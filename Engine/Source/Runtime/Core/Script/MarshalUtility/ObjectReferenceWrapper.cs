@@ -4,9 +4,10 @@ using System.Runtime.InteropServices;
 namespace Ayla;
 
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
-public readonly struct ObjectReferenceWrapper
+public struct ObjectReferenceWrapper
 {
-    public readonly nint Ptr;
+    public nint Ptr;
+    public nint IntGCHandlePtr;
 
     public T? AsManaged<T>() where T : Object
     {

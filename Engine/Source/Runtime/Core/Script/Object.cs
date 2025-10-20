@@ -42,7 +42,10 @@ public partial class Object : IDisposable, IStaticObject
 
     public nint NativePointer { get; private set; }
 
-    public ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer);
+    internal ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer) with
+    {
+        IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal)
+    };
 
     public virtual ManagedTypeWrapper GetClass() => StaticClass();
 
