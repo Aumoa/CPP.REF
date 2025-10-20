@@ -4,6 +4,7 @@
 
 #include "IntegralTypes.h"
 #include "ObjectReferenceWrapper.h"
+#include "SharedPtr.h"
 
 namespace Ayla
 {
@@ -20,10 +21,10 @@ namespace Ayla
 		}
 
 		template<class T>
-		inline std::vector<std::shared_ptr<T>> AsObjectArray() const
+		inline std::vector<SharedPtr<T>> AsObjectArray() const
 		{
 			auto* ptr = reinterpret_cast<const ObjectReferenceWrapper*>(Data);
-			std::vector<std::shared_ptr<T>> output;
+			std::vector<SharedPtr<T>> output;
 			output.reserve(Length);
 			for (int32 i = 0; i < Length; ++i)
 			{
@@ -80,7 +81,7 @@ namespace Ayla
 		};
 
 		template<class T>
-		static ObjectArrayBinder FromObjectArray(const std::vector<std::shared_ptr<T>>& array)
+		static ObjectArrayBinder FromObjectArray(const std::vector<SharedPtr<T>>& array)
 		{
 			auto output = new ObjectReferenceWrapper[array.size()];
 			for (size_t i = 0; i < array.size(); ++i)

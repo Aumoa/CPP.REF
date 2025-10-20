@@ -7,11 +7,11 @@
 #include "AssertionMacros.h"
 #include "LanguageSupportMacros.h"
 #include "Referencer.h"
+#include "SharedPtr.h"
 #include "Platform/PlatformMacros.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Marshal/ObjectReferenceWrapper.h"
-#include "Marshal/ObjectReferenceLocker.h"
 #include "Marshal/ManagedTypeWrapper.h"
 #include "Threading/Spinlock.h"
 #include <vector>
@@ -22,7 +22,7 @@
 extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self);
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle);
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr);
 	PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedType__Injected();
 }
 
@@ -33,13 +33,13 @@ namespace Ayla
 	class RuntimeType;
 
 	ACLASS()
-	class CORE_API Object : public std::enable_shared_from_this<Object>
+	class CORE_API Object
 	{
 		friend TypeRegister;
 		friend Type;
 		friend RuntimeType;
 		friend ::Ayla::ssize_t (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self);
-		friend void ::Ayla__Object__EndWriteGCHandle__Injected(void* self, ssize_t handle);
+		friend void ::Ayla__Object__EndWriteGCHandle__Injected(void* self, ssize_t handle, bool releaseIntPtr);
 		friend ::Ayla::ManagedTypeWrapper (::Ayla__Object__GetManagedType__Injected)();
 
 	public:
@@ -49,7 +49,7 @@ namespace Ayla
 		struct CreationHack;
 
 	public:
-		enum class CreationFlags
+		enum class CreationFlags : uint8
 		{
 			None,
 			FromScript = 1 << 0
@@ -66,6 +66,7 @@ namespace Ayla
 		Spinlock m_Spinlock;
 		Type* m_Type;
 		CreationFlags m_Flags;
+		int32 m_Refs = 0;
 		ssize_t m_GCHandle = 0;
 
 	protected:
@@ -83,48 +84,64 @@ namespace Ayla
 		String ToString();
 		Type* GetType() const { return m_Type; }
 
-		ObjectReferenceLocker CreateLocker();
+		void AddRef();
+		void ReleaseRef();
+		void* BindGCHandle__Unsafe(ssize_t gcHandlePtr);
 		ObjectReferenceWrapper AsWrapper();
+		
+		template<class T>
+		auto AsShared(this T&& self)
+		{
+			using U = std::remove_const_t<std::remove_reference_t<T>>;
+			auto& hack = const_cast<U&>(self);
+			hack.AddRef();
+			return SharedPtr<U>(&hack);
+		}
 
 		Object& operator =(const Object&) = delete;
 		Object& operator =(Object&&) = delete;
 
 	public:
 		template<std::derived_from<Object> T, class... TArgs>
-		static std::shared_ptr<T> New(TArgs&&... args)
+		static SharedPtr<T> New(TArgs&&... args)
 		{
-			std::optional<std::shared_ptr<T>> ptr;
+			std::optional<SharedPtr<T>> ptr;
 			ConfigureNew(typeid(T), CreationFlags::None, [&]()
 			{
-				ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
+				ptr.emplace((new T(std::forward<TArgs>(args)...))->AsShared());
 			});
 			return std::move(ptr).value();
 		}
 
 		template<std::derived_from<Object> T, class... TArgs>
-		static std::shared_ptr<T> ScriptNew(TArgs&&... args)
+		static SharedPtr<T> UnsafeNew(TArgs&&... args)
 		{
-			std::optional<std::shared_ptr<T>> ptr;
-			if constexpr (std::constructible_from<T, TArgs...>)
+			if constexpr (std::is_constructible_v<T, TArgs...>)
 			{
-				ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
-				{
-					ptr.emplace(std::make_shared<T>(std::forward<TArgs>(args)...));
-				});
-
-				return std::move(ptr).value();
+				return New<T>(std::forward<TArgs>(args)...);
 			}
 			else
 			{
-				throw MemberAccessException(TEXT("Cannot create an abstract class."));
+				throw InvalidOperationException(TEXT("The constructor is not constructible."));
 			}
 		}
 
-	protected:
-		template<class U>
-		std::shared_ptr<std::remove_reference_t<U>> SharedFromThis(this const U& u)
+		template<std::derived_from<Object> T, class... TArgs>
+		static T* ScriptNew(TArgs&&... args)
 		{
-			return std::static_pointer_cast<U>(const_cast<U&>(u).shared_from_this());
+			if constexpr (std::is_constructible_v<T, TArgs...>)
+			{
+				T* ptr;
+				ConfigureNew(typeid(T), CreationFlags::FromScript, [&]()
+				{
+					ptr = new T(std::forward<TArgs>(args)...);
+				});
+				return ptr;
+			}
+			else
+			{
+				throw InvalidOperationException(TEXT("The constructor is not constructible."));
+			}
 		}
 
 	private:

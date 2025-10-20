@@ -15,7 +15,7 @@ namespace Ayla
 	{
 	}
 
-	void GenericWindow::AddExtension(std::shared_ptr<GenericWindowExtension> extension)
+	void GenericWindow::AddExtension(SharedPtr<GenericWindowExtension> extension)
 	{
 		auto lock = std::unique_lock(m_Lock);
 		m_Extensions.emplace_back(std::move(extension));
@@ -29,7 +29,7 @@ namespace Ayla
 
 		for (auto& extension : extensions)
 		{
-			if (auto* handler = dynamic_cast<IGenericWindowResizeEventHandler*>(extension.get()); handler)
+			if (auto* handler = dynamic_cast<IGenericWindowResizeEventHandler*>(extension.Get()); handler)
 			{
 				handler->OnResize(newSize);
 			}
@@ -44,7 +44,7 @@ namespace Ayla
 
 		for (auto& extension : extensions)
 		{
-			if (auto* handler = dynamic_cast<IGenericWindowDestroyEventHandler*>(extension.get()); handler)
+			if (auto* handler = dynamic_cast<IGenericWindowDestroyEventHandler*>(extension.Get()); handler)
 			{
 				handler->OnDestroy();
 			}

@@ -6,7 +6,7 @@
 
 namespace Ayla
 {
-    RuntimeConstructorInfo::RuntimeConstructorInfo(std::reflect::access_type access, std::shared_ptr<Object>(*function)())
+    RuntimeConstructorInfo::RuntimeConstructorInfo(std::reflect::access_type access, SharedPtr<Object>(*function)())
         : m_Access(access)
         , m_Function(function)
     {

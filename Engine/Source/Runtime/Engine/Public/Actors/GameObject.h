@@ -28,10 +28,10 @@ namespace Ayla
 		AFUNCTION()
 		bool IsActiveSelf() const { return m_IsActive; }
 		AFUNCTION()
-		std::shared_ptr<Component> AddComponent(ManagedTypeWrapper componentType);
+		SharedPtr<Component> AddComponent(ManagedTypeWrapper componentType);
 
 		template<std::derived_from<Component> TComponent>
-		std::shared_ptr<TComponent> AddComponent()
+		SharedPtr<TComponent> AddComponent()
 		{
 			return std::dynamic_pointer_cast<TComponent>(AddComponent(TComponent::GetManagedType()));
 		}

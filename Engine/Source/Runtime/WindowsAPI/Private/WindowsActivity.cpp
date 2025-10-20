@@ -11,13 +11,13 @@ namespace Ayla
 {
 	WindowsActivity::WindowsActivity()
 	{
-		m_MainWindow = std::static_pointer_cast<WindowsWindow>(GenericApplication::Get().MakeWindow(GenericWindowDefinition
+		m_MainWindow = (GenericApplication::Get().MakeWindow(GenericWindowDefinition
 		{
 			.Caption = TEXT("Main Activity"),
 			.bThickframe = true,
 			.DesiredScreenPosition = Vector2N(-1, -1),
 			.DesiredScreenSize = Vector2N(-1, -1),
-		}));
+		})).As<WindowsWindow>();
 
 		m_MainWindow->AddExtension(New<GenericMainWindowDefaultExt>());
 	}
@@ -35,7 +35,7 @@ namespace Ayla
 		m_MainWindow->Show();
 	}
 
-	std::shared_ptr<GenericWindow> WindowsActivity::GetMainWindow_Implementation() const
+	SharedPtr<GenericWindow> WindowsActivity::GetMainWindow_Implementation() const
 	{
 		return m_MainWindow;
 	}

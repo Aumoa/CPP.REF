@@ -4,11 +4,10 @@ using System.Runtime.InteropServices;
 namespace Ayla;
 
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
-public readonly struct ObjectReferenceWrapper
+public struct ObjectReferenceWrapper
 {
-    public readonly nint IntRef;
-    public readonly nint Ptr;
-    public readonly nint Handle;
+    public nint Ptr;
+    public nint IntGCHandlePtr;
 
     public T? AsManaged<T>() where T : Object
     {
@@ -20,33 +19,32 @@ public readonly struct ObjectReferenceWrapper
         var managedType = Object.GetManagedTypeFromPtr__Injected(Ptr);
         var scriptType = managedType.GetScriptType();
 
-        Object.BeginWriteGCHandle__Injected(Ptr);
+        nint handlePtr = Object.BeginWriteGCHandle__Injected(Ptr);
         GCHandle handle = default;
         try
         {
-            if (Handle != 0)
+            if (handlePtr != 0)
             {
-                handle = GCHandle.FromIntPtr(Handle);
+                handle = GCHandle.FromIntPtr(handlePtr);
                 if (handle.Target is T t)
                 {
                     return t;
                 }
             }
 
-            var locker = Object.CreateLocker__Injected(Ptr);
-            Object.InternalCreation.ThreadLocal.Value!.CreatedByResolver = true;
-            var inst = (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
-            handle = GCHandle.Alloc(inst, GCHandleType.Weak);
-            return inst;
-        }
-        finally
-        {
-            if (IntRef > 0)
+            var ptr = Ptr;
+            Func<object, nint> locker = @this =>
             {
-                Object.DeleteIntermediateRef__Injected(IntRef);
-            }
+                Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal), true);
+                return ptr;
+            };
 
-            Object.EndWriteGCHandle__Injected(Ptr, (nint)handle);
+            return (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
+        }
+        catch
+        {
+            Object.EndWriteGCHandle__Injected(Ptr, 0, true);
+            throw;
         }
     }
 

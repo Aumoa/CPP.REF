@@ -9,7 +9,11 @@ namespace Ayla
 	{
 	}
 
-	Task<void> SceneManager::LoadSceneAsync(std::shared_ptr<Scene> scene, LoadSceneMode mode, CancellationToken cancellationToken)
+	SceneManager::~SceneManager() noexcept
+	{
+	}
+
+	void SceneManager::LoadScene(SharedPtr<Scene> scene, LoadSceneMode mode)
 	{
 		if (m_ActiveScene)
 		{
@@ -22,7 +26,5 @@ namespace Ayla
 		{
 			m_ActiveScene->Activate();
 		}
-
-		return Task<>::CompletedTask();
 	}
 }

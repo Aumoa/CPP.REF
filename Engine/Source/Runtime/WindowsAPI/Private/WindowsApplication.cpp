@@ -20,12 +20,12 @@ namespace Ayla
 	{
 	}
 
-	std::shared_ptr<GenericActivity> WindowsApplication::CreateMainActivity_Implementation()
+	SharedPtr<GenericActivity> WindowsApplication::CreateMainActivity_Implementation()
 	{
 		return New<WindowsActivity>();
 	}
 
-	std::shared_ptr<GenericWindow> WindowsApplication::MakeWindow(const GenericWindowDefinition& winDef)
+	SharedPtr<GenericWindow> WindowsApplication::MakeWindow(const GenericWindowDefinition& winDef)
 	{
 		return New<WindowsWindow>(winDef);
 	}

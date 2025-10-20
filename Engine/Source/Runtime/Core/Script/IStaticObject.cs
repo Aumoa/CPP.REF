@@ -2,5 +2,5 @@
 
 public interface IStaticObject
 {
-    static abstract ManagedTypeWrapper GetManagedType();
+    static abstract ManagedTypeWrapper StaticClass();
 }

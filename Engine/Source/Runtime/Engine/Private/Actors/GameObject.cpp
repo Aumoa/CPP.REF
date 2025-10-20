@@ -2,6 +2,8 @@
 
 #include "Actors/GameObject.h"
 #include "Components/Component.h"
+#include "Activator.h"
+#include "LogEngine.h"
 
 namespace Ayla
 {
@@ -17,19 +19,15 @@ namespace Ayla
 	{
 	}
 
-	std::shared_ptr<Component> GameObject::AddComponent(ManagedTypeWrapper componentType)
+	SharedPtr<Component> GameObject::AddComponent(ManagedTypeWrapper componentType)
 	{
-		for (auto& ctor : componentType.NativeType->GetConstructors())
+		auto obj = Activator::CreateInstance(componentType);
+		SharedPtr<Component> comp;
+		if (obj.Is(&comp) == false)
 		{
-			auto component = ctor->Invoke(std::span<std::any const>{});
-			if (component.has_value())
-			{
-				auto componentPtr = std::static_pointer_cast<Component>(std::any_cast<std::shared_ptr<Object>>(component));
-				m_Components.emplace_back(componentPtr);
-				return componentPtr;
-			}
+			LogEngine::Error(TEXT("Failed to add component. The type is not a Component type."));
 		}
 
-		throw InvalidOperationException(TEXT("There is no valid constructor."));
+		return comp;
 	}
 }

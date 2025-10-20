@@ -4,6 +4,7 @@
 
 #include "Reflection/ConstructorInfo.h"
 #include "Reflection/reflexpr.h"
+#include "SharedPtr.h"
 #include <memory>
 
 namespace Ayla
@@ -14,10 +15,10 @@ namespace Ayla
     {
     private:
         std::reflect::access_type m_Access;
-        std::shared_ptr<Object>(*const m_Function)();
+        SharedPtr<Object>(*const m_Function)();
 
     public:
-        RuntimeConstructorInfo(std::reflect::access_type access, std::shared_ptr<Object>(*function)());
+        RuntimeConstructorInfo(std::reflect::access_type access, SharedPtr<Object>(*function)());
         virtual ~RuntimeConstructorInfo() noexcept override;
 
         virtual bool IsPublic() const override;

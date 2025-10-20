@@ -18,7 +18,7 @@ namespace Ayla
 #if PLATFORM_WINDOWS
 
 	private:
-		std::shared_ptr<WindowsWindow> m_MainWindow;
+		SharedPtr<WindowsWindow> m_MainWindow;
 
 	public:
 		WindowsActivity();
@@ -26,7 +26,7 @@ namespace Ayla
 
 		virtual void BeforeInitialize_Implementation() override;
 		virtual void AfterInitialize_Implementation() override;
-		virtual std::shared_ptr<GenericWindow> GetMainWindow_Implementation() const override;
+		virtual SharedPtr<GenericWindow> GetMainWindow_Implementation() const override;
 
 #endif
 	};

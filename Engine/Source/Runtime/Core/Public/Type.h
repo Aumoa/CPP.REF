@@ -10,13 +10,10 @@
 
 namespace Ayla
 {
-	class GC;
 	class ConstructorInfo;
 
 	class Type
 	{
-		friend GC;
-
 	protected:
 		Type() = default;
 

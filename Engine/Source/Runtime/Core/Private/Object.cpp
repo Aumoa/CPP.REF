@@ -9,6 +9,8 @@
 #include "Reflection/TypeCollector.h"
 #include "Reflection/ReflectionMacros.h"
 #include "ScriptingBackend/ScriptingBackend.h"
+#include "Marshal/CoreCLRFunctions.h"
+#include "Marshal/ManagedStringWrapper.h"
 
 ACLASS__IMPL_CLASS_REGISTER(Ayla, Object);
 
@@ -39,6 +41,7 @@ namespace Ayla
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
 	size_t Object::s_LiveObjects;
+	CoreCLRFunctions g_CoreCLRFunctions;
 
 	ManagedTypeWrapper Object::GetManagedType()
 	{
@@ -62,6 +65,14 @@ namespace Ayla
 			throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
 		}
 
+		static int s_StaticConstruct = []() -> int
+		{
+			using signature_t = CoreCLRFunctions(*)();
+			auto function = (signature_t)ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.CoreCLRFunctions", "Get__Invoke");
+			g_CoreCLRFunctions = function();
+			return 0;
+		}();
+
 		PlatformAtomics::InterlockedIncrement(&s_LiveObjects);
 	}
 
@@ -75,23 +86,45 @@ namespace Ayla
 		return String::Format(TEXT("{}"), String::FromLiteral(typeid(*this).name()));
 	}
 
-	ObjectReferenceLocker Object::CreateLocker()
+	void Object::AddRef()
 	{
-		return ObjectReferenceLocker
+		auto lock = std::unique_lock{ m_Spinlock };
+		if (m_Refs++ == 0 && m_GCHandle != 0)
 		{
-			.Ref = reinterpret_cast<ssize_t>(new std::shared_ptr<Object>(shared_from_this())),
-			.Flags = (int32)m_Flags
-		};
+			g_CoreCLRFunctions.AsHardHandle__Invoke(&m_GCHandle);
+		}
+	}
+
+	void Object::ReleaseRef()
+	{
+		auto lock = std::unique_lock{ m_Spinlock };
+		if (--m_Refs == 0)
+		{
+			if (m_GCHandle == 0)
+			{
+				lock.unlock();
+				delete this;
+				return;
+			}
+			else
+			{
+				g_CoreCLRFunctions.AsWeakHandle__Invoke(&m_GCHandle);
+			}
+		}
+	}
+
+	void* Object::BindGCHandle__Unsafe(ssize_t gcHandlePtr)
+	{
+		m_GCHandle = gcHandlePtr;
+		return this;
 	}
 
 	ObjectReferenceWrapper Object::AsWrapper()
 	{
-		auto lock = std::unique_lock{ m_Spinlock };
 		return ObjectReferenceWrapper
 		{
-			.IntRef = m_GCHandle == 0 ? (ssize_t)new std::shared_ptr<Object>(shared_from_this()) : 0,
 			.Ptr = reinterpret_cast<ssize_t>(this),
-			.Handle = m_GCHandle
+			.IntGCHandlePtr = 0
 		};
 	}
 
@@ -111,11 +144,6 @@ namespace Ayla
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT void Ayla__Object__DeleteIntermediateRef__Injected(void* self)
-	{
-		delete reinterpret_cast<std::shared_ptr<::Ayla::Object>*>(self);
-	}
-
 	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self)
 	{
 		auto self_ = (::Ayla::Object*)self;
@@ -123,10 +151,20 @@ extern "C"
 		return self_->m_GCHandle;
 	}
 
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle)
+	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr)
 	{
 		auto self_ = (::Ayla::Object*)self;
 		self_->m_GCHandle = handle;
+		if (releaseIntPtr)
+		{
+			--self_->m_Refs;
+			check(self_->m_Refs != 0 || self_->m_GCHandle);
+		}
+		if (self_->m_Refs == 0 && handle == 0)
+		{
+			self_->m_Spinlock.unlock();
+			delete self_;
+		}
 		self_->m_Spinlock.unlock();
 	}
 
@@ -138,11 +176,6 @@ extern "C"
 	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper Ayla__Object__AsWrapper__Injected(::Ayla::Object* self)
 	{
 		return self->AsWrapper();
-	}
-
-	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceLocker Ayla__Object__CreateLocker__Injected(::Ayla::Object* self)
-	{
-		return self->CreateLocker();
 	}
 
 	PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedTypeFromPtr__Injected(::Ayla::Object* self)

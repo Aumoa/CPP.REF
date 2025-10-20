@@ -81,7 +81,7 @@ internal partial class RHTGenerator
                 sourceCode += IndentedLine($"{{");
                 Indented(() =>
                 {
-                    sourceCode += IndentedLine($"protected {@class.Name}__Injected(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
+                    sourceCode += IndentedLine($"protected {@class.Name}__Injected(global::System.Func<object, nint> locker) : base(locker)");
                     sourceCode += IndentedLine($"{{");
                     sourceCode += IndentedLine($"}}");
                     sourceCode += IndentedLine($"");
@@ -100,24 +100,22 @@ internal partial class RHTGenerator
                             parameters.Add(paramType, param.Variable.Name);
                         }
 
-                        var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters);
+                        var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
                         sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-                        sourceCode += IndentedLine($"private static extern global::Ayla.ObjectReferenceLocker ctor_{constructor.Name}__Injected({injectParamsDeclare});");
+                        sourceCode += IndentedLine($"private static extern nint ctor_{constructor.Name}__Injected({injectParamsDeclare});");
 
                         var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
-                        sourceCode += IndentedLine($"private static unsafe global::Ayla.ObjectReferenceLocker ctor_{constructor.Name}__CallInjected({csharpParamsDeclare})");
+                        var returnStmt = returnType.CSharpName;
+                        var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
+                        sourceCode += IndentedLine($"protected unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(@this =>");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
-                            var codegen = new FunctionBodyGenerator(parameters, $"ctor_{constructor.Name}__Injected", TypeName.Object);
+                            var codegen = new FunctionBodyGenerator(parameters.AddFirstTemp(PlaceholderName.Value, "(nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak)"), $"ctor_{constructor.Name}__Injected", TypeName.Object);
                             codegen.GenerateCSharpCSharpToNative(ref sourceCode, ref indent, IndentedLine);
                         });
-                        sourceCode += IndentedLine($"}}");
-
-                        var returnStmt = returnType.CSharpName;
-                        var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters);
-                        sourceCode += IndentedLine($"protected unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(ctor_{constructor.Name}__CallInjected({callArguments}))");
+                        sourceCode += IndentedLine($"}})");
                         sourceCode += IndentedLine($"{{");
                         sourceCode += IndentedLine($"}}");
                     }
@@ -136,7 +134,7 @@ internal partial class RHTGenerator
                 {
                     sourceCode += "#pragma warning disable CS8618\n";
 
-                    sourceCode += IndentedLine($"protected {@class.Name}(global::Ayla.ObjectReferenceLocker locker) : base(locker)");
+                    sourceCode += IndentedLine($"protected {@class.Name}(global::System.Func<object, nint> locker) : base(locker)");
                     sourceCode += IndentedLine($"{{");
                     Indented(() =>
                     {
@@ -144,7 +142,7 @@ internal partial class RHTGenerator
                     });
                     sourceCode += IndentedLine($"}}");
                     sourceCode += "#pragma warning restore CS8618\n";
-                    sourceCode += IndentedLine($"partial void OnConstructed(global::Ayla.ObjectReferenceLocker locker);");
+                    sourceCode += IndentedLine($"partial void OnConstructed(global::System.Func<object, nint> locker);");
                     sourceCode += IndentedLine($"");
 
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
@@ -173,7 +171,9 @@ internal partial class RHTGenerator
                     }
 
                     sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper GetManagedType() => GetManagedType__Injected();");
+                    sourceCode += IndentedLine($"public override global::Ayla.ManagedTypeWrapper GetClass() => StaticClass();");
+                    sourceCode += IndentedLine($"");
+                    sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper StaticClass() => GetManagedType__Injected();");
                     sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
                     sourceCode += IndentedLine($"private static extern global::Ayla.ManagedTypeWrapper GetManagedType__Injected();");
 

@@ -235,7 +235,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (returnType_ is PlaceholderName)
             {
-                formatLine($"return {bodyStmt}->CreateLocker();");
+                formatLine($"return ({bodyStmt})->BindGCHandle__Unsafe(__gchandle_ptr);");
             }
             else
             {

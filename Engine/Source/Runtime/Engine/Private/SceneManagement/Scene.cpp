@@ -27,7 +27,7 @@ namespace Ayla
 		m_Disposed = true;
 	}
 
-	std::shared_ptr<GameObject> Scene::SpawnGameObject()
+	SharedPtr<GameObject> Scene::SpawnGameObject()
 	{
 		ObjectDisposedException::ThrowIfDisposed(m_Disposed, TEXT("Scene"));
 		auto obj = New<GameObject>();

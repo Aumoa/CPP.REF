@@ -21,4 +21,9 @@ internal static class ParametersGenerator
     {
         return string.Join(", ", collection.Parameters.Select(p => $"{p.T.CppBindingName} {p.N}"));
     }
+
+    public static string GenerateCppParametersOnly<T>(T collection) where T : IParameterCollection
+    {
+        return string.Join(", ", collection.Parameters.Select(p => p.T.CppName));
+    }
 }

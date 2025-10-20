@@ -21,7 +21,7 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
+		std::vector<SharedPtr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 
 	public:
 		ACONSTRUCTOR()
@@ -37,6 +37,6 @@ namespace Ayla
 
 	protected:
 		AFUNCTION()
-		void SetupSwapchainExtensions(std::vector<std::shared_ptr<GenericWindowSwapchainExtension>> extensions);
+		void SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions);
 	};
 }

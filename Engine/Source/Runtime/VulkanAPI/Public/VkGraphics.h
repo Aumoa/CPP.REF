@@ -31,7 +31,7 @@ namespace Ayla
         VkGraphics();
         virtual ~VkGraphics() noexcept override;
 
-        virtual std::shared_ptr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(std::shared_ptr<GenericWindow> targetWindow) override;
+        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
         virtual void BeginRenderThread() override;
         virtual void EndRenderThread() override;
 

@@ -16,7 +16,7 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::vector<std::shared_ptr<GameObject>> m_GameObjects;
+		std::vector<SharedPtr<GameObject>> m_GameObjects;
 		bool m_Active = false;
 		bool m_Disposed = false;
 
@@ -31,6 +31,6 @@ namespace Ayla
 		void Destroy();
 
 		AFUNCTION()
-		std::shared_ptr<GameObject> SpawnGameObject();
+		SharedPtr<GameObject> SpawnGameObject();
 	};
 }

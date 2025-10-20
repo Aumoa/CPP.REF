@@ -23,7 +23,7 @@ namespace Ayla
 		virtual ~Launch() noexcept;
 
 		AFUNCTION()
-		virtual int32 GuardedMain(std::shared_ptr<LaunchOptions> options);
+		virtual int32 GuardedMain(SharedPtr<LaunchOptions> options);
 
 		static int32 Main(std::unique_ptr<CommandLineParser> args, String platform);
 	};

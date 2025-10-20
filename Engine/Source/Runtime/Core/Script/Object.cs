@@ -8,44 +8,11 @@ public partial class Object : IDisposable, IStaticObject
     internal class InternalCreation
     {
         public static ThreadLocal<InternalCreation> ThreadLocal = new(() => new InternalCreation());
-
-        public bool CreatedByResolver;
     }
-        
 
-    private ObjectReferenceLocker m_Locker;
-
-    protected Object(ObjectReferenceLocker locker)
+    protected Object(Func<object, nint> locker)
     {
-        m_Locker = locker;
-        NativePointer = ObjectReferenceLocker.GetRawPointer__Injected(ref locker);
-
-        GCHandle gch = default;
-        try
-        {
-            if (InternalCreation.ThreadLocal.Value!.CreatedByResolver == false)
-            {
-                var handle = BeginWriteGCHandle__Injected(NativePointer);
-                if (handle != default)
-                {
-                    throw new InvalidOperationException("The instance is already managed by C#.");
-                }
-
-                gch = GCHandle.Alloc(this, GCHandleType.Weak);
-                handle = (nint)gch;
-            }
-        }
-        finally
-        {
-            if (InternalCreation.ThreadLocal.Value!.CreatedByResolver)
-            {
-                InternalCreation.ThreadLocal.Value.CreatedByResolver = false;
-            }
-            else
-            {
-                EndWriteGCHandle__Injected(NativePointer, (nint)gch);
-            }
-        }
+        NativePointer = locker(this);
     }
 
     ~Object()
@@ -63,16 +30,26 @@ public partial class Object : IDisposable, IStaticObject
     {
         var iid = NativePointer;
         NativePointer = 0;
-        BeginWriteGCHandle__Injected(iid);
-        EndWriteGCHandle__Injected(iid, 0);
-        ObjectReferenceLocker.Destroy__Injected(ref m_Locker);
+        var gcHandlePtr = BeginWriteGCHandle__Injected(iid);
+        EndWriteGCHandle__Injected(iid, 0, false);
+        if (gcHandlePtr == 0)
+        {
+            throw new InvalidOperationException();
+        }
+
+        GCHandle.FromIntPtr(gcHandlePtr).Free();
     }
 
     public nint NativePointer { get; private set; }
 
-    public ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer);
+    internal ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer) with
+    {
+        IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal)
+    };
 
-    public static ManagedTypeWrapper GetManagedType() => GetManagedType__Injected();
+    public virtual ManagedTypeWrapper GetClass() => StaticClass();
+
+    public static ManagedTypeWrapper StaticClass() => GetManagedType__Injected();
 
     private static GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof(Object);
 
@@ -81,24 +58,21 @@ public partial class Object : IDisposable, IStaticObject
         return Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);
     }
 
-    [DllImport("Core", EntryPoint = "Ayla__Object__DeleteIntermediateRef__Injected")]
-    internal static extern void DeleteIntermediateRef__Injected(nint self);
-
     [DllImport("Core", EntryPoint = "Ayla__Object__BeginWriteGCHandle__Injected")]
-    internal static extern nint BeginWriteGCHandle__Injected(nint instanceId);
+    internal static extern nint BeginWriteGCHandle__Injected(nint instancePtr);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__EndWriteGCHandle__Injected")]
-    internal static extern void EndWriteGCHandle__Injected(nint instanceId, nint handle);
+    internal static extern void EndWriteGCHandle__Injected(nint instancePtr, nint handle, bool releaseIntPtr);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedType__Injected")]
     internal static extern ManagedTypeWrapper GetManagedType__Injected();
 
     [DllImport("Core", EntryPoint = "Ayla__Object__AsWrapper__Injected")]
-    internal static extern ObjectReferenceWrapper AsWrapper__Injected(nint instanceId);
-
-    [DllImport("Core", EntryPoint = "Ayla__Object__CreateLocker__Injected")]
-    internal static extern ObjectReferenceLocker CreateLocker__Injected(nint instanceId);
+    internal static extern ObjectReferenceWrapper AsWrapper__Injected(nint instancePtr);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedTypeFromPtr__Injected")]
-    internal static extern ManagedTypeWrapper GetManagedTypeFromPtr__Injected(nint instanceId);
+    internal static extern ManagedTypeWrapper GetManagedTypeFromPtr__Injected(nint instancePtr);
+
+    [DllImport("Core", EntryPoint = "Ayla__Object__ReleaseIntermediatePtr__Injected")]
+    internal static extern void ReleaseIntermediatePtr__Injected(nint instancePtr);
 }
