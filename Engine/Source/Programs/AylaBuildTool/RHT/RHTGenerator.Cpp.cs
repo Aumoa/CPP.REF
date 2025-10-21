@@ -101,7 +101,7 @@ internal partial class RHTGenerator
                         Indented(() =>
                         {
                             WriteIndentedLine($".NativeType = ::Ayla::TypeCollector::FindType(typeid({className})),");
-                            WriteIndentedLine($".ScriptTypeGetter = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Injected\", \"GetScriptType__Invoke\"))()");
+                            WriteIndentedLine($".ScriptTypeGetter = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"GetScriptType__Invoke\"))()");
                         });
                         WriteIndentedLine($"}};");
                         WriteIndentedLine($"");
@@ -135,7 +135,7 @@ internal partial class RHTGenerator
                         {
                             var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
                             WriteIndentedLine($"using signature_t = {returnType.CppBindingName}(*)({invokeParametersDeclare});");
-                            WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Injected\", \"{function.Name}__Invoke\"));");
+                            WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"{function.Name}__Invoke\"));");
                             WriteIndentedLine($"auto self = AsShared();");
                             string callable = $"callable";
                             var codeGen = new FunctionBodyGenerator(parameters.AddFirstTemp(SharedPtrTypeName.SharedObject, "self"), callable, returnType);

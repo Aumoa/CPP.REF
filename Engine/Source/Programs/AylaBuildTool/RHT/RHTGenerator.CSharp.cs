@@ -69,30 +69,24 @@ internal partial class RHTGenerator
                     ++indent;
                 }
 
-                var @base = aclass.Class.Base;
-                string inherit = string.Empty;
-                if (@base != null)
-                {
-                    var baseClass = typeNames.FindType(@base, aclass.Class);
-                    inherit = $" : {baseClass.CSharpName}";
-                }
+                string injectClassName = $"{@class.Name}__Injected";
+                string injectFullName = $"global::{@namespace}.{injectClassName}";
 
-                sourceCode += IndentedLine($"public abstract class {@class.Name}__Injected{inherit}");
+                string invocableClassName = $"{@class.Name}__Invocable";
+                string invocableFullName = $"global::{@namespace}.{invocableClassName}";
+
+                string classFullName = $"global::{@namespace}.{@class.Name}";
+
+                sourceCode += IndentedLine($"file static class {injectClassName}");
                 sourceCode += IndentedLine($"{{");
                 Indented(() =>
                 {
-                    sourceCode += IndentedLine($"protected {@class.Name}__Injected(global::System.Func<object, nint> locker) : base(locker)");
-                    sourceCode += IndentedLine($"{{");
-                    sourceCode += IndentedLine($"}}");
-                    sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"private static readonly global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({@class.Name});");
-                    sourceCode += IndentedLine($"private static nint GetScriptType__Invoke() => global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
+                    sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
+                    sourceCode += IndentedLine($"public static extern global::Ayla.ManagedTypeWrapper GetManagedType();");
 
                     for (int i = 0; i < aclass.Constructors.Count; ++i)
                     {
                         var constructor = aclass.Constructors[i];
-                        var access = constructor.Access.ToString().ToLower();
-                        var returnType = (SharedPtrTypeName)Activator.CreateInstance(typeof(SharedPtrTypeName), @class)!;
                         var parameters = new ParameterCollection();
                         foreach (var param in constructor.Parameters)
                         {
@@ -103,16 +97,79 @@ internal partial class RHTGenerator
                         var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
                         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{i}__Injected";
                         sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-                        sourceCode += IndentedLine($"private static extern nint ctor_{constructor.Name}__Injected({injectParamsDeclare});");
+                        sourceCode += IndentedLine($"public static extern nint ctor_{constructor.Name}({injectParamsDeclare});");
+                    }
+
+                    for (int i = 0; i < aclass.Functions.Count; ++i)
+                    {
+                        var function = aclass.Functions[i];
+                        var returnType = typeNames.FindType(function.ReturnType, aclass.Class);
+                        var parameterTypes = function.Parameters.Select(p => typeNames.FindType(p.Variable.TypeName, aclass.Class)).ToArray();
+                        bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
+                        var parameters = new ParameterCollection();
+                        for (int j = 0; j < parameterTypes.Length; ++j)
+                        {
+                            var paramType = parameterTypes[j];
+                            var parameter = function.Parameters[j].Variable;
+                            parameters.Add(paramType, parameter.Name);
+                        }
+
+                        string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
+                        string injectParamsDeclare;
+                        if (isStatic)
+                        {
+                            injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters);
+                        }
+                        else
+                        {
+                            injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+                        }
+
+                        sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
+                        sourceCode += IndentedLine($"public static extern {returnType.CSharpBindingName} {function.Name}({injectParamsDeclare});");
+                    }
+                });
+                sourceCode += IndentedLine($"}}");
+                sourceCode += IndentedLine($"");
+
+                var @base = aclass.Class.Base;
+                string inherit = string.Empty;
+                if (@base != null)
+                {
+                    var baseClass = typeNames.FindType(@base, aclass.Class);
+                    inherit = $" : {baseClass.CSharpName}";
+                }
+
+                sourceCode += IndentedLine($"public abstract class {invocableClassName}{inherit}");
+                sourceCode += IndentedLine($"{{");
+                Indented(() =>
+                {
+                    sourceCode += IndentedLine($"protected {invocableClassName}(global::System.Func<object, nint> locker) : base(locker)");
+                    sourceCode += IndentedLine($"{{");
+                    sourceCode += IndentedLine($"}}");
+                    sourceCode += IndentedLine($"");
+                    sourceCode += IndentedLine($"private static readonly global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({classFullName});");
+                    sourceCode += IndentedLine($"private static nint GetScriptType__Invoke() => global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
+
+                    for (int i = 0; i < aclass.Constructors.Count; ++i)
+                    {
+                        var constructor = aclass.Constructors[i];
+                        var returnType = (SharedPtrTypeName)Activator.CreateInstance(typeof(SharedPtrTypeName), @class)!;
+                        var parameters = new ParameterCollection();
+                        foreach (var param in constructor.Parameters)
+                        {
+                            var paramType = typeNames.FindType(param.Variable.TypeName, aclass.Class);
+                            parameters.Add(paramType, param.Variable.Name);
+                        }
 
                         var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
                         var returnStmt = returnType.CSharpName;
                         var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
-                        sourceCode += IndentedLine($"protected unsafe {constructor.Name}__Injected({csharpParamsDeclare}) : this(@this =>");
+                        sourceCode += IndentedLine($"protected unsafe {invocableClassName}({csharpParamsDeclare}) : this(@this =>");
                         sourceCode += IndentedLine($"{{");
                         Indented(() =>
                         {
-                            var codegen = new FunctionBodyGenerator(parameters.AddFirstTemp(PlaceholderName.Value, "(nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak)"), $"ctor_{constructor.Name}__Injected", TypeName.Object);
+                            var codegen = new FunctionBodyGenerator(parameters.AddFirstTemp(PlaceholderName.Value, "(nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak)"), $"{injectFullName}.ctor_{constructor.Name}", TypeName.Object);
                             codegen.GenerateCSharpCSharpToNative(ref sourceCode, ref indent, IndentedLine);
                         });
                         sourceCode += IndentedLine($"}})");
@@ -127,7 +184,7 @@ internal partial class RHTGenerator
                 sourceCode += IndentedLine($"}}");
                 sourceCode += IndentedLine($"");
 
-                sourceCode += IndentedLine($"public partial class {@class.Name} : {@class.Name}__Injected, global::Ayla.IStaticObject");
+                sourceCode += IndentedLine($"public partial class {@class.Name} : {invocableFullName}, global::Ayla.IStaticObject");
                 sourceCode += IndentedLine($"{{");
 
                 Indented(() =>
@@ -173,9 +230,7 @@ internal partial class RHTGenerator
                     sourceCode += IndentedLine($"");
                     sourceCode += IndentedLine($"public override global::Ayla.ManagedTypeWrapper GetClass() => StaticClass();");
                     sourceCode += IndentedLine($"");
-                    sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper StaticClass() => GetManagedType__Injected();");
-                    sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
-                    sourceCode += IndentedLine($"private static extern global::Ayla.ManagedTypeWrapper GetManagedType__Injected();");
+                    sourceCode += IndentedLine($"public static new global::Ayla.ManagedTypeWrapper StaticClass() => {injectFullName}.GetManagedType();");
 
                     GenerateFunctionBodies(false);
                 });
@@ -213,20 +268,6 @@ internal partial class RHTGenerator
                             parameters.Add(paramType, parameter.Name);
                         }
 
-                        string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{i}__Injected";
-                        string injectParamsDeclare;
-                        if (isStatic)
-                        {
-                            injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters);
-                        }
-                        else
-                        {
-                            injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
-                        }
-
-                        sourceCode += IndentedLine($"[{kDllImport}(\"{moduleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-                        sourceCode += IndentedLine($"private static extern {returnType.CSharpBindingName} {function.Name}__Injected({injectParamsDeclare});");
-
                         var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, i) => $"{t.CSharpName} {function.Parameters[i].Variable.Name}"));
                         var returnStmt = returnType is SharedPtrTypeName ? $"{returnType.CSharpName}" : returnType.CSharpName;
                         sourceCode += IndentedLine($"{access} unsafe{(isVirtual ? " virtual" : string.Empty)}{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}({internalParamsDeclare})");
@@ -241,7 +282,7 @@ internal partial class RHTGenerator
                             }
 
                             FunctionBodyGenerator bodyGen;
-                            string callable = $"{function.Name}__Injected";
+                            string callable = $"{injectFullName}.{function.Name}";
                             if (isStatic == false)
                             {
                                 bodyGen = new FunctionBodyGenerator(parameters.AddFirstTemp(TypeName.IntPtr, "this.NativePointer"), callable, returnType);
