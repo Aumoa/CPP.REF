@@ -14,14 +14,21 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		APROPERTY()
 		bool m_Enabled = true;
 
 	public:
 		Behavior();
 		virtual ~Behavior() noexcept override;
 
+		AFUNCTION()
 		void SetEnabled(bool value);
-		bool IsEnabled() const noexcept { return m_Enabled; }
+		AFUNCTION()
+		bool IsEnabled() const;
+
+	protected:
+		AFUNCTION()
+		virtual void OnEnable();
+		AFUNCTION()
+		virtual void OnDisable();
 	};
 }

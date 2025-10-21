@@ -24,11 +24,6 @@ public partial class Engine
 
         m_GameInstance = InitializeGame(options);
         m_SceneManager = new SceneManager();
-        var cancellationTokenSource = new CancellationTokenSource();
-        cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(5.0));
-        m_SceneManager.LoadScene(m_GameInstance.GetEntryScene(), LoadSceneMode.Single);
-
-        m_MainActivity.AfterInitialize();
         SetupSwapchainExtensions([.. m_SwapchainExtensions]);
     }
 
@@ -42,20 +37,10 @@ public partial class Engine
         base.Dispose(disposing);
     }
 
-    public override void GuardedLoop()
+    public void Start()
     {
-        while (true)
-        {
-            try
-            {
-                base.GuardedLoop();
-                break;
-            }
-            catch (Exception e)
-            {
-                LogEngine.Error("Exception caught in main loop: {0}", e);
-            }
-        }
+        m_SceneManager.LoadScene(m_GameInstance.GetEntryScene(), LoadSceneMode.Single);
+        m_MainActivity.AfterInitialize();
     }
 
     private GameInstance InitializeGame(LaunchOptions options)

@@ -81,7 +81,7 @@ namespace Ayla
 		PlatformAtomics::InterlockedDecrement(&s_LiveObjects);
 	}
 
-	String Object::ToString()
+	String Object::ToString() const
 	{
 		return String::Format(TEXT("{}"), String::FromLiteral(typeid(*this).name()));
 	}

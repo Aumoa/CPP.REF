@@ -81,7 +81,7 @@ namespace Ayla
 		Object(Object&&) = delete;
 		virtual ~Object() noexcept;
 
-		String ToString();
+		String ToString() const;
 		Type* GetType() const { return m_Type; }
 
 		void AddRef();
