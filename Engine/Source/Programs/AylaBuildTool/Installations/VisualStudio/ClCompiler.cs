@@ -109,18 +109,8 @@ internal class ClCompiler : CppCompiler
 
         m_CommandBuilder.Append(string.Join(' ', includes) + ' ');
 
-        var additionalMacros = item.Resolver.AdditionalMacros
-            .Append("PLATFORM_WINDOWS=1")
-            .Append("_UNICODE")
-            .Append("UNICODE");
-
-        if (m_TargetInfo.Config != Configuration.Shipping)
-        {
-            additionalMacros = additionalMacros.Append("DO_CHECK=1");
-        }
-
         List<string> macros = [];
-        foreach (var macro in additionalMacros)
+        foreach (var macro in item.Resolver.AdditionalMacros)
         {
             if (macro.Value == null)
             {
@@ -192,6 +182,21 @@ internal class ClCompiler : CppCompiler
             {
                 Logs = [.. output.Logs.Skip(1)],
                 StdOut = [.. output.StdOut.Skip(1)]
+            };
+        }
+        else
+        {
+            var command = new Terminal.Log
+            {
+                Value = $"cl.exe {m_CommandBuilder}",
+                Verbosity = Terminal.Verbose.Info
+            };
+
+            output = output with
+            {
+                Logs = [command, .. output.Logs],
+                StdOut = [.. output.StdOut],
+                StdErr = [.. output.StdErr]
             };
         }
 

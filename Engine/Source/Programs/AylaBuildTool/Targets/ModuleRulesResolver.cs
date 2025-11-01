@@ -21,7 +21,7 @@ internal class ModuleRulesResolver
 
         PrivateDependencyModuleNames = WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames).Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
-        PrivateAdditionalMacros = WithAdditionalMacros(rules.PrivateAdditionalMacros).Distinct().ToArray();
+        PrivateAdditionalMacros = rules.PrivateAdditionalMacros.Concat(BuiltinMacros).Distinct().ToArray();
         PrivateDisableWarnings = rules.PrivateDisableWarnings.Distinct().ToArray();
         PrivateAdditionalLibraries = rules.PrivateAdditionalLibraries.Distinct().ToArray();
 
@@ -43,12 +43,39 @@ internal class ModuleRulesResolver
         return;
     }
 
-    private IEnumerable<MacroSet> WithAdditionalMacros(IEnumerable<MacroSet> source)
+    private IEnumerable<MacroSet> BuiltinMacros
     {
-        return source
-            .Append($"PLATFORM_STRING=TEXT(\"{m_TargetInfo.Platform}\")")
-            .Append($"CONFIG_STRING=TEXT(\"{m_TargetInfo.Config}\")")
-            .Append($"WITH_EDITOR={(m_TargetInfo.Editor ? "1" : "0")}");
+        get
+        {
+            yield return $"PLATFORM_STRING=TEXT(\"{m_TargetInfo.Platform}\")";
+            yield return $"CONFIG_STRING=TEXT(\"{m_TargetInfo.Config}\")";
+            yield return $"WITH_EDITOR={(m_TargetInfo.Editor ? "1" : "0")}";
+
+            if (m_TargetInfo.Platform.Group == PlatformGroup.Windows)
+            {
+                yield return "PLATFORM_WINDOWS=1";
+            }
+            else if (m_TargetInfo.Platform.Group == PlatformGroup.Linux)
+            {
+                yield return "PLATFORM_LINUX=1";
+            }
+            else if (m_TargetInfo.Platform.Group == PlatformGroup.OSX)
+            {
+                yield return "PLATFORM_OSX=1";
+            }
+            else
+            {
+                throw new PlatformNotSupportedException();
+            }
+
+            yield return "_UNICODE";
+            yield return "UNICODE";
+
+            if (m_TargetInfo.Config != Configuration.Shipping)
+            {
+                yield return "DO_CHECK=1";
+            }
+        }
     }
 
     private IEnumerable<string> WithBuiltInDependencyModule(IEnumerable<string> source)

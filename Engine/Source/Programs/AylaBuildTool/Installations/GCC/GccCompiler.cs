@@ -45,18 +45,8 @@ internal class GccCompiler : CppCompiler
 
         AddCompilerCommands(includes.ToArray());
 
-        var additionalMacros = item.Resolver.AdditionalMacros
-            .Append("PLATFORM_LINUX=1")
-            .Append("_UNICODE")
-            .Append("UNICODE");
-
-        if (m_TargetInfo.Config != Configuration.Shipping)
-        {
-            additionalMacros = additionalMacros.Append("DO_CHECK=1");
-        }
-
         List<string> macros = [];
-        foreach (var macro in additionalMacros)
+        foreach (var macro in item.Resolver.AdditionalMacros)
         {
             if (macro.Value == null)
             {
