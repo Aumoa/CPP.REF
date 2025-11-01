@@ -21,6 +21,7 @@ namespace Ayla
 		QuaternionF m_LocalRotation = QuaternionF::Identity();
 
 	public:
+		ACONSTRUCTOR()
 		Transform();
 		virtual ~Transform() noexcept override;
 	};

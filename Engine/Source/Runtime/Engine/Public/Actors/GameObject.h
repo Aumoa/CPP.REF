@@ -3,37 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NamedObject.h"
+#include "Actors/Actor.h"
 #include "GameObject.gen.h"
 
 namespace Ayla
 {
-	class Component;
-
 	ACLASS()
-	class ENGINE_API GameObject : public NamedObject
+	class ENGINE_API GameObject : public Actor
 	{
 		GENERATED_BODY()
-
-	private:
-		bool m_IsActive = false;
-		std::vector<std::shared_ptr<Component>> m_Components;
 
 	public:
 		GameObject();
 		virtual ~GameObject() noexcept override;
-
-		AFUNCTION()
-		void SetActive(bool active);
-		AFUNCTION()
-		bool IsActiveSelf() const { return m_IsActive; }
-		AFUNCTION()
-		SharedPtr<Component> AddComponent(ManagedTypeWrapper componentType);
-
-		template<std::derived_from<Component> TComponent>
-		SharedPtr<TComponent> AddComponent()
-		{
-			return std::dynamic_pointer_cast<TComponent>(AddComponent(TComponent::GetManagedType()));
-		}
 	};
 }

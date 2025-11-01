@@ -1,6 +1,6 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "Actors/Transform.h"
+#include "Components/Transform.h"
 
 namespace Ayla
 {

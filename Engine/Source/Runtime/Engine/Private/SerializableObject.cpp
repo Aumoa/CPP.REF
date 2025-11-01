@@ -15,4 +15,23 @@ namespace Ayla
 	void SerializableObject::MarkDirty()
 	{
 	}
+
+	void SerializableObject::SetName(String name)
+	{
+		m_Name = name;
+	}
+
+	String SerializableObject::GetName() const
+	{
+		return m_Name;
+	}
+
+	void SerializableObject::Destroy(SharedPtr<SerializableObject> obj)
+	{
+		check(obj);
+		if (ensure(obj->m_Disposed == false))
+		{
+			obj->m_Disposed = true;
+		}
+	}
 }
