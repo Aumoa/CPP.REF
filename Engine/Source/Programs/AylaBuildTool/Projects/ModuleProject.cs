@@ -152,7 +152,7 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
                 itemGroups.Add(new CSItemGroup(
                     null,
                     [],
-                    [new CSUsing("Ayla.Object", "Object")],
+                    [new CSUsing("Ayla.Object", "Object"), new CSUsing("Ayla.Debug", "Debug")],
                     [new CSRemoveItem("**\\*.meta")]
                     ));
 
@@ -160,10 +160,14 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
                 {
                     var outputPath = Group.Output(targetInfo, FolderPolicy.PathType.Current);
                     var optimized = targetInfo.Config.IsOptimized();
-                    List<string> defines = ["$(DefineConstants)"];
+                    List<string> defines = [];
                     if (targetInfo.Editor)
                     {
                         defines.Add("WITH_EDITOR");
+                    }
+                    if (targetInfo.Config != Configuration.Shipping)
+                    {
+                        defines.Add("DO_CHECK");
                     }
 
                     var condition = CSCondition.Parse($"$(Configuration)|$(Platform)'=='{VSUtility.GetConfigName(targetInfo)}|{targetInfo.Platform.Name}");

@@ -51,6 +51,8 @@ public partial class Object : IDisposable, IStaticObject
 
     public static ManagedTypeWrapper StaticClass() => GetManagedType__Injected();
 
+    public static implicit operator bool(Object self) => self != null;
+
     private static GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof(Object);
 
     private static nint GetScriptType__Invoke()

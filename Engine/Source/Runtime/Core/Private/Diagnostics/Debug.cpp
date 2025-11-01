@@ -16,8 +16,18 @@ namespace Ayla
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT void Ayla__Debug__Log(::Ayla::ManagedStringWrapper category, ::Ayla::LogVerbosity logLevel, ::Ayla::ManagedStringWrapper message)
+	PLATFORM_SHARED_EXPORT void Ayla__Debug__Log__Injected(::Ayla::ManagedStringWrapper category, ::Ayla::LogVerbosity logLevel, ::Ayla::ManagedStringWrapper message)
 	{
 		::Ayla::Debug::Log(category.AsString(), logLevel, message.AsString());
+	}
+
+	PLATFORM_SHARED_EXPORT void Ayla__Debug__EnsureMessage__Injected(bool condition, ::Ayla::ManagedStringWrapper message)
+	{
+		ensureMsgf(condition, ::Ayla::String::Format(TEXT("Ensure failed: {}"), message.AsString()));
+	}
+
+	PLATFORM_SHARED_EXPORT void Ayla__Debug__AssertMessage__Injected(bool condition, ::Ayla::ManagedStringWrapper message)
+	{
+		checkf(condition, ::Ayla::String::Format(TEXT("Assertion failed: {}"), message.AsString()));
 	}
 }

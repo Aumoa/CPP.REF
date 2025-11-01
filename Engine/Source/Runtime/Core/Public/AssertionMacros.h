@@ -23,7 +23,7 @@ namespace Ayla
 		PLATFORM_BREAK(); \
 	}
 
-#define check(Expr)						AE_CHECK_IMPL( , Expr, TEXT(#Expr))
+#define check(Expr)						AE_CHECK_IMPL( , Expr, ::Ayla::String::Format(TEXT("Assertion failed: {}"), TEXT(#Expr)))
 #define checkf(Expr, Msgf, ...)			AE_CHECK_IMPL(&, Expr, ::Ayla::String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
 
 #define AE_ENSURE_IMPL(Capture, Expr, Msg) \
@@ -39,8 +39,8 @@ namespace Ayla
 		return false; \
 	}) && ([] () { PLATFORM_BREAK(); } (), false)))
 
-#define ensure(Expr)					AE_ENSURE_IMPL( , Expr, TEXT(#Expr))
-#define ensureMsgf(Expr, Msgf, ...)		AE_ENSURE_IMPL(&, Expr, String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
+#define ensure(Expr)					AE_ENSURE_IMPL( , Expr, ::Ayla::String::Format(TEXT("Ensure failed: {}"), TEXT(#Expr)))
+#define ensureMsgf(Expr, Msgf, ...)		AE_ENSURE_IMPL(&, Expr, ::Ayla::String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
 
 #else
 

@@ -120,7 +120,11 @@ public static class CSCompiler
             throw new CSCompilerError($"One or more required referenced assemblies({string.Join(", ", notExists)}) are missing.");
         }
 
-        CSharpParseOptions parseOptions = new(langVersion);
+        CSharpParseOptions parseOptions = new(
+            langVersion,
+            preprocessorSymbols: project.PropertyGroup.DefineConstants
+        );
+
         List<Diagnostic> diagnostics = [];
         var syntaxTrees = await Task.WhenAll(sourceCodes.Select(sourceCode => Task.Run(async () =>
         {
