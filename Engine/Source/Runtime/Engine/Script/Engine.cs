@@ -21,6 +21,7 @@ public partial class Engine
 
         m_Graphics = Graphics.CreateGraphics(RenderFeatures.Vulkan);
         m_SwapchainExtensions.Add(m_Graphics.InstallSwapChain(m_MainActivity.GetMainWindow()));
+        InitializeGraphics(m_Graphics);
 
         m_GameInstance = InitializeGame(options);
         m_SceneManager = new SceneManager();

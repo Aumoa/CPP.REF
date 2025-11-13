@@ -4,6 +4,7 @@
 #include "GenericApplication.h"
 #include "GenericWindowSwapchainExtension.h"
 #include "VkSwapchainExt.h"
+#include "VkCommandBuffer.h"
 #include "Linq/Concat.h"
 #include <ranges>
 
@@ -190,11 +191,16 @@ namespace Ayla
 
 		VKR(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &m_Fence));
 
-        VkSemaphoreCreateInfo semaphoreCreateInfo =
+        for (size_t i = 0; i < kMaxFramesInFlight; ++i)
         {
-            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
-        };
-        VKR(vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphore));
+            VkSemaphoreCreateInfo semaphoreCreateInfo =
+            {
+                .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+            };
+            VkSemaphore semaphore;
+            VKR(vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &semaphore));
+            m_RenderCompletedSemaphores.emplace_back(semaphore);
+		}
     }
 
     VkGraphics::~VkGraphics() noexcept
@@ -207,12 +213,13 @@ namespace Ayla
             vkDestroyFence(m_Device, m_Fence, nullptr);
             m_Fence = nullptr;
         }
-        
-        if (m_Semaphore)
+
+        for (auto& semaphore : m_RenderCompletedSemaphores)
         {
-            vkDestroySemaphore(m_Device, m_Semaphore, nullptr);
-            m_Semaphore = nullptr;
+            vkDestroySemaphore(m_Device, semaphore, nullptr);
         }
+
+        m_RenderCompletedSemaphores.clear();
     }
 
     SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow)
@@ -323,12 +330,19 @@ namespace Ayla
         return extension;
     }
 
-    void VkGraphics::BeginRenderThread()
+    void VkGraphics::BeginRenderFrame_Implementation()
     {
         VKR(vkWaitForFences(m_Device, 1, &m_Fence, VK_TRUE, 10000));
+        VKR(vkResetFences(m_Device, 1, &m_Fence));
+        ++m_FrameCount;
     }
 
-    void VkGraphics::EndRenderThread()
+    void VkGraphics::EndRenderFrame_Implementation()
     {
+    }
+
+    SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()
+    {
+        return New<VkCommandBuffer>(this);
     }
 }

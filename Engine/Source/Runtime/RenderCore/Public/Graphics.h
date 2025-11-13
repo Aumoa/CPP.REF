@@ -11,6 +11,7 @@ namespace Ayla
     class GenericApplication;
     class GenericWindow;
     class GenericWindowSwapchainExtension;
+    class CommandBuffer;
 
     ACLASS()
     class RENDERCORE_API Graphics : public Object
@@ -25,7 +26,11 @@ namespace Ayla
 
         AFUNCTION()
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) APURE;
-        virtual void BeginRenderThread() = 0;
-        virtual void EndRenderThread() = 0;
+        AFUNCTION()
+        virtual void BeginRenderFrame() APURE;
+        AFUNCTION()
+        virtual void EndRenderFrame() APURE;
+        AFUNCTION()
+        virtual SharedPtr<CommandBuffer> CreateCommandBuffer() APURE;
     };
 }

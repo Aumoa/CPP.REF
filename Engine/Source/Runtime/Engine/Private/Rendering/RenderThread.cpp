@@ -6,7 +6,7 @@
 
 namespace Ayla
 {
-	RenderThread::RenderThread(std::shared_ptr<Graphics> graphics)
+	RenderThread::RenderThread(SharedPtr<Graphics> graphics)
 		: m_Thread(std::bind(&RenderThread::ThreadProc, this, std::move(graphics)))
 	{
 	}
@@ -32,7 +32,7 @@ namespace Ayla
 		m_Thread.join();
 	}
 
-	void RenderThread::ThreadProc(std::shared_ptr<Graphics> graphics)
+	void RenderThread::ThreadProc(SharedPtr<Graphics> graphics)
 	{
 		Thread::GetCurrentThread().SetDescription(TEXT("Render Thread #0"));
 

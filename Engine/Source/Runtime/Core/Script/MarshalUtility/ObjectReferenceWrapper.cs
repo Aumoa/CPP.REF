@@ -28,6 +28,7 @@ public struct ObjectReferenceWrapper
                 handle = GCHandle.FromIntPtr(handlePtr);
                 if (handle.Target is T t)
                 {
+                    Object.EndWriteGCHandle__Injected(Ptr, handlePtr, true);
                     return t;
                 }
             }

@@ -23,13 +23,13 @@ namespace Ayla
 		std::atomic<bool> m_StopRequested = false;
 
 	public:
-		RenderThread(std::shared_ptr<Graphics> graphics);
+		RenderThread(SharedPtr<Graphics> graphics);
 		~RenderThread() noexcept;
 
 		void Dispatch(std::move_only_function<void()> completionAction);
 		void RequestStop();
 
 	private:
-		void ThreadProc(std::shared_ptr<Graphics> graphics);
+		void ThreadProc(SharedPtr<Graphics> graphics);
 	};
 }

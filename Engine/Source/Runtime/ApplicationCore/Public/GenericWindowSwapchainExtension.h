@@ -8,6 +8,8 @@
 
 namespace Ayla
 {
+    class CommandBuffer;
+
     ACLASS()
     class APPLICATIONCORE_API GenericWindowSwapchainExtension : public GenericWindowExtension
     {
@@ -19,7 +21,8 @@ namespace Ayla
     public:
         virtual ~GenericWindowSwapchainExtension() noexcept;
 
-        virtual void Present() = 0;
+        virtual void Acquire(CommandBuffer* commandBuffer) = 0;
+        virtual void Present(CommandBuffer* commandBuffer) = 0;
         virtual void Destroy() = 0;
     };
 }

@@ -8,12 +8,9 @@
 namespace Ayla
 {
 	class Graphics;
-	class GenericActivity;
 	class GenericWindowSwapchainExtension;
 	class RenderThread;
-	class GameInstance;
-	class CommandLineParser;
-	class ScriptingBackend;
+	class CommandBuffer;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -21,7 +18,10 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
+		SharedPtr<Graphics> m_Graphics;
+		SharedPtr<RenderThread> m_RenderThread;
 		std::vector<SharedPtr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
+		SharedPtr<CommandBuffer> m_CommandBuffer;
 
 	public:
 		ACONSTRUCTOR()
@@ -36,6 +36,8 @@ namespace Ayla
 		virtual void Tick();
 
 	protected:
+		AFUNCTION()
+		void InitializeGraphics(SharedPtr<Graphics> graphics);
 		AFUNCTION()
 		void SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions);
 	};

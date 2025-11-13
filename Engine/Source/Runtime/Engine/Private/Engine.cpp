@@ -7,6 +7,7 @@
 #include "GenericWindowSwapchainExtension.h"
 #include "GameInstance.h"
 #include "CommandLineParser.h"
+#include "CommandBuffer.h"
 #include "Platform/DynamicLibrary.h"
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
@@ -49,13 +50,37 @@ namespace Ayla
 
 	void Engine::Tick()
 	{
-		//m_RenderThread->Dispatch([swapchainExtensions = m_SwapchainExtensions, graphics = m_Graphics]()
-		//{
-		//	for (auto& swapchainExt : swapchainExtensions)
-		//	{
-		//		swapchainExt->Present();
-		//	}
-		//});
+		m_RenderThread->Dispatch([
+			swapchainExtensions = m_SwapchainExtensions,
+			graphics = m_Graphics,
+			commandBuffer = m_CommandBuffer
+		]()
+		{
+			graphics->BeginRenderFrame();
+
+			commandBuffer->BeginCommands();
+
+			for (auto& swapchainExt : swapchainExtensions)
+			{
+				swapchainExt->Acquire(commandBuffer.Get());
+			}
+
+			commandBuffer->EndCommands();
+
+			for (auto& swapchainExt : swapchainExtensions)
+			{
+				swapchainExt->Present(commandBuffer.Get());
+			}
+
+			graphics->EndRenderFrame();
+		});
+	}
+
+	void Engine::InitializeGraphics(SharedPtr<Graphics> graphics)
+	{
+		m_Graphics = graphics;
+		m_RenderThread = New<RenderThread>(graphics);
+		m_CommandBuffer = graphics->CreateCommandBuffer();
 	}
 
 	void Engine::SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions)
