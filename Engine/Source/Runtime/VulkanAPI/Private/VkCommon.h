@@ -15,11 +15,16 @@
 #include <vulkan/vk_enum_string_helper.h>
 #include <format>
 
+inline void VKR__impl(Ayla::String s)
+{
+    Ayla::LogVulkan::Critical(s);
+    throw Ayla::InvalidOperationException(s);
+}
+
 #define VKR(expr, ...) \
 if (auto VKR_res__ = (expr); VkrFailure __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>) (VKR_res__)) \
 { \
-    ::Ayla::LogVulkan::Critical(TEXT("{}"), VKR_res__); \
-    throw ::Ayla::InvalidOperationException(String::Format(TEXT("{}"), VKR_res__)); \
+    VKR__impl(String::Format(TEXT("{}"), VKR_res__)); \
 }
 
 #define DECLARE_FORMATTER(T) \

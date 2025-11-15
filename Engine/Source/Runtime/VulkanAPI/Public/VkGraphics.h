@@ -18,6 +18,7 @@ namespace Ayla
 
     public:
         static constexpr size_t kMaxFramesInFlight = 2;
+		static constexpr size_t kMaxSwapchainImages = 3;
 
     private:
         VkInstanceRef m_Instance;
@@ -29,7 +30,6 @@ namespace Ayla
         VkFence m_Fence{ nullptr };
 
         std::atomic<std::size_t> m_FrameCount = 0;
-        std::vector<VkSemaphore> m_RenderCompletedSemaphores;
 
     public:
         ACONSTRUCTOR()
@@ -47,7 +47,7 @@ namespace Ayla
 		uint32_t GetGraphicsQueueFamilyIndex() const noexcept { return m_GraphicsQueueFamilyIndex; }
         VkFence GetFence() const noexcept { return m_Fence; }
 
+        inline size_t GetFrameNumber() const noexcept { return m_FrameCount; }
         inline size_t GetFrameIndex() const noexcept { return m_FrameCount % kMaxFramesInFlight; }
-        inline VkSemaphore GetRenderCompletedSemaphore(size_t index) const noexcept { return m_RenderCompletedSemaphores[index]; }
     };
 }

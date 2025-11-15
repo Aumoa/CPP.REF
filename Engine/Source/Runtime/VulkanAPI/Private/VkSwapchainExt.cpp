@@ -38,35 +38,38 @@ namespace Ayla
 		bool isFirstRender = (m_SwapchainImageFirstRender & (1 << m_CurrentImageIndex)) == 0;
         auto* vkCmd = (VkCommandBuffer*)commandBuffer;
 
-        VkImageMemoryBarrier barrier
+        if (isFirstRender)
         {
-            .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-            .srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-            .dstAccessMask = 0,
-            .oldLayout = isFirstRender ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            .newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-            .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            .image = m_SwapchainImages[m_CurrentImageIndex],
-            .subresourceRange =
+            VkImageMemoryBarrier barrier
             {
-                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                .baseMipLevel = 0,
-                .levelCount = 1,
-                .baseArrayLayer = 0,
-                .layerCount = 1,
-            },
-        };
+                .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+                .srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                .dstAccessMask = 0,
+                .oldLayout = isFirstRender ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                .newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+                .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+                .image = m_SwapchainImages[m_CurrentImageIndex],
+                .subresourceRange =
+                {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .baseMipLevel = 0,
+                    .levelCount = 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1,
+                },
+            };
 
-        vkCmdPipelineBarrier(
-            vkCmd->GetVkCommandBuffer(),
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-            VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-            0,
-            0, nullptr,
-            0, nullptr,
-            1, &barrier
-        );
+            vkCmdPipelineBarrier(
+                vkCmd->GetVkCommandBuffer(),
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                0,
+                0, nullptr,
+                0, nullptr,
+                1, &barrier
+            );
+        }
 
 		m_SwapchainImageFirstRender |= (1 << m_CurrentImageIndex);
         vkCmd->m_PresentCompletedSemaphore = presentCompletedSemaphore;
@@ -75,7 +78,7 @@ namespace Ayla
     void VkSwapchainExt::Present(CommandBuffer* commandBuffer)
     {
         check(m_CurrentImageIndex != 0xFFFFFFFF);
-        auto semaphore = ((VkCommandBuffer*)commandBuffer)->GetRenderCompletedSemaphore(m_Owner->GetFrameIndex());
+        auto semaphore = ((VkCommandBuffer*)commandBuffer)->GetRenderCompletedSemaphore();
         VkPresentInfoKHR presentInfo
         {
             .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,

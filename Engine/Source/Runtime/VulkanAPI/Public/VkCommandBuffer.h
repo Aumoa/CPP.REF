@@ -34,6 +34,6 @@ namespace Ayla
 		virtual void EndCommands_Implementation() override;
 
 		::VkCommandBuffer GetVkCommandBuffer() const noexcept { return m_CommandBuffer; }
-		VkSemaphore GetRenderCompletedSemaphore(size_t frameIndex) const noexcept { return m_RenderCompletedSemaphores[frameIndex]; }
+		VkSemaphore GetRenderCompletedSemaphore() const noexcept;
 	};
 }

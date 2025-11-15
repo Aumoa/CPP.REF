@@ -31,7 +31,7 @@ namespace Ayla
 		{
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
 		};
-		m_RenderCompletedSemaphores.resize(VkGraphics::kMaxFramesInFlight);
+		m_RenderCompletedSemaphores.resize(VkGraphics::kMaxSwapchainImages);
 		for (auto& semaphore : m_RenderCompletedSemaphores)
 		{
 			VKR(vkCreateSemaphore(graphics->GetDevice(), &semaphoreCreateInfo, nullptr, &semaphore));
@@ -68,7 +68,7 @@ namespace Ayla
 	{
 		VKR(vkEndCommandBuffer(m_CommandBuffer));
 
-		auto semaphore = GetRenderCompletedSemaphore(m_Graphics->GetFrameIndex());
+		auto semaphore = GetRenderCompletedSemaphore();
 		VkSubmitInfo submitInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -78,14 +78,21 @@ namespace Ayla
 			.pSignalSemaphores = &semaphore
 		};
 
-		if (m_PresentCompletedSemaphore != nullptr)
+		VkSemaphore presentCompletedSemaphore = m_PresentCompletedSemaphore;
+		m_PresentCompletedSemaphore = nullptr;
+		if (presentCompletedSemaphore != nullptr)
 		{
 			VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 			submitInfo.pWaitDstStageMask = &waitStage;
 			submitInfo.waitSemaphoreCount = 1;
-			submitInfo.pWaitSemaphores = &m_PresentCompletedSemaphore;
+			submitInfo.pWaitSemaphores = &presentCompletedSemaphore;
 		}
 
 		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, m_Graphics->GetFence()));
+	}
+
+	VkSemaphore VkCommandBuffer::GetRenderCompletedSemaphore() const noexcept
+	{
+		return m_RenderCompletedSemaphores[m_Graphics->GetFrameNumber() % VkGraphics::kMaxSwapchainImages];
 	}
 }
