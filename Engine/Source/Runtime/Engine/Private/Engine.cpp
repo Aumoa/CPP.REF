@@ -40,6 +40,8 @@ namespace Ayla
 
 	void Engine::Shutdown()
 	{
+		m_RenderThread->RequestStop();
+
 		for (auto& swapchain : m_SwapchainExtensions)
 		{
 			swapchain->Destroy();
