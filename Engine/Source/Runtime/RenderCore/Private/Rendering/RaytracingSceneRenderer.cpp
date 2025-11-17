@@ -9,7 +9,7 @@ namespace Ayla
 	{
 	}
 
-	void RaytracingSceneRenderer::Render_Implementation(SharedPtr<SceneView> view)
+	void RaytracingSceneRenderer::Render(const SceneView& view)
 	{
 	}
 }

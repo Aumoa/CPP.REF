@@ -12,6 +12,8 @@
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/SceneManager.h"
+#include "Rendering/RaytracingSceneRenderer.h"
+#include "Rendering/SceneView.h"
 
 namespace Ayla
 {
@@ -55,7 +57,8 @@ namespace Ayla
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
 			graphics = m_Graphics,
-			commandBuffer = m_CommandBuffer
+			commandBuffer = m_CommandBuffer,
+			renderer = m_SceneRenderer.get()
 		]()
 		{
 			graphics->BeginRenderFrame();
@@ -83,6 +86,7 @@ namespace Ayla
 		m_Graphics = graphics;
 		m_RenderThread = New<RenderThread>(graphics);
 		m_CommandBuffer = graphics->CreateCommandBuffer();
+		m_SceneRenderer = std::make_unique<RaytracingSceneRenderer>();
 	}
 
 	void Engine::SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions)

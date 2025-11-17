@@ -4,7 +4,6 @@
 #include "GenericApplication.h"
 #include "GenericWindowSwapchainExtension.h"
 #include "VkSwapchainExt.h"
-#include "VkCommandBuffer.h"
 #include "Linq/Concat.h"
 #include <ranges>
 
@@ -314,10 +313,5 @@ namespace Ayla
 
     void VkGraphics::EndRenderFrame_Implementation()
     {
-    }
-
-    SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()
-    {
-        return New<VkCommandBuffer>(this);
     }
 }

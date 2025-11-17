@@ -3,23 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SceneRenderer.gen.h"
 
 namespace Ayla
 {
 	class SceneView;
 
-	ACLASS()
-	class RENDERCORE_API SceneRenderer : public Object
+	class RENDERCORE_API SceneRenderer
 	{
-		GENERATED_BODY()
-
 	protected:
-		ACONSTRUCTOR()
 		SceneRenderer();
 
 	public:
-		AFUNCTION()
-		virtual void Render(SharedPtr<SceneView> view) APURE;
+		virtual ~SceneRenderer() noexcept;
+
+		virtual void Render(const SceneView& view) = 0;
 	};
 }

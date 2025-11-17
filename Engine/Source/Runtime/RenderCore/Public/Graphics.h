@@ -12,6 +12,7 @@ namespace Ayla
     class GenericWindow;
     class GenericWindowSwapchainExtension;
     class CommandBuffer;
+    class SceneView;
 
     ACLASS()
     class RENDERCORE_API Graphics : public Object

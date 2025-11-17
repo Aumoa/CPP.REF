@@ -3,17 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SceneView.gen.h"
 
 namespace Ayla
 {
-	ACLASS()
-	class RENDERCORE_API SceneView : public Object
+	class RenderTexture;
+
+	class RENDERCORE_API SceneView
 	{
-		GENERATED_BODY()
+	private:
+		const SharedPtr<RenderTexture> m_OutputTexture;
 
 	public:
-		ACONSTRUCTOR()
-		SceneView();
+		SceneView() = delete;
+		SceneView(SharedPtr<RenderTexture> outputTexture);
+		SceneView(const SceneView&) = delete;
+		~SceneView() noexcept;
 	};
 }

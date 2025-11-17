@@ -95,4 +95,9 @@ namespace Ayla
 	{
 		return m_RenderCompletedSemaphores[m_Graphics->GetFrameNumber() % VkGraphics::kMaxSwapchainImages];
 	}
+
+	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()
+	{
+		return New<VkCommandBuffer>(this);
+	}
 }

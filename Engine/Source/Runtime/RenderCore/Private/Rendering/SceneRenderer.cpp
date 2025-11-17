@@ -7,4 +7,8 @@ namespace Ayla
 	SceneRenderer::SceneRenderer()
 	{
 	}
+
+	SceneRenderer::~SceneRenderer() noexcept
+	{
+	}
 }
