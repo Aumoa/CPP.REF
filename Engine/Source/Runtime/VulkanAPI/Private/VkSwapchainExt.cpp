@@ -3,6 +3,7 @@
 #include "VkSwapchainExt.h"
 #include "VkGraphics.h"
 #include "VkCommandBuffer.h"
+#include "VkSwapchainRenderTexture.h"
 
 namespace Ayla
 {
@@ -13,6 +14,7 @@ namespace Ayla
         , m_SwapchainCreateInfoCache(swapchainCreateInfo)
         , m_SuitableQueue(suitableQueue)
     {
+        m_SwapchainRenderTexture = New<VkSwapchainRenderTexture>(this);
         ReallocateSwapchainImages();
 
         m_PresentCompletedSemaphores.resize(VkGraphics::kMaxFramesInFlight);
@@ -28,69 +30,14 @@ namespace Ayla
         checkf(m_Surface == nullptr, TEXT("Swapchain does not destroyed."));
     }
 
-    void VkSwapchainExt::Acquire(CommandBuffer* commandBuffer)
+    SharedPtr<RenderTexture> VkSwapchainExt::GetRenderTexture()
     {
-        check(m_CurrentImageIndex == 0xFFFFFFFF);
-        
-		auto presentCompletedSemaphore = m_PresentCompletedSemaphores[m_Owner->GetFrameIndex()];
-        VKR(vkAcquireNextImageKHR(m_Owner->GetDevice(), m_Swapchain, UINT64_MAX, presentCompletedSemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex));
-
-		bool isFirstRender = (m_SwapchainImageFirstRender & (1 << m_CurrentImageIndex)) == 0;
-        auto* vkCmd = (VkCommandBuffer*)commandBuffer;
-
-        if (isFirstRender)
-        {
-            VkImageMemoryBarrier barrier
-            {
-                .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-                .srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-                .dstAccessMask = 0,
-                .oldLayout = isFirstRender ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                .newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-                .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-                .image = m_SwapchainImages[m_CurrentImageIndex],
-                .subresourceRange =
-                {
-                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                    .baseMipLevel = 0,
-                    .levelCount = 1,
-                    .baseArrayLayer = 0,
-                    .layerCount = 1,
-                },
-            };
-
-            vkCmdPipelineBarrier(
-                vkCmd->GetVkCommandBuffer(),
-                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-                VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-                0,
-                0, nullptr,
-                0, nullptr,
-                1, &barrier
-            );
-        }
-
-		m_SwapchainImageFirstRender |= (1 << m_CurrentImageIndex);
-        vkCmd->m_PresentCompletedSemaphore = presentCompletedSemaphore;
+        return m_SwapchainRenderTexture;
     }
 
     void VkSwapchainExt::Present(CommandBuffer* commandBuffer)
     {
-        check(m_CurrentImageIndex != 0xFFFFFFFF);
-        auto semaphore = ((VkCommandBuffer*)commandBuffer)->GetRenderCompletedSemaphore();
-        VkPresentInfoKHR presentInfo
-        {
-            .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-            .waitSemaphoreCount = 1,
-            .pWaitSemaphores = &semaphore,
-            .swapchainCount = 1,
-            .pSwapchains = &m_Swapchain,
-            .pImageIndices = &m_CurrentImageIndex
-        };
-
-        VKR(vkQueuePresentKHR(m_SuitableQueue, &presentInfo), VK_ERROR_SURFACE_LOST_KHR, VK_ERROR_OUT_OF_DATE_KHR);
-        m_CurrentImageIndex = 0xFFFFFFFF;
+        m_SwapchainRenderTexture->Present(m_SuitableQueue, (VkCommandBuffer*)commandBuffer);
     }
 
     void VkSwapchainExt::Destroy()
@@ -122,6 +69,12 @@ namespace Ayla
         LogVulkan::Verbose(TEXT("Swapchain resized to {}"), newSize);
 
         ReallocateSwapchainImages();
+    }
+
+    Vector2N VkSwapchainExt::GetSize() const
+    {
+        auto extent = m_SwapchainCreateInfoCache.imageExtent;
+        return Vector2N((int32)extent.width, (int32)extent.height);
     }
 
     void VkSwapchainExt::CleanupSwapchain()

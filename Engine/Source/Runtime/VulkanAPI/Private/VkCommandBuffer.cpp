@@ -31,11 +31,7 @@ namespace Ayla
 		{
 			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
 		};
-		m_RenderCompletedSemaphores.resize(VkGraphics::kMaxSwapchainImages);
-		for (auto& semaphore : m_RenderCompletedSemaphores)
-		{
-			VKR(vkCreateSemaphore(graphics->GetDevice(), &semaphoreCreateInfo, nullptr, &semaphore));
-		}
+		VKR(vkCreateSemaphore(graphics->GetDevice(), &semaphoreCreateInfo, nullptr, &m_RenderCompletedSemaphore));
 	}
 
 	VkCommandBuffer::~VkCommandBuffer() noexcept
@@ -68,32 +64,32 @@ namespace Ayla
 	{
 		VKR(vkEndCommandBuffer(m_CommandBuffer));
 
-		auto semaphore = GetRenderCompletedSemaphore();
 		VkSubmitInfo submitInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 			.commandBufferCount = 1,
 			.pCommandBuffers = &m_CommandBuffer,
 			.signalSemaphoreCount = 1,
-			.pSignalSemaphores = &semaphore
+			.pSignalSemaphores = &m_RenderCompletedSemaphore,
 		};
 
-		VkSemaphore presentCompletedSemaphore = m_PresentCompletedSemaphore;
-		m_PresentCompletedSemaphore = nullptr;
-		if (presentCompletedSemaphore != nullptr)
-		{
-			VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-			submitInfo.pWaitDstStageMask = &waitStage;
-			submitInfo.waitSemaphoreCount = 1;
-			submitInfo.pWaitSemaphores = &presentCompletedSemaphore;
-		}
-
+		VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		submitInfo.pWaitDstStageMask = &waitStage;
+		submitInfo.waitSemaphoreCount = (uint32_t)m_ImageReadySemaphores.size();
+		submitInfo.pWaitSemaphores = m_ImageReadySemaphores.data();
 		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, m_Graphics->GetFence()));
+		
+		m_ImageReadySemaphores.clear();
+	}
+
+	void VkCommandBuffer::AddImageReadySemaphore(VkSemaphore semaphore)
+	{
+		m_ImageReadySemaphores.emplace_back(semaphore);
 	}
 
 	VkSemaphore VkCommandBuffer::GetRenderCompletedSemaphore() const noexcept
 	{
-		return m_RenderCompletedSemaphores[m_Graphics->GetFrameNumber() % VkGraphics::kMaxSwapchainImages];
+		return m_RenderCompletedSemaphore;
 	}
 
 	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()

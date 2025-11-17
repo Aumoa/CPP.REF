@@ -14,6 +14,7 @@
 #include "SceneManagement/SceneManager.h"
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "Rendering/SceneView.h"
+#include "Rendering/RenderTexture.h"
 
 namespace Ayla
 {
@@ -57,18 +58,22 @@ namespace Ayla
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
 			graphics = m_Graphics,
-			commandBuffer = m_CommandBuffer,
-			renderer = m_SceneRenderer.get()
+			commandBuffer = m_CommandBuffer
 		]()
 		{
 			graphics->BeginRenderFrame();
 
+			// TODO: This point must block until the semaphore set in vkQueuePresentKHR has been signaled.
+			std::this_thread::sleep_for(16ms);
+
+			// SceneView: Overlay, #0
+			auto rt = swapchainExtensions[0]->GetRenderTexture();
+			SceneView view(rt);
+			RaytracingSceneRenderer renderer;
+
 			commandBuffer->BeginCommands();
 
-			for (auto& swapchainExt : swapchainExtensions)
-			{
-				swapchainExt->Acquire(commandBuffer.Get());
-			}
+			rt->Acquire(commandBuffer.Get());
 
 			commandBuffer->EndCommands();
 
@@ -86,7 +91,6 @@ namespace Ayla
 		m_Graphics = graphics;
 		m_RenderThread = New<RenderThread>(graphics);
 		m_CommandBuffer = graphics->CreateCommandBuffer();
-		m_SceneRenderer = std::make_unique<RaytracingSceneRenderer>();
 	}
 
 	void Engine::SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions)

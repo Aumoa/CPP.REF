@@ -8,6 +8,8 @@
 
 namespace Ayla
 {
+	class CommandBuffer;
+
 	ACLASS()
 	class RENDERCORE_API RenderTexture : public Object
 	{
@@ -15,5 +17,7 @@ namespace Ayla
 
 	public:
 		virtual Vector2N GetSize() const = 0;
+
+		virtual void Acquire(CommandBuffer* cmd) = 0;
 	};
 }
