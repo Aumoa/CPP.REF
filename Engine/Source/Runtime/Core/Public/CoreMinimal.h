@@ -71,6 +71,7 @@
 #include "Diagnostics/Debug.h"
 #include "Diagnostics/LogMacros.h"
 
+#include "Threading/SynchronizationContext.h"
 #include "Threading/Tasks/TaskStatus.h"
 #include "Threading/Tasks/Task.h"
 #include "Threading/Tasks/TaskCompletionSource.h"

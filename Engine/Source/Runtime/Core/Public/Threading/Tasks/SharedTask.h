@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "Threading/Tasks/TaskStatus.h"
 #include "Threading/ThreadPool.h"
+#include "Threading/SynchronizationContext.h"
+#include "Threading/Tasks/TaskStatus.h"
 #include "InvalidOperationException.h"
 #include "OperationCanceledException.h"
 #include <functional>
@@ -39,7 +40,7 @@ namespace Ayla
 		TaskStatus m_Status = TaskStatus::Created;
 		std::exception_ptr m_ExceptionPtr;
 
-		std::vector<function_t<void()>> m_Continuations;
+		std::vector<std::tuple<function_t<void()>, SynchronizationContext*>> m_Continuations;
 		std::optional<std::stop_callback<function_t<void()>>> m_Cancellation;
 
 	public:
@@ -72,17 +73,18 @@ namespace Ayla
 			return m_Status;
 		}
 
-		void ContinueWith(function_t<void()> continuation) noexcept
+		void ContinueWith(function_t<void()> continuation, bool continueOnCapturedContext) noexcept
 		{
+			auto context = continueOnCapturedContext ? SynchronizationContext::GetCurrent() : nullptr;
 			std::unique_lock lock(m_Mutex);
 			if (IsCompleted())
 			{
 				lock.unlock();
-				ThreadPool::QueueUserWorkItem(std::move(continuation));
+				this->Invoke(std::move(continuation), context);
 			}
 			else
 			{
-				m_Continuations.emplace_back(std::move(continuation));
+				m_Continuations.emplace_back(std::move(continuation), context);
 			}
 		}
 
@@ -188,8 +190,20 @@ namespace Ayla
 
 			for (auto& c : cc)
 			{
-				ThreadPool::QueueUserWorkItem(std::move(c));
+				this->Invoke(std::move(std::get<0>(c)), std::get<1>(c));
 			}
+		}
+
+	private:
+		void Invoke(function_t<void()> continuation, SynchronizationContext* context) noexcept
+		{
+			if (context)
+			{
+				context->Post(std::move(continuation));
+				return;
+			}
+
+			ThreadPool::QueueUserWorkItem(std::move(continuation));
 		}
 	};
 

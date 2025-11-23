@@ -8,14 +8,15 @@
 namespace Ayla
 {
 	template<class T>
-	class TaskAwaiter
+	class ConfiguredTaskAwaiter
 	{
-	private:
 		const std::shared_ptr<SharedTask<T>> m_Task;
+		const bool m_ContinueOnCapturedContext;
 
 	public:
-		TaskAwaiter(std::shared_ptr<SharedTask<T>> task)
+		ConfiguredTaskAwaiter(std::shared_ptr<SharedTask<T>> task, bool continueOnCapturedContext) noexcept
 			: m_Task(std::move(task))
+			, m_ContinueOnCapturedContext(continueOnCapturedContext)
 		{
 		}
 
@@ -27,11 +28,10 @@ namespace Ayla
 		template<class CoroutineHandle>
 		void await_suspend(CoroutineHandle&& coro) const noexcept
 		{
-			constexpr bool kContinueOnCapturedContext = true;
 			m_Task->ContinueWith([c = std::forward<CoroutineHandle>(coro)]()
-			{
-				c.resume();
-			}, kContinueOnCapturedContext);
+				{
+					c.resume();
+				}, m_ContinueOnCapturedContext);
 		}
 
 		decltype(auto) await_resume() const

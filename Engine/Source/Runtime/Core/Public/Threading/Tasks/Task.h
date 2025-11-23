@@ -6,6 +6,7 @@
 #include "Threading/Tasks/TaskAwaiter.h"
 #include "Threading/Tasks/PromiseType.h"
 #include "Threading/Tasks/YieldAwaitable.h"
+#include "Threading/Tasks/ConfiguredTaskAwaitable.h"
 #include <memory>
 
 namespace Ayla
@@ -115,6 +116,12 @@ namespace Ayla
 
 		Task<bool> SuppressCancellationThrow() requires std::same_as<T, void>;
 		Task<std::optional<T>> SuppressCancellationThrow() requires (!std::same_as<T, void>);
+
+		ConfiguredTaskAwaitable<T> ConfigureAwait(bool continueOnCapturedContext) const noexcept
+		{
+			check(IsValid());
+			return ConfiguredTaskAwaitable<T>(m_Task, continueOnCapturedContext);
+		}
 
 		inline void Wait() const noexcept
 		{
