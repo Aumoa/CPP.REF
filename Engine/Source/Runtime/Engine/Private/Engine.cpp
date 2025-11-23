@@ -6,9 +6,7 @@
 #include "GenericActivity.h"
 #include "GenericWindowSwapchainExtension.h"
 #include "GameInstance.h"
-#include "CommandLineParser.h"
 #include "CommandBuffer.h"
-#include "Platform/DynamicLibrary.h"
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/SceneManager.h"
@@ -26,8 +24,28 @@ namespace Ayla
 	{
 	}
 
+	class MainSynchronizationContext : public SynchronizationContext
+	{
+	public:
+		static std::mutex s_Mutex;
+		static std::queue<SharedTask<>::function_t<void()>> s_Continuations;
+
+	public:
+		virtual void Post(SharedTask<>::function_t<void()> callback) override
+		{
+			std::unique_lock lock(s_Mutex);
+			s_Continuations.emplace(std::move(callback));
+		}
+	};
+
+	std::mutex MainSynchronizationContext::s_Mutex;
+	std::queue<SharedTask<>::function_t<void()>> MainSynchronizationContext::s_Continuations;
+
 	void Engine::GuardedLoop_Implementation()
 	{
+		MainSynchronizationContext syncContext;
+		SynchronizationContext::SetSynchronizationContext(&syncContext);
+
 		auto& app = GenericApplication::Get();
 		std::vector<GenericPlatformInputEvent> inputEvents;
 		while (true)
@@ -37,6 +55,7 @@ namespace Ayla
 			{
 				break;
 			}
+
 			Tick();
 		}
 	}
@@ -55,6 +74,16 @@ namespace Ayla
 
 	void Engine::Tick()
 	{
+		std::unique_lock lock(MainSynchronizationContext::s_Mutex);
+		auto cc = std::move(MainSynchronizationContext::s_Continuations);
+		lock.unlock();
+
+		while (!cc.empty())
+		{
+			cc.front()();
+			cc.pop();
+		}
+
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
 			graphics = m_Graphics,
@@ -62,9 +91,6 @@ namespace Ayla
 		]()
 		{
 			graphics->BeginRenderFrame();
-
-			// TODO: This point must block until the semaphore set in vkQueuePresentKHR has been signaled.
-			std::this_thread::sleep_for(16ms);
 
 			// SceneView: Overlay, #0
 			auto rt = swapchainExtensions[0]->GetRenderTexture();
