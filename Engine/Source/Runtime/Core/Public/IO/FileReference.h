@@ -66,7 +66,7 @@ namespace Ayla
 			return File::ReadAllText(GetValue());
 		}
 
-		[[nodiscard]] Task<String> ReadAllTextAsync(CancellationToken InCancellationToken = {}) const
+		[[nodiscard]] Task<String> ReadAllTextAsync(std::stop_token InCancellationToken = {}) const
 		{
 			return File::ReadAllTextAsync(GetValue(), InCancellationToken);
 		}

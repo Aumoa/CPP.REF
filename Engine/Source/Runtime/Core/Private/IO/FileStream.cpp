@@ -51,7 +51,7 @@ namespace Ayla
 		WriteAsync(InBytes).GetResult();
 	}
 
-	Task<> FileStream::WriteAsync(std::span<const uint8> InBytes, CancellationToken InCancellationToken)
+	Task<> FileStream::WriteAsync(std::span<const uint8> InBytes, std::stop_token InCancellationToken)
 	{
 		auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
 		auto Ptr = new IOCompletionOverlapped(PlatformIO::FileIOWrittenAction(TCS, IOCPWriteBuf));
@@ -79,7 +79,7 @@ namespace Ayla
 		return ReadAsync(OutBytes).GetResult();
 	}
 
-	Task<size_t> FileStream::ReadAsync(std::span<uint8> OutBytes, CancellationToken InCancellationToken)
+	Task<size_t> FileStream::ReadAsync(std::span<uint8> OutBytes, std::stop_token InCancellationToken)
 	{
 		auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
 		auto Ptr = new IOCompletionOverlapped(PlatformIO::FileIOReadAction(TCS, IOCPReadBuf));

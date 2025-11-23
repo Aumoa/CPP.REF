@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Threading/Tasks/Task.h"
+#include "Threading/Tasks/SharedTask.h"
 
 namespace Ayla
 {
@@ -12,12 +13,11 @@ namespace Ayla
 		template<class>
 		friend class TaskCompletionSource;
 
-		std::shared_ptr<Awaiter<T>> MyAwaiter;
-		mutable std::source_location Src = std::source_location::current();
+		std::shared_ptr<SharedTask<T>> m_Task;
 
 	private:
-		TaskCompletionSource(std::shared_ptr<Awaiter<T>> InAwaiter)
-			: MyAwaiter(std::move(InAwaiter))
+		TaskCompletionSource(std::shared_ptr<SharedTask<T>> task)
+			: m_Task(std::move(task))
 		{
 		}
 
@@ -28,67 +28,65 @@ namespace Ayla
 
 		bool IsValid() const
 		{
-			return (bool)MyAwaiter;
+			return (bool)m_Task;
 		}
 
-		void SetResult(std::source_location InSrc = std::source_location::current()) const
+		void SetResult() const
 		{
 			SetResultImpl();
-			Src = InSrc;
 		}
 
 		template<class U>
-		void SetResult(U&& Result, std::source_location InSrc = std::source_location::current()) const
+		void SetResult(U&& result) const
 		{
-			SetResultImpl(std::forward<U>(Result));
-			Src = InSrc;
+			SetResultImpl(std::forward<U>(result));
 		}
 
 		template<class TException>
-		void SetException(const TException& ExceptionObj) const
+		bool TrySetException(const TException& exceptionObject) const
 		{
-			SetException(std::make_exception_ptr(ExceptionObj));
+			TrySetException(std::make_exception_ptr(exceptionObject));
 		}
 
-		void SetException(std::exception_ptr ExceptionPtr) const
+		bool TrySetException(std::exception_ptr exceptionPtr) const
 		{
-			Xassert(IsValid(), TEXT("MyAwaiter is null."));
-			MyAwaiter->SetException(std::move(ExceptionPtr));
+			Xassert(IsValid(), TEXT("m_Task is null."));
+			return m_Task->TrySetException(std::move(exceptionPtr));
 		}
 
-		void SetCanceled() const
+		bool TrySetCanceled() const
 		{
-			Xassert(IsValid(), TEXT("MyAwaiter is null."));
-			MyAwaiter->Cancel();
+			Xassert(IsValid(), TEXT("m_Task is null."));
+			return m_Task->TryCancel();
 		}
 
 		Task<T> GetTask() const
 		{
-			return Task<T>(MyAwaiter);
+			return Task<T>(m_Task);
 		}
 
 		TaskCompletionSource& operator =(const TaskCompletionSource&) = default;
 		TaskCompletionSource& operator =(TaskCompletionSource&&) = default;
 
 		template<class U = T>
-		static TaskCompletionSource<U> Create(CancellationToken sToken = {})
+		static TaskCompletionSource<U> Create(std::stop_token cancellationToken = {})
 		{
-			return TaskCompletionSource<U>(std::make_shared<Awaiter<U>>(sToken));
+			return TaskCompletionSource<U>(std::make_shared<SharedTask<U>>(cancellationToken));
 		}
 
 	private:
 		template<class... U>
-		void SetResultImpl(U&&... Result) const
+		void SetResultImpl(U&&... result) const
 		{
 			Xassert(IsValid(), TEXT("Awaiter is null."));
-			MyAwaiter->SetResult(std::forward<U>(Result)...);
+			m_Task->SetResult(std::forward<U>(result)...);
 		}
 
-		void Xassert(bool bAssert, String InMessage) const
+		void Xassert(bool condition, String message) const
 		{
-			if (!bAssert)
+			if (!condition)
 			{
-				throw InvalidOperationException(InMessage);
+				throw InvalidOperationException(message);
 			}
 		}
 	};

@@ -2,13 +2,10 @@
 
 #pragma once
 
-#include "VoidableVector.h"
-#include "TimeSpan.h"
-#include "Threading/Tasks/promise_type.h"
-#include "Threading/Tasks/Awaiter.h"
 #include "Threading/ThreadPool.h"
-#include "Threading/CancellationToken.h"
-#include "Linq/Linq.ToVector.h"
+#include "Threading/Tasks/TaskAwaiter.h"
+#include "Threading/Tasks/PromiseType.h"
+#include "Threading/Tasks/YieldAwaitable.h"
 #include <memory>
 
 namespace Ayla
@@ -20,107 +17,100 @@ namespace Ayla
 		friend class Task;
 
 	public:
-		using promise_type = ::Ayla::promise_type<T, Task<T>>;
-		using Awaiter_t = ::Ayla::Awaiter<T>;
+		using promise_type = PromiseType<T, Task<T>>;
 		using ValueType = T;
 
 	private:
-		static bool bConfigureDefault;
-		std::shared_ptr<AwaiterBase> Awaiter;
+		std::shared_ptr<SharedTask<T>> m_Task;
 
 	public:
 		Task() = default;
 		Task(const Task&) = default;
 
 		template<class U>
-		explicit Task(std::shared_ptr<U> InAwaiter) requires
+		explicit Task(std::shared_ptr<U> task) requires
 			std::constructible_from<Task, std::shared_ptr<U>, int>
-			: Task(InAwaiter, 0)
+			: Task(task, 0)
 		{
 		}
 
-		Task(std::shared_ptr<Awaiter_t> InAwaiter, int)
-			: Awaiter(std::move(InAwaiter))
+		Task(std::shared_ptr<SharedTask<T>> task, int)
+			: m_Task(std::move(task))
 		{
 		}
 
-		explicit Task(std::shared_ptr<AwaiterBase> InAwaiter, short)
-			: Awaiter(InAwaiter)
+		explicit Task(std::shared_ptr<SharedTask<T>> task, short)
+			: m_Task(std::move(task))
 		{
 		}
 
-		explicit Task(const Task<>& InTask) requires (!std::same_as<T, void>)
-			: Task(InTask.GetAwaiter())
+		explicit Task(const Task<>& task) requires (!std::same_as<T, void>)
+			: Task(std::static_pointer_cast<SharedTask<T>>(task.GetShared()))
 		{
 		}
 
-		Task(Task&& InTask)
-			: Awaiter(std::move(InTask.Awaiter))
+		Task(Task&& task)
+			: m_Task(std::move(task.m_Task))
 		{
 		}
 
 		inline bool IsValid() const noexcept
 		{
-			return (bool)Awaiter;
+			return (bool)m_Task;
 		}
 
-		inline std::shared_ptr<AwaiterBase> GetAwaiter() const requires std::is_void_v<T>
+		inline std::shared_ptr<SharedTask<T>> GetShared() const
 		{
-			return Awaiter;
+			return m_Task;
 		}
 
-		inline std::shared_ptr<Awaiter_t> GetAwaiter() const requires (!std::is_void_v<T>)
+		inline TaskAwaiter<T> GetAwaiter() const noexcept
 		{
-			return std::static_pointer_cast<Awaiter_t>(Awaiter);
+			check(IsValid());
+			return TaskAwaiter<T>(m_Task);
 		}
 
 		inline TaskStatus GetStatus() const noexcept
 		{
-			return Awaiter->GetStatus();
+			check(IsValid());
+			return m_Task->GetStatus();
 		}
 
 		inline std::exception_ptr GetException() const noexcept
 		{
-			return Awaiter->GetException();
-		}
-
-		inline void RethrowException() const
-		{
-			std::rethrow_exception(Awaiter->GetException());
-		}
-
-		inline void AddStopCallback(CancellationToken sToken, std::function<void()> CallbackBody)
-		{
-			Awaiter->AddStopCallback(std::move(sToken), std::move(CallbackBody));
+			check(IsValid());
+			return m_Task->GetException();
 		}
 
 		template<class TBody>
-		auto ContinueWith(TBody&& ContinuationBody, CancellationToken sToken = {}) const -> Task<std::invoke_result_t<TBody, Task>>
+		auto ContinueWith(TBody&& continuationBody, std::stop_token cancellationToken = {}) const -> Task<std::invoke_result_t<TBody, Task>>
 		{
 			using U = std::invoke_result_t<TBody, Task>;
-			std::shared_ptr uAwaiter = std::make_shared<::Ayla::Awaiter<U>>(sToken);
-			Awaiter->ContinueWith([ContinuationBody = std::forward<TBody>(ContinuationBody), uAwaiter](std::shared_ptr<AwaiterBase> result) mutable
+			check(IsValid());
+			std::shared_ptr otherTask = std::make_shared<SharedTask<U>>(cancellationToken);
+			otherTask->TransitToRunning();
+			m_Task->ContinueWith([continuationBody = std::forward<TBody>(continuationBody), selfTask = m_Task, otherTask]() mutable
+			{
+				try
 				{
-					try
+					if constexpr (std::same_as<U, void>)
 					{
-						if constexpr (std::same_as<U, void>)
-						{
-							ContinuationBody(Task(result));
-							uAwaiter->SetResult();
-						}
-						else
-						{
-							auto r = ContinuationBody(Task(result));
-							uAwaiter->SetResult(std::move(r));
-						}
+						continuationBody(Task(selfTask));
+						otherTask->SetResult();
 					}
-					catch (...)
+					else
 					{
-						uAwaiter->SetException(std::current_exception());
+						auto r = continuationBody(Task(selfTask));
+						otherTask->SetResult(std::move(r));
 					}
-				});
+				}
+				catch (...)
+				{
+					otherTask->SetException(std::current_exception());
+				}
+			});
 
-			return Task<U>(std::move(uAwaiter));
+			return Task<U>(std::move(otherTask));
 		}
 
 		Task<bool> SuppressCancellationThrow() requires std::same_as<T, void>;
@@ -128,56 +118,55 @@ namespace Ayla
 
 		inline void Wait() const noexcept
 		{
-			Awaiter->Wait();
+			check(IsValid());
+			m_Task->Wait();
 		}
 
-		inline Task<T> WaitAsync(CancellationToken cancellationToken) const noexcept
+		inline Task<T> WaitAsync(std::stop_token cancellationToken) const noexcept
 		{
+			check(IsValid());
 			return ContinueWith([](Task<T> task)
-				{
-					return task.GetResult();
-				}, cancellationToken);
-		}
-
-		inline bool WaitFor(const TimeSpan& Timeout) const noexcept
-		{
-			return Awaiter->WaitFor(Timeout);
+			{
+				return task.GetResult();
+			}, cancellationToken);
 		}
 
 		inline T GetResult() const
 		{
+			check(IsValid());
 			if constexpr (std::same_as<T, void>)
 			{
-				Awaiter.get()->Wait();
-				if (Awaiter->GetException())
+				m_Task->Wait();
+				auto e = m_Task->GetException();
+				if (e)
 				{
-					std::rethrow_exception(Awaiter->GetException());
+					std::rethrow_exception(e);
 				}
 			}
 			else
 			{
-				return static_cast<Awaiter_t*>(Awaiter.get())->GetResult();
+				return m_Task->GetResult();
 			}
 		}
 
 		inline bool IsCompleted() const noexcept
 		{
-			return Awaiter && Awaiter->IsCompleted();
+			return m_Task && m_Task->IsCompleted();
 		}
 
 		inline bool IsCompletedSuccessfully() const noexcept
 		{
-			return Awaiter && Awaiter->GetStatus() == TaskStatus::RanToCompletion;
+			return m_Task && m_Task->GetStatus() == TaskStatus::RanToCompletion;
 		}
 
 		inline bool IsCanceled() const noexcept
 		{
-			return Awaiter && Awaiter->GetStatus() == TaskStatus::Canceled;
+			return m_Task && m_Task->GetStatus() == TaskStatus::Canceled;
 		}
 
 		inline bool IsFaulted() const noexcept
 		{
-			return Awaiter && Awaiter->GetStatus() == TaskStatus::Faulted;
+			return m_Task && m_Task->GetStatus() == TaskStatus::Faulted;
 		}
 
 		Task& operator =(const Task&) = default;
@@ -187,7 +176,7 @@ namespace Ayla
 		explicit operator Task<U>() const requires
 			std::same_as<T, void>
 		{
-			return Task<U>(Awaiter);
+			return Task<U>(m_Task);
 		}
 
 		template<class U>
@@ -195,7 +184,7 @@ namespace Ayla
 			std::same_as<U, void> &&
 			(!std::same_as<T, void>)
 		{
-			return Task<U>(Awaiter);
+			return Task<U>(m_Task);
 		}
 
 		auto operator <=>(const Task&) const = default;
@@ -203,294 +192,83 @@ namespace Ayla
 
 	public:
 		template<class TBody>
-		static auto Run(TBody&& Body, CancellationToken sToken = {}) -> Task<std::invoke_result_t<TBody>>
+		static auto Run(TBody&& continuationBody, std::stop_token cancellationToken = {}) -> Task<std::invoke_result_t<TBody>>
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
 
 			using U = std::invoke_result_t<TBody>;
-			std::shared_ptr uAwaiter = std::make_shared<::Ayla::Awaiter<U>>(sToken);
+			std::shared_ptr task = std::make_shared<SharedTask<U>>(cancellationToken);
+			task->TransitToRunning();
 
-			ThreadPool::QueueUserWorkItem([uAwaiter, Body = std::forward<TBody>(Body)]() mutable
-				{
-					try
-					{
-						if constexpr (std::same_as<U, void>)
-						{
-							Body();
-							uAwaiter->SetResult();
-						}
-						else
-						{
-							U result = Body();
-							uAwaiter->SetResult(std::move(result));
-						}
-					}
-					catch (...)
-					{
-						uAwaiter->SetException(std::current_exception());
-					}
-				});
-
-			return Task<U>(std::move(uAwaiter));
-		}
-
-		static auto Yield()
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
-
-			std::shared_ptr uAwaiter = std::make_shared<::Ayla::Awaiter<void>>();
-			ThreadPool::QueueUserWorkItem([uAwaiter]
+			ThreadPool::QueueUserWorkItem([task, continuationBody = std::forward<TBody>(continuationBody)]() mutable
 			{
-				uAwaiter->SetResult();
+				try
+				{
+					if constexpr (std::same_as<U, void>)
+					{
+						continuationBody();
+						task->SetResult();
+					}
+					else
+					{
+						U result = continuationBody();
+						task->SetResult(std::move(result));
+					}
+				}
+				catch (...)
+				{
+					bool b = task->TrySetException(std::current_exception());
+					check(b);
+				}
 			});
 
-			return Task<>(std::move(uAwaiter));
+			return Task<U>(std::move(task));
 		}
 
-		static Task<> Delay(std::chrono::milliseconds InDelay, CancellationToken sToken = {})
+		static YieldAwaitable Yield()
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");
+			return YieldAwaitable();
+		}
+
+		static Task<> Delay(std::chrono::milliseconds delay, std::stop_token cancellationToken = {})
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::Delay instead.");
 
-			std::shared_ptr uAwaiter = std::make_shared<::Ayla::Awaiter<void>>(sToken);
-			ThreadPool::QueueDelayedUserWorkItem(InDelay, [uAwaiter]() mutable
+			std::shared_ptr task = std::make_shared<SharedTask<void>>(cancellationToken);
+			task->TransitToRunning();
+			ThreadPool::QueueDelayedUserWorkItem(delay, [task]() mutable
 			{
-				uAwaiter->SetResult();
+				task->SetResult();
 			});
 
-			return Task<>(std::move(uAwaiter));
+			return Task<>(std::move(task));
 		}
 
 		static Task<> CompletedTask()
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::CompletedTask instead.");
 
-			static thread_local std::shared_ptr sAwaiter = []
+			static thread_local std::shared_ptr sTask = []
 			{
-				auto ptr = std::make_shared<::Ayla::Awaiter<void>>();
+				auto ptr = std::make_shared<SharedTask<void>>();
+				ptr->TransitToRunning();
 				ptr->SetResult();
 				return ptr;
 			}();
 
-			return Task<>(sAwaiter);
+			return Task<>(sTask);
 		}
 
 		template<class U> requires (!std::same_as<U, void>)
-			static Task<U> FromResult(U InValue)
+			static Task<U> FromResult(U value)
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::FromResult<U> instead.");
 
-			auto Ptr = std::make_shared<::Ayla::Awaiter<U>>();
-			Ptr->SetResult(std::move(InValue));
-			return Task<U>(Ptr);
-		}
-
-		static void ConfigureDefault(bool bContinueOnCapturedContext)
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::ConfigureDefault instead.");
-			bConfigureDefault = bContinueOnCapturedContext;
-		}
-
-	public:
-		template<std::ranges::input_range R> requires std::convertible_to<std::ranges::range_value_t<R>, Task<>>
-		static auto WhenAll(const R& InTasks)
-		{
-			static_assert(std::is_void_v<T>, "Use Task<>::WhenAll instead.");
-			using RValueType = typename std::ranges::range_value_t<R>::ValueType;
-
-			if (std::ranges::empty(InTasks))
-			{
-				if constexpr (std::is_void_v<RValueType>)
-				{
-					return Task<>::CompletedTask();
-				}
-				else
-				{
-					return Task<>::FromResult<std::vector<RValueType>>({});
-				}
-			}
-
-			class WhenAllAwaiter : public ::Ayla::Awaiter<VoidableVector<RValueType>>
-			{
-				std::vector<Task<RValueType>> Tasks;
-
-				std::atomic<size_t> Counter;
-				std::atomic<bool> bComplete;
-				VoidableVector<RValueType> Values;
-
-			public:
-				WhenAllAwaiter(std::vector<Task<RValueType>> Tasks)
-					: ::Ayla::Awaiter<VoidableVector<RValueType>>()
-					, Tasks(std::move(Tasks))
-				{
-					Values.resize(this->Tasks.size());
-				}
-
-				~WhenAllAwaiter() noexcept
-				{
-				}
-
-				void Start(std::shared_ptr<WhenAllAwaiter> Self)
-				{
-					size_t Index = 0;
-					for (auto& Task : Tasks)
-					{
-						std::ignore = Task.ContinueWith([Self, MyIndex = Index++](::Ayla::Task<RValueType> p)
-						{
-							if (p.IsCanceled())
-							{
-								if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
-								{
-									Self->Cancel();
-								}
-							}
-							else if (auto E = p.GetException())
-							{
-								if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
-								{
-									Self->SetException(E);
-								}
-							}
-							else
-							{
-								if constexpr (std::is_void_v<RValueType> == false)
-								{
-									Self->Values[MyIndex] = p.GetResult();
-								}
-
-								if (++Self->Counter == Self->Values.size())
-								{
-									if constexpr (std::is_void_v<RValueType>)
-									{
-										Self->SetResult();
-									}
-									else
-									{
-										Self->SetResult((std::vector<RValueType>&&)std::move(Self->Values));
-									}
-								}
-							}
-						});
-					}
-				}
-			};
-
-			auto Ptr = std::make_shared<WhenAllAwaiter>(InTasks | Linq::ToVector());
-			Ptr->Start(Ptr);
-			if constexpr (std::is_void_v<RValueType>)
-			{
-				return Task<>(std::move(Ptr));
-			}
-			else
-			{
-				return Task<VoidableVector<RValueType>>(std::move(Ptr)).ContinueWith([](Task<VoidableVector<RValueType>> p)
-				{
-					if constexpr (std::is_void_v<RValueType>)
-					{
-						// Task<>
-						return;
-					}
-					else
-					{
-						return (std::vector<RValueType>)p.GetResult();
-					}
-				});
-			}
-		}
-
-		template<std::convertible_to<Task<>> Task1, std::convertible_to<Task<>>... Tasks>
-		static auto WhenAll(const Task1& InTask1, const Tasks&... InTasks)
-		{
-			static_assert(std::is_void_v<T>, "Use Task<>::WhenAll instead.");
-
-			using ValueType1 = typename Task1::ValueType;
-			constexpr bool bIsSameValues = (true && ... && std::same_as<ValueType1, typename Tasks::ValueType>);
-
-			if constexpr (bIsSameValues && std::is_void_v<ValueType1> == false)
-			{
-				return WhenAll(std::array<Task<ValueType1>, sizeof...(Tasks) + 1>{ InTask1, InTasks... });
-			}
-			else
-			{
-				return WhenAll(std::array<Task<>, sizeof...(Tasks) + 1>{ InTask1, InTasks... });
-			}
-		}
-
-		template<std::ranges::input_range R> requires std::convertible_to<std::ranges::range_value_t<R>, Task<>>
-		static auto WhenAny(const R& InTasks)
-		{
-			static_assert(std::is_void_v<T>, "Use Task<>::WhenAll instead.");
-			using ValueType = typename std::ranges::range_value_t<R>::ValueType;
-
-			if (std::ranges::empty(InTasks))
-			{
-				throw InvalidOperationException(TEXT("Tasks of WhenAny is empty."));
-			}
-
-			class WhenAnyAwaiter : public ::Ayla::Awaiter<Task<ValueType>>
-			{
-				std::vector<Task<>> Tasks;
-				std::atomic<bool> bComplete;
-
-			public:
-				WhenAnyAwaiter(std::vector<Task<ValueType>> Tasks)
-					: ::Ayla::Awaiter<Task<ValueType>>()
-					, Tasks(std::move(Tasks))
-				{
-				}
-
-				void Start(std::shared_ptr<WhenAnyAwaiter> Self)
-				{
-					for (auto& Task : Tasks)
-					{
-						Task.ContinueWith([Self](::Ayla::Task<ValueType> p)
-						{
-							if (p.IsCanceled())
-							{
-								if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
-								{
-									Self->Cancel();
-								}
-							}
-							else if (auto E = p.GetException())
-							{
-								if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
-								{
-									Self->SetException(E);
-								}
-							}
-							else if (p.IsCompletedSuccessfully())
-							{
-								if (bool bExpected = false; Self->bComplete.compare_exchange_strong(bExpected, true))
-								{
-									Self->SetResult(p);
-								}
-							}
-						});
-					}
-				}
-			};
-
-			auto Ptr = std::make_shared<WhenAnyAwaiter>(InTasks | Linq::ToVector());
-			Ptr->Start(Ptr);
-			return Task<Task<ValueType>>(std::move(Ptr));
-		}
-
-		template<std::convertible_to<Task<>> Task1, std::convertible_to<Task<>>... Tasks>
-		static auto WhenAny(const Task1& InTask1, const Tasks&... InTasks)
-		{
-			static_assert(std::is_void_v<T>, "Use Task<>::WhenAny instead.");
-
-			using ValueType1 = typename Task1::ValueType;
-			constexpr bool bIsSameValues = (true && ... && std::same_as<ValueType1, typename Tasks::ValueType>);
-
-			if constexpr (bIsSameValues)
-			{
-				return WhenAny(std::array<ValueType1, sizeof...(Tasks) + 1>{ InTask1, InTasks... });
-			}
-			else
-			{
-				return WhenAny(std::array<Task<>, sizeof...(Tasks) + 1>{ InTask1, InTasks... });
-			}
+			auto task = std::make_shared<SharedTask<U>>();
+			task->TransitToRunning();
+			task->SetResult(std::move(value));
+			return Task<U>(task);
 		}
 	};
 
@@ -505,6 +283,7 @@ namespace Ayla
 			}
 			else
 			{
+				task.GetResult();
 				return true;
 			}
 		});

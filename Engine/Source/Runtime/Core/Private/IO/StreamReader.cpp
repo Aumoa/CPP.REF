@@ -20,7 +20,7 @@ namespace Ayla
 		return ReadLineAsync().GetResult();
 	}
 
-	Task<String> StreamReader::ReadLineAsync(CancellationToken InCancellationToken)
+	Task<String> StreamReader::ReadLineAsync(std::stop_token InCancellationToken)
 	{
 		size_t EndPos = static_cast<size_t>(-1);
 
@@ -71,7 +71,7 @@ namespace Ayla
 		co_return Str;
 	}
 
-	Task<String> StreamReader::ReadToEndAsync(CancellationToken InCancellationToken)
+	Task<String> StreamReader::ReadToEndAsync(std::stop_token InCancellationToken)
 	{
 		while (bEOF == false)
 		{
@@ -96,7 +96,7 @@ namespace Ayla
 		return bEOF;
 	}
 
-	Task<> StreamReader::TryShrinkAndFillAsync(CancellationToken InCancellationToken)
+	Task<> StreamReader::TryShrinkAndFillAsync(std::stop_token InCancellationToken)
 	{
 		if (BufferPos == 0 || BufferPos < InitialBufferSize)
 		{
@@ -121,7 +121,7 @@ namespace Ayla
 		bEOF = ActualRead == 0;
 	}
 
-	Task<bool> StreamReader::ExpandBufferAsync(CancellationToken InCancellationToken)
+	Task<bool> StreamReader::ExpandBufferAsync(std::stop_token InCancellationToken)
 	{
 		size_t SizeToRead;
 		uint8* BufferPtr;

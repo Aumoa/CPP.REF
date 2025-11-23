@@ -195,7 +195,7 @@ namespace Ayla
 
 			if (ErrorCode)
 			{
-				TCS.SetException(std::make_exception_ptr(SystemException(ErrorCode)));
+				TCS.TrySetException(std::make_exception_ptr(SystemException(ErrorCode)));
 			}
 			else
 			{
@@ -244,7 +244,7 @@ namespace Ayla
 
 			if (ErrorCode && ErrorCode != ERROR_HANDLE_EOF)
 			{
-				TCS.SetException(std::make_exception_ptr(SystemException(ErrorCode)));
+				TCS.TrySetException(std::make_exception_ptr(SystemException(ErrorCode)));
 			}
 			else
 			{

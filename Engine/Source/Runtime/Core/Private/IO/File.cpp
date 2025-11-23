@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-	Task<String> File::ReadAllTextAsync(String InPath, CancellationToken InCancellationToken)
+	Task<String> File::ReadAllTextAsync(String InPath, std::stop_token InCancellationToken)
 	{
 		FileStream Stream(InPath, FileMode::Open, FileAccessMode::Read, FileSharedMode::Read);
 		StreamReader Reader(&Stream);
@@ -21,7 +21,7 @@ namespace Ayla
 		return ReadAllTextAsync(InPath).GetResult();
 	}
 
-	Task<> File::WriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken)
+	Task<> File::WriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken)
 	{
 		FileStream Stream(InPath, FileMode::Create, FileAccessMode::Write);
 		StreamWriter Writer(&Stream);
@@ -29,7 +29,7 @@ namespace Ayla
 		Stream.Close();
 	}
 
-	Task<bool> File::CompareAndWriteAllTextAsync(String InPath, String InContent, CancellationToken InCancellationToken)
+	Task<bool> File::CompareAndWriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken)
 	{
 		if (Exists(InPath))
 		{

@@ -22,6 +22,14 @@ namespace Ayla
 	{
 		friend void ::Ayla__ThreadPool__HandleUserWorkItem();
 
+	public:
+		template<class TBody>
+#if __cpp_lib_move_only_function
+		using function_t = std::move_only_function<TBody>;
+#else
+		using function_t = std::function<TBody>;
+#endif
+
 	private:
 		static void (*coreclr__QueueUserWorkItem)();
 		static void (*coreclr__GetMinThreads)(int32* workerThreads, int32* completionPortThreads);
@@ -32,12 +40,11 @@ namespace Ayla
 		static size_t NumCompletionPortThreads;
 
 		static Spinlock Lck;
-		static SpinlockConditionVariable Cv;
-		static std::queue<Action<>> Works;
+		static std::queue<function_t<void()>> Works;
 
 		static Spinlock DelayedLck;
 		static SpinlockConditionVariable DelayedCv;
-		static std::multimap<std::chrono::steady_clock::time_point, Action<>> DelayedWorks;
+		static std::multimap<std::chrono::steady_clock::time_point, function_t<void()>> DelayedWorks;
 
 		static void* IO;
 		static size_t IOCPWorkers;
@@ -50,8 +57,8 @@ namespace Ayla
 		static void BindHandle(void* NativeHandle);
 		static void UnbindHandle(void* NativeHandle);
 
-		static void QueueUserWorkItem(Action<> InWork);
-		static void QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork);
+		static void QueueUserWorkItem(function_t<void()> InWork);
+		static void QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, function_t<void()> InWork);
 		static void QueueSignal();
 
 		static void GetMinThreads(int32* workerThreads, int32* completionPortThreads);
