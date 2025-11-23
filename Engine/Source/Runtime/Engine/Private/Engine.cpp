@@ -7,10 +7,14 @@
 #include "GenericWindowSwapchainExtension.h"
 #include "GameInstance.h"
 #include "CommandLineParser.h"
+#include "CommandBuffer.h"
 #include "Platform/DynamicLibrary.h"
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/SceneManager.h"
+#include "Rendering/RaytracingSceneRenderer.h"
+#include "Rendering/SceneView.h"
+#include "Rendering/RenderTexture.h"
 
 namespace Ayla
 {
@@ -39,6 +43,8 @@ namespace Ayla
 
 	void Engine::Shutdown()
 	{
+		m_RenderThread->RequestStop();
+
 		for (auto& swapchain : m_SwapchainExtensions)
 		{
 			swapchain->Destroy();
@@ -49,13 +55,42 @@ namespace Ayla
 
 	void Engine::Tick()
 	{
-		//m_RenderThread->Dispatch([swapchainExtensions = m_SwapchainExtensions, graphics = m_Graphics]()
-		//{
-		//	for (auto& swapchainExt : swapchainExtensions)
-		//	{
-		//		swapchainExt->Present();
-		//	}
-		//});
+		m_RenderThread->Dispatch([
+			swapchainExtensions = m_SwapchainExtensions,
+			graphics = m_Graphics,
+			commandBuffer = m_CommandBuffer
+		]()
+		{
+			graphics->BeginRenderFrame();
+
+			// TODO: This point must block until the semaphore set in vkQueuePresentKHR has been signaled.
+			std::this_thread::sleep_for(16ms);
+
+			// SceneView: Overlay, #0
+			auto rt = swapchainExtensions[0]->GetRenderTexture();
+			SceneView view(rt);
+			RaytracingSceneRenderer renderer;
+
+			commandBuffer->BeginCommands();
+
+			rt->Acquire(commandBuffer.Get());
+
+			commandBuffer->EndCommands();
+
+			for (auto& swapchainExt : swapchainExtensions)
+			{
+				swapchainExt->Present(commandBuffer.Get());
+			}
+
+			graphics->EndRenderFrame();
+		});
+	}
+
+	void Engine::InitializeGraphics(SharedPtr<Graphics> graphics)
+	{
+		m_Graphics = graphics;
+		m_RenderThread = New<RenderThread>(graphics);
+		m_CommandBuffer = graphics->CreateCommandBuffer();
 	}
 
 	void Engine::SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions)

@@ -16,6 +16,10 @@ namespace Ayla
     {
         GENERATED_BODY()
 
+    public:
+        static constexpr size_t kMaxFramesInFlight = 2;
+		static constexpr size_t kMaxSwapchainImages = 3;
+
     private:
         VkInstanceRef m_Instance;
         VkPhysicalDevice m_PhysicalDevice{ nullptr };
@@ -24,7 +28,8 @@ namespace Ayla
 		uint32_t m_GraphicsQueueFamilyIndex{ 0 };
         uint32_t m_QueueCount{ 0 };
         VkFence m_Fence{ nullptr };
-        VkSemaphore m_Semaphore{ nullptr };
+
+        std::atomic<std::size_t> m_FrameCount = 0;
 
     public:
         ACONSTRUCTOR()
@@ -32,14 +37,17 @@ namespace Ayla
         virtual ~VkGraphics() noexcept override;
 
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
-        virtual void BeginRenderThread() override;
-        virtual void EndRenderThread() override;
+        virtual void BeginRenderFrame_Implementation() override;
+        virtual void EndRenderFrame_Implementation() override;
+        virtual SharedPtr<CommandBuffer> CreateCommandBuffer_Implementation() override;  // VkCommandBuffer.cpp
 
         VkInstance GetInstance() const noexcept { return m_Instance; }
         VkDevice GetDevice() const noexcept { return m_Device; }
         VkQueue GetGraphicsQueue() const noexcept { return m_GraphicsQueue; }
 		uint32_t GetGraphicsQueueFamilyIndex() const noexcept { return m_GraphicsQueueFamilyIndex; }
         VkFence GetFence() const noexcept { return m_Fence; }
-        VkSemaphore GetSemaphore() const noexcept { return m_Semaphore; }
+
+        inline size_t GetFrameNumber() const noexcept { return m_FrameCount; }
+        inline size_t GetFrameIndex() const noexcept { return m_FrameCount % kMaxFramesInFlight; }
     };
 }

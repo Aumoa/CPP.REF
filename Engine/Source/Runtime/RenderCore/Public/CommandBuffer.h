@@ -3,18 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CommandBuffer.gen.h"
 
 namespace Ayla
 {
-	class RENDERCORE_API CommandBuffer
+	ACLASS()
+	class RENDERCORE_API CommandBuffer : public Object
 	{
+		GENERATED_BODY()
+
 	protected:
 		CommandBuffer();
 
 	public:
 		virtual ~CommandBuffer() noexcept;
 
-		virtual void BeginCommands() = 0;
-		virtual void EndCommands() = 0;
+		AFUNCTION()
+		virtual void BeginCommands() APURE;
+		AFUNCTION()
+		virtual void EndCommands() APURE;
 	};
 }

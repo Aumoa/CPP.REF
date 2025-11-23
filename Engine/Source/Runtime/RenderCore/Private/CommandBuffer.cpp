@@ -11,12 +11,4 @@ namespace Ayla
 	CommandBuffer::~CommandBuffer() noexcept
 	{
 	}
-
-	void CommandBuffer::BeginCommands()
-	{
-	}
-
-	void CommandBuffer::EndCommands()
-	{
-	}
 }

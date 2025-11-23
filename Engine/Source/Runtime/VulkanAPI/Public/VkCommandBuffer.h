@@ -5,23 +5,35 @@
 #include "CoreMinimal.h"
 #include "CommandBuffer.h"
 #include "VkCommon.h"
+#include "VkCommandBuffer.gen.h"
 
 namespace Ayla
 {
 	class VkGraphics;
 
+	ACLASS()
 	class VkCommandBuffer : public CommandBuffer
 	{
+		GENERATED_BODY()
+
 	private:
 		VkGraphics* m_Graphics{ nullptr };
 		VkCommandPool m_CommandPool{ nullptr };
-		::VkCommandBuffer m_CommandBuffer{ nullptr };
+		std::vector<::VkCommandBuffer> m_CommandBuffers;
+		std::vector<VkSemaphore> m_RenderCompletedSemaphores;
+		std::vector<VkSemaphore> m_ImageReadySemaphores;
+		bool m_HasBegun{ false };
 
 	public:
 		VkCommandBuffer(VkGraphics* graphics);
 		virtual ~VkCommandBuffer() noexcept override;
 
-		virtual void BeginCommands() override;
-		virtual void EndCommands() override;
+		virtual void BeginCommands_Implementation() override;
+		virtual void EndCommands_Implementation() override;
+
+		void AddImageReadySemaphore(VkSemaphore semaphore);
+
+		::VkCommandBuffer GetVkCommandBuffer() const noexcept;
+		VkSemaphore GetRenderCompletedSemaphore() const noexcept;
 	};
 }

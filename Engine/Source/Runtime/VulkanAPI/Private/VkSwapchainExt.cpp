@@ -2,6 +2,8 @@
 
 #include "VkSwapchainExt.h"
 #include "VkGraphics.h"
+#include "VkCommandBuffer.h"
+#include "VkSwapchainRenderTexture.h"
 
 namespace Ayla
 {
@@ -12,6 +14,15 @@ namespace Ayla
         , m_SwapchainCreateInfoCache(swapchainCreateInfo)
         , m_SuitableQueue(suitableQueue)
     {
+        m_SwapchainRenderTexture = New<VkSwapchainRenderTexture>(this);
+        ReallocateSwapchainImages();
+
+        m_PresentCompletedSemaphores.resize(VkGraphics::kMaxFramesInFlight);
+        for (auto& semaphore : m_PresentCompletedSemaphores)
+        {
+            VkSemaphoreCreateInfo semaphoreCreateInfo{ .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
+            VKR(vkCreateSemaphore(m_Owner->GetDevice(), &semaphoreCreateInfo, nullptr, &semaphore));
+        }
     }
 
     VkSwapchainExt::~VkSwapchainExt() noexcept
@@ -19,29 +30,26 @@ namespace Ayla
         checkf(m_Surface == nullptr, TEXT("Swapchain does not destroyed."));
     }
 
-    void VkSwapchainExt::Present()
+    SharedPtr<RenderTexture> VkSwapchainExt::GetRenderTexture()
     {
-        uint32_t imageIndex;
-        VKR(vkAcquireNextImageKHR(m_Owner->GetDevice(), m_Swapchain, UINT64_MAX, m_Owner->GetSemaphore(), VK_NULL_HANDLE, &imageIndex));
+        return m_SwapchainRenderTexture;
+    }
 
-        auto semaphore = m_Owner->GetSemaphore();
-        VkPresentInfoKHR presentInfo
-        {
-            .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-            .waitSemaphoreCount = 1,
-            .pWaitSemaphores = &semaphore,
-            .swapchainCount = 1,
-            .pSwapchains = &m_Swapchain,
-            .pImageIndices = &imageIndex
-        };
-
-        VKR(vkQueuePresentKHR(m_SuitableQueue, &presentInfo), VK_ERROR_SURFACE_LOST_KHR, VK_ERROR_OUT_OF_DATE_KHR);
+    void VkSwapchainExt::Present(CommandBuffer* commandBuffer)
+    {
+        m_SwapchainRenderTexture->Present(m_SuitableQueue, (VkCommandBuffer*)commandBuffer);
     }
 
     void VkSwapchainExt::Destroy()
     {
-        CleanupSwapChain();
+        CleanupSwapchain();
 
+        for (auto& semaphore : m_PresentCompletedSemaphores)
+        {
+            vkDestroySemaphore(m_Owner->GetDevice(), semaphore, nullptr);
+		}
+
+		m_PresentCompletedSemaphores.clear();
         vkDestroySurfaceKHR(m_Owner->GetInstance(), m_Surface, nullptr);
         m_Surface = nullptr;
     }
@@ -54,16 +62,32 @@ namespace Ayla
             return;
         }
 
-        CleanupSwapChain();
+        CleanupSwapchain();
 
         m_SwapchainCreateInfoCache.imageExtent = newExtent;
         VKR(vkCreateSwapchainKHR(m_Owner->GetDevice(), &m_SwapchainCreateInfoCache, nullptr, &m_Swapchain));
         LogVulkan::Verbose(TEXT("Swapchain resized to {}"), newSize);
+
+        ReallocateSwapchainImages();
     }
 
-    void VkSwapchainExt::CleanupSwapChain()
+    Vector2N VkSwapchainExt::GetSize() const
+    {
+        auto extent = m_SwapchainCreateInfoCache.imageExtent;
+        return Vector2N((int32)extent.width, (int32)extent.height);
+    }
+
+    void VkSwapchainExt::CleanupSwapchain()
     {
         vkDestroySwapchainKHR(m_Owner->GetDevice(), m_Swapchain, nullptr);
         m_Swapchain = nullptr;
     }
+
+    void VkSwapchainExt::ReallocateSwapchainImages()
+    {
+        uint32_t imageCount = 0;
+        VKR(vkGetSwapchainImagesKHR(m_Owner->GetDevice(), m_Swapchain, &imageCount, nullptr));
+        m_SwapchainImages.resize(imageCount);
+        VKR(vkGetSwapchainImagesKHR(m_Owner->GetDevice(), m_Swapchain, &imageCount, m_SwapchainImages.data()));
+	}
 }

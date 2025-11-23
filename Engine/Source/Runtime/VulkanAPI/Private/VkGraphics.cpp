@@ -163,9 +163,7 @@ namespace Ayla
 
         std::vector<const char*> deviceExtensions = 
         {
-            "VK_KHR_swapchain",
-            
-            "VK_KHR_timeline_semaphore"
+            "VK_KHR_swapchain"
         };
         VkDeviceCreateInfo vkDeviceInfo =
         {
@@ -189,12 +187,6 @@ namespace Ayla
 		};
 
 		VKR(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &m_Fence));
-
-        VkSemaphoreCreateInfo semaphoreCreateInfo =
-        {
-            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
-        };
-        VKR(vkCreateSemaphore(m_Device, &semaphoreCreateInfo, nullptr, &m_Semaphore));
     }
 
     VkGraphics::~VkGraphics() noexcept
@@ -206,12 +198,6 @@ namespace Ayla
         {
             vkDestroyFence(m_Device, m_Fence, nullptr);
             m_Fence = nullptr;
-        }
-        
-        if (m_Semaphore)
-        {
-            vkDestroySemaphore(m_Device, m_Semaphore, nullptr);
-            m_Semaphore = nullptr;
         }
     }
 
@@ -272,16 +258,9 @@ namespace Ayla
             compositeAlpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
         }
 
-        uint32_t imageCount = caps.minImageCount;
-        if (caps.maxImageCount > 0 && imageCount > caps.maxImageCount)
-        {
-            imageCount = caps.maxImageCount;
-        }
-
-        if (caps.maxImageCount == 0 || caps.minImageCount + 1 <= caps.maxImageCount)
-        {
-            imageCount = caps.minImageCount + 1;
-        }
+        uint32_t imageCount = (uint32_t)kMaxSwapchainImages;
+		check(caps.maxImageCount == 0 || (size_t)caps.maxImageCount >= kMaxSwapchainImages);
+		check(caps.minImageCount == 0 || (size_t)caps.minImageCount <= kMaxSwapchainImages);
 
         VkSwapchainCreateInfoKHR swapchainCreateInfo
         {
@@ -323,12 +302,16 @@ namespace Ayla
         return extension;
     }
 
-    void VkGraphics::BeginRenderThread()
+    void VkGraphics::BeginRenderFrame_Implementation()
     {
-        VKR(vkWaitForFences(m_Device, 1, &m_Fence, VK_TRUE, 10000));
+        constexpr auto _1s = TimeSpan::FromSeconds(1);
+
+        VKR(vkWaitForFences(m_Device, 1, &m_Fence, VK_TRUE, (uint64_t)_1s.GetTotalNanoseconds()));
+        VKR(vkResetFences(m_Device, 1, &m_Fence));
     }
 
-    void VkGraphics::EndRenderThread()
+    void VkGraphics::EndRenderFrame_Implementation()
     {
+        ++m_FrameCount;
     }
 }

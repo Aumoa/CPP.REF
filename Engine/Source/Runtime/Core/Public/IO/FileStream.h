@@ -25,11 +25,11 @@ namespace Ayla
 		virtual void Close() override;
 
 		virtual void Write(std::span<const uint8> InBytes) override;
-		virtual Task<> WriteAsync(std::span<const uint8> InBytes, CancellationToken InCancellationToken = {}) override;
+		virtual Task<> WriteAsync(std::span<const uint8> InBytes, std::stop_token InCancellationToken = {}) override;
 		virtual void Seek(int64 InSeekpos, SeekOrigin InOrigin) override;
 
 		virtual size_t Read(std::span<uint8> OutBytes) override;
-		virtual Task<size_t> ReadAsync(std::span<uint8> OutBytes, CancellationToken InCancellationToken = {}) override;
+		virtual Task<size_t> ReadAsync(std::span<uint8> OutBytes, std::stop_token InCancellationToken = {}) override;
 		virtual size_t GetLength() const override;
 	};
 }

@@ -16,12 +16,11 @@ namespace Ayla
 	size_t ThreadPool::NumCompletionPortThreads;
 
 	Spinlock ThreadPool::Lck;
-	SpinlockConditionVariable ThreadPool::Cv;
-	std::queue<Action<>> ThreadPool::Works;
+	std::queue<ThreadPool::function_t<void()>> ThreadPool::Works;
 
 	Spinlock ThreadPool::DelayedLck;
 	SpinlockConditionVariable ThreadPool::DelayedCv;
-	std::multimap<std::chrono::steady_clock::time_point, Action<>> ThreadPool::DelayedWorks;
+	std::multimap<std::chrono::steady_clock::time_point, ThreadPool::function_t<void()>> ThreadPool::DelayedWorks;
 
 	void* ThreadPool::IO;
 	size_t ThreadPool::IOCPWorkers;
@@ -64,7 +63,6 @@ namespace Ayla
 				auto lock1 = std::unique_lock{ Lck };
 				auto lock2 = std::unique_lock{ DelayedLck };
 				IO = nullptr;
-				Cv.NotifyAll();
 				DelayedCv.NotifyAll();
 				lock1.unlock();
 				lock2.unlock();
@@ -95,7 +93,7 @@ namespace Ayla
 		PlatformIO::UnbindIOHandle(IO, NativeHandle);
 	}
 
-	void ThreadPool::QueueUserWorkItem(Action<> InWork)
+	void ThreadPool::QueueUserWorkItem(function_t<void()> InWork)
 	{
 		static__ThreadPool();
 		std::unique_lock lock{ Lck };
@@ -104,7 +102,7 @@ namespace Ayla
 		coreclr__QueueUserWorkItem();
 	}
 
-	void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, Action<> InWork)
+	void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, function_t<void()> InWork)
 	{
 		static__ThreadPool();
 		auto Tp = std::chrono::steady_clock::now() + InDur;
@@ -118,7 +116,6 @@ namespace Ayla
 		static__ThreadPool();
 		std::unique_lock lock1(Lck);
 		std::unique_lock lock2(DelayedLck);
-		Cv.NotifyAll();
 		DelayedCv.NotifyAll();
 	}
 
@@ -163,7 +160,7 @@ namespace Ayla
 
 	void ThreadPool::DelayedWorker()
 	{
-		std::vector<Action<>> Actions;
+		std::vector<function_t<void()>> Actions;
 		
 		String name = TEXT("Timer #0");
 		Thread::GetCurrentThread().SetDescription(name);
@@ -217,11 +214,17 @@ namespace Ayla
 			// enqueue to user work item.
 			{
 				std::unique_lock ScopedLock(Lck);
+				size_t c = 0;
 				for (auto& Action : Actions)
 				{
 					Works.emplace(std::move(Action));
+					++c;
 				}
-				Cv.NotifyOne();
+				ScopedLock.unlock();
+				for (size_t i = 0; i < c; ++i)
+				{
+					coreclr__QueueUserWorkItem();
+				}
 			}
 		}
 		
@@ -231,7 +234,7 @@ namespace Ayla
 	void ThreadPool::HandleUserWorkItem()
 	{
 		auto lock = std::unique_lock{ Lck };
-		Action<> work = std::move(Works.front());
+		function_t<void()> work = std::move(Works.front());
 		Works.pop();
 		lock.unlock();
 		work();
