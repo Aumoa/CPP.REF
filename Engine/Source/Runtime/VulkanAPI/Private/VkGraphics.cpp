@@ -308,10 +308,10 @@ namespace Ayla
 
         VKR(vkWaitForFences(m_Device, 1, &m_Fence, VK_TRUE, (uint64_t)_1s.GetTotalNanoseconds()));
         VKR(vkResetFences(m_Device, 1, &m_Fence));
-        ++m_FrameCount;
     }
 
     void VkGraphics::EndRenderFrame_Implementation()
     {
+        ++m_FrameCount;
     }
 }
