@@ -19,8 +19,8 @@ namespace Ayla
 	private:
 		VkGraphics* m_Graphics{ nullptr };
 		VkCommandPool m_CommandPool{ nullptr };
-		::VkCommandBuffer m_CommandBuffer{ nullptr };
-		VkSemaphore m_RenderCompletedSemaphore = VK_NULL_HANDLE;
+		std::vector<::VkCommandBuffer> m_CommandBuffers;
+		std::vector<VkSemaphore> m_RenderCompletedSemaphores;
 		std::vector<VkSemaphore> m_ImageReadySemaphores;
 		bool m_HasBegun{ false };
 
@@ -33,7 +33,7 @@ namespace Ayla
 
 		void AddImageReadySemaphore(VkSemaphore semaphore);
 
-		::VkCommandBuffer GetVkCommandBuffer() const noexcept { return m_CommandBuffer; }
+		::VkCommandBuffer GetVkCommandBuffer() const noexcept;
 		VkSemaphore GetRenderCompletedSemaphore() const noexcept;
 	};
 }
