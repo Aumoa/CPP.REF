@@ -19,6 +19,10 @@ namespace Ayla
     {
         GENERATED_BODY()
 
+    public:
+        static constexpr size_t kMaxFramesInFlight = 2;
+        static constexpr size_t kMaxSwapchainImages = 3;
+
     protected:
         Graphics();
 
