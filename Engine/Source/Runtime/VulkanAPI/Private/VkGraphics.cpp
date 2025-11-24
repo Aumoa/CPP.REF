@@ -186,7 +186,11 @@ namespace Ayla
             .flags = VK_FENCE_CREATE_SIGNALED_BIT
 		};
 
-		VKR(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &m_Fence));
+        m_Fences.resize(kMaxFramesInFlight);
+        for (size_t i = 0; i < kMaxFramesInFlight; ++i)
+        {
+            VKR(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &m_Fences[i]));
+        }
     }
 
     VkGraphics::~VkGraphics() noexcept
@@ -194,11 +198,11 @@ namespace Ayla
         m_GraphicsQueue = nullptr;
         m_PhysicalDevice = nullptr;
 
-        if (m_Fence)
+        for (auto& fence : m_Fences)
         {
-            vkDestroyFence(m_Device, m_Fence, nullptr);
-            m_Fence = nullptr;
+            vkDestroyFence(m_Device, fence, nullptr);
         }
+        m_Fences.clear();
     }
 
     SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow)
@@ -306,12 +310,23 @@ namespace Ayla
     {
         constexpr auto _1s = TimeSpan::FromSeconds(1);
 
-        VKR(vkWaitForFences(m_Device, 1, &m_Fence, VK_TRUE, (uint64_t)_1s.GetTotalNanoseconds()));
-        VKR(vkResetFences(m_Device, 1, &m_Fence));
+        auto frameIndex = GetFrameIndex();
+        VKR(vkWaitForFences(m_Device, 1, &m_Fences[frameIndex], VK_TRUE, (uint64_t)_1s.GetTotalNanoseconds()));
+        VKR(vkResetFences(m_Device, 1, &m_Fences[frameIndex]));
     }
 
     void VkGraphics::EndRenderFrame_Implementation()
     {
         ++m_FrameCount;
+    }
+
+    VkFence VkGraphics::GetFence() const noexcept
+    {
+        return m_Fences[GetFrameIndex()];
+    }
+
+    PFN_vkSetDebugUtilsObjectNameEXT VkGraphics::GetSetDebugUtilsObjectNameEXTFunction() const noexcept
+    {
+        return reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetDeviceProcAddr(m_Device, "vkSetDebugUtilsObjectNameEXT"));
     }
 }

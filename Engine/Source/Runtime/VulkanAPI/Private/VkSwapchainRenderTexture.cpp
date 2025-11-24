@@ -7,11 +7,41 @@
 
 namespace Ayla
 {
-	VkSwapchainRenderTexture::VkSwapchainRenderTexture(VkSwapchainExt* swapchain)
+	VkSwapchainRenderTexture::VkSwapchainRenderTexture(VkSwapchainExt* swapchain, VkGraphics* graphics)
 		: m_Swapchain(swapchain)
+		, m_Graphics(graphics)
 	{
 		VkSemaphoreCreateInfo semaphoreCreateInfo{ .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
-		VKR(vkCreateSemaphore(swapchain->GetOwner()->GetDevice(), &semaphoreCreateInfo, nullptr, &m_ImageReadySemaphore));
+
+		m_PresentCompletedSemaphores.resize(VkGraphics::kMaxFramesInFlight);
+		for (size_t i = 0; i < VkGraphics::kMaxFramesInFlight; ++i)
+		{
+			VKR(vkCreateSemaphore(swapchain->GetOwner()->GetDevice(), &semaphoreCreateInfo, nullptr, &m_PresentCompletedSemaphores[i]));
+			std::string debugName = String::Format(TEXT("m_PresentCompletedSemaphores[{}]"), i).AsCodepage();
+			VkDebugUtilsObjectNameInfoEXT info =
+			{
+				.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+				.objectType = VK_OBJECT_TYPE_SEMAPHORE,
+				.objectHandle = reinterpret_cast<uint64_t>(m_PresentCompletedSemaphores[i]),
+				.pObjectName = debugName.c_str(),
+			};
+			VKR(graphics->GetSetDebugUtilsObjectNameEXTFunction()(graphics->GetDevice(), &info));
+		}
+
+		m_RenderCompletedSemaphores.resize(VkGraphics::kMaxSwapchainImages);
+		for (size_t i = 0; i < VkGraphics::kMaxSwapchainImages; ++i)
+		{
+			VKR(vkCreateSemaphore(swapchain->GetOwner()->GetDevice(), &semaphoreCreateInfo, nullptr, &m_RenderCompletedSemaphores[i]));
+			std::string debugName = String::Format(TEXT("m_RenderCompletedSemaphores[{}]"), i).AsCodepage();
+			VkDebugUtilsObjectNameInfoEXT info =
+			{
+				.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT,
+				.objectType = VK_OBJECT_TYPE_SEMAPHORE,
+				.objectHandle = reinterpret_cast<uint64_t>(m_RenderCompletedSemaphores[i]),
+				.pObjectName = debugName.c_str(),
+			};
+			VKR(graphics->GetSetDebugUtilsObjectNameEXTFunction()(graphics->GetDevice(), &info));
+		}
 	}
 
 	Vector2N VkSwapchainRenderTexture::GetSize() const
@@ -29,7 +59,8 @@ namespace Ayla
 		check(m_CurrentImageIndex == 0xFFFFFFFF);
 
 		auto graphics = m_Swapchain->GetOwner();
-		VKR(vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, m_ImageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex));
+		auto imageReadySemaphore = m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()];
+		VKR(vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, imageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex));
 
 		auto* vkCmd = (VkCommandBuffer*)cmd;
 
@@ -68,7 +99,23 @@ namespace Ayla
 		}
 
 		m_SwapchainImageFirstRender |= (1 << m_CurrentImageIndex);
-		vkCmd->AddImageReadySemaphore(m_ImageReadySemaphore);
+		vkCmd->AddSignalSemaphore(m_RenderCompletedSemaphores[m_CurrentImageIndex]);
+		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()]);
+	}
+
+	void VkSwapchainRenderTexture::Dispose()
+	{
+		for (auto& semaphore : m_PresentCompletedSemaphores)
+		{
+			vkDestroySemaphore(m_Graphics->GetDevice(), semaphore, nullptr);
+		}
+		m_PresentCompletedSemaphores.clear();
+
+		for (auto& semaphore : m_RenderCompletedSemaphores)
+		{
+			vkDestroySemaphore(m_Graphics->GetDevice(), semaphore, nullptr);
+		}
+		m_RenderCompletedSemaphores.clear();
 	}
 
 	void VkSwapchainRenderTexture::Invalidate()
@@ -79,7 +126,7 @@ namespace Ayla
 	void VkSwapchainRenderTexture::Present(VkQueue queue, VkCommandBuffer* vkCmd)
 	{
 		check(m_CurrentImageIndex != 0xFFFFFFFF);
-		auto semaphore = vkCmd->GetRenderCompletedSemaphore();
+		auto semaphore = m_RenderCompletedSemaphores[m_CurrentImageIndex];
 		auto swapchain = m_Swapchain->GetSwapchain();
 		VkPresentInfoKHR presentInfo
 		{

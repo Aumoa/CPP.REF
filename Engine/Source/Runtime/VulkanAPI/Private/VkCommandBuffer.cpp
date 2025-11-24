@@ -31,12 +31,7 @@ namespace Ayla
 		};
 
 		m_CommandBuffers.resize(VkGraphics::kMaxFramesInFlight);
-		m_RenderCompletedSemaphores.resize(VkGraphics::kMaxFramesInFlight);
 		VKR(vkAllocateCommandBuffers(graphics->GetDevice(), &commandBufferAllocInfo, m_CommandBuffers.data()));
-		for (size_t i = 0; i < VkGraphics::kMaxFramesInFlight; i++)
-		{
-			VKR(vkCreateSemaphore(graphics->GetDevice(), &semaphoreCreateInfo, nullptr, &m_RenderCompletedSemaphores[i]));
-		}
 	}
 
 	VkCommandBuffer::~VkCommandBuffer() noexcept
@@ -52,16 +47,13 @@ namespace Ayla
 			vkDestroyCommandPool(m_Graphics->GetDevice(), m_CommandPool, nullptr);
 			m_CommandPool = nullptr;
 		}
-
-		for (auto& semaphore : m_RenderCompletedSemaphores)
-		{
-			vkDestroySemaphore(m_Graphics->GetDevice(), semaphore, nullptr);
-		}
-		m_RenderCompletedSemaphores.clear();
 	}
 
 	void VkCommandBuffer::BeginCommands_Implementation()
 	{
+		m_SignalSemaphores.clear();
+		m_WaitSemaphores.clear();
+
 		VkCommandBufferBeginInfo beginInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
@@ -84,33 +76,33 @@ namespace Ayla
 		{
 			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 			.commandBufferCount = 1,
-			.pCommandBuffers = &commandBuffer,
-			.signalSemaphoreCount = 1,
-			.pSignalSemaphores = &m_RenderCompletedSemaphores[frameIndex],
+			.pCommandBuffers = &commandBuffer
 		};
 
-		VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		submitInfo.pWaitDstStageMask = &waitStage;
-		submitInfo.waitSemaphoreCount = (uint32_t)m_ImageReadySemaphores.size();
-		submitInfo.pWaitSemaphores = m_ImageReadySemaphores.data();
+		submitInfo.signalSemaphoreCount = (uint32_t)m_SignalSemaphores.size();
+		submitInfo.pSignalSemaphores = m_SignalSemaphores.data();
+
+		static thread_local std::vector<VkPipelineStageFlags> sStages;
+		sStages.resize(m_WaitSemaphores.size(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+		submitInfo.pWaitDstStageMask = sStages.data();
+		submitInfo.waitSemaphoreCount = (uint32_t)m_WaitSemaphores.size();
+		submitInfo.pWaitSemaphores = m_WaitSemaphores.data();
 		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, m_Graphics->GetFence()));
-		
-		m_ImageReadySemaphores.clear();
 	}
 
-	void VkCommandBuffer::AddImageReadySemaphore(VkSemaphore semaphore)
+	void VkCommandBuffer::AddSignalSemaphore(VkSemaphore semaphore)
 	{
-		m_ImageReadySemaphores.emplace_back(semaphore);
+		m_SignalSemaphores.emplace_back(semaphore);
+	}
+
+	void VkCommandBuffer::AddWaitSemaphore(VkSemaphore semaphore)
+	{
+		m_WaitSemaphores.emplace_back(semaphore);
 	}
 
 	::VkCommandBuffer VkCommandBuffer::GetVkCommandBuffer() const noexcept
 	{
 		return m_CommandBuffers[m_Graphics->GetFrameIndex()];
-	}
-
-	VkSemaphore VkCommandBuffer::GetRenderCompletedSemaphore() const noexcept
-	{
-		return m_RenderCompletedSemaphores[m_Graphics->GetFrameIndex()];
 	}
 
 	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()
