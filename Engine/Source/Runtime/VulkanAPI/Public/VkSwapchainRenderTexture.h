@@ -11,6 +11,7 @@ namespace Ayla
 {
 	class VkSwapchainExt;
 	class VkCommandBuffer;
+	class VkGraphics;
 
 	ACLASS()
 	class VkSwapchainRenderTexture : public RenderTexture
@@ -19,19 +20,22 @@ namespace Ayla
 
 	private:
 		const VkSwapchainExt* m_Swapchain;
+		VkGraphics* m_Graphics;
 		std::vector<VkImage> m_SwapchainImages;
-		VkSemaphore m_ImageReadySemaphore = VK_NULL_HANDLE;
+		std::vector<VkSemaphore> m_PresentCompletedSemaphores;
+		std::vector<VkSemaphore> m_RenderCompletedSemaphores;
 
 		uint32 m_CurrentImageIndex = 0xFFFFFFFF;
 		uint8 m_SwapchainImageFirstRender = 0;
 
 	public:
-		VkSwapchainRenderTexture(VkSwapchainExt* swapchain);
+		VkSwapchainRenderTexture(VkSwapchainExt* swapchain, VkGraphics* graphics);
 
 		virtual Vector2N GetSize() const override;
 
 		virtual void Acquire(CommandBuffer* cmd) override;
 
+		void Dispose();
 		void Invalidate();
 		void Present(VkQueue queue, VkCommandBuffer* vkCmd);
 

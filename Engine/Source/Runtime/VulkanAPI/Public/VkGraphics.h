@@ -27,7 +27,7 @@ namespace Ayla
         VkQueue m_GraphicsQueue{ nullptr };
 		uint32_t m_GraphicsQueueFamilyIndex{ 0 };
         uint32_t m_QueueCount{ 0 };
-        VkFence m_Fence{ nullptr };
+        std::vector<VkFence> m_Fences;
 
         std::atomic<std::size_t> m_FrameCount = 0;
 
@@ -45,9 +45,11 @@ namespace Ayla
         VkDevice GetDevice() const noexcept { return m_Device; }
         VkQueue GetGraphicsQueue() const noexcept { return m_GraphicsQueue; }
 		uint32_t GetGraphicsQueueFamilyIndex() const noexcept { return m_GraphicsQueueFamilyIndex; }
-        VkFence GetFence() const noexcept { return m_Fence; }
+        VkFence GetFence() const noexcept;
 
         inline size_t GetFrameNumber() const noexcept { return m_FrameCount; }
         inline size_t GetFrameIndex() const noexcept { return m_FrameCount % kMaxFramesInFlight; }
+
+        PFN_vkSetDebugUtilsObjectNameEXT GetSetDebugUtilsObjectNameEXTFunction() const noexcept;
     };
 }

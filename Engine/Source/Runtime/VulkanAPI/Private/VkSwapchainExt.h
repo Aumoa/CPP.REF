@@ -24,8 +24,6 @@ namespace Ayla
         VkSwapchainKHR m_Swapchain;
         VkSwapchainCreateInfoKHR m_SwapchainCreateInfoCache;
         VkQueue m_SuitableQueue;
-        std::vector<VkImage> m_SwapchainImages;
-        std::vector<VkSemaphore> m_PresentCompletedSemaphores;
         SharedPtr<VkSwapchainRenderTexture> m_SwapchainRenderTexture;
 
     public:
@@ -44,6 +42,5 @@ namespace Ayla
 
     private:
         void CleanupSwapchain();
-		void ReallocateSwapchainImages();
     };
 }
