@@ -7,12 +7,14 @@
 #include "GenericWindowSwapchainExtension.h"
 #include "GameInstance.h"
 #include "CommandBuffer.h"
+#include "TimerManager.h"
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/SceneManager.h"
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "Rendering/SceneView.h"
 #include "Rendering/RenderTexture.h"
+#include "Threading/MainSynchronizationContext.h"
 
 namespace Ayla
 {
@@ -24,23 +26,6 @@ namespace Ayla
 	{
 	}
 
-	class MainSynchronizationContext : public SynchronizationContext
-	{
-	public:
-		static std::mutex s_Mutex;
-		static std::queue<SharedTask<>::function_t<void()>> s_Continuations;
-
-	public:
-		virtual void Post(SharedTask<>::function_t<void()> callback) override
-		{
-			std::unique_lock lock(s_Mutex);
-			s_Continuations.emplace(std::move(callback));
-		}
-	};
-
-	std::mutex MainSynchronizationContext::s_Mutex;
-	std::queue<SharedTask<>::function_t<void()>> MainSynchronizationContext::s_Continuations;
-
 	void Engine::GuardedLoop_Implementation()
 	{
 		MainSynchronizationContext syncContext;
@@ -48,6 +33,9 @@ namespace Ayla
 
 		auto& app = GenericApplication::Get();
 		std::vector<GenericPlatformInputEvent> inputEvents;
+		m_TimerManager = std::make_unique<TimerManager>();
+		m_TimerManager->Start();
+
 		while (true)
 		{
 			app.PumpMessages(inputEvents);
@@ -74,15 +62,8 @@ namespace Ayla
 
 	void Engine::Tick()
 	{
-		std::unique_lock lock(MainSynchronizationContext::s_Mutex);
-		auto cc = std::move(MainSynchronizationContext::s_Continuations);
-		lock.unlock();
-
-		while (!cc.empty())
-		{
-			cc.front()();
-			cc.pop();
-		}
+		m_TimerManager->StartFrame();
+		MainSynchronizationContext::GetCurrent()->Tick();
 
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
@@ -110,6 +91,14 @@ namespace Ayla
 
 			graphics->EndRenderFrame();
 		});
+
+		auto fps = 1.0 / m_TimerManager->GetDeltaTime().GetTotalSeconds();
+		m_MainActivity->SetTitle(String::Format(TEXT("FPS: {:.2f}"), fps));
+	}
+
+	void Engine::InitializeMainActivity(SharedPtr<GenericActivity> mainActivity)
+	{
+		m_MainActivity = mainActivity;
 	}
 
 	void Engine::InitializeGraphics(SharedPtr<Graphics> graphics)

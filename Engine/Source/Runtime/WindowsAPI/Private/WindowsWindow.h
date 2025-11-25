@@ -30,6 +30,8 @@ namespace Ayla
 		virtual void Show() override;
 		virtual void Hide() override;
 		virtual Vector2N GetSize() const override;
+
+		void SetText(String text);
 #endif
 	};
 }

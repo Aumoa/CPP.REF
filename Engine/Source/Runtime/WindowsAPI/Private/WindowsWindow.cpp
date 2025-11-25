@@ -94,32 +94,28 @@ namespace Ayla
 
 	void WindowsWindow::Show()
 	{
-		if (m_WindowHandle)
-		{
-			ShowWindow(m_WindowHandle, SW_SHOW);
-			UpdateWindow(m_WindowHandle);
-		}
+		ShowWindow(m_WindowHandle, SW_SHOW);
+		UpdateWindow(m_WindowHandle);
 	}
 
 	void WindowsWindow::Hide()
 	{
-		if (m_WindowHandle)
-		{
-			ShowWindow(m_WindowHandle, SW_HIDE);
-		}
+		ShowWindow(m_WindowHandle, SW_HIDE);
 	}
 
 	Vector2N WindowsWindow::GetSize() const
 	{
-		if (m_WindowHandle)
+		RECT rect;
+		if (GetClientRect(m_WindowHandle, &rect))
 		{
-			RECT rect;
-			if (GetClientRect(m_WindowHandle, &rect))
-			{
-				return Vector2N(rect.right - rect.left, rect.bottom - rect.top);
-			}
+			return Vector2N(rect.right - rect.left, rect.bottom - rect.top);
 		}
 		return Vector2N(0, 0);
+	}
+
+	void WindowsWindow::SetText(String text)
+	{
+		SetWindowTextW(m_WindowHandle, text.c_str());
 	}
 }
 

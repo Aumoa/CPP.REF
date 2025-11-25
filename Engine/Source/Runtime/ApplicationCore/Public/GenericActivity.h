@@ -28,5 +28,7 @@ namespace Ayla
 		virtual void AfterInitialize() APURE;
 		AFUNCTION()
 		virtual SharedPtr<GenericWindow> GetMainWindow() const APURE;
+
+		virtual void SetTitle(String title) = 0;
 	};
 }
