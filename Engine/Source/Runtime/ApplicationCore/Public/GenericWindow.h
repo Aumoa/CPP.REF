@@ -36,9 +36,9 @@ namespace Ayla
             auto lock = std::unique_lock{ m_Lock };
             for (auto& extension : m_Extensions)
             {
-                if (auto ptr = dynamic_cast<T*>(extension.get()); ptr != nullptr)
+                if (SharedPtr<T> ptr; extension.Is(&ptr))
                 {
-                    return std::static_pointer_cast<T>(extension);
+                    return ptr;
                 }
             }
 

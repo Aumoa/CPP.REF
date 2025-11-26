@@ -11,13 +11,13 @@ namespace Ayla
 {
     LinuxActivity::LinuxActivity()
     {
-        m_MainWindow = std::static_pointer_cast<LinuxWindow>(GenericApplication::Get().MakeWindow(GenericWindowDefinition
+        m_MainWindow = GenericApplication::Get().MakeWindow(GenericWindowDefinition
         {
             .Caption = TEXT("Main Activity"),
             .bThickframe = true,
             .DesiredScreenPosition = Vector2N(-1, -1),
             .DesiredScreenSize = Vector2N(-1, -1)
-        }));
+        }).As<LinuxWindow>();
 
         m_MainWindow->AddExtension(New<GenericMainWindowDefaultExt>());
     }
@@ -35,9 +35,14 @@ namespace Ayla
 		m_MainWindow->Show();
 	}
 
-	std::shared_ptr<GenericWindow> LinuxActivity::GetMainWindow_Implementation() const
+	SharedPtr<GenericWindow> LinuxActivity::GetMainWindow_Implementation() const
 	{
 		return m_MainWindow;
+	}
+
+	void LinuxActivity::SetTitle(String title)
+	{
+		m_MainWindow->SetName(title);
 	}
 }
 

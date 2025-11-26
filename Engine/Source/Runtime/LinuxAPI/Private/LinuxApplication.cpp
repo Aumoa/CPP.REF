@@ -24,16 +24,16 @@ namespace Ayla
         m_Display = nullptr;
     }
 
-    std::shared_ptr<GenericActivity> LinuxApplication::CreateMainActivity_Implementation()
+    SharedPtr<GenericActivity> LinuxApplication::CreateMainActivity_Implementation()
     {
         return New<LinuxActivity>();
     }
 
-    std::shared_ptr<GenericWindow> LinuxApplication::MakeWindow(const GenericWindowDefinition& winDef)
+    SharedPtr<GenericWindow> LinuxApplication::MakeWindow(const GenericWindowDefinition& winDef)
     {
         auto window = New<LinuxWindow>(m_Display, winDef);
         auto lock = std::unique_lock{ m_Spinlock };
-        m_WeakWindows.try_emplace(window->GetOSWindowHandle(), window);
+        m_WeakWindows.try_emplace(window->GetOSWindowHandle(), window.Get());
         return window;
     }
 
@@ -52,7 +52,7 @@ namespace Ayla
             XEvent event;
             XNextEvent(m_Display, &event);
 
-            auto resolveWindow = [&]() -> std::shared_ptr<LinuxWindow>
+            auto resolveWindow = [&]() -> LinuxWindow*
             {
                 auto* id = reinterpret_cast<void*>(event.xclient.window);
                 auto lock = std::unique_lock{ m_Spinlock };
@@ -62,7 +62,7 @@ namespace Ayla
                     return nullptr;
                 }
 
-                return it->second.lock();
+                return it->second;
             };
 
             switch (event.type)

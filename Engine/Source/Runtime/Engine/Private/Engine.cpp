@@ -35,6 +35,15 @@ namespace Ayla
 		std::vector<GenericPlatformInputEvent> inputEvents;
 		m_TimerManager = std::make_unique<TimerManager>();
 		m_TimerManager->Start();
+		
+		m_TimerManager->AddInterval([this]()
+		{
+			auto dt = m_FrameTime / m_FrameCount;
+			auto fps = 1.0 / dt;
+			m_MainActivity->SetTitle(String::Format(TEXT("FPS: {:.2f}"), fps));
+			m_FrameTime = 0;
+			m_FrameCount = 0;
+		}, TimeSpan::FromSeconds(1));
 
 		while (true)
 		{
@@ -63,7 +72,12 @@ namespace Ayla
 	void Engine::Tick()
 	{
 		m_TimerManager->StartFrame();
+
 		MainSynchronizationContext::GetCurrent()->Tick();
+
+		m_FrameTime += m_TimerManager->GetDeltaTime().GetTotalSeconds();
+		m_FrameCount += 1;
+		m_TimerManager->UpdateTasks();
 
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
@@ -91,9 +105,6 @@ namespace Ayla
 
 			graphics->EndRenderFrame();
 		});
-
-		auto fps = 1.0 / m_TimerManager->GetDeltaTime().GetTotalSeconds();
-		m_MainActivity->SetTitle(String::Format(TEXT("FPS: {:.2f}"), fps));
 	}
 
 	void Engine::InitializeMainActivity(SharedPtr<GenericActivity> mainActivity)

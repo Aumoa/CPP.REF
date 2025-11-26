@@ -26,6 +26,8 @@ namespace Ayla
 		std::vector<SharedPtr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 		SharedPtr<CommandBuffer> m_CommandBuffer;
 		std::unique_ptr<TimerManager> m_TimerManager;
+		double m_FrameTime = 0;
+		size_t m_FrameCount = 0;
 
 	public:
 		ACONSTRUCTOR()

@@ -45,7 +45,7 @@ namespace Ayla
 		template<class TException>
 		bool TrySetException(const TException& exceptionObject) const
 		{
-			TrySetException(std::make_exception_ptr(exceptionObject));
+			return TrySetException(std::make_exception_ptr(exceptionObject));
 		}
 
 		bool TrySetException(std::exception_ptr exceptionPtr) const
