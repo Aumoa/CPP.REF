@@ -164,6 +164,7 @@ extern "C"
 		{
 			self_->m_Spinlock.unlock();
 			delete self_;
+			return;
 		}
 		self_->m_Spinlock.unlock();
 	}
