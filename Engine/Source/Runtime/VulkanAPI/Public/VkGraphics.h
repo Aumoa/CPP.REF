@@ -33,9 +33,11 @@ namespace Ayla
         virtual ~VkGraphics() noexcept override;
 
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
-        virtual void BeginRenderFrame_Implementation() override;
-        virtual void EndRenderFrame_Implementation() override;
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer_Implementation() override;  // VkCommandBuffer.cpp
+
+        virtual void BeginRenderFrame() override;
+        virtual void EndRenderFrame() override;
+        virtual void WaitForCompletion() override;
 
         VkInstance GetInstance() const noexcept { return m_Instance; }
         VkDevice GetDevice() const noexcept { return m_Device; }

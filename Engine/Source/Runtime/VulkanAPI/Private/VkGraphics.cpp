@@ -306,7 +306,7 @@ namespace Ayla
         return extension;
     }
 
-    void VkGraphics::BeginRenderFrame_Implementation()
+    void VkGraphics::BeginRenderFrame()
     {
         constexpr auto _1s = TimeSpan::FromSeconds(1);
 
@@ -315,9 +315,14 @@ namespace Ayla
         VKR(vkResetFences(m_Device, 1, &m_Fences[frameIndex]));
     }
 
-    void VkGraphics::EndRenderFrame_Implementation()
+    void VkGraphics::EndRenderFrame()
     {
         ++m_FrameCount;
+    }
+
+    void VkGraphics::WaitForCompletion()
+    {
+        vkDeviceWaitIdle(m_Device);
     }
 
     VkFence VkGraphics::GetFence() const noexcept

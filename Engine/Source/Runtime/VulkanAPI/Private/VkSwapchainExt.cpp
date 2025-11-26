@@ -41,8 +41,14 @@ namespace Ayla
         m_Surface = nullptr;
     }
 
-    void VkSwapchainExt::OnResize(const Vector2N& newSize)
+    void VkSwapchainExt::DoResize()
     {
+        if (!m_PendingResize.has_value())
+        {
+            return;
+        }
+
+        auto newSize = m_PendingResize.value();
         VkExtent2D newExtent{ .width = (uint32_t)newSize.X, .height = (uint32_t)newSize.Y };
         if (memcmp(&newExtent, &m_SwapchainCreateInfoCache.imageExtent, sizeof(VkExtent2D)) == 0)
         {
@@ -54,6 +60,11 @@ namespace Ayla
         m_SwapchainCreateInfoCache.imageExtent = newExtent;
         VKR(vkCreateSwapchainKHR(m_Owner->GetDevice(), &m_SwapchainCreateInfoCache, nullptr, &m_Swapchain));
         LogVulkan::Verbose(TEXT("Swapchain resized to {}"), newSize);
+    }
+
+    void VkSwapchainExt::OnResize(const Vector2N& newSize)
+    {
+        m_PendingResize = newSize;
     }
 
     Vector2N VkSwapchainExt::GetSize() const

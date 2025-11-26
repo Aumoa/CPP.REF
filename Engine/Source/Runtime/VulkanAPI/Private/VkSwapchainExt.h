@@ -25,6 +25,7 @@ namespace Ayla
         VkSwapchainCreateInfoKHR m_SwapchainCreateInfoCache;
         VkQueue m_SuitableQueue;
         SharedPtr<VkSwapchainRenderTexture> m_SwapchainRenderTexture;
+        std::optional<Vector2N> m_PendingResize;
 
     public:
         VkSwapchainExt(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain, const VkSwapchainCreateInfoKHR& swapchainCreateInfo, VkQueue suitableQueue);
@@ -33,6 +34,7 @@ namespace Ayla
         virtual SharedPtr<RenderTexture> GetRenderTexture() override;
         virtual void Present(CommandBuffer* commandBuffer) override;
         virtual void Destroy() override;
+        virtual void DoResize() override;
 
         virtual void OnResize(const Vector2N& newSize) override;
 

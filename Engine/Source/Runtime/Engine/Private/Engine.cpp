@@ -60,6 +60,7 @@ namespace Ayla
 	void Engine::Shutdown()
 	{
 		m_RenderThread->RequestStop();
+		m_Graphics->WaitForCompletion();
 
 		for (auto& swapchain : m_SwapchainExtensions)
 		{
@@ -82,10 +83,18 @@ namespace Ayla
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
 			graphics = m_Graphics,
-			commandBuffer = m_CommandBuffer
+			commandBuffer = m_CommandBuffer,
+			self = m_RenderThread.Get()
 		]()
 		{
 			graphics->BeginRenderFrame();
+
+			for (auto& swapchainExt : swapchainExtensions)
+			{
+				swapchainExt->DoResize();
+			}
+
+			self->ExecuteJobs();
 
 			// SceneView: Overlay, #0
 			auto rt = swapchainExtensions[0]->GetRenderTexture();

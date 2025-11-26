@@ -6,16 +6,25 @@
 
 namespace Ayla
 {
+	RenderThread* RenderThread::m_Current;
+
 	RenderThread::RenderThread(SharedPtr<Graphics> graphics)
 		: m_Thread(std::bind(&RenderThread::ThreadProc, this, std::move(graphics)))
 	{
+		m_Current = this;
 	}
 
 	RenderThread::~RenderThread()
 	{
 	}
 
-	void RenderThread::Dispatch(std::move_only_function<void()> completionAction)
+	void RenderThread::Add(function_t<void()> job)
+	{
+		auto lock = std::unique_lock{ m_Mtx };
+		m_Jobs.emplace(std::move(job));
+	}
+
+	void RenderThread::Dispatch(function_t<void()> completionAction)
 	{
 		auto lock = std::unique_lock{ m_Mtx };
 		m_Notify.wait(lock, [&]() { return m_CompletionActions.size() < 2; });
@@ -30,6 +39,25 @@ namespace Ayla
 		m_Request.notify_one();
 		lock.unlock();
 		m_Thread.join();
+	}
+
+	void RenderThread::ExecuteJobs()
+	{
+		auto lock = std::unique_lock{ m_Mtx };
+		static std::queue<function_t<void()>> executionJobs;
+		while (m_Jobs.empty() == false)
+		{
+			executionJobs.emplace(std::move(m_Jobs.front()));
+			m_Jobs.pop();
+		}
+
+		lock.unlock();
+
+		while (!executionJobs.empty())
+		{
+			executionJobs.front()();
+			executionJobs.pop();
+		}
 	}
 
 	void RenderThread::ThreadProc(SharedPtr<Graphics> graphics)
