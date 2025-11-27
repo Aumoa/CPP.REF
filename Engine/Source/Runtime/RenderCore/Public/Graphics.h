@@ -24,6 +24,10 @@ namespace Ayla
         static constexpr size_t kMaxFramesInFlight = 2;
         static constexpr size_t kMaxSwapchainImages = 3;
 
+    private:
+        std::mutex m_PooledCommandBufferMutex;
+        std::vector<SharedPtr<CommandBuffer>> m_PooledCommandBuffers;
+
     protected:
         Graphics();
 
@@ -39,6 +43,9 @@ namespace Ayla
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer() APURE;
         AFUNCTION()
         virtual SharedPtr<Buffer> CreateBuffer(BufferUsage usage) APURE;
+
+        AFUNCTION()
+        SharedPtr<CommandBuffer> GetPooledCommandBuffer();
 
         virtual void BeginRenderFrame() = 0;
         virtual void EndRenderFrame() = 0;
