@@ -5,8 +5,8 @@
 
 namespace Ayla
 {
-	SceneView::SceneView(SharedPtr<RenderTexture> outputTexture)
-		: m_OutputTexture(outputTexture)
+	SceneView::SceneView(MinimalViewInfo view)
+		: m_View(std::move(view))
 	{
 	}
 

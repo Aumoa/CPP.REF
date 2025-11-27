@@ -12,6 +12,7 @@
 #include "Action.h"
 #include "Func.h"
 #include "StaticClass.h"
+#include "NonCopyable.h"
 #include "IntegralTypes.h"
 #include "StringComparison.h"
 #include "StringSplitOptions.h"

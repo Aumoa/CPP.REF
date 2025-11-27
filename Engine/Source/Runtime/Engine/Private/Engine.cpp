@@ -83,6 +83,14 @@ namespace Ayla
 		m_FrameCount += 1;
 		m_TimerManager->UpdateTasks();
 
+		static constexpr MinimalViewInfo kSampleView =
+		{
+			.Position = Vector3D(0, 0, -10),
+			.Rotation = QuaternionD::Identity(),
+			.FieldOfView = 60.0,
+			.AspectRatio = std::nullopt
+		};
+
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
 			graphics = m_Graphics,
@@ -99,14 +107,15 @@ namespace Ayla
 
 			self->ExecuteJobs();
 
-			// SceneView: Overlay, #0
-			auto rt = swapchainExtensions[0]->GetRenderTexture();
-			SceneView view(rt);
-			RaytracingSceneRenderer renderer;
-
 			commandBuffer->BeginCommands();
 
+			// Camera: Overlay, Display #0
+			auto rt = swapchainExtensions[0]->GetRenderTexture();
 			rt->Acquire(commandBuffer.Get());
+
+			SceneView view(kSampleView);
+			RaytracingSceneRenderer renderer(rt);
+			renderer.Render(view);
 
 			commandBuffer->EndCommands();
 
@@ -117,6 +126,11 @@ namespace Ayla
 
 			graphics->EndRenderFrame();
 		});
+	}
+
+	SharedPtr<Graphics> Engine::GetGraphics()
+	{
+		return m_Graphics;
 	}
 
 	void Engine::InitializeMainActivity(SharedPtr<GenericActivity> mainActivity)

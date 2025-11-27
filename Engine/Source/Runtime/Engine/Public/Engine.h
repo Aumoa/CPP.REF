@@ -41,6 +41,9 @@ namespace Ayla
 
 		virtual void Tick();
 
+		AFUNCTION()
+		SharedPtr<Graphics> GetGraphics();
+
 	protected:
 		AFUNCTION()
 		void InitializeMainActivity(SharedPtr<GenericActivity> mainActivity);

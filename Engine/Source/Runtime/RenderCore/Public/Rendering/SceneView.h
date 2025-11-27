@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Rendering/MinimalViewInfo.h"
 
 namespace Ayla
 {
@@ -11,12 +12,14 @@ namespace Ayla
 	class RENDERCORE_API SceneView
 	{
 	private:
-		const SharedPtr<RenderTexture> m_OutputTexture;
+		const MinimalViewInfo m_View;
 
 	public:
 		SceneView() = delete;
-		SceneView(SharedPtr<RenderTexture> outputTexture);
+		SceneView(MinimalViewInfo view);
 		SceneView(const SceneView&) = delete;
 		~SceneView() noexcept;
+
+		const MinimalViewInfo& GetViewInfo() const noexcept { return m_View; }
 	};
 }

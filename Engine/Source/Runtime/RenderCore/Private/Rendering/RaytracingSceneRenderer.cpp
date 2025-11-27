@@ -2,10 +2,12 @@
 
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "Rendering/SceneView.h"
+#include "Rendering/RenderTexture.h"
 
 namespace Ayla
 {
-	RaytracingSceneRenderer::RaytracingSceneRenderer()
+	RaytracingSceneRenderer::RaytracingSceneRenderer(SharedPtr<RenderTexture> outputTexture)
+		: SceneRenderer(std::move(outputTexture))
 	{
 	}
 

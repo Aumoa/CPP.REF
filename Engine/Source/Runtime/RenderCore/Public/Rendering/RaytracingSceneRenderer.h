@@ -9,7 +9,7 @@ namespace Ayla
 	class RENDERCORE_API RaytracingSceneRenderer : public SceneRenderer
 	{
 	public:
-		RaytracingSceneRenderer();
+		RaytracingSceneRenderer(SharedPtr<RenderTexture> outputTexture);
 
 		virtual void Render(const SceneView& view) override;
 	};

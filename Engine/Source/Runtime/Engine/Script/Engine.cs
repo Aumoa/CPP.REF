@@ -66,6 +66,7 @@ public partial class Engine
 
         var gameInstance = (GameInstance)primaryConstructor.Invoke([]);
         LogEngine.Info("GameInstance created: {0}", gameInstance.GetType().FullName);
+        gameInstance.SetEngine(this);
         return gameInstance;
     }
 }

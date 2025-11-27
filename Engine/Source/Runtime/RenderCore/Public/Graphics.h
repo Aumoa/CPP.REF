@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "RenderFeatures.h"
+#include "BufferUsage.h"
 #include "Graphics.gen.h"
 
 namespace Ayla
@@ -12,7 +13,7 @@ namespace Ayla
     class GenericWindow;
     class GenericWindowSwapchainExtension;
     class CommandBuffer;
-    class SceneView;
+    class Buffer;
 
     ACLASS()
     class RENDERCORE_API Graphics : public Object
@@ -36,6 +37,8 @@ namespace Ayla
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) APURE;
         AFUNCTION()
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer() APURE;
+        AFUNCTION()
+        virtual SharedPtr<Buffer> CreateBuffer(BufferUsage usage) APURE;
 
         virtual void BeginRenderFrame() = 0;
         virtual void EndRenderFrame() = 0;

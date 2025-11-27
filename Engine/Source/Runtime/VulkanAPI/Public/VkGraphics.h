@@ -37,6 +37,7 @@ namespace Ayla
 
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer_Implementation() override;  // VkCommandBuffer.cpp
+        virtual SharedPtr<Buffer> CreateBuffer_Implementation(BufferUsage usage) override; // VkBuffer.cpp
 
         virtual void BeginRenderFrame() override;
         virtual void EndRenderFrame() override;
