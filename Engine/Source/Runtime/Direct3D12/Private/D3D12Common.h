@@ -5,6 +5,7 @@
 #pragma push_macro("TEXT")
 #include <d3d12.h>
 #include <dxgi1_5.h>
+#include <d3d12sdklayers.h>
 #include <wrl/client.h>
 #include <comdef.h>
 #include "Platform/Windows/UndefWindowsPlatformMacros.h"
@@ -19,25 +20,20 @@ inline void HR__impl(Ayla::String s)
 	throw Ayla::InvalidOperationException(s);
 }
 
+inline Ayla::String HR__format(HRESULT value)
+{
+	static thread_local std::map<HRESULT, _com_error> sCache;
+	auto it = sCache.find(value);
+	if (it == sCache.end())
+	{
+		it = sCache.emplace(value, value).first;
+	}
+	const wchar_t* msg = it->second.ErrorMessage();
+	return Ayla::String::FromLiteral(msg);
+}
+
 #define HR(expr, ...) \
 if (auto HR_res__ = (expr); FAILED(HR_res__)) \
 { \
-	HR__impl(Ayla::String::Format(TEXT("{}"), HR_res__)); \
+	HR__impl(HR__format(HR_res__)); \
 }
-
-template<>
-struct std::formatter<HRESULT, wchar_t> : public std::formatter<Ayla::String, wchar_t>
-{
-	template<class TFormatContext>
-	auto format(HRESULT value, TFormatContext& context) const
-	{
-		static thread_local std::map<HRESULT, _com_error> sCache;
-		auto it = sCache.find(value);
-		if (it == sCache.end())
-		{
-			it = sCache.emplace(value, value).first;
-		}
-		const wchar_t* msg = it->second.ErrorMessage();
-		return std::formatter<Ayla::String, wchar_t>::format(Ayla::String::FromLiteral(msg), context);
-	}
-};

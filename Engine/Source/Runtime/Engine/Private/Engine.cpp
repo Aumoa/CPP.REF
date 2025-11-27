@@ -40,7 +40,7 @@ namespace Ayla
 		{
 			auto dt = m_FrameTime / m_FrameCount;
 			auto fps = 1.0 / dt;
-			m_MainActivity->SetTitle(String::Format(TEXT("FPS: {:.2f}"), fps));
+			m_MainActivity->SetTitle(String::Format(TEXT("{}, FPS: {:.2f}"), m_Graphics->GetCurrentRenderFeature(), fps));
 			m_FrameTime = 0;
 			m_FrameCount = 0;
 		}, TimeSpan::FromSeconds(1));
@@ -68,6 +68,9 @@ namespace Ayla
 		}
 
 		m_SwapchainExtensions.clear();
+
+		m_CommandBuffer->Dispose();
+		m_Graphics->Dispose();
 	}
 
 	void Engine::Tick()

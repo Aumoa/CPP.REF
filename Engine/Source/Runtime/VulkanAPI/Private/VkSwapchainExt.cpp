@@ -43,12 +43,17 @@ namespace Ayla
 
     void VkSwapchainExt::DoResize()
     {
-        if (!m_PendingResize.has_value())
+        if (m_PendingFrameNumber == -1 || m_PendingFrameNumber > (int64)m_Owner->GetFrameNumber() || !m_PendingResize.has_value())
         {
             return;
         }
 
+        vkDeviceWaitIdle(m_Owner->GetDevice());
+        m_PendingFrameNumber = -1;
+
         auto newSize = m_PendingResize.value();
+        m_PendingResize.reset();
+
         VkExtent2D newExtent{ .width = (uint32_t)newSize.X, .height = (uint32_t)newSize.Y };
         if (memcmp(&newExtent, &m_SwapchainCreateInfoCache.imageExtent, sizeof(VkExtent2D)) == 0)
         {
@@ -65,6 +70,7 @@ namespace Ayla
     void VkSwapchainExt::OnResize(const Vector2N& newSize)
     {
         m_PendingResize = newSize;
+        m_PendingFrameNumber = m_Owner->GetFrameNumber() + 1;
     }
 
     Vector2N VkSwapchainExt::GetSize() const

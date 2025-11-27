@@ -32,6 +32,9 @@ namespace Ayla
         VkGraphics();
         virtual ~VkGraphics() noexcept override;
 
+        virtual void Dispose() noexcept override;
+        virtual RenderFeatures GetCurrentRenderFeature() noexcept override { return RenderFeatures::Vulkan; }
+
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer_Implementation() override;  // VkCommandBuffer.cpp
 

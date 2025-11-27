@@ -39,6 +39,15 @@ namespace Ayla
 		m_Request.notify_one();
 		lock.unlock();
 		m_Thread.join();
+
+		{
+			std::queue<function_t<void()>> empty;
+			std::swap(m_CompletionActions, empty);
+		}
+		{
+			std::queue<function_t<void()>> empty;
+			std::swap(m_Jobs, empty);
+		}
 	}
 
 	void RenderThread::ExecuteJobs()

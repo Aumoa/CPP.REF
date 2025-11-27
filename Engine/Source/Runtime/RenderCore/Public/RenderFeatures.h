@@ -10,6 +10,7 @@ namespace Ayla
     AENUM()
     enum class RenderFeatures
     {
-        Vulkan
+        Vulkan,
+        D3D12
     };
 }

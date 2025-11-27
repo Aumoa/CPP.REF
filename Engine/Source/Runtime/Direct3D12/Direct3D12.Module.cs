@@ -12,6 +12,6 @@ public class Direct3D12 : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("RenderCore", "ApplicationCore");
-        AddPrivateAdditionalLibraries("dxgi.lib");
+        AddPrivateAdditionalLibraries("dxgi.lib", "d3d12.lib");
     }
 }

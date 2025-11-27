@@ -25,6 +25,8 @@ namespace Ayla
         VkSwapchainCreateInfoKHR m_SwapchainCreateInfoCache;
         VkQueue m_SuitableQueue;
         SharedPtr<VkSwapchainRenderTexture> m_SwapchainRenderTexture;
+
+        int64 m_PendingFrameNumber = -1;
         std::optional<Vector2N> m_PendingResize;
 
     public:

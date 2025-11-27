@@ -36,6 +36,11 @@ namespace Ayla
 
 	VkCommandBuffer::~VkCommandBuffer() noexcept
 	{
+		Dispose();
+	}
+
+	void VkCommandBuffer::Dispose() noexcept
+	{
 		if (m_CommandBuffers.size() > 0)
 		{
 			vkFreeCommandBuffers(m_Graphics->GetDevice(), m_CommandPool, (uint32_t)m_CommandBuffers.size(), m_CommandBuffers.data());

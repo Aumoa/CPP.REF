@@ -29,6 +29,9 @@ namespace Ayla
     public:
         virtual ~Graphics() noexcept;
 
+        virtual void Dispose() noexcept = 0;
+        virtual RenderFeatures GetCurrentRenderFeature() noexcept = 0;
+
         AFUNCTION()
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) APURE;
         AFUNCTION()

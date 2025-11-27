@@ -195,6 +195,11 @@ namespace Ayla
 
     VkGraphics::~VkGraphics() noexcept
     {
+        Dispose();
+    }
+
+    void VkGraphics::Dispose() noexcept
+    {
         m_GraphicsQueue = nullptr;
         m_PhysicalDevice = nullptr;
 
