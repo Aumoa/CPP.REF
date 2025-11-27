@@ -28,6 +28,8 @@ namespace Ayla
 		VkCommandBuffer(VkGraphics* graphics);
 		virtual ~VkCommandBuffer() noexcept override;
 
+		virtual void Dispose() noexcept override;
+
 		virtual void BeginCommands_Implementation() override;
 		virtual void EndCommands_Implementation() override;
 

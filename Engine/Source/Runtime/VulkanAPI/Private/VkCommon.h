@@ -24,7 +24,7 @@ inline void VKR__impl(Ayla::String s)
 #define VKR(expr, ...) \
 if (auto VKR_res__ = (expr); VkrFailure __VA_OPT__(<) __VA_ARGS__ __VA_OPT__(>) (VKR_res__)) \
 { \
-    VKR__impl(String::Format(TEXT("{}"), VKR_res__)); \
+    VKR__impl(Ayla::String::Format(TEXT("{}"), VKR_res__)); \
 }
 
 #define DECLARE_FORMATTER(T) \

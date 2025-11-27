@@ -25,5 +25,6 @@ namespace Ayla
         virtual SharedPtr<RenderTexture> GetRenderTexture() = 0;
         virtual void Present(CommandBuffer* commandBuffer) = 0;
         virtual void Destroy() = 0;
+        virtual void DoResize() = 0;
     };
 }

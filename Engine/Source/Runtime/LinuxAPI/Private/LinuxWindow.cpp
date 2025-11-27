@@ -87,6 +87,12 @@ namespace Ayla
         m_Window = 0;
         XDestroyWindow(m_Display, window);
     }
+
+    void LinuxWindow::SetName(String text)
+    {
+        auto ansi = text.AsCodepage();
+        XStoreName(m_Display, m_Window, ansi.c_str());
+    }
 }
 
 #endif

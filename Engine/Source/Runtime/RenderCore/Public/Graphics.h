@@ -19,19 +19,26 @@ namespace Ayla
     {
         GENERATED_BODY()
 
+    public:
+        static constexpr size_t kMaxFramesInFlight = 2;
+        static constexpr size_t kMaxSwapchainImages = 3;
+
     protected:
         Graphics();
 
     public:
         virtual ~Graphics() noexcept;
 
+        virtual void Dispose() noexcept = 0;
+        virtual RenderFeatures GetCurrentRenderFeature() noexcept = 0;
+
         AFUNCTION()
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) APURE;
         AFUNCTION()
-        virtual void BeginRenderFrame() APURE;
-        AFUNCTION()
-        virtual void EndRenderFrame() APURE;
-        AFUNCTION()
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer() APURE;
+
+        virtual void BeginRenderFrame() = 0;
+        virtual void EndRenderFrame() = 0;
+        virtual void WaitForCompletion() = 0;
     };
 }

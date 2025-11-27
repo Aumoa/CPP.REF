@@ -18,7 +18,7 @@ namespace Ayla
         GENERATED_BODY()
 
     private:
-        std::shared_ptr<LinuxWindow> m_MainWindow;
+        SharedPtr<LinuxWindow> m_MainWindow;
 
     public:
         LinuxActivity();
@@ -26,7 +26,9 @@ namespace Ayla
 
         virtual void BeforeInitialize_Implementation() override;
         virtual void AfterInitialize_Implementation() override;
-        virtual std::shared_ptr<GenericWindow> GetMainWindow_Implementation() const override;
+        virtual SharedPtr<GenericWindow> GetMainWindow_Implementation() const override;
+
+        virtual void SetTitle(String title) override;
     };
 }
 

@@ -18,8 +18,9 @@ public partial class Engine
     {
         m_MainActivity = GenericApplication.Get().CreateMainActivity();
         m_MainActivity.BeforeInitialize();
+        InitializeMainActivity(m_MainActivity);
 
-        m_Graphics = Graphics.CreateGraphics(RenderFeatures.Vulkan);
+        m_Graphics = Graphics.CreateGraphics(RenderFeatures.D3D12);
         m_SwapchainExtensions.Add(m_Graphics.InstallSwapChain(m_MainActivity.GetMainWindow()));
         InitializeGraphics(m_Graphics);
 

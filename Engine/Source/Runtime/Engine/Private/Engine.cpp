@@ -7,12 +7,14 @@
 #include "GenericWindowSwapchainExtension.h"
 #include "GameInstance.h"
 #include "CommandBuffer.h"
+#include "TimerManager.h"
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/SceneManager.h"
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "Rendering/SceneView.h"
 #include "Rendering/RenderTexture.h"
+#include "Threading/MainSynchronizationContext.h"
 
 namespace Ayla
 {
@@ -24,23 +26,6 @@ namespace Ayla
 	{
 	}
 
-	class MainSynchronizationContext : public SynchronizationContext
-	{
-	public:
-		static std::mutex s_Mutex;
-		static std::queue<SharedTask<>::function_t<void()>> s_Continuations;
-
-	public:
-		virtual void Post(SharedTask<>::function_t<void()> callback) override
-		{
-			std::unique_lock lock(s_Mutex);
-			s_Continuations.emplace(std::move(callback));
-		}
-	};
-
-	std::mutex MainSynchronizationContext::s_Mutex;
-	std::queue<SharedTask<>::function_t<void()>> MainSynchronizationContext::s_Continuations;
-
 	void Engine::GuardedLoop_Implementation()
 	{
 		MainSynchronizationContext syncContext;
@@ -48,6 +33,18 @@ namespace Ayla
 
 		auto& app = GenericApplication::Get();
 		std::vector<GenericPlatformInputEvent> inputEvents;
+		m_TimerManager = std::make_unique<TimerManager>();
+		m_TimerManager->Start();
+		
+		m_TimerManager->AddInterval([this]()
+		{
+			auto dt = m_FrameTime / m_FrameCount;
+			auto fps = 1.0 / dt;
+			m_MainActivity->SetTitle(String::Format(TEXT("{}, FPS: {:.2f}"), m_Graphics->GetCurrentRenderFeature(), fps));
+			m_FrameTime = 0;
+			m_FrameCount = 0;
+		}, TimeSpan::FromSeconds(1));
+
 		while (true)
 		{
 			app.PumpMessages(inputEvents);
@@ -63,6 +60,7 @@ namespace Ayla
 	void Engine::Shutdown()
 	{
 		m_RenderThread->RequestStop();
+		m_Graphics->WaitForCompletion();
 
 		for (auto& swapchain : m_SwapchainExtensions)
 		{
@@ -70,27 +68,36 @@ namespace Ayla
 		}
 
 		m_SwapchainExtensions.clear();
+
+		m_CommandBuffer->Dispose();
+		m_Graphics->Dispose();
 	}
 
 	void Engine::Tick()
 	{
-		std::unique_lock lock(MainSynchronizationContext::s_Mutex);
-		auto cc = std::move(MainSynchronizationContext::s_Continuations);
-		lock.unlock();
+		m_TimerManager->StartFrame();
 
-		while (!cc.empty())
-		{
-			cc.front()();
-			cc.pop();
-		}
+		MainSynchronizationContext::GetCurrent()->Tick();
+
+		m_FrameTime += m_TimerManager->GetDeltaTime().GetTotalSeconds();
+		m_FrameCount += 1;
+		m_TimerManager->UpdateTasks();
 
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
 			graphics = m_Graphics,
-			commandBuffer = m_CommandBuffer
+			commandBuffer = m_CommandBuffer,
+			self = m_RenderThread.Get()
 		]()
 		{
 			graphics->BeginRenderFrame();
+
+			for (auto& swapchainExt : swapchainExtensions)
+			{
+				swapchainExt->DoResize();
+			}
+
+			self->ExecuteJobs();
 
 			// SceneView: Overlay, #0
 			auto rt = swapchainExtensions[0]->GetRenderTexture();
@@ -110,6 +117,11 @@ namespace Ayla
 
 			graphics->EndRenderFrame();
 		});
+	}
+
+	void Engine::InitializeMainActivity(SharedPtr<GenericActivity> mainActivity)
+	{
+		m_MainActivity = mainActivity;
 	}
 
 	void Engine::InitializeGraphics(SharedPtr<Graphics> graphics)

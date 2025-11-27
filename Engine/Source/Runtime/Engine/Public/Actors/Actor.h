@@ -33,7 +33,7 @@ namespace Ayla
 		template<std::derived_from<Component> TComponent>
 		SharedPtr<TComponent> AddComponent()
 		{
-			return AddComponent(TComponent::GetManagedType()).As<TComponent>();
+			return AddComponent(TComponent::GetManagedType()).template As<TComponent>();
 		}
 	};
 }

@@ -9,6 +9,7 @@ public partial class Graphics
         string assemblyName = api switch
         {
             RenderFeatures.Vulkan => "VulkanAPI.Script",
+            RenderFeatures.D3D12 => "Direct3D12.Script",
             _ => throw new NotSupportedException($"The specified Render API '{api}' is not supported.")
         };
 

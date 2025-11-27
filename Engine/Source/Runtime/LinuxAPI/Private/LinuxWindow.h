@@ -30,6 +30,7 @@ namespace Ayla
         virtual Vector2N GetSize() const override;
 
         void OnDestroy();
+        void SetName(String text);
 #endif
     };
 }

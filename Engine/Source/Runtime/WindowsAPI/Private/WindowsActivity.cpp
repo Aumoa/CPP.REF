@@ -39,6 +39,11 @@ namespace Ayla
 	{
 		return m_MainWindow;
 	}
+
+	void WindowsActivity::SetTitle(String title)
+	{
+		m_MainWindow->SetText(title);
+	}
 }
 
 #endif

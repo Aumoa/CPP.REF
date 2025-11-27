@@ -14,22 +14,41 @@ namespace Ayla
 	{
 		GENERATED_BODY()
 
+	public:
+		template<class TBody>
+#if __cpp_lib_move_only_function
+		using function_t = std::move_only_function<TBody>;
+#else
+		using function_t = std::function<TBody>;
+#endif
+
 	private:
+		static RenderThread* m_Current;
+
 		std::thread m_Thread;
 		std::mutex m_Mtx;
 		std::condition_variable m_Request;
 		std::condition_variable m_Notify;
-		std::queue<std::move_only_function<void()>> m_CompletionActions;
+		std::queue<function_t<void()>> m_Jobs;
+		std::queue<function_t<void()>> m_CompletionActions;
 		std::atomic<bool> m_StopRequested = false;
 
 	public:
 		RenderThread(SharedPtr<Graphics> graphics);
 		~RenderThread() noexcept;
 
-		void Dispatch(std::move_only_function<void()> completionAction);
+		void Add(function_t<void()> job);
+		void Dispatch(function_t<void()> completionAction);
+
 		void RequestStop();
+		void ExecuteJobs();
+
+	public:
+		static inline RenderThread* GetCurrent() { return m_Current; }
 
 	private:
 		void ThreadProc(SharedPtr<Graphics> graphics);
 	};
 }
+
+#define ENQUEUE_RENDER_THREAD_JOB(job) ::Ayla::RenderThread::GetCurrent()->Add((job));

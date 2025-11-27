@@ -16,10 +16,6 @@ namespace Ayla
     {
         GENERATED_BODY()
 
-    public:
-        static constexpr size_t kMaxFramesInFlight = 2;
-		static constexpr size_t kMaxSwapchainImages = 3;
-
     private:
         VkInstanceRef m_Instance;
         VkPhysicalDevice m_PhysicalDevice{ nullptr };
@@ -36,10 +32,15 @@ namespace Ayla
         VkGraphics();
         virtual ~VkGraphics() noexcept override;
 
+        virtual void Dispose() noexcept override;
+        virtual RenderFeatures GetCurrentRenderFeature() noexcept override { return RenderFeatures::Vulkan; }
+
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
-        virtual void BeginRenderFrame_Implementation() override;
-        virtual void EndRenderFrame_Implementation() override;
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer_Implementation() override;  // VkCommandBuffer.cpp
+
+        virtual void BeginRenderFrame() override;
+        virtual void EndRenderFrame() override;
+        virtual void WaitForCompletion() override;
 
         VkInstance GetInstance() const noexcept { return m_Instance; }
         VkDevice GetDevice() const noexcept { return m_Device; }

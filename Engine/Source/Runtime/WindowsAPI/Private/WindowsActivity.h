@@ -28,6 +28,8 @@ namespace Ayla
 		virtual void AfterInitialize_Implementation() override;
 		virtual SharedPtr<GenericWindow> GetMainWindow_Implementation() const override;
 
+		virtual void SetTitle(String title) override;
+
 #endif
 	};
 }

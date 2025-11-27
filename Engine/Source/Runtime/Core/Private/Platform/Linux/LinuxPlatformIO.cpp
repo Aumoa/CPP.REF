@@ -9,8 +9,6 @@
 #include "AssertionMacros.h"
 #include "SystemException.h"
 #include "Threading/ThreadPool.h"
-#include "Threading/CancellationToken.h"
-#include "Threading/CancellationTokenSource.h"
 #include "Platform/PlatformCommon.h"
 #include "LinuxStandardStreamTextWriter.h"
 #include "IO/IOCompletionOverlapped.h"
@@ -37,7 +35,7 @@ namespace Ayla
         std::condition_variable m_Cond;
 
         std::mutex m_CancellationLock;
-        CancellationTokenSource m_DispatchCancel = CancellationTokenSource::Create();
+        std::stop_source m_DispatchCancel;
 
     public:
         struct scoped_sqe
@@ -76,7 +74,7 @@ namespace Ayla
         IOCompletionPort()
         {
             io_uring_queue_init((unsigned int)kUringQueueDepth, &m_Ring, 0);
-            std::thread([this]() { this->io_uring_dispatch(this->m_DispatchCancel.GetToken()); }).detach();
+            std::thread([this]() { this->io_uring_dispatch(this->m_DispatchCancel.get_token()); }).detach();
         }
 
         ~IOCompletionPort() noexcept
@@ -87,12 +85,12 @@ namespace Ayla
         bool DispatchQueuedCompletionStatus(const TimeSpan& dur) noexcept
         {
             auto lock = std::unique_lock{ m_Mutex };
-            auto cancellationToken = m_DispatchCancel.GetToken();
+            auto cancellationToken = m_DispatchCancel.get_token();
             if (m_Overlaps.empty())
             {
                 auto pred = [this, &cancellationToken]()
                 {
-                    return m_Overlaps.empty() == false || cancellationToken.IsCancellationRequested();
+                    return m_Overlaps.empty() == false || cancellationToken.stop_requested();
                 };
                 auto len = (std::chrono::nanoseconds)dur;
                 if (len == 0ns)
@@ -105,7 +103,7 @@ namespace Ayla
                 }
             }
 
-            if (m_DispatchCancel.GetToken().IsCancellationRequested())
+            if (cancellationToken.stop_requested())
             {
                 return false;
             }
@@ -134,16 +132,16 @@ namespace Ayla
         void QueueInterruptSignal() noexcept
         {
             auto lock = std::unique_lock{ m_Mutex };
-            m_DispatchCancel.Cancel();
+            m_DispatchCancel.request_stop();
             m_Cond.notify_all();
         }
         
-        void io_uring_dispatch(CancellationToken cancellationToken)
+        void io_uring_dispatch(std::stop_token cancellationToken)
         {
             while (true)
             {
                 auto lock = std::unique_lock{ m_CancellationLock };
-                if (cancellationToken.IsCancellationRequested())
+                if (cancellationToken.stop_requested())
                 {
                     break;
                 }
@@ -319,7 +317,7 @@ namespace Ayla
         {
             if (err)
             {
-                TCS.SetException(std::make_exception_ptr(SystemException(err)));
+                TCS.TrySetException<SystemException>(err);
             }
             else
             {
@@ -343,7 +341,7 @@ namespace Ayla
         {
             if (err)
             {
-                TCS.SetException(std::make_exception_ptr(SystemException(err)));
+                TCS.TrySetException<SystemException>(err);
             }
             else
             {

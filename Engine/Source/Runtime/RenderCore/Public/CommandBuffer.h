@@ -18,6 +18,8 @@ namespace Ayla
 	public:
 		virtual ~CommandBuffer() noexcept;
 
+		virtual void Dispose() noexcept = 0;
+
 		AFUNCTION()
 		virtual void BeginCommands() APURE;
 		AFUNCTION()
