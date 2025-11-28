@@ -20,6 +20,7 @@ internal class VSSolutionGenerator : Generator
     private static readonly Guid EngineRuntimeFilterGuid = Guid.Parse("87D7F3FA-72BF-49B6-EAB2-8586AF32A448");
     private static readonly Guid EngineEditorFilterGuid = Guid.Parse("F25589A2-561D-BD3C-A288-05D20D162C9C");
     private static readonly Guid ProgramFilterGuid = Guid.Parse("C39416C3-6B11-1C22-C316-84C2012A201C");
+    private static readonly Guid ThirdPartyFilterGuid = Guid.Parse("8F7D990B-004E-4DD6-8AEB-F5A78A4B3C83");
 
     public override async ValueTask GenerateAsync(Solution solution, CancellationToken cancellationToken = default)
     {
@@ -100,6 +101,7 @@ internal class VSSolutionGenerator : Generator
             WriteFilter("Runtime", EngineRuntimeFilterGuid);
             WriteFilter("Editor", EngineEditorFilterGuid);
             WriteFilter("Program", ProgramFilterGuid);
+            WriteFilter("ThirdParty", ThirdPartyFilterGuid);
             if (solution.Projects.Any(p => p.IsEngine == false))
             {
                 WriteFilter("Game", GameFilterGuid);
@@ -195,6 +197,11 @@ internal class VSSolutionGenerator : Generator
                         {
                             AddNested(mp.Decl.Guid, EngineEditorFilterGuid);
                             AddNested(mp.Decl.ScriptGuid, EngineEditorFilterGuid);
+                        }
+                        else if (directoryName.Replace('\\', '/').Contains("/ThirdParty/"))
+                        {
+                            AddNested(mp.Decl.Guid, ThirdPartyFilterGuid);
+                            AddNested(mp.Decl.ScriptGuid, ThirdPartyFilterGuid);
                         }
                         else
                         {

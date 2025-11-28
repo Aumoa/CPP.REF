@@ -47,6 +47,28 @@ public static class Terminal
         public bool IsCompletedSuccessfully => ExitCode == 0;
 
         public bool IsFailure => ExitCode != 0;
+
+        public static Output Success(string executable, string message)
+        {
+            var logs = new Log[]
+            {
+                new Log
+                {
+                    Value = message,
+                    Verbosity = Verbose.Info
+                }
+            };
+
+            return new Output
+            {
+                Executable = executable,
+                Command = string.Empty,
+                ExitCode = 0,
+                Logs = logs,
+                StdOut = logs,
+                StdErr = []
+            };
+        }
     }
 
     public enum Verbose
