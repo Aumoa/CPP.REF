@@ -46,6 +46,8 @@ namespace Ayla
 
         AFUNCTION()
         SharedPtr<CommandBuffer> GetPooledCommandBuffer();
+        AFUNCTION()
+        void ReleasePooledCommandBuffer(SharedPtr<CommandBuffer> cmd);
 
         virtual void BeginRenderFrame() = 0;
         virtual void EndRenderFrame() = 0;

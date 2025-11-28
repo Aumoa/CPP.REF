@@ -98,6 +98,7 @@ namespace Ayla
 			self = m_RenderThread.Get()
 		]()
 		{
+			commandBuffer->WaitForCompletion(TimeSpan::FromSeconds(1));
 			graphics->BeginRenderFrame();
 
 			for (auto& swapchainExt : swapchainExtensions)

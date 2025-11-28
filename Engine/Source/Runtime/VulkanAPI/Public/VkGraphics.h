@@ -16,6 +16,14 @@ namespace Ayla
     {
         GENERATED_BODY()
 
+    public:
+        template<class TBody>
+#if __cpp_lib_move_only_function
+        using function_t = std::move_only_function<TBody>;
+#else
+        using function_t = std::function<TBody>;
+#endif
+
     private:
         VkInstanceRef m_Instance;
         VkPhysicalDevice m_PhysicalDevice{ nullptr };
@@ -23,9 +31,11 @@ namespace Ayla
         VkQueue m_GraphicsQueue{ nullptr };
 		uint32_t m_GraphicsQueueFamilyIndex{ 0 };
         uint32_t m_QueueCount{ 0 };
-        std::vector<VkFence> m_Fences;
 
         std::atomic<std::size_t> m_FrameCount = 0;
+
+        std::mutex m_FenceCompletionMutex;
+		std::map<VkFence, function_t<void()>> m_FenceCompletionCallbacks;
 
     public:
         ACONSTRUCTOR()
@@ -45,13 +55,14 @@ namespace Ayla
 
         VkInstance GetInstance() const noexcept { return m_Instance; }
         VkDevice GetDevice() const noexcept { return m_Device; }
+        VkPhysicalDevice GetPhysicalDevice() const noexcept { return m_PhysicalDevice; }
         VkQueue GetGraphicsQueue() const noexcept { return m_GraphicsQueue; }
 		uint32_t GetGraphicsQueueFamilyIndex() const noexcept { return m_GraphicsQueueFamilyIndex; }
-        VkFence GetFence() const noexcept;
 
         inline size_t GetFrameNumber() const noexcept { return m_FrameCount; }
         inline size_t GetFrameIndex() const noexcept { return m_FrameCount % kMaxFramesInFlight; }
 
         PFN_vkSetDebugUtilsObjectNameEXT GetSetDebugUtilsObjectNameEXTFunction() const noexcept;
+        void AddFenceCompletionCallback(VkFence fence, function_t<void()> continuation);
     };
 }

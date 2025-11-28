@@ -5,7 +5,7 @@
 
 namespace Ayla
 {
-	VkCommandBuffer::VkCommandBuffer(VkGraphics* graphics)
+	VkCommandBuffer::VkCommandBuffer(VkGraphics* graphics, bool fence)
 		: m_Graphics{ graphics }
 	{
 		VkCommandPoolCreateInfo commandPoolCreateInfo
@@ -32,6 +32,16 @@ namespace Ayla
 
 		m_CommandBuffers.resize(VkGraphics::kMaxFramesInFlight);
 		VKR(vkAllocateCommandBuffers(graphics->GetDevice(), &commandBufferAllocInfo, m_CommandBuffers.data()));
+
+		if (fence)
+		{
+			VkFenceCreateInfo fenceCreateInfo
+			{
+				.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+				.flags = VK_FENCE_CREATE_SIGNALED_BIT
+			};
+			VKR(vkCreateFence(graphics->GetDevice(), &fenceCreateInfo, nullptr, &m_Fence));
+		}
 	}
 
 	VkCommandBuffer::~VkCommandBuffer() noexcept
@@ -41,6 +51,12 @@ namespace Ayla
 
 	void VkCommandBuffer::Dispose() noexcept
 	{
+		if (m_Fence)
+		{
+			vkDestroyFence(m_Graphics->GetDevice(), m_Fence, nullptr);
+			m_Fence = VK_NULL_HANDLE;
+		}
+
 		if (m_CommandBuffers.size() > 0)
 		{
 			vkFreeCommandBuffers(m_Graphics->GetDevice(), m_CommandPool, (uint32_t)m_CommandBuffers.size(), m_CommandBuffers.data());
@@ -56,6 +72,11 @@ namespace Ayla
 
 	void VkCommandBuffer::BeginCommands_Implementation()
 	{
+		if (m_Fence)
+		{
+			VKR(vkResetFences(m_Graphics->GetDevice(), 1, &m_Fence));
+		}
+
 		m_SignalSemaphores.clear();
 		m_WaitSemaphores.clear();
 
@@ -92,7 +113,17 @@ namespace Ayla
 		submitInfo.pWaitDstStageMask = sStages.data();
 		submitInfo.waitSemaphoreCount = (uint32_t)m_WaitSemaphores.size();
 		submitInfo.pWaitSemaphores = m_WaitSemaphores.data();
-		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, m_Graphics->GetFence()));
+		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, m_Fence));
+	}
+
+	void VkCommandBuffer::WaitForCompletion(const TimeSpan& timeout)
+	{
+		if (!m_Fence)
+		{
+			throw InvalidOperationException(TEXT("This command buffer was not created with a fence."));
+		}
+
+		VKR(vkWaitForFences(m_Graphics->GetDevice(), 1, &m_Fence, VK_TRUE, (uint64_t)timeout.GetTotalNanoseconds()));
 	}
 
 	void VkCommandBuffer::AddSignalSemaphore(VkSemaphore semaphore)
@@ -112,6 +143,6 @@ namespace Ayla
 
 	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()
 	{
-		return New<VkCommandBuffer>(this);
+		return New<VkCommandBuffer>(this, true);
 	}
 }

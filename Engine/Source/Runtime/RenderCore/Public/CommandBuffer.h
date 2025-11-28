@@ -24,5 +24,6 @@ namespace Ayla
 		virtual void BeginCommands() APURE;
 		AFUNCTION()
 		virtual void EndCommands() APURE;
+		virtual void WaitForCompletion(const TimeSpan& timeout) = 0;
 	};
 }

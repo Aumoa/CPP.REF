@@ -30,4 +30,10 @@ namespace Ayla
             return cmd;
         }
     }
+
+    void Graphics::ReleasePooledCommandBuffer(SharedPtr<CommandBuffer> cmd)
+    {
+        std::unique_lock lock(m_PooledCommandBufferMutex);
+        m_PooledCommandBuffers.emplace_back(std::move(cmd));
+    }
 }

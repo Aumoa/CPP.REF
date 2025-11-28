@@ -161,36 +161,40 @@ namespace Ayla
             .timelineSemaphore = VK_TRUE
         };
 
+        // Enable buffer device address feature for raytracing support
+        VkPhysicalDeviceBufferDeviceAddressFeatures bufferAddressFeatures =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES,
+            .pNext = nullptr,
+            .bufferDeviceAddress = VK_TRUE,
+            .bufferDeviceAddressCaptureReplay = VK_FALSE,
+            .bufferDeviceAddressMultiDevice = VK_FALSE
+        };
+
+        // Chain timelineFeatures -> bufferAddressFeatures
+        timelineFeatures.pNext = &bufferAddressFeatures;
+
         std::vector<const char*> deviceExtensions = 
         {
             "VK_KHR_swapchain"
         };
+        // Required for buffer device address usage (raytracing support may require additional extensions)
+        deviceExtensions.emplace_back("VK_KHR_buffer_device_address");
+
         VkDeviceCreateInfo vkDeviceInfo =
         {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .pNext = &timelineFeatures,
-            .queueCreateInfoCount = (uint32_t)vkQueueInfos.size(),
-            .pQueueCreateInfos = vkQueueInfos.data(),
-            .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
-            .ppEnabledExtensionNames = deviceExtensions.data()
-        };
+             .queueCreateInfoCount = (uint32_t)vkQueueInfos.size(),
+             .pQueueCreateInfos = vkQueueInfos.data(),
+             .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
+             .ppEnabledExtensionNames = deviceExtensions.data()
+         };
 
         LogVulkan::Verbose(TEXT("Logical device created using {} physical device."), String::FromLiteral(physicalDeviceProps[0].deviceName));
         VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
         vkGetDeviceQueue(m_Device, m_GraphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
         m_PhysicalDevice = physicalDevices[0];
-
-        VkFenceCreateInfo fenceCreateInfo =
-        {
-            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
-            .flags = VK_FENCE_CREATE_SIGNALED_BIT
-		};
-
-        m_Fences.resize(kMaxFramesInFlight);
-        for (size_t i = 0; i < kMaxFramesInFlight; ++i)
-        {
-            VKR(vkCreateFence(m_Device, &fenceCreateInfo, nullptr, &m_Fences[i]));
-        }
     }
 
     VkGraphics::~VkGraphics() noexcept
@@ -202,12 +206,6 @@ namespace Ayla
     {
         m_GraphicsQueue = nullptr;
         m_PhysicalDevice = nullptr;
-
-        for (auto& fence : m_Fences)
-        {
-            vkDestroyFence(m_Device, fence, nullptr);
-        }
-        m_Fences.clear();
     }
 
     SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow)
@@ -313,11 +311,33 @@ namespace Ayla
 
     void VkGraphics::BeginRenderFrame()
     {
-        constexpr auto _1s = TimeSpan::FromSeconds(1);
+        static thread_local std::vector<function_t<void()>> s_Continuations;
+        static thread_local std::vector<decltype(m_FenceCompletionCallbacks)::iterator> s_RemoveIterators;
 
-        auto frameIndex = GetFrameIndex();
-        VKR(vkWaitForFences(m_Device, 1, &m_Fences[frameIndex], VK_TRUE, (uint64_t)_1s.GetTotalNanoseconds()));
-        VKR(vkResetFences(m_Device, 1, &m_Fences[frameIndex]));
+        std::unique_lock lock(m_FenceCompletionMutex);
+		for (auto it = m_FenceCompletionCallbacks.begin(); it != m_FenceCompletionCallbacks.end(); ++it)
+        {
+            VkResult result = vkGetFenceStatus(m_Device, it->first);
+            if (result == VK_SUCCESS)
+            {
+                s_Continuations.emplace_back(std::move(it->second));
+                s_RemoveIterators.emplace_back(std::move(it));
+            }
+        }
+
+        for (auto& it : s_RemoveIterators)
+        {
+            m_FenceCompletionCallbacks.erase(it);
+		}
+        s_RemoveIterators.clear();
+
+        lock.unlock();
+
+        for (auto& continuation : s_Continuations)
+        {
+            continuation();
+        }
+        s_Continuations.clear();
     }
 
     void VkGraphics::EndRenderFrame()
@@ -330,13 +350,14 @@ namespace Ayla
         vkDeviceWaitIdle(m_Device);
     }
 
-    VkFence VkGraphics::GetFence() const noexcept
-    {
-        return m_Fences[GetFrameIndex()];
-    }
-
     PFN_vkSetDebugUtilsObjectNameEXT VkGraphics::GetSetDebugUtilsObjectNameEXTFunction() const noexcept
     {
         return reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetDeviceProcAddr(m_Device, "vkSetDebugUtilsObjectNameEXT"));
+    }
+    
+    void VkGraphics::AddFenceCompletionCallback(VkFence fence, function_t<void()> continuation)
+    {
+        std::unique_lock lock(m_FenceCompletionMutex);
+        m_FenceCompletionCallbacks.emplace(fence, std::move(continuation));
     }
 }

@@ -21,9 +21,18 @@ namespace Ayla
 		const BufferUsage m_Usage;
 		::VkBuffer m_Buffer = VK_NULL_HANDLE;
 		VkDeviceMemory m_Memory = VK_NULL_HANDLE;
+		VkGraphics* m_Graphics = nullptr;
+		size_t m_Size = 0;
+
+	public:
+		::VkBuffer GetVkBuffer() const noexcept { return m_Buffer; }
+		VkDeviceMemory GetVkMemory() const noexcept { return m_Memory; }
+		VkDeviceAddress GetDeviceAddress() const noexcept;
 
 	public:
 		VkBuffer(VkGraphics* graphics, BufferUsage usage);
 		virtual ~VkBuffer() noexcept override;
+
+		virtual void UpdateData(std::span<const byte> buffer) override;
 	};
 }

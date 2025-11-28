@@ -17,5 +17,7 @@ namespace Ayla
 
 	public:
 		virtual ~Buffer() noexcept override;
+
+		virtual void UpdateData(std::span<const byte> buffer) = 0;
 	};
 }
