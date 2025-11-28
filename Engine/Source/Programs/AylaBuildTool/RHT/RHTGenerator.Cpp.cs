@@ -82,6 +82,21 @@ internal partial class RHTGenerator
                 WriteIndentedLine($"{{");
                 Indented(() =>
                 {
+                    for (int i = 0; i < aclass.Constructors.Count; ++i)
+                    {
+                        var constructor = aclass.Constructors[i];
+                        var parameterDeclare1 = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName + " " + p.Variable.Name));
+                        WriteIndentedLine($"::Ayla::SharedPtr<::Ayla::Object> {className}::reflexpr_class::members::constructor__{i}__{constructor.Name}({parameterDeclare1})");
+                        WriteIndentedLine($"{{");
+                        Indented(() =>
+                        {
+                            var arguments = string.Join(", ", constructor.Parameters.Select(p => p.Variable.Name));
+                            WriteIndentedLine($"return ::Ayla::Object::UnsafeNew<{aclass.Class.Name}>({arguments});");
+                        });
+                        WriteIndentedLine($"}}");
+                    }
+
+                    WriteIndentedLine($"");
                     WriteIndentedLine($"void {className}::GatherProperties(::Ayla::PropertyCollector& collector)");
                     WriteIndentedLine($"{{");
                     Indented(() =>

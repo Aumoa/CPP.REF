@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Graphics.h"  // TODO: Move function implementation of reflection to source code
 #include "Rendering/Mesh.h"
 #include "StaticMesh.gen.h"
 

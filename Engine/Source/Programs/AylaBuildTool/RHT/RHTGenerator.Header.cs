@@ -111,14 +111,7 @@ internal partial class RHTGenerator
                         Indented(() =>
                         {
                             var parameterDeclare1 = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName + " " + p.Variable.Name));
-                            headerText += IndentedMLine($"static ::Ayla::SharedPtr<::Ayla::Object> constructor__{i}__{constructor.Name}({parameterDeclare1})");
-                            headerText += IndentedMLine($"{{");
-                            Indented(() =>
-                            {
-                                var arguments = string.Join(", ", constructor.Parameters.Select(p => p.Variable.Name));
-                                headerText += IndentedMLine($"return ::Ayla::Object::UnsafeNew<{aclass.Class.Name}>({arguments});");
-                            });
-                            headerText += IndentedMLine($"}}");
+                            headerText += IndentedMLine($"static ::Ayla::SharedPtr<::Ayla::Object> constructor__{i}__{constructor.Name}({parameterDeclare1});");
                             headerText += IndentedMLine($"");
                             headerText += IndentedMLine($"static consteval auto {constructor.Name}__{i}()");
                             headerText += IndentedMLine($"{{");
