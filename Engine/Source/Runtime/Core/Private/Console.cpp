@@ -22,10 +22,10 @@ namespace Ayla
 		}
 
 		int SignalInit = +[]()
-			{
-				signal(SIGINT, BroadcastSignalInterrupt);
-				return 0;
-			}();
+		{
+			signal(SIGINT, BroadcastSignalInterrupt);
+			return 0;
+		}();
 	}
 
 	void Console::Write(String Str)

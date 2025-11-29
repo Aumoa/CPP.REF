@@ -6,7 +6,7 @@
 
 namespace Ayla
 {
-    RuntimeConstructorInfo::RuntimeConstructorInfo(std::reflect::access_type access, SharedPtr<Object>(*function)())
+    RuntimeConstructorInfo::RuntimeConstructorInfo(std::experimental::reflect::access_type access, SharedPtr<Object>(*function)())
         : m_Access(access)
         , m_Function(function)
     {
@@ -18,12 +18,12 @@ namespace Ayla
 
     bool RuntimeConstructorInfo::IsPublic() const
     {
-        return m_Access == std::reflect::access_type::public_;
+        return m_Access == std::experimental::reflect::access_type::public_;
     }
 
     bool RuntimeConstructorInfo::IsPrivate() const
     {
-        return m_Access == std::reflect::access_type::private_;
+        return m_Access == std::experimental::reflect::access_type::private_;
     }
 
     std::any RuntimeConstructorInfo::Invoke(std::any obj, std::span<std::any const> parameters) const

@@ -16,29 +16,29 @@ namespace Ayla
 	{
 	private:
 		// TODO:
-		std::reflect::access_type m_DefaultConstructorAccess = std::reflect::access_type::public_;
+		std::experimental::reflect::access_type m_DefaultConstructorAccess = std::experimental::reflect::access_type::public_;
 		SharedPtr<Object>(*m_DefaultConstructor)();
 
 	public:
 		PropertyCollector() noexcept = default;
 		PropertyCollector(const PropertyCollector&) = delete;
 
-		template<std::reflect::is_reflexpr_field T>
+		template<std::experimental::reflect::is_reflexpr_field T>
 		inline void Transfer()
 		{
 		}
 
-		template<std::reflect::is_reflexpr_method T>
+		template<std::experimental::reflect::is_reflexpr_method T>
 		inline void Transfer()
 		{
 		}
 
-		template<std::reflect::is_reflexpr_constructor T>
+		template<std::experimental::reflect::is_reflexpr_constructor T>
 		inline void Transfer()
 		{
 			if constexpr (std::invocable<typename T::function_type>)
 			{
-				m_DefaultConstructorAccess = std::reflect::get_access_v<T>;
+				m_DefaultConstructorAccess = std::experimental::reflect::get_access_v<T>;
 				m_DefaultConstructor = T::pointer;
 			}
 		}

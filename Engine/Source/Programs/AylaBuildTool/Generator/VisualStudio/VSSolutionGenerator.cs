@@ -203,6 +203,11 @@ internal class VSSolutionGenerator : Generator
                             AddNested(mp.Decl.Guid, ThirdPartyFilterGuid);
                             AddNested(mp.Decl.ScriptGuid, ThirdPartyFilterGuid);
                         }
+                        else if (directoryName.Replace('\\', '/').Contains("/Programs/"))
+                        {
+                            AddNested(mp.Decl.Guid, ProgramFilterGuid);
+                            AddNested(mp.Decl.ScriptGuid, ProgramFilterGuid);
+                        }
                         else
                         {
                             AddNested(mp.Decl.Guid, EngineRuntimeFilterGuid);

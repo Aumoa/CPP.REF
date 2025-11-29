@@ -4,7 +4,7 @@
 
 #include "String_.h"
 
-namespace std::inline experimental::reflect
+namespace std::experimental::reflect
 {
 	template<class T>
 	struct get_aliased

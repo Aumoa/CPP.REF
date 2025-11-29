@@ -14,11 +14,11 @@ namespace Ayla
     class RuntimeConstructorInfo : public ConstructorInfo
     {
     private:
-        std::reflect::access_type m_Access;
+        std::experimental::reflect::access_type m_Access;
         SharedPtr<Object>(*const m_Function)();
 
     public:
-        RuntimeConstructorInfo(std::reflect::access_type access, SharedPtr<Object>(*function)());
+        RuntimeConstructorInfo(std::experimental::reflect::access_type access, SharedPtr<Object>(*function)());
         virtual ~RuntimeConstructorInfo() noexcept override;
 
         virtual bool IsPublic() const override;

@@ -7,15 +7,15 @@
 
 namespace Ayla
 {
-	struct TransferFunction_reflexpr_field_null : public std::reflect::reflexpr_field<std::reflect::access_type::public_, int, 0>
+	struct TransferFunction_reflexpr_field_null : public std::experimental::reflect::reflexpr_field<std::experimental::reflect::access_type::public_, int, 0>
 	{
 	};
 
-	struct TransferFunction_reflexpr_method_null : public std::reflect::reflexpr_method<std::reflect::access_type::public_, void(*)(), static_cast<void(*)()>(0)>
+	struct TransferFunction_reflexpr_method_null : public std::experimental::reflect::reflexpr_method<std::experimental::reflect::access_type::public_, void(*)(), static_cast<void(*)()>(0)>
 	{
 	};
 
-	struct TransferFunction_reflexpr_constructor_null : public std::reflect::reflexpr_constructor<std::reflect::access_type::public_, void(*)(), static_cast<void(*)()>(0)>
+	struct TransferFunction_reflexpr_constructor_null : public std::experimental::reflect::reflexpr_constructor<std::experimental::reflect::access_type::public_, void(*)(), static_cast<void(*)()>(0)>
 	{
 	};
 
