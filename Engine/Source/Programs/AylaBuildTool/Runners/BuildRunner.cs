@@ -132,36 +132,40 @@ internal static partial class BuildRunner
             var resolver = project.GetResolver(buildTarget);
             List<CompileItem> allCompiles = [];
             List<CompileTask> needCompiles = [];
-            var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
 
-            foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
+            if (project.GetRule(buildTarget).Type != ModuleType.ThirdParty)
             {
-                if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
+                var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
+
+                foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
                 {
-                    var item = new CppCompiler.CompileItem
+                    if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
                     {
-                        Resolver = resolver,
-                        SourceCode = sourceCode,
-                        Descriptor = project.Group
-                    };
+                        var item = new CppCompiler.CompileItem
+                        {
+                            Resolver = resolver,
+                            SourceCode = sourceCode,
+                            Descriptor = project.Group
+                        };
 
-                    var fileName = Path.GetFileName(item.SourceCode.FilePath);
-                    var cacheFileName = Path.Combine(intDir, fileName + ".cache");
-                    var depsFileName = Path.Combine(intDir, fileName + ".deps");
-                    allCompiles.Add(item);
+                        var fileName = Path.GetFileName(item.SourceCode.FilePath);
+                        var cacheFileName = Path.Combine(intDir, fileName + ".cache");
+                        var depsFileName = Path.Combine(intDir, fileName + ".deps");
+                        allCompiles.Add(item);
 
-                    if (options.Clean != CleanOptions.Rebuild)
-                    {
-                        var cached = await SourceCodeCache.MakeCachedAsync(installation, item.SourceCode.FilePath, project.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
-                        if (File.Exists(cacheFileName) == false ||
-                            SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
+                        if (options.Clean != CleanOptions.Rebuild)
+                        {
+                            var cached = await SourceCodeCache.MakeCachedAsync(installation, item.SourceCode.FilePath, project.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
+                            if (File.Exists(cacheFileName) == false ||
+                                SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
+                            {
+                                needCompiles.Add(new CompileTask(item));
+                            }
+                        }
+                        else
                         {
                             needCompiles.Add(new CompileTask(item));
                         }
-                    }
-                    else
-                    {
-                        needCompiles.Add(new CompileTask(item));
                     }
                 }
             }
@@ -188,6 +192,9 @@ internal static partial class BuildRunner
             _ => 6
         };
 
+        // Execute CMake builds for third-party modules
+        await ExecuteCMakeBuilds();
+
         DispatchCompileWorkers();
         DispatchLinkWorkers();
         DispatchScriptCompileWorkers();
@@ -198,6 +205,28 @@ internal static partial class BuildRunner
         string MakeOutputPrefix()
         {
             return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
+        }
+
+        async Task ExecuteCMakeBuilds()
+        {
+            bool hasFailure = false;
+
+            foreach (var module in moduleTasks)
+            {
+                try
+                {
+                    await module.BuildCMakeAsync(buildTarget, cancellationToken);
+                }
+                catch (TerminalExecutionException)
+                {
+                    hasFailure = true;
+                }
+            }
+
+            if (hasFailure)
+            {
+                throw TerminateException.User();
+            }
         }
 
         async Task DispatchGenerateHeaderWorkers()
@@ -305,8 +334,16 @@ internal static partial class BuildRunner
                 {
                     moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                     {
-                        var output = r.Result;
-                        Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                        try
+                        {
+                            var output = r.Result;
+                            Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                        }
+                        catch (TerminalExecutionException e)
+                        {
+                            Console.Error.WriteLine(string.Join('\n', e.Output.Logs.Select(l => l.Value)));
+                            throw;
+                        }
                     });
                 }
                 else

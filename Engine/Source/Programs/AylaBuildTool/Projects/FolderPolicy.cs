@@ -15,6 +15,12 @@ internal static class FolderPolicy
         return PathPolicy(result, pathType);
     }
 
+    public static string Intermediate(this GroupDescriptor descriptor, string name, PlatformInfo platformInfo, PathType pathType)
+    {
+        var result = Path.Combine(descriptor.IntermediateDirectory, name, platformInfo.Name);
+        return PathPolicy(result, pathType);
+    }
+
     public static string Output(this GroupDescriptor descriptor, ITargetInfo targetInfo, PathType pathType)
     {
         var result = Path.Combine(descriptor.BinariesDirectory, targetInfo.Platform.Name, targetInfo.Config.ToString() + (targetInfo.Editor ? "-Editor" : string.Empty));

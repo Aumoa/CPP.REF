@@ -12,7 +12,7 @@ public class ModuleRules
 
     public struct ThirdPartyConfiguration
     {
-        public bool NeedConfigure { get; set; }
+        public string CMakeSource { get; set; }
     }
 
     public readonly ITargetInfo TargetInfo = ConstructorArgs.s_TargetInfo.Value
@@ -36,7 +36,14 @@ public class ModuleRules
     public IReadOnlySet<string> PublicAdditionalLibraries { get; private set; } = new HashSet<string>();
     public IReadOnlySet<string> PrivateAdditionalLibraries { get; private set; } = new HashSet<string>();
 
-    public ThirdPartyConfiguration ThirdParty;
+    public ThirdPartyConfiguration ThirdParty
+    {
+        get;
+        init;
+    } = new()
+    {
+        CMakeSource = "src"
+    };
 
     protected ModuleRules()
     {
