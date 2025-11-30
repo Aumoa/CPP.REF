@@ -19,6 +19,7 @@ namespace Ayla
 		TaskCompletionSource(std::shared_ptr<SharedTask<T>> task)
 			: m_Task(std::move(task))
 		{
+			m_Task->TransitToRunning();
 		}
 
 	public:

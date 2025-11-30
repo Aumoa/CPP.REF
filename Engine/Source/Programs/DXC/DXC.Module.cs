@@ -7,10 +7,11 @@ public class DXC : ModuleRules
 {
     public DXC()
     {
-        Script.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core");
         Type = ModuleType.Application;
+
+        AddPrivateAdditionalLibraries("dxcompiler.lib");
     }
 }

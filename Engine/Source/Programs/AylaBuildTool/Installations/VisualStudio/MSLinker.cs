@@ -83,7 +83,8 @@ internal class MSLinker : Linker
             m_CommandBuilder.AppendFormat("\"{0}\" ", additionalLibrary);
         }
 
-        var result = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+        var commandParameters = m_CommandBuilder.ToString();
+        var result = await Terminal.ExecuteCommandAsync(commandParameters, options, cancellationToken);
         if (result.IsCompletedSuccessfully && ((result.StdOut.Length == 0 && result.Logs.Length == 0) || (result.StdOut.Length == 1 && result.Logs.Length == 1 && string.IsNullOrWhiteSpace(result.StdOut[0].Value))))
         {
             Terminal.Log[] outputs =
@@ -95,11 +96,7 @@ internal class MSLinker : Linker
                 }
             ];
 
-            result = result with
-            {
-                StdOut = outputs,
-                Logs = outputs
-            };
+            result = result.Replace(outputs);
         }
 
         return result;

@@ -69,6 +69,36 @@ public static class Terminal
                 StdErr = []
             };
         }
+
+        public Output AppendFirst(params Log[] logs)
+        {
+            return this with
+            {
+                Logs = [.. logs, .. Logs],
+                StdOut = [.. logs.Where(l => l.Verbosity is Verbose.Info or Verbose.Warning), .. StdOut],
+                StdErr = [.. logs.Where(l => l.Verbosity is Verbose.Error or Verbose.Critical), .. StdErr]
+            };
+        }
+
+        public Output AppendLast(params Log[] logs)
+        {
+            return this with
+            {
+                Logs = [.. Logs, .. logs],
+                StdOut = [.. StdOut, .. logs.Where(l => l.Verbosity is Verbose.Info or Verbose.Warning)],
+                StdErr = [.. StdErr, .. logs.Where(l => l.Verbosity is Verbose.Error or Verbose.Critical)]
+            };
+        }
+
+        public Output Replace(params Log[] logs)
+        {
+            return this with
+            {
+                Logs = [.. logs],
+                StdOut = [.. logs.Where(l => l.Verbosity is Verbose.Info or Verbose.Warning)],
+                StdErr = [.. logs.Where(l => l.Verbosity is Verbose.Error or Verbose.Critical)]
+            };
+        }
     }
 
     public enum Verbose
