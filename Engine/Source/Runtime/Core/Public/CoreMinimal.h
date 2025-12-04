@@ -51,6 +51,8 @@
 #include "ConstructorNotFoundException.h"
 #include "ObjectDisposedException.h"
 #include "MemberAccessException.h"
+#include "TaskCanceledException.h"
+#include "AggregateException.h"
 #include "Object.h"
 #include "Type.h"
 #include "try_finally.h"

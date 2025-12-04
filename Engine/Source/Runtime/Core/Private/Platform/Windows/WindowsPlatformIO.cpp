@@ -146,7 +146,7 @@ namespace Ayla
 	void WindowsPlatformIO::OpenFileHandle(void*& Handle, String InFilename, FileMode InFileMode, FileAccessMode InAccessMode, FileSharedMode InSharedMode) noexcept
 	{
 		HANDLE hFile = CreateFileW(InFilename.c_str(), (DWORD)InAccessMode, (DWORD)InSharedMode, NULL, (DWORD)InFileMode, FILE_FLAG_OVERLAPPED, NULL);
-		if (hFile == NULL)
+		if (hFile == INVALID_HANDLE_VALUE)
 		{
 			Handle = nullptr;
 			return;

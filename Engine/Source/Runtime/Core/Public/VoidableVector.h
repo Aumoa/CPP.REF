@@ -17,6 +17,9 @@ namespace Ayla
 		{
 		}
 
+		constexpr VoidableVector(const VoidableVector&) = default;
+		constexpr VoidableVector(VoidableVector&&) = default;
+
 		constexpr VoidableVector& operator =(const VoidableVector& R) const noexcept(noexcept(std::declval<std::vector<T>&>() = std::declval<const std::vector<T>&>()))
 		{
 			std::vector<T>::operator =(R);

@@ -6,7 +6,7 @@
 #include "Threading/SynchronizationContext.h"
 #include "Threading/Tasks/TaskStatus.h"
 #include "InvalidOperationException.h"
-#include "OperationCanceledException.h"
+#include "TaskCanceledException.h"
 #include <functional>
 #include <mutex>
 #include <condition_variable>
@@ -39,6 +39,9 @@ namespace Ayla
 
 		TaskStatus m_Status = TaskStatus::Created;
 		std::exception_ptr m_ExceptionPtr;
+
+		std::stop_token m_StoppedToken;
+		std::source_location m_StoppedLocation;
 
 		std::vector<std::tuple<function_t<void()>, SynchronizationContext*>> m_Continuations;
 		std::optional<std::stop_callback<function_t<void()>>> m_Cancellation;
@@ -114,6 +117,10 @@ namespace Ayla
 			{
 				std::rethrow_exception(m_ExceptionPtr);
 			}
+			else if (m_Status == TaskStatus::Canceled)
+			{
+				throw TaskCanceledException(m_StoppedToken, m_StoppedLocation);
+			}
 		}
 
 		void SetResult()
@@ -130,7 +137,7 @@ namespace Ayla
 			UnlockAndInvokeContinuations(lock);
 		}
 
-		bool TryCancel() noexcept
+		bool TryCancel(std::stop_token stoppingToken = {}, std::source_location src = std::source_location::current()) noexcept
 		{
 			std::unique_lock lock(m_Mutex);
 			if (IsCompleted())
@@ -140,7 +147,9 @@ namespace Ayla
 
 			check(m_Status == TaskStatus::Running || m_Status == TaskStatus::Created);
 			m_Status = TaskStatus::Canceled;
-			m_ExceptionPtr = std::make_exception_ptr(OperationCanceledException());
+			
+			m_StoppedToken = stoppingToken;
+			m_StoppedLocation = src;
 
 			UnlockAndInvokeContinuations(lock);
 			return true;

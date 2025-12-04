@@ -7,7 +7,10 @@
 #include "Threading/Tasks/PromiseType.h"
 #include "Threading/Tasks/YieldAwaitable.h"
 #include "Threading/Tasks/ConfiguredTaskAwaitable.h"
+#include "VoidableVector.h"
+#include "AggregateException.h"
 #include <memory>
+#include <ranges>
 
 namespace Ayla
 {
@@ -107,9 +110,9 @@ namespace Ayla
 				}
 				catch (...)
 				{
-					otherTask->SetException(std::current_exception());
+					otherTask->TrySetException(std::current_exception());
 				}
-			});
+			}, false);
 
 			return Task<U>(std::move(otherTask));
 		}
@@ -276,6 +279,91 @@ namespace Ayla
 			task->TransitToRunning();
 			task->SetResult(std::move(value));
 			return Task<U>(task);
+		}
+
+		template<std::ranges::input_range IR>
+		static auto WhenAll(IR&& tasks) requires std::convertible_to<std::ranges::range_value_t<IR>, Task<>>
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+
+			using VT = std::ranges::range_value_t<IR>;
+			using V = typename VT::ValueType;
+
+			struct State
+			{
+				size_t m_SizeResult;
+				std::atomic<size_t> m_SizeCompleted;
+				VoidableVector<V> m_Results;
+				std::vector<std::exception_ptr> m_Exceptions;
+				std::shared_ptr<SharedTask<VoidableVector<V>>> m_Task;
+			};
+
+			auto state = std::make_shared<State>();
+			state->m_Task = std::make_shared<SharedTask<VoidableVector<V>>>();
+			state->m_SizeResult = std::ranges::size(tasks);
+			state->m_Results.resize(state->m_SizeResult);
+			state->m_Exceptions.resize(state->m_SizeResult);
+			state->m_Task->TransitToRunning();
+			size_t i = 0;
+			for (auto& task : tasks)
+			{
+				std::ignore = task.ContinueWith([state, l = i++](auto t)
+				{
+					if (t.IsCompletedSuccessfully())
+					{
+						if constexpr (!std::is_void_v<V>)
+						{
+							state->m_Results[l] = t.GetResult();
+						}
+					}
+					else if (t.IsCanceled())
+					{
+						state->m_Exceptions[l] = std::make_exception_ptr(TaskCanceledException());
+					}
+					else
+					{
+						state->m_Exceptions[l] = t.GetException();
+					}
+
+					if (++state->m_SizeCompleted == state->m_SizeResult)
+					{
+						std::vector<std::exception_ptr> innerExceptions;
+						for (auto& exception : state->m_Exceptions)
+						{
+							if (exception)
+							{
+								innerExceptions.emplace_back(std::move(exception));
+							}
+						}
+
+						if (!innerExceptions.empty())
+						{
+							state->m_Task->TrySetException(std::make_exception_ptr(AggregateException(std::move(innerExceptions))));
+						}
+						else
+						{
+							state->m_Task->SetResult(std::move(state->m_Results));
+						}
+					}
+				});
+			}
+
+			return Task<VoidableVector<V>>(state->m_Task).ContinueWith([state](auto p)
+			{
+				if constexpr (!std::is_void_v<V>)
+				{
+					return std::vector<V>(p.GetResult());
+				}
+			});
+		}
+
+		template<class IR>
+		static auto WhenAll(IR&& tasks) requires std::convertible_to<std::ranges::range_value_t<IR>, Task<>> && (!std::ranges::sized_range<IR>)
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+
+			auto v = std::ranges::to<std::vector>(std::forward<IR>(tasks));
+			return WhenAll(std::move(v));
 		}
 	};
 
