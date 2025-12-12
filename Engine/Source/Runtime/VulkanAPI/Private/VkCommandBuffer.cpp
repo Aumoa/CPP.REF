@@ -40,7 +40,12 @@ namespace Ayla
 				.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
 				.flags = VK_FENCE_CREATE_SIGNALED_BIT
 			};
-			VKR(vkCreateFence(graphics->GetDevice(), &fenceCreateInfo, nullptr, &m_Fence));
+
+			m_Fences.resize(VkGraphics::kMaxFramesInFlight);
+			for (size_t i = 0; i < VkGraphics::kMaxFramesInFlight; ++i)
+			{
+				VKR(vkCreateFence(graphics->GetDevice(), &fenceCreateInfo, nullptr, &m_Fences[i]));
+			}
 		}
 	}
 
@@ -51,11 +56,11 @@ namespace Ayla
 
 	void VkCommandBuffer::Dispose() noexcept
 	{
-		if (m_Fence)
+		for (auto& fence : m_Fences)
 		{
-			vkDestroyFence(m_Graphics->GetDevice(), m_Fence, nullptr);
-			m_Fence = VK_NULL_HANDLE;
+			vkDestroyFence(m_Graphics->GetDevice(), fence, nullptr);
 		}
+		m_Fences.clear();
 
 		if (m_CommandBuffers.size() > 0)
 		{
@@ -72,9 +77,11 @@ namespace Ayla
 
 	void VkCommandBuffer::BeginCommands_Implementation()
 	{
-		if (m_Fence)
+		auto frameIndex = m_Graphics->GetFrameIndex();
+
+		if (m_Fences.size() > 0)
 		{
-			VKR(vkResetFences(m_Graphics->GetDevice(), 1, &m_Fence));
+			VKR(vkResetFences(m_Graphics->GetDevice(), 1, &m_Fences[frameIndex]));
 		}
 
 		m_SignalSemaphores.clear();
@@ -85,7 +92,6 @@ namespace Ayla
 			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
 		};
 
-		auto frameIndex = m_Graphics->GetFrameIndex();
 		auto commandBuffer = m_CommandBuffers[frameIndex];
 
 		vkResetCommandBuffer(commandBuffer, 0);
@@ -113,17 +119,19 @@ namespace Ayla
 		submitInfo.pWaitDstStageMask = sStages.data();
 		submitInfo.waitSemaphoreCount = (uint32_t)m_WaitSemaphores.size();
 		submitInfo.pWaitSemaphores = m_WaitSemaphores.data();
-		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, m_Fence));
+		auto fence = m_Fences.size() > 0 ? m_Fences[frameIndex] : VK_NULL_HANDLE;
+		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, fence));
 	}
 
 	void VkCommandBuffer::WaitForCompletion(const TimeSpan& timeout)
 	{
-		if (!m_Fence)
+		if (m_Fences.empty())
 		{
 			throw InvalidOperationException(TEXT("This command buffer was not created with a fence."));
 		}
 
-		VKR(vkWaitForFences(m_Graphics->GetDevice(), 1, &m_Fence, VK_TRUE, (uint64_t)timeout.GetTotalNanoseconds()));
+		auto frameIndex = m_Graphics->GetFrameIndex();
+		VKR(vkWaitForFences(m_Graphics->GetDevice(), 1, &m_Fences[frameIndex], VK_TRUE, (uint64_t)timeout.GetTotalNanoseconds()));
 	}
 
 	void VkCommandBuffer::AddSignalSemaphore(VkSemaphore semaphore)
@@ -139,6 +147,11 @@ namespace Ayla
 	::VkCommandBuffer VkCommandBuffer::GetVkCommandBuffer() const noexcept
 	{
 		return m_CommandBuffers[m_Graphics->GetFrameIndex()];
+	}
+
+	VkFence VkCommandBuffer::GetFence() const noexcept
+	{
+		return m_Fences[m_Graphics->GetFrameIndex()];
 	}
 
 	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()

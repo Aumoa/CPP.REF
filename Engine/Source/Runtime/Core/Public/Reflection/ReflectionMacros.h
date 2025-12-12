@@ -44,7 +44,7 @@ public: \
 	static constexpr void Transfer(F&& transfer) \
 	{ \
 		using class_t = reflexpr(This); \
-		using members_t = std::reflect::get_data_members_t<class_t>; \
+		using members_t = std::experimental::reflect::get_data_members_t<class_t>; \
 		Transfer2(std::forward<F>(transfer), std::make_index_sequence<std::tuple_size_v<members_t>>{}); \
 	} \
 	\
@@ -54,7 +54,7 @@ public: \
 		if constexpr (sizeof...(I) > 0) \
 		{ \
 			using class_t = reflexpr(This); \
-			using members_t = std::reflect::get_data_members_t<class_t>; \
+			using members_t = std::experimental::reflect::get_data_members_t<class_t>; \
 			((transfer.template Transfer<std::tuple_element_t<I, members_t>>(), 0) + ...); \
 		} \
 	}

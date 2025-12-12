@@ -23,7 +23,7 @@ namespace Ayla
 		std::vector<VkSemaphore> m_SignalSemaphores;
 		std::vector<VkSemaphore> m_WaitSemaphores;
 		bool m_HasBegun{ false };
-		VkFence m_Fence = VK_NULL_HANDLE;
+		std::vector<VkFence> m_Fences;
 
 	public:
 		VkCommandBuffer(VkGraphics* graphics, bool fence);
@@ -39,6 +39,6 @@ namespace Ayla
 		void AddWaitSemaphore(VkSemaphore semaphore);
 
 		::VkCommandBuffer GetVkCommandBuffer() const noexcept;
-		VkFence GetFence() const noexcept { return m_Fence; }
+		VkFence GetFence() const noexcept;
 	};
 }
