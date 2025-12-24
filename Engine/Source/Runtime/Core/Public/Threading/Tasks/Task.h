@@ -340,6 +340,32 @@ namespace Ayla
 			auto v = std::ranges::to<std::vector>(std::forward<IR>(tasks));
 			return WhenAll(std::move(v));
 		}
+
+		template<class... Tasks>
+		static Task<> WhenAll(Tasks&&... tasks) requires (std::convertible_to<Tasks, Task<>> && ...)
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+			
+			std::vector<Task<>> taskVector;
+			taskVector.reserve(sizeof...(Tasks));
+			(taskVector.push_back(std::forward<Tasks>(tasks)), ...);
+			
+			return WhenAll(std::move(taskVector));
+		}
+
+		template<class U, class... Tasks>
+		static Task<std::vector<U>> WhenAll(Task<U> first, Tasks&&... rest) 
+			requires ((std::same_as<Tasks, Task<U>> && ...) && !std::same_as<U, void>)
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
+			
+			std::vector<Task<U>> taskVector;
+			taskVector.reserve(1 + sizeof...(Tasks));
+			taskVector.push_back(std::move(first));
+			(taskVector.push_back(std::forward<Tasks>(rest)), ...);
+			
+			return WhenAll(std::move(taskVector));
+		}
 	};
 
 	template<class T>
