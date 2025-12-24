@@ -109,9 +109,10 @@ namespace Ayla
 			using U = std::invoke_result_t<TBody, Task>;
 			check(IsValid());
 			std::shared_ptr otherTask = std::make_shared<SharedTask<U>>(cancellationToken);
-			otherTask->TransitToRunning();
 			m_Task->ContinueWith([continuationBody = std::forward<TBody>(continuationBody), selfTask = m_Task, otherTask]() mutable
 			{
+				otherTask->TransitToRunning();
+
 				try
 				{
 					if constexpr (std::same_as<U, void>)
@@ -460,6 +461,82 @@ namespace Ayla
 			(taskVector.push_back(std::forward<Tasks>(rest)), ...);
 			
 			return WhenAny(std::move(taskVector));
+		}
+
+		// Unwrap for Task<Task<T>> ¡æ Task<T>
+		template<class U = T>
+		auto Unwrap() const -> Task<typename U::ValueType>
+			requires std::same_as<U, Task<typename U::ValueType>>
+		{
+			using InnerType = typename U::ValueType;
+			
+			check(IsValid());
+			
+			// Create result task
+			std::shared_ptr<SharedTask<InnerType>> resultTask = std::make_shared<SharedTask<InnerType>>();
+			
+			// Handle outer task completion
+			std::ignore = this->ContinueWith([resultTask](Task<Task<InnerType>> outerTask)
+			{
+				resultTask->TransitToRunning();
+
+				try
+				{
+					// Check outer task status
+					if (outerTask.IsCanceled())
+					{
+						resultTask->TryCancel();
+						return;
+					}
+					
+					if (outerTask.IsFaulted())
+					{
+						resultTask->TrySetException(outerTask.GetException());
+						return;
+					}
+					
+					// Get inner task
+					Task<InnerType> innerTask = outerTask.GetResult();
+					
+					// Handle inner task completion
+					std::ignore = innerTask.ContinueWith([resultTask](Task<InnerType> inner)
+					{
+						try
+						{
+							if (inner.IsCanceled())
+							{
+								resultTask->TryCancel();
+							}
+							else if (inner.IsFaulted())
+							{
+								resultTask->TrySetException(inner.GetException());
+							}
+							else
+							{
+								if constexpr (std::same_as<InnerType, void>)
+								{
+									inner.GetResult();  // Ensure completion
+									resultTask->SetResult();
+								}
+								else
+								{
+									resultTask->SetResult(inner.GetResult());
+								}
+							}
+						}
+						catch (...)
+						{
+							resultTask->TrySetException(std::current_exception());
+						}
+					});
+				}
+				catch (...)
+				{
+					resultTask->TrySetException(std::current_exception());
+				}
+			});
+			
+			return Task<InnerType>(resultTask, (short)0);
 		}
 	};
 
