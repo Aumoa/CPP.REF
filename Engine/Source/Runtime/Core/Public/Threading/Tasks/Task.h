@@ -366,7 +366,7 @@ namespace Ayla
 			
 			std::vector<Task<>> taskVector;
 			taskVector.reserve(sizeof...(Tasks));
-			(taskVector.push_back(std::forward<Tasks>(tasks)), ...);
+			(taskVector.emplace_back(std::forward<Tasks>(tasks)), ...);
 			
 			return WhenAll(std::move(taskVector));
 		}
@@ -379,8 +379,8 @@ namespace Ayla
 			
 			std::vector<Task<U>> taskVector;
 			taskVector.reserve(1 + sizeof...(Tasks));
-			taskVector.push_back(std::move(first));
-			(taskVector.push_back(std::forward<Tasks>(rest)), ...);
+			taskVector.emplace_back(std::move(first));
+			(taskVector.emplace_back(std::forward<Tasks>(rest)), ...);
 			
 			return WhenAll(std::move(taskVector));
 		}
@@ -408,7 +408,7 @@ namespace Ayla
 			// Store original tasks for result
 			for (auto& task : tasks)
 			{
-				state->m_OriginalTasks.push_back(task);
+				state->m_OriginalTasks.emplace_back(task);
 			}
 
 			for (auto& task : state->m_OriginalTasks)
@@ -444,7 +444,7 @@ namespace Ayla
 			
 			std::vector<Task<>> taskVector;
 			taskVector.reserve(sizeof...(Tasks));
-			(taskVector.push_back(std::forward<Tasks>(tasks)), ...);
+			(taskVector.emplace_back(std::forward<Tasks>(tasks)), ...);
 			
 			return WhenAny(std::move(taskVector));
 		}
@@ -457,8 +457,8 @@ namespace Ayla
 			
 			std::vector<Task<U>> taskVector;
 			taskVector.reserve(1 + sizeof...(Tasks));
-			taskVector.push_back(std::move(first));
-			(taskVector.push_back(std::forward<Tasks>(rest)), ...);
+			taskVector.emplace_back(std::move(first));
+			(taskVector.emplace_back(std::forward<Tasks>(rest)), ...);
 			
 			return WhenAny(std::move(taskVector));
 		}
