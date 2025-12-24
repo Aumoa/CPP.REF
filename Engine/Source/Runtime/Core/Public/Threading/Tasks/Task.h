@@ -14,6 +14,8 @@
 
 namespace Ayla
 {
+	class TaskFactory;
+
 	template<class T = void>
 	class [[nodiscard]] Task
 	{
@@ -201,39 +203,12 @@ namespace Ayla
 		bool operator ==(const Task&) const = default;
 
 	public:
+		// TaskFactory.h
+		static std::shared_ptr<TaskFactory> GetFactory();
+
+		// TaskFactory.h
 		template<class TBody>
-		static auto Run(TBody&& continuationBody, std::stop_token cancellationToken = {}) -> Task<std::invoke_result_t<TBody>>
-		{
-			static_assert(std::same_as<T, void>, "Use Task<>::Run instead.");
-
-			using U = std::invoke_result_t<TBody>;
-			std::shared_ptr task = std::make_shared<SharedTask<U>>(cancellationToken);
-			task->TransitToRunning();
-
-			ThreadPool::QueueUserWorkItem([task, continuationBody = std::forward<TBody>(continuationBody)]() mutable
-			{
-				try
-				{
-					if constexpr (std::same_as<U, void>)
-					{
-						continuationBody();
-						task->SetResult();
-					}
-					else
-					{
-						U result = continuationBody();
-						task->SetResult(std::move(result));
-					}
-				}
-				catch (...)
-				{
-					bool b = task->TrySetException(std::current_exception());
-					check(b);
-				}
-			});
-
-			return Task<U>(std::move(task));
-		}
+		static auto Run(TBody&& continuationBody, std::stop_token cancellationToken = {}) -> Task<std::invoke_result_t<TBody>>;
 
 		static YieldAwaitable Yield()
 		{
