@@ -3,14 +3,29 @@
 #pragma once
 
 #include "Threading/ThreadPool.h"
+#include "Threading/Tasks/TaskStatus.h"
 #include "Threading/Tasks/TaskAwaiter.h"
 #include "Threading/Tasks/PromiseType.h"
 #include "Threading/Tasks/YieldAwaitable.h"
 #include "Threading/Tasks/ConfiguredTaskAwaitable.h"
+#include "Threading/Tasks/SharedTask.h"
+#include "IntegralTypes.h"
 #include "VoidableVector.h"
 #include "AggregateException.h"
+#include "TaskCanceledException.h"
+#include "AssertionMacros.h"
 #include <memory>
 #include <ranges>
+#include <concepts>
+#include <utility>
+#include <algorithm>
+#include <exception>
+#include <type_traits>
+#include <stop_token>
+#include <chrono>
+#include <vector>
+#include <atomic>
+#include <tuple>
 
 namespace Ayla
 {
@@ -36,7 +51,7 @@ namespace Ayla
 		template<class U>
 		explicit Task(std::shared_ptr<U> task) requires
 			std::constructible_from<Task, std::shared_ptr<U>, int>
-			: Task(task, 0)
+			: Task(std::move(task), 0)
 		{
 		}
 
@@ -284,6 +299,7 @@ namespace Ayla
 			{
 				std::ignore = task.ContinueWith([state, l = i++](auto t)
 				{
+					// Collect results or exceptions from each task
 					if (t.IsCompletedSuccessfully())
 					{
 						if constexpr (!std::is_void_v<V>)
@@ -300,6 +316,7 @@ namespace Ayla
 						state->m_Exceptions[l] = t.GetException();
 					}
 
+					// All tasks completed - set final result
 					if (++state->m_SizeCompleted == state->m_SizeResult)
 					{
 						std::vector<std::exception_ptr> innerExceptions;
@@ -365,6 +382,84 @@ namespace Ayla
 			(taskVector.push_back(std::forward<Tasks>(rest)), ...);
 			
 			return WhenAll(std::move(taskVector));
+		}
+
+		template<std::ranges::input_range IR>
+		static auto WhenAny(IR&& tasks) requires std::convertible_to<std::ranges::range_value_t<IR>, Task<>>
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
+
+			using VT = std::ranges::range_value_t<IR>;
+			using V = typename VT::ValueType;
+
+			struct State
+			{
+				std::atomic<bool> m_Completed;
+				std::shared_ptr<SharedTask<VT>> m_Task;
+				std::vector<VT> m_OriginalTasks;
+			};
+
+			auto state = std::make_shared<State>();
+			state->m_Task = std::make_shared<SharedTask<VT>>();
+			state->m_Completed = false;
+			state->m_Task->TransitToRunning();
+
+			// Store original tasks for result
+			for (auto& task : tasks)
+			{
+				state->m_OriginalTasks.push_back(task);
+			}
+
+			for (auto& task : state->m_OriginalTasks)
+			{
+				std::ignore = task.ContinueWith([state](auto t)
+				{
+					// Only the first completed task sets the result
+					bool expected = false;
+					if (state->m_Completed.compare_exchange_strong(expected, true))
+					{
+						// WhenAny returns the completed task itself, not unwrapping exceptions
+						state->m_Task->SetResult(t);
+					}
+				});
+			}
+
+			return Task<VT>(state->m_Task);
+		}
+
+		template<class IR>
+		static auto WhenAny(IR&& tasks) requires std::convertible_to<std::ranges::range_value_t<IR>, Task<>> && (!std::ranges::sized_range<IR>)
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
+
+			auto v = std::ranges::to<std::vector>(std::forward<IR>(tasks));
+			return WhenAny(std::move(v));
+		}
+
+		template<class... Tasks>
+		static Task<Task<>> WhenAny(Tasks&&... tasks) requires (std::convertible_to<Tasks, Task<>> && ...)
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAny statt.");
+			
+			std::vector<Task<>> taskVector;
+			taskVector.reserve(sizeof...(Tasks));
+			(taskVector.push_back(std::forward<Tasks>(tasks)), ...);
+			
+			return WhenAny(std::move(taskVector));
+		}
+
+		template<class U, class... Tasks>
+		static Task<Task<U>> WhenAny(Task<U> first, Tasks&&... rest) 
+			requires ((std::same_as<Tasks, Task<U>> && ...) && !std::same_as<U, void>)
+		{
+			static_assert(std::same_as<T, void>, "Use Task<>::WhenAny statt.");
+			
+			std::vector<Task<U>> taskVector;
+			taskVector.reserve(1 + sizeof...(Tasks));
+			taskVector.push_back(std::move(first));
+			(taskVector.push_back(std::forward<Tasks>(rest)), ...);
+			
+			return WhenAny(std::move(taskVector));
 		}
 	};
 
