@@ -5,6 +5,7 @@
 #include "Threading/ThreadPool.h"
 #include "Threading/SynchronizationContext.h"
 #include "Threading/Tasks/TaskStatus.h"
+#include "Threading/Tasks/TaskCreationOptions.h"
 #include "InvalidOperationException.h"
 #include "TaskCanceledException.h"
 #include <functional>
@@ -46,6 +47,7 @@ namespace Ayla
 
 		TaskStatus m_Status = TaskStatus::Created;
 		std::exception_ptr m_ExceptionPtr;
+		TaskCreationOptions m_Options = TaskCreationOptions::None;
 		SharedTask<>::function_t<void()> m_Scheduled;
 
 		std::stop_token m_StoppedToken;
@@ -79,9 +81,14 @@ namespace Ayla
 			m_Status = TaskStatus::Running;
 		}
 
-		TaskStatus GetStatus() const noexcept
+		inline TaskStatus GetStatus() const noexcept
 		{
 			return m_Status;
+		}
+
+		inline TaskCreationOptions GetOptions() const noexcept
+		{
+			return m_Options;
 		}
 
 		void ContinueWith(function_t<void()> continuation, bool continueOnCapturedContext) noexcept

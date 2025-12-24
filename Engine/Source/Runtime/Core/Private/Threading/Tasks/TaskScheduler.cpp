@@ -3,6 +3,7 @@
 #include "Threading/Tasks/TaskScheduler.h"
 #include "Threading/Tasks/ThreadPoolTaskScheduler.h"
 #include "Threading/SynchronizationContext.h"
+#include <thread>
 
 namespace Ayla
 {
@@ -39,5 +40,18 @@ namespace Ayla
 		g_CurrentTaskScheduler = shared_from_this();
 		std::exchange(shared->m_Scheduled, {})();
 		g_CurrentTaskScheduler = nullptr;
+	}
+
+	void TaskScheduler::QueueTaskOnDedicatedThread(Task<> task)
+	{
+		// Create a dedicated thread for long-running tasks
+		// This bypasses the ThreadPool to avoid thread starvation
+		std::thread dedicatedThread([this, self = shared_from_this(), task = std::move(task)]() mutable
+		{
+			TryExecuteTask(std::move(task));
+		});
+
+		// Detach the thread so it runs independently
+		dedicatedThread.detach();
 	}
 }

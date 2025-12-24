@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "Platform/PlatformMacros.h"
 #include "Threading/Tasks/Task.h"
+#include "Threading/Tasks/TaskCreationOptions.h"
 #include <memory>
 
 namespace Ayla
@@ -22,9 +22,16 @@ namespace Ayla
 		template<class TBody>
 		auto StartNew(TBody&& continuationBody, std::stop_token cancellationToken = {}) -> Task<std::invoke_result_t<TBody>>
 		{
+			return StartNew(std::forward<TBody>(continuationBody), TaskCreationOptions::None, cancellationToken);
+		}
+
+		template<class TBody>
+		auto StartNew(TBody&& continuationBody, TaskCreationOptions creationOptions, std::stop_token cancellationToken = {}) -> Task<std::invoke_result_t<TBody>>
+		{
 			using U = std::invoke_result_t<TBody>;
 			std::shared_ptr task = std::make_shared<SharedTask<U>>(cancellationToken);
 
+			task->m_Options = creationOptions;
 			task->m_Scheduled = [sharedTask = task, continuationBody = std::forward<TBody>(continuationBody)]() mutable
 			{
 				sharedTask->TransitToRunning();
@@ -50,6 +57,8 @@ namespace Ayla
 			};
 
 			auto wrapped = Task<U>(std::move(task));
+
+			// Delegate to TaskScheduler - it will handle LongRunning option
 			QueueTask(wrapped);
 			return wrapped;
 		}

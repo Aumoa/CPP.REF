@@ -23,5 +23,8 @@ namespace Ayla
 		virtual void QueueTask(Task<> task) = 0;
 
 		void TryExecuteTask(Task<> task);
+
+		// Helper method to create dedicated thread for LongRunning tasks
+		void QueueTaskOnDedicatedThread(Task<> task);
 	};
 }
