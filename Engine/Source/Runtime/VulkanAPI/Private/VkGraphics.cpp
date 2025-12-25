@@ -171,8 +171,26 @@ namespace Ayla
             .bufferDeviceAddressMultiDevice = VK_FALSE
         };
 
-        // Chain timelineFeatures -> bufferAddressFeatures
+        // Enable raytracing pipeline features
+        VkPhysicalDeviceRayTracingPipelineFeaturesKHR raytracingPipelineFeatures =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR,
+            .pNext = nullptr,
+            .rayTracingPipeline = VK_TRUE
+        };
+
+        // Enable acceleration structure features
+        VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR,
+            .pNext = nullptr,
+            .accelerationStructure = VK_TRUE
+        };
+
+        // Chain features: timelineFeatures -> bufferAddressFeatures -> raytracingPipelineFeatures -> accelerationStructureFeatures
         timelineFeatures.pNext = &bufferAddressFeatures;
+        bufferAddressFeatures.pNext = &raytracingPipelineFeatures;
+        raytracingPipelineFeatures.pNext = &accelerationStructureFeatures;
 
         std::vector<const char*> deviceExtensions = 
         {
@@ -180,6 +198,10 @@ namespace Ayla
         };
         // Required for buffer device address usage (raytracing support may require additional extensions)
         deviceExtensions.emplace_back("VK_KHR_buffer_device_address");
+        // Raytracing extensions
+        deviceExtensions.emplace_back("VK_KHR_acceleration_structure");
+        deviceExtensions.emplace_back("VK_KHR_ray_tracing_pipeline");
+        deviceExtensions.emplace_back("VK_KHR_deferred_host_operations");
 
         VkDeviceCreateInfo vkDeviceInfo =
         {
