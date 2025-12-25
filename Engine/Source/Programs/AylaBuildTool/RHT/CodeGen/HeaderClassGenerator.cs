@@ -53,17 +53,6 @@ internal class HeaderClassGenerator
             }
         });
         m_Parent.HeaderText += m_Parent.IndentedLine("}");
-
-        GenerateReflexprClassDefinition(@class, friends);
-    }
-
-    private void GenerateReflexprClassDefinition(ClassName @class, List<string> friends)
-    {
-        // Store friends for later use in macro
-        m_Class.Class.GetType().GetField("Friends", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?.SetValue(m_Class.Class, friends);
-        
-        // We'll use friends list in the macro generation
     }
 
     private void GenerateReflexprClassMacro(int lineNumber, string scope, string className, ClassName @class)

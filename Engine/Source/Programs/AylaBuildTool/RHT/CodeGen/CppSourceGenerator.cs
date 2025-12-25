@@ -25,7 +25,6 @@ internal class CppSourceGenerator
 
     public string Generate()
     {
-        CollectHeaders();
         GenerateFileHeader();
 
         foreach (var syntax in m_Generator.Syntaxes)
@@ -43,58 +42,9 @@ internal class CppSourceGenerator
         return m_SourceCode;
     }
 
-    private void CollectHeaders()
-    {
-        List<string> headers = [];
-        
-        foreach (var aclass in m_Generator.Classes)
-        {
-            foreach (var type in aclass
-                .Properties.Select(p => p.Variable.TypeName)
-                .Concat(aclass.Functions.Select(f => f.ReturnType))
-                .Concat(aclass.Functions.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName)))
-                .Concat(aclass.Constructors.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName))))
-            {
-                var typeName = m_TypeNames.FindType(type, aclass.Class);
-                CollectElementType(typeName, headers);
-            }
-        }
-
-        return;
-
-        void CollectElementType(TypeName typeName, List<string> headers)
-        {
-            if (typeName is ClassName className)
-            {
-                headers.Add(className.Source.SourceCode.FilePath);
-            }
-            else if (typeName is SharedPtrTypeName rptr)
-            {
-                headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
-            }
-            else if (typeName is ArrayTypeName array)
-            {
-                CollectElementType(array.ElementType, headers);
-            }
-        }
-    }
-
     private void GenerateFileHeader()
     {
-        List<string> headers = [];
-        
-        foreach (var aclass in m_Generator.Classes)
-        {
-            foreach (var type in aclass
-                .Properties.Select(p => p.Variable.TypeName)
-                .Concat(aclass.Functions.Select(f => f.ReturnType))
-                .Concat(aclass.Functions.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName)))
-                .Concat(aclass.Constructors.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName))))
-            {
-                var typeName = m_TypeNames.FindType(type, aclass.Class);
-                CollectElementType(typeName, headers);
-            }
-        }
+        List<string> headers = CollectRequiredHeaders();
 
         string headersInclude = string.Empty;
         if (headers.Count > 0)
@@ -112,21 +62,41 @@ internal class CppSourceGenerator
 
 
 """;
+    }
 
-        void CollectElementType(TypeName typeName, List<string> headers)
+    private List<string> CollectRequiredHeaders()
+    {
+        List<string> headers = [];
+        
+        foreach (var aclass in m_Generator.Classes)
         {
-            if (typeName is ClassName className)
+            foreach (var type in aclass
+                .Properties.Select(p => p.Variable.TypeName)
+                .Concat(aclass.Functions.Select(f => f.ReturnType))
+                .Concat(aclass.Functions.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName)))
+                .Concat(aclass.Constructors.SelectMany(f => f.Parameters.Select(p => p.Variable.TypeName))))
             {
-                headers.Add(className.Source.SourceCode.FilePath);
+                var typeName = m_TypeNames.FindType(type, aclass.Class);
+                CollectElementType(typeName, headers);
             }
-            else if (typeName is SharedPtrTypeName rptr)
-            {
-                headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
-            }
-            else if (typeName is ArrayTypeName array)
-            {
-                CollectElementType(array.ElementType, headers);
-            }
+        }
+
+        return headers;
+    }
+
+    private void CollectElementType(TypeName typeName, List<string> headers)
+    {
+        if (typeName is ClassName className)
+        {
+            headers.Add(className.Source.SourceCode.FilePath);
+        }
+        else if (typeName is SharedPtrTypeName rptr)
+        {
+            headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
+        }
+        else if (typeName is ArrayTypeName array)
+        {
+            CollectElementType(array.ElementType, headers);
         }
     }
 
