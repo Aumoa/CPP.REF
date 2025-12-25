@@ -7,7 +7,8 @@ public class Core : ModuleRules
 {
     public Core()
     {
-        Script.Enabled = true;
+        // Core must not be scriptable to support pure native console applications
+        Script.Enabled = false;
 
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
