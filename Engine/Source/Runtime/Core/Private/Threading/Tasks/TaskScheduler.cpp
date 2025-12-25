@@ -3,7 +3,9 @@
 #include "Threading/Tasks/TaskScheduler.h"
 #include "Threading/Tasks/ThreadPoolTaskScheduler.h"
 #include "Threading/SynchronizationContext.h"
+#include "Threading/Thread.h"
 #include <thread>
+#include <atomic>
 
 namespace Ayla
 {
@@ -44,14 +46,17 @@ namespace Ayla
 
 	void TaskScheduler::QueueTaskOnDedicatedThread(Task<> task)
 	{
-		// Create a dedicated thread for long-running tasks
-		// This bypasses the ThreadPool to avoid thread starvation
-		std::thread dedicatedThread([this, self = shared_from_this(), task = std::move(task)]() mutable
+		static std::atomic<size_t> s_DedicatedThreadIndex = 0;
+		size_t threadIndex = s_DedicatedThreadIndex.fetch_add(1);
+
+		std::thread dedicatedThread([this, self = shared_from_this(), task = std::move(task), ti = threadIndex]() mutable
 		{
+			auto name = String::Format(TEXT("LongRunning #{}"), ti);
+			Thread::GetCurrentThread().SetDescription(name);
+
 			TryExecuteTask(std::move(task));
 		});
 
-		// Detach the thread so it runs independently
 		dedicatedThread.detach();
 	}
 }

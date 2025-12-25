@@ -3,34 +3,28 @@
 #include "Threading/ThreadPool.h"
 #include "Threading/Thread.h"
 #include "Platform/PlatformIO.h"
-#include "ScriptingBackend/ScriptingBackend.h"
+#include <thread>
 
 namespace Ayla
 {
-	void (*ThreadPool::coreclr__QueueUserWorkItem)();
-	void (*ThreadPool::coreclr__GetMinThreads)(int32* workerThreads, int32* completionPortThreads);
-	void (*ThreadPool::coreclr__GetMaxThreads)(int32* workerThreads, int32* completionPortThreads);
-	void (*ThreadPool::coreclr__SetMinThreads)(int32 workerThreads, int32 completionPortThreads);
-	void (*ThreadPool::coreclr__SetMaxThreads)(int32 workerThreads, int32 completionPortThreads);
-
-	size_t ThreadPool::NumCompletionPortThreads;
+	int32 ThreadPool::MinWorkerThreads = 1;
+	int32 ThreadPool::MaxWorkerThreads = 32767;
+	int32 ThreadPool::MinCompletionPortThreads = 1;
+	int32 ThreadPool::MaxCompletionPortThreads = 1000;
+	size_t ThreadPool::NumWorkerThreads = 0;
+	size_t ThreadPool::NumCompletionPortThreads = 0;
 
 	Spinlock ThreadPool::Lck;
+	SpinlockConditionVariable ThreadPool::Cv;
 	std::queue<ThreadPool::function_t<void()>> ThreadPool::Works;
 
 	Spinlock ThreadPool::DelayedLck;
 	SpinlockConditionVariable ThreadPool::DelayedCv;
 	std::multimap<std::chrono::steady_clock::time_point, ThreadPool::function_t<void()>> ThreadPool::DelayedWorks;
 
-	void* ThreadPool::IO;
-	size_t ThreadPool::IOCPWorkers;
+	void* ThreadPool::IO = nullptr;
 	std::vector<std::thread> ThreadPool::Threads;
-
-	template<class Ret, class... Args>
-	inline auto fget(std::string_view name)
-	{
-		return reinterpret_cast<Ret(*)(Args...)>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.ThreadPoolMarshal", name));
-	}
+	bool ThreadPool::bShutdown = false;
 
 	void ThreadPool::static__ThreadPool()
 	{
@@ -39,21 +33,32 @@ namespace Ayla
 		public:
 			s_trap_init()
 			{
-				coreclr__QueueUserWorkItem = fget<void>("QueueUserWorkItem");
-				coreclr__GetMinThreads = fget<void, int32*, int32*>("GetMinThreads");
-				coreclr__GetMaxThreads = fget<void, int32*, int32*>("GetMaxThreads");
-				coreclr__SetMinThreads = fget<void, int32, int32>("SetMinThreads");
-				coreclr__SetMaxThreads = fget<void, int32, int32>("SetMaxThreads");
-
 				check(IO == nullptr);
 				PlatformIO::InitializeIOCPHandle(IO);
-				NumCompletionPortThreads = 4;
-
-				while (IOCPWorkers < NumCompletionPortThreads)
+				
+				// Initialize default thread counts
+				size_t hardwareConcurrency = std::thread::hardware_concurrency();
+				if (hardwareConcurrency == 0)
 				{
-					Threads.emplace_back(std::bind(IOCPWorker, IOCPWorkers++));
+					hardwareConcurrency = 4;
+				}
+				
+				NumWorkerThreads = hardwareConcurrency;
+				NumCompletionPortThreads = 4;
+				
+				// Start worker threads
+				for (size_t i = 0; i < NumWorkerThreads; ++i)
+				{
+					Threads.emplace_back(std::bind(WorkerThread, i));
 				}
 
+				// Start IOCP worker threads
+				for (size_t i = 0; i < NumCompletionPortThreads; ++i)
+				{
+					Threads.emplace_back(std::bind(IOCPWorker, i));
+				}
+
+				// Start delayed worker thread
 				Threads.emplace_back(DelayedWorker);
 			}
 
@@ -63,6 +68,8 @@ namespace Ayla
 				auto lock1 = std::unique_lock{ Lck };
 				auto lock2 = std::unique_lock{ DelayedLck };
 				IO = nullptr;
+				bShutdown = true;
+				Cv.NotifyAll();
 				DelayedCv.NotifyAll();
 				lock1.unlock();
 				lock2.unlock();
@@ -99,7 +106,7 @@ namespace Ayla
 		std::unique_lock lock{ Lck };
 		Works.emplace(std::move(InWork));
 		lock.unlock();
-		coreclr__QueueUserWorkItem();
+		Cv.NotifyOne();
 	}
 
 	void ThreadPool::QueueDelayedUserWorkItem(std::chrono::nanoseconds InDur, function_t<void()> InWork)
@@ -116,37 +123,83 @@ namespace Ayla
 		static__ThreadPool();
 		std::unique_lock lock1(Lck);
 		std::unique_lock lock2(DelayedLck);
+		Cv.NotifyAll();
 		DelayedCv.NotifyAll();
 	}
 
 	void ThreadPool::GetMinThreads(int32* workerThreads, int32* completionPortThreads)
 	{
 		static__ThreadPool();
-		coreclr__GetMinThreads(workerThreads, completionPortThreads);
+		if (workerThreads)
+		{
+			*workerThreads = MinWorkerThreads;
+		}
+		if (completionPortThreads)
+		{
+			*completionPortThreads = MinCompletionPortThreads;
+		}
 	}
 
 	void ThreadPool::GetMaxThreads(int32* workerThreads, int32* completionPortThreads)
 	{
 		static__ThreadPool();
-		coreclr__GetMaxThreads(workerThreads, completionPortThreads);
+		if (workerThreads)
+		{
+			*workerThreads = MaxWorkerThreads;
+		}
+		if (completionPortThreads)
+		{
+			*completionPortThreads = MaxCompletionPortThreads;
+		}
 	}
 
 	void ThreadPool::SetMinThreads(int32 workerThreads, int32 completionPortThreads)
 	{
 		static__ThreadPool();
-		coreclr__SetMinThreads(workerThreads, completionPortThreads);
+		MinWorkerThreads = workerThreads;
+		MinCompletionPortThreads = completionPortThreads;
 	}
 
 	void ThreadPool::SetMaxThreads(int32 workerThreads, int32 completionPortThreads)
 	{
 		static__ThreadPool();
-		coreclr__SetMaxThreads(workerThreads, completionPortThreads);
+		MaxWorkerThreads = workerThreads;
+		MaxCompletionPortThreads = completionPortThreads;
+	}
+
+	void ThreadPool::WorkerThread(size_t Index)
+	{
+		String name = String::Format(TEXT("Worker #{}"), Index);
+		Thread::GetCurrentThread().SetDescription(name);
+
+		while (!bShutdown)
+		{
+			std::unique_lock lock{ Lck };
+			Cv.Wait(lock, []()
+			{
+				return !Works.empty() || bShutdown;
+			});
+
+			if (bShutdown)
+			{
+				break;
+			}
+
+			if (!Works.empty())
+			{
+				function_t<void()> work = std::move(Works.front());
+				Works.pop();
+				lock.unlock();
+				
+				work();
+			}
+		}
+
+		PlatformProcess::OutputDebugString(String::Format(TEXT("{0} closed."), name));
 	}
 
 	void ThreadPool::IOCPWorker(size_t Index)
 	{
-		PLATFORM_UNREFERENCED_PARAMETER(Index);
-
 		String name = String::Format(TEXT("IOCP #{}"), Index);
 		Thread::GetCurrentThread().SetDescription(name);
 
@@ -165,20 +218,20 @@ namespace Ayla
 		String name = TEXT("Timer #0");
 		Thread::GetCurrentThread().SetDescription(name);
 
-		while (IO)
+		while (!bShutdown)
 		{
 			// calculate timer works.
 			{
 				std::unique_lock ScopedLock(DelayedLck);
-				if (IO == nullptr)
+				if (bShutdown)
 				{
 					break;
 				}
 				DelayedCv.Wait(ScopedLock, []()
 				{
-					return !DelayedWorks.empty() || IO == nullptr;
+					return !DelayedWorks.empty() || bShutdown;
 				});
-				if (IO == nullptr)
+				if (bShutdown)
 				{
 					break;
 				}
@@ -189,7 +242,7 @@ namespace Ayla
 				{
 					DelayedCv.WaitUntil(ScopedLock, Until);
 				}
-				if (IO == nullptr)
+				if (bShutdown)
 				{
 					break;
 				}
@@ -214,37 +267,14 @@ namespace Ayla
 			// enqueue to user work item.
 			{
 				std::unique_lock ScopedLock(Lck);
-				size_t c = 0;
 				for (auto& Action : Actions)
 				{
 					Works.emplace(std::move(Action));
-					++c;
-				}
-				ScopedLock.unlock();
-				for (size_t i = 0; i < c; ++i)
-				{
-					coreclr__QueueUserWorkItem();
+					Cv.NotifyOne();
 				}
 			}
 		}
 		
 		PlatformProcess::OutputDebugString(String::Format(TEXT("{0} closed."), name));
-	}
-
-	void ThreadPool::HandleUserWorkItem()
-	{
-		auto lock = std::unique_lock{ Lck };
-		function_t<void()> work = std::move(Works.front());
-		Works.pop();
-		lock.unlock();
-		work();
-	}
-}
-
-extern "C"
-{
-	PLATFORM_SHARED_EXPORT void Ayla__ThreadPool__HandleUserWorkItem()
-	{
-		::Ayla::ThreadPool::HandleUserWorkItem();
 	}
 }
