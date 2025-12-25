@@ -22,6 +22,7 @@ namespace Ayla
 		const VkSwapchainExt* m_Swapchain;
 		VkGraphics* m_Graphics;
 		std::vector<VkImage> m_SwapchainImages;
+		std::vector<VkImageView> m_SwapchainImageViews;
 		std::vector<VkSemaphore> m_PresentCompletedSemaphores;
 		std::vector<VkSemaphore> m_RenderCompletedSemaphores;
 
@@ -38,6 +39,9 @@ namespace Ayla
 		void Dispose();
 		void Invalidate();
 		void Present(VkQueue queue, VkCommandBuffer* vkCmd);
+
+		VkImage GetCurrentImage() const { return m_SwapchainImages[m_CurrentImageIndex]; }
+		VkImageView GetCurrentImageView() const { return m_SwapchainImageViews[m_CurrentImageIndex]; }
 
 	private:
 		void ReallocateSwapchainImages();

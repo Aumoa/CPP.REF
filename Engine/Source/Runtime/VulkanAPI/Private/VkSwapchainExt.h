@@ -42,6 +42,7 @@ namespace Ayla
 
         VkGraphics* GetOwner() const noexcept { return m_Owner; }
         VkSwapchainKHR GetSwapchain() const noexcept { return m_Swapchain; }
+        VkFormat GetFormat() const noexcept { return m_SwapchainCreateInfoCache.imageFormat; }
         Vector2N GetSize() const;
 
     private:
