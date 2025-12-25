@@ -28,6 +28,8 @@ namespace Ayla
 
 		virtual void Acquire(CommandBuffer* cmd) override;
 
+		virtual void RenderRaytracing(CommandBuffer* cmd, const SceneView& view) override;
+
 		void ReleaseResources();
 		void AllocateResources();
 	};

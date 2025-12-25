@@ -9,6 +9,7 @@
 namespace Ayla
 {
 	class CommandBuffer;
+	class SceneView;
 
 	ACLASS()
 	class RENDERCORE_API RenderTexture : public Object
@@ -19,5 +20,8 @@ namespace Ayla
 		virtual Vector2N GetSize() const = 0;
 
 		virtual void Acquire(CommandBuffer* cmd) = 0;
+
+		// Render using raytracing (backend-specific implementation)
+		virtual void RenderRaytracing(CommandBuffer* cmd, const SceneView& view) = 0;
 	};
 }

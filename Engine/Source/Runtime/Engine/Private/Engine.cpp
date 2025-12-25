@@ -16,13 +16,6 @@
 #include "Rendering/RenderTexture.h"
 #include "Threading/MainSynchronizationContext.h"
 
-// Vulkan-specific includes
-#if PLATFORM_WINDOWS || PLATFORM_LINUX
-#include "../../../VulkanAPI/Public/VkGraphics.h"
-#include "../../../VulkanAPI/Private/VkSwapchainRenderTexture.h"
-#include "../../../VulkanAPI/Private/VkRaytracingSceneRenderer.h"
-#endif
-
 namespace Ayla
 {
 	Engine::Engine()
@@ -103,9 +96,6 @@ namespace Ayla
 			graphics = m_Graphics,
 			commandBuffer = m_CommandBuffer,
 			self = m_RenderThread.Get()
-#if PLATFORM_WINDOWS || PLATFORM_LINUX
-			, vkRenderer = &m_VkRaytracingRenderer
-#endif
 		]()
 		{
 			commandBuffer->WaitForCompletion(TimeSpan::FromSeconds(1));
@@ -124,35 +114,9 @@ namespace Ayla
 			auto rt = swapchainExtensions[0]->GetRenderTexture();
 			rt->Acquire(commandBuffer.Get());
 
-#if PLATFORM_WINDOWS || PLATFORM_LINUX
-			// Use Vulkan raytracing if available
-			if (auto* vkGraphics = dynamic_cast<VkGraphics*>(graphics.Get()))
-			{
-				// Initialize renderer on first use
-				if (!*vkRenderer)
-				{
-					*vkRenderer = std::make_unique<VkRaytracingSceneRenderer>(vkGraphics);
-				}
-
-				// Get Vulkan-specific render texture
-				if (auto* vkRT = dynamic_cast<VkSwapchainRenderTexture*>(rt.Get()))
-				{
-					(*vkRenderer)->Render(
-						commandBuffer.Get(),
-						vkRT->GetCurrentImage(),
-						vkRT->GetCurrentImageView(),
-						vkRT->GetSize()
-					);
-				}
-			}
-			else
-#endif
-			{
-				// Fallback for non-Vulkan graphics
-				SceneView view(kSampleView);
-				RaytracingSceneRenderer renderer(rt);
-				renderer.Render(view);
-			}
+			SceneView view(kSampleView);
+			RaytracingSceneRenderer renderer(rt);
+			renderer.Render(view);
 
 			commandBuffer->EndCommands();
 

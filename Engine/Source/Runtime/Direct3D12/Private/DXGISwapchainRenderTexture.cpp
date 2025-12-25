@@ -1,6 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "DXGISwapchainRenderTexture.h"
+#include "Rendering/SceneView.h"
 
 namespace Ayla
 {
@@ -23,6 +24,12 @@ namespace Ayla
 	void DXGISwapchainRenderTexture::Acquire(CommandBuffer* cmd)
 	{
 		m_CurrentBackBufferIndex = (uint32)m_Swapchain->GetCurrentBackBufferIndex();
+	}
+
+	void DXGISwapchainRenderTexture::RenderRaytracing(CommandBuffer* cmd, const SceneView& view)
+	{
+		// TODO: Implement D3D12 raytracing rendering
+		// For now, this is a stub to satisfy the interface
 	}
 
 	void DXGISwapchainRenderTexture::ReleaseResources()

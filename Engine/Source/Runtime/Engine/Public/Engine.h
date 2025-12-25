@@ -29,10 +29,6 @@ namespace Ayla
 		double m_FrameTime = 0;
 		size_t m_FrameCount = 0;
 
-#if PLATFORM_WINDOWS || PLATFORM_LINUX
-		std::unique_ptr<VkRaytracingSceneRenderer> m_VkRaytracingRenderer;
-#endif
-
 	public:
 		ACONSTRUCTOR()
 		Engine();

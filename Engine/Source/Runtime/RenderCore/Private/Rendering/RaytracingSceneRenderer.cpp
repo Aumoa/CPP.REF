@@ -3,6 +3,7 @@
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "Rendering/SceneView.h"
 #include "Rendering/RenderTexture.h"
+#include "CommandBuffer.h"
 
 namespace Ayla
 {
@@ -13,5 +14,8 @@ namespace Ayla
 
 	void RaytracingSceneRenderer::Render(const SceneView& view)
 	{
+		// Delegate to the backend-specific RenderTexture implementation
+		// This allows each backend (Vulkan, D3D12) to implement raytracing in their own way
+		GetOutputTexture()->RenderRaytracing(nullptr, view);
 	}
 }

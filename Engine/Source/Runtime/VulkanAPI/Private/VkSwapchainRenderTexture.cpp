@@ -4,6 +4,8 @@
 #include "VkSwapchainExt.h"
 #include "VkGraphics.h"
 #include "VkCommandBuffer.h"
+#include "VkRaytracingSceneRenderer.h"
+#include "Rendering/SceneView.h"
 
 namespace Ayla
 {
@@ -58,6 +60,9 @@ namespace Ayla
 
 		check(m_CurrentImageIndex == 0xFFFFFFFF);
 
+		// Store the command buffer for later use in RenderRaytracing
+		m_CurrentCommandBuffer = cmd;
+
 		auto graphics = m_Swapchain->GetOwner();
 		auto imageReadySemaphore = m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()];
 		VKR(vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, imageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex));
@@ -107,6 +112,9 @@ namespace Ayla
 	{
 		auto device = m_Graphics->GetDevice();
 
+		// Clean up raytracing renderer
+		m_RaytracingRenderer.reset();
+
 		for (auto& imageView : m_SwapchainImageViews)
 		{
 			vkDestroyImageView(device, imageView, nullptr);
@@ -124,6 +132,27 @@ namespace Ayla
 			vkDestroySemaphore(device, semaphore, nullptr);
 		}
 		m_RenderCompletedSemaphores.clear();
+	}
+
+	void VkSwapchainRenderTexture::RenderRaytracing(CommandBuffer* cmd, const SceneView& view)
+	{
+		// Initialize raytracing renderer on first use
+		if (!m_RaytracingRenderer)
+		{
+			m_RaytracingRenderer = std::make_unique<VkRaytracingSceneRenderer>(m_Graphics);
+		}
+
+		// Use the command buffer from Acquire if cmd is null, otherwise use the provided one
+		CommandBuffer* activeCmd = cmd ? cmd : m_CurrentCommandBuffer;
+		check(activeCmd != nullptr);
+
+		// Render using Vulkan raytracing
+		m_RaytracingRenderer->Render(
+			activeCmd,
+			GetCurrentImage(),
+			GetCurrentImageView(),
+			GetSize()
+		);
 	}
 
 	void VkSwapchainRenderTexture::Invalidate()

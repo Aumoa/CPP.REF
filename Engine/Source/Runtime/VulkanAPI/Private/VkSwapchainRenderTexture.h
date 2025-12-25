@@ -12,6 +12,7 @@ namespace Ayla
 	class VkSwapchainExt;
 	class VkCommandBuffer;
 	class VkGraphics;
+	class VkRaytracingSceneRenderer;
 
 	ACLASS()
 	class VkSwapchainRenderTexture : public RenderTexture
@@ -29,12 +30,17 @@ namespace Ayla
 		uint32 m_CurrentImageIndex = 0xFFFFFFFF;
 		uint8 m_SwapchainImageFirstRender = 0;
 
+		std::unique_ptr<VkRaytracingSceneRenderer> m_RaytracingRenderer;
+		CommandBuffer* m_CurrentCommandBuffer = nullptr;
+
 	public:
 		VkSwapchainRenderTexture(VkSwapchainExt* swapchain, VkGraphics* graphics);
 
 		virtual Vector2N GetSize() const override;
 
 		virtual void Acquire(CommandBuffer* cmd) override;
+
+		virtual void RenderRaytracing(CommandBuffer* cmd, const SceneView& view) override;
 
 		void Dispose();
 		void Invalidate();
