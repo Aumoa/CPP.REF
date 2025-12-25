@@ -38,6 +38,11 @@ internal static partial class BuildRunner
                 requiredProjects.Add("VulkanAPI");
                 requiredProjects.Add("WindowsAPI");
             }
+            else if (mp.GetRule(buildTarget).Type == ModuleType.Application)
+            {
+                // Application type (e.g., Launch) requires ApplicationCore and rendering APIs
+                // Dependencies are specified in the module's rule file
+            }
             else if (mp.GetRule(buildTarget).Type == ModuleType.Console)
             {
                 // Console applications don't require ApplicationCore, Launch, or rendering APIs
