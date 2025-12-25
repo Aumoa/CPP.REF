@@ -29,6 +29,9 @@ namespace Ayla
 	void DXGISwapchainRenderTexture::RenderRaytracing(CommandBuffer* cmd, const SceneView& view)
 	{
 		// TODO: Implement D3D12 raytracing rendering
+		// Parameters:
+		//   - cmd: Command buffer for recording render commands
+		//   - view: Scene view information (camera position, rotation, FOV)
 		// For now, this is a stub to satisfy the interface
 	}
 

@@ -143,10 +143,12 @@ namespace Ayla
 		}
 
 		// Use the command buffer from Acquire if cmd is null, otherwise use the provided one
+		// This relies on Acquire() being called first to set m_CurrentCommandBuffer
 		CommandBuffer* activeCmd = cmd ? cmd : m_CurrentCommandBuffer;
 		check(activeCmd != nullptr);
 
 		// Render using Vulkan raytracing
+		// TODO: Use SceneView parameters (camera position, rotation, FOV) in raytracing shaders
 		m_RaytracingRenderer->Render(
 			activeCmd,
 			GetCurrentImage(),

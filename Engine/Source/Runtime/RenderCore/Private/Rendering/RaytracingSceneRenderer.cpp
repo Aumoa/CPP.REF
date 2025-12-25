@@ -16,6 +16,7 @@ namespace Ayla
 	{
 		// Delegate to the backend-specific RenderTexture implementation
 		// This allows each backend (Vulkan, D3D12) to implement raytracing in their own way
+		// CommandBuffer is managed by the backend through the Acquire() call
 		GetOutputTexture()->RenderRaytracing(nullptr, view);
 	}
 }
