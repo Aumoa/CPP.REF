@@ -78,6 +78,8 @@
 #include "Threading/Tasks/TaskStatus.h"
 #include "Threading/Tasks/Task.h"
 #include "Threading/Tasks/TaskCompletionSource.h"
+#include "Threading/Tasks/TaskScheduler.h"
+#include "Threading/Tasks/TaskFactory.h"
 
 #include "Localizational/Name.h"
 

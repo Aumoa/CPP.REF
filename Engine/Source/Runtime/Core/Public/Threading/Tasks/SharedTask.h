@@ -5,6 +5,7 @@
 #include "Threading/ThreadPool.h"
 #include "Threading/SynchronizationContext.h"
 #include "Threading/Tasks/TaskStatus.h"
+#include "Threading/Tasks/TaskCreationOptions.h"
 #include "InvalidOperationException.h"
 #include "TaskCanceledException.h"
 #include <functional>
@@ -14,9 +15,13 @@
 #include <vector>
 #include <optional>
 #include <stop_token>
+#include <memory>
 
 namespace Ayla
 {
+	class TaskScheduler;
+	class TaskFactory;
+
 	template<class T = void, int kCheck = 0>
 	class SharedTask
 	{
@@ -25,6 +30,9 @@ namespace Ayla
 	template<>
 	class SharedTask<void, 0>
 	{
+		friend class TaskScheduler;
+		friend class TaskFactory;
+
 	public:
 		template<class TBody>
 #if __cpp_lib_move_only_function
@@ -39,11 +47,13 @@ namespace Ayla
 
 		TaskStatus m_Status = TaskStatus::Created;
 		std::exception_ptr m_ExceptionPtr;
+		TaskCreationOptions m_Options = TaskCreationOptions::None;
+		SharedTask<>::function_t<void()> m_Scheduled;
 
 		std::stop_token m_StoppedToken;
 		std::source_location m_StoppedLocation;
 
-		std::vector<std::tuple<function_t<void()>, SynchronizationContext*>> m_Continuations;
+		std::vector<std::tuple<function_t<void()>, std::weak_ptr<SynchronizationContext>>> m_Continuations;
 		std::optional<std::stop_callback<function_t<void()>>> m_Cancellation;
 
 	public:
@@ -71,14 +81,19 @@ namespace Ayla
 			m_Status = TaskStatus::Running;
 		}
 
-		TaskStatus GetStatus() const noexcept
+		inline TaskStatus GetStatus() const noexcept
 		{
 			return m_Status;
 		}
 
+		inline TaskCreationOptions GetOptions() const noexcept
+		{
+			return m_Options;
+		}
+
 		void ContinueWith(function_t<void()> continuation, bool continueOnCapturedContext) noexcept
 		{
-			auto context = continueOnCapturedContext ? SynchronizationContext::GetCurrent() : nullptr;
+			std::weak_ptr<SynchronizationContext> context = continueOnCapturedContext ? SynchronizationContext::GetCurrent() : nullptr;
 			std::unique_lock lock(m_Mutex);
 			if (IsCompleted())
 			{
@@ -204,11 +219,12 @@ namespace Ayla
 		}
 
 	private:
-		void Invoke(function_t<void()> continuation, SynchronizationContext* context) noexcept
+		void Invoke(function_t<void()> continuation, std::weak_ptr<SynchronizationContext> context) noexcept
 		{
-			if (context)
+			auto context_ptr = context.lock();
+			if (context_ptr)
 			{
-				context->Post(std::move(continuation));
+				context_ptr->Post(std::move(continuation));
 				return;
 			}
 
