@@ -266,7 +266,8 @@ public class MyConsoleApp : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         
-        // 스크립팅이 필요한 경우에만 활성화
+        // Script.Enabled = true를 설정하면 C# 스크립트에서 이 모듈을 사용할 수 있음
+        // 모든 모듈은 기본적으로 네이티브만으로 동작 가능
         // Script.Enabled = true;
     }
 }
