@@ -8,6 +8,13 @@ internal partial class RHTGenerator
 {
     public string GenerateSourceCode(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
     {
+        var generator = new CppSourceGenerator(this, project, buildTarget, typeNames);
+        return generator.Generate();
+    }
+
+    [Obsolete("Use GenerateSourceCode instead. This method is kept for reference.")]
+    public string GenerateSourceCode_Legacy(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
+    {
         List<string> headers = [];
         var rule = project.GetRule(buildTarget);
         foreach (var aclass in Classes)

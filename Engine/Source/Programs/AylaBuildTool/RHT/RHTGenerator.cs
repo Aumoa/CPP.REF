@@ -11,6 +11,8 @@ internal partial class RHTGenerator
 
     public SAEnum[] Enums { get; }
 
+    internal Syntax[] Syntaxes => m_Syntaxes;
+
     private RHTGenerator(SourceCodeDescriptor sourceCode, Syntax[] syntaxes)
     {
         SourceCode = sourceCode;

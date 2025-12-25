@@ -8,6 +8,13 @@ internal partial class RHTGenerator
 {
     public string GenerateHeader(TypeNames typeNames)
     {
+        var generator = new HeaderGenerator(this, typeNames, m_FileId);
+        return generator.Generate();
+    }
+
+    [Obsolete("Use GenerateHeader instead. This method is kept for reference.")]
+    public string GenerateHeader_Legacy(TypeNames typeNames)
+    {
         string headerText = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.

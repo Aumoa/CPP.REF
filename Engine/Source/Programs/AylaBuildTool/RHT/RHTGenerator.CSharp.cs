@@ -6,6 +6,13 @@ internal partial class RHTGenerator
 {
     public string GenerateCSharp(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
     {
+        var generator = new CSharpCodeGenerator(this, project, buildTarget, typeNames);
+        return generator.Generate();
+    }
+
+    [Obsolete("Use GenerateCSharp instead. This method is kept for reference.")]
+    public string GenerateCSharp_Legacy(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
+    {
         const string kDllImport = "global::System.Runtime.InteropServices.DllImport";
 
         string sourceCode = $"""
