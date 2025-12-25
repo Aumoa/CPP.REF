@@ -7,8 +7,7 @@ public class ApplicationCore : ModuleRules
 {
     public ApplicationCore()
     {
-        // ApplicationCore must not be scriptable to support pure native console applications
-        Script.Enabled = false;
+        Script.Enabled = true;
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics");
