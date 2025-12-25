@@ -201,6 +201,7 @@ internal class VisualStudioInstallation : Installation
             ModuleType.Library => ".dll",
             ModuleType.Game => ".dll",
             ModuleType.Application => ".exe",
+            ModuleType.Console => ".exe",
             _ => string.Empty
         };
     }

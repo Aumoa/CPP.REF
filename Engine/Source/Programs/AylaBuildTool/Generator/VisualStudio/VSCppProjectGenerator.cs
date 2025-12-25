@@ -52,7 +52,7 @@ internal static class VSCppProjectGenerator
                         AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Current));
                         AppendFormatLine("""<LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>""");
                         
-                        if (rules.Type == ModuleType.Application)
+                        if (rules.Type == ModuleType.Application || rules.Type == ModuleType.Console)
                         {
                             AppendFormatLine("""<LocalDebuggerCommand>$(OutDir){0}</LocalDebuggerCommand>""", project.Name + ".exe");
                         }

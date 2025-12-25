@@ -275,9 +275,9 @@ internal partial class RHTGenerator
                         Indented(() =>
                         {
                             var rule = project.GetRule(buildTarget);
-                            if (rule.Type == ModuleType.Application)
+                            if (rule.Type == ModuleType.Application || rule.Type == ModuleType.Console)
                             {
-                                sourceCode += IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application type cannot directly invoke native functions.\");");
+                                sourceCode += IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application or Console type cannot directly invoke native functions.\");");
                                 return;
                             }
 

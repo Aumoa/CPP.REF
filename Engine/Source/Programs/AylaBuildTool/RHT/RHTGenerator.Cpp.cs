@@ -157,13 +157,13 @@ internal partial class RHTGenerator
                             codeGen.GenerateCppNativeToCSharp(WriteIndentedLine);
                         });
                         WriteIndentedLine($"}}");
-                        if (rule.Type == ModuleType.Application)
+                        if (rule.Type == ModuleType.Application || rule.Type == ModuleType.Console)
                         {
                             WriteIndentedLine($"{function.ReturnType.FullName} {className}::{function.Name}_Implementation({parametersDeclare})");
                             WriteIndentedLine($"{{");
                             Indented(() =>
                             {
-                                WriteIndentedLine($"throw ::Ayla::AccessViolationException(TEXT(\"Assemblies of the Application type cannot directly invoke native functions.\"));");
+                                WriteIndentedLine($"throw ::Ayla::AccessViolationException(TEXT(\"Assemblies of the Application or Console type cannot directly invoke native functions.\"));");
                             });
                             WriteIndentedLine($"}}");
                         }
