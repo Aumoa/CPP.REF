@@ -97,7 +97,6 @@ namespace Ayla
 		m_Pipeline->UpdateDescriptorSet(m_Tlas->GetHandle(), outputImageView);
 
 		// Bind raytracing pipeline
-		auto vkCmdBindPipeline = vkCmdBindPipeline;
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, m_Pipeline->GetPipeline());
 
 		// Bind descriptor sets
