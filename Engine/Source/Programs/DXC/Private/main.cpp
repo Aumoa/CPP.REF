@@ -35,16 +35,19 @@ std::vector<ShaderCompilationTask> ParseCompilationList(const String& listFilePa
 	}
 
 	String content = listFile.ReadAllText();
+	// Handle both Unix (\n) and Windows (\r\n) line endings
 	auto lines = content.Split(TEXT("\n"));
 
 	for (const auto& line : lines)
 	{
+		// Trim whitespace including carriage returns
 		String trimmedLine = line.Trim();
 		if (trimmedLine.IsEmpty() || trimmedLine.StartsWith(TEXT("#")))
 		{
 			continue;
 		}
 
+		// Split by spaces to get tokens
 		auto tokens = trimmedLine.Split(TEXT(" "));
 		if (tokens.size() < 5)
 		{
@@ -55,6 +58,7 @@ std::vector<ShaderCompilationTask> ParseCompilationList(const String& listFilePa
 		ShaderCompilationTask task;
 		task.SourceFile = tokens[0];
 
+		// Parse command-line arguments
 		for (size_t i = 1; i < tokens.size(); ++i)
 		{
 			if (tokens[i] == TEXT("-o") && i + 1 < tokens.size())
@@ -69,6 +73,7 @@ std::vector<ShaderCompilationTask> ParseCompilationList(const String& listFilePa
 			}
 		}
 
+		// Validate that all required fields are present
 		if (task.SourceFile.IsEmpty() || task.OutputFile.IsEmpty() || task.DependencyFile.IsEmpty())
 		{
 			LogDXC::Warning(TEXT("Incomplete compilation task: {}"), trimmedLine);
@@ -78,6 +83,7 @@ std::vector<ShaderCompilationTask> ParseCompilationList(const String& listFilePa
 		tasks.emplace_back(std::move(task));
 	}
 
+	LogDXC::Log(TEXT("Parsed {} valid compilation task(s) from list"), tasks.size());
 	return tasks;
 }
 
@@ -160,6 +166,12 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		// Get compiled shader bytecode
 		ComPtr<IDxcBlob> shaderBlob;
 		HR(compileResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr));
+
+		if (!shaderBlob || shaderBlob->GetBufferSize() == 0)
+		{
+			LogDXC::Error(TEXT("Compilation produced no output for: {}"), task.SourceFile);
+			return false;
+		}
 
 		// Ensure output directory exists
 		FileReference outputFile(task.OutputFile);
