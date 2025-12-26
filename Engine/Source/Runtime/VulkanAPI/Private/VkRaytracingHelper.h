@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "VkCommon.h"
+#include "Numerics/VectorInterface/Vector.h"
 
 namespace Ayla
 {
@@ -23,7 +24,7 @@ namespace Ayla
 		VkAccelerationStructure(VkGraphics* graphics);
 		~VkAccelerationStructure() noexcept;
 
-		void CreateBottomLevel(const std::vector<Vector3>& vertices, const std::vector<uint32_t>& indices);
+		void CreateBottomLevel(const std::vector<Vector3F>& vertices, const std::vector<uint32_t>& indices);
 		void CreateTopLevel(const VkAccelerationStructure& blas);
 
 		VkAccelerationStructureKHR GetHandle() const noexcept { return m_AccelerationStructure; }

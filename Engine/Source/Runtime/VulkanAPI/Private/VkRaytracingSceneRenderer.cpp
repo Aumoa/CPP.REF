@@ -36,10 +36,10 @@ namespace Ayla
 	void VkRaytracingSceneRenderer::CreateTriangle()
 	{
 		// Define a simple triangle
-		std::vector<Vector3> vertices = {
-			Vector3(0.0f, -0.5f, 0.0f),
-			Vector3(0.5f, 0.5f, 0.0f),
-			Vector3(-0.5f, 0.5f, 0.0f)
+		std::vector<Vector3F> vertices = {
+			Vector3F(0.0f, -0.5f, 0.0f),
+			Vector3F(0.5f, 0.5f, 0.0f),
+			Vector3F(-0.5f, 0.5f, 0.0f)
 		};
 
 		std::vector<uint32_t> indices = { 0, 1, 2 };

@@ -84,7 +84,7 @@ namespace Ayla
 		VKR(vkBindBufferMemory(device, m_Buffer, m_Memory, 0));
 	}
 
-	void VkAccelerationStructure::CreateBottomLevel(const std::vector<Vector3>& vertices, const std::vector<uint32_t>& indices)
+	void VkAccelerationStructure::CreateBottomLevel(const std::vector<Vector3F>& vertices, const std::vector<uint32_t>& indices)
 	{
 		auto device = m_Graphics->GetDevice();
 		
@@ -99,7 +99,7 @@ namespace Ayla
 			vkGetDeviceProcAddr(device, "vkCmdBuildAccelerationStructuresKHR");
 
 		// Create vertex and index buffers
-		size_t vertexBufferSize = vertices.size() * sizeof(Vector3);
+		size_t vertexBufferSize = vertices.size() * sizeof(Vector3F);
 		size_t indexBufferSize = indices.size() * sizeof(uint32_t);
 
 		::VkBuffer vertexBuffer = VK_NULL_HANDLE;
@@ -335,7 +335,7 @@ namespace Ayla
 					.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR,
 					.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT,
 					.vertexData = { .deviceAddress = vertexAddress },
-					.vertexStride = sizeof(Vector3),
+					.vertexStride = sizeof(Vector3F),
 					.maxVertex = (uint32_t)vertices.size() - 1,
 					.indexType = VK_INDEX_TYPE_UINT32,
 					.indexData = { .deviceAddress = indexAddress }
