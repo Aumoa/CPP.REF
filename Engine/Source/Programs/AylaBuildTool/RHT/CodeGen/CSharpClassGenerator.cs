@@ -282,9 +282,9 @@ internal class CSharpClassGenerator
     private void GenerateFunctionBody(SFunction function, TypeName returnType, ParameterCollection parameters, bool isStatic, string injectFullName)
     {
         var rule = m_Parent.Project.GetRule(m_Parent.BuildTarget);
-        if (rule.Type == ModuleType.Application)
+        if (rule.Type == ModuleType.Application || rule.Type == ModuleType.Console)
         {
-            m_SourceCode += m_Parent.IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application type cannot directly invoke native functions.\");");
+            m_SourceCode += m_Parent.IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application or Console type cannot directly invoke native functions.\");");
             return;
         }
 

@@ -98,6 +98,26 @@ internal class ModuleRulesResolver
                     throw TerminateException.Internal();
             }
         }
+        else if (Rules.Type == ModuleType.Console)
+        {
+            // Console applications only need platform APIs on desktop platforms
+            // No ApplicationCore dependency required
+            switch (m_TargetInfo.Platform.Group)
+            {
+                case PlatformGroup.Windows:
+                    source = source.Append("WindowsAPI");
+                    break;
+                case PlatformGroup.Linux:
+                    source = source.Append("LinuxAPI");
+                    break;
+                case PlatformGroup.OSX:
+                    source = source.Append("OSXAPI");
+                    break;
+                default:
+                    Console.Error.WriteLine("Console applications are not supported on this platform.");
+                    throw TerminateException.User();
+            }
+        }
 
         return source;
     }

@@ -10,7 +10,7 @@ public class DXC : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core");
-        Type = ModuleType.Application;
+        Type = ModuleType.Console;
 
         AddPrivateAdditionalLibraries("dxcompiler.lib");
     }

@@ -63,7 +63,7 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
 
     public bool IsExecutable()
     {
-        return TargetInfo.GetAllTargets().Any(t => GetRule(t).Type == ModuleType.Application);
+        return TargetInfo.GetAllTargets().Any(t => GetRule(t).Type == ModuleType.Application || GetRule(t).Type == ModuleType.Console);
     }
 
     public ModuleRulesResolver GetResolver(ITargetInfo targetInfo)

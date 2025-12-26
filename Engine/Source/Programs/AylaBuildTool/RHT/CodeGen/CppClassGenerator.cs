@@ -132,13 +132,13 @@ internal class CppClassGenerator
             m_Parent.WriteIndentedLine("}");
 
             var rule = m_Parent.Project.GetRule(m_Parent.BuildTarget);
-            if (rule.Type == ModuleType.Application)
+            if (rule.Type == ModuleType.Application || rule.Type == ModuleType.Console)
             {
                 m_Parent.WriteIndentedLine($"{function.ReturnType.FullName} {className}::{function.Name}_Implementation({parametersDeclare})");
                 m_Parent.WriteIndentedLine("{");
                 m_Parent.Indented(() =>
                 {
-                    m_Parent.WriteIndentedLine($"throw ::Ayla::AccessViolationException(TEXT(\"Assemblies of the Application type cannot directly invoke native functions.\"));");
+                    m_Parent.WriteIndentedLine($"throw ::Ayla::AccessViolationException(TEXT(\"Assemblies of the Application or Console type cannot directly invoke native functions.\"));");
                 });
                 m_Parent.WriteIndentedLine("}");
             }
