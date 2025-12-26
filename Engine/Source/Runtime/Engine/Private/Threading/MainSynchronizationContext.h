@@ -33,11 +33,11 @@ namespace Ayla
 			}
 		}
 
-		inline static MainSynchronizationContext* GetCurrent()
+		inline static std::shared_ptr<MainSynchronizationContext> GetCurrent()
 		{
-			auto* context = SynchronizationContext::GetCurrent();
-			check(dynamic_cast<MainSynchronizationContext*>(context));
-			return (MainSynchronizationContext*)context;
+			auto context = SynchronizationContext::GetCurrent();
+			check(std::dynamic_pointer_cast<MainSynchronizationContext>(context));
+			return std::static_pointer_cast<MainSynchronizationContext>(context);
 		}
 	};
 }

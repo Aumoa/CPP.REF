@@ -28,8 +28,8 @@ namespace Ayla
 
 	void Engine::GuardedLoop_Implementation()
 	{
-		MainSynchronizationContext syncContext;
-		SynchronizationContext::SetSynchronizationContext(&syncContext);
+		auto syncContext = std::make_shared<MainSynchronizationContext>();
+		SynchronizationContext::SetSynchronizationContext(syncContext);
 
 		auto& app = GenericApplication::Get();
 		std::vector<GenericPlatformInputEvent> inputEvents;

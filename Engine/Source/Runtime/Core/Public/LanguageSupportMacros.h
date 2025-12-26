@@ -45,6 +45,12 @@ friend inline constexpr bool operator ==(ClassType Lhs, std::underlying_type_t<C
 friend inline constexpr auto operator <=>(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
 { \
 	return static_cast<std::underlying_type_t<ClassType>>(Lhs) <=> Rhs; \
+} \
+\
+friend inline constexpr bool HasFlag(ClassType value, ClassType flag) noexcept \
+{ \
+	using T = std::underlying_type_t<ClassType>; \
+	return ((T)value & (T)flag) != 0; \
 }
 
 #define GENERATE_BITMASK_ENUM_OPERATORS(ClassType) \
@@ -86,6 +92,12 @@ inline constexpr bool operator ==(ClassType Lhs, std::underlying_type_t<ClassTyp
 inline constexpr auto operator <=>(ClassType Lhs, std::underlying_type_t<ClassType> Rhs) noexcept \
 { \
 	return static_cast<std::underlying_type_t<ClassType>>(Lhs) <=> Rhs; \
+} \
+\
+inline constexpr bool HasFlag(ClassType value, ClassType flag) noexcept \
+{ \
+	using T = std::underlying_type_t<ClassType>; \
+	return ((T)value & (T)flag) != 0; \
 }
 
 #define MACRO_RECURSIVE_HELPER_PARENTHESES ()

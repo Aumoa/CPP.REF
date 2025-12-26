@@ -11,17 +11,10 @@
 #include <queue>
 #include <map>
 
-extern "C"
-{
-	PLATFORM_SHARED_EXPORT void Ayla__ThreadPool__HandleUserWorkItem();
-}
-
 namespace Ayla
 {
 	class CORE_API ThreadPool
 	{
-		friend void ::Ayla__ThreadPool__HandleUserWorkItem();
-
 	public:
 		template<class TBody>
 #if __cpp_lib_move_only_function
@@ -31,15 +24,15 @@ namespace Ayla
 #endif
 
 	private:
-		static void (*coreclr__QueueUserWorkItem)();
-		static void (*coreclr__GetMinThreads)(int32* workerThreads, int32* completionPortThreads);
-		static void (*coreclr__GetMaxThreads)(int32* workerThreads, int32* completionPortThreads);
-		static void (*coreclr__SetMinThreads)(int32 workerThreads, int32 completionPortThreads);
-		static void (*coreclr__SetMaxThreads)(int32 workerThreads, int32 completionPortThreads);
-
+		static int32 MinWorkerThreads;
+		static int32 MaxWorkerThreads;
+		static int32 MinCompletionPortThreads;
+		static int32 MaxCompletionPortThreads;
+		static size_t NumWorkerThreads;
 		static size_t NumCompletionPortThreads;
 
 		static Spinlock Lck;
+		static SpinlockConditionVariable Cv;
 		static std::queue<function_t<void()>> Works;
 
 		static Spinlock DelayedLck;
@@ -47,8 +40,8 @@ namespace Ayla
 		static std::multimap<std::chrono::steady_clock::time_point, function_t<void()>> DelayedWorks;
 
 		static void* IO;
-		static size_t IOCPWorkers;
 		static std::vector<std::thread> Threads;
+		static bool bShutdown;
 
 	private:
 		static void static__ThreadPool();
@@ -67,8 +60,8 @@ namespace Ayla
 		static void SetMaxThreads(int32 workerThreads, int32 completionPortThreads);
 
 	private:
+		static void WorkerThread(size_t Index);
 		static void IOCPWorker(size_t Index);
 		static void DelayedWorker();
-		static void HandleUserWorkItem();
 	};
 }

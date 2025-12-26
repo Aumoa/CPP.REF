@@ -224,10 +224,52 @@ public class MyModule : ModuleRules
 ```csharp
 public enum ModuleType
 {
-    Runtime,        // 런타임 모듈 (게임에 포함)
-    Editor,         // 에디터 전용 모듈
-    Program,        // 독립 실행 프로그램
+    Library,        // 런타임 라이브러리 모듈 (DLL/SO)
+    Application,    // GUI 애플리케이션 (ApplicationCore 필요)
+    Console,        // 콘솔 애플리케이션 (데스크톱 전용, ApplicationCore 불필요)
+    Game,           // 게임 모듈 (Launch를 통해 실행)
     ThirdParty      // 서드파티 라이브러리
+}
+```
+
+#### ModuleType 상세 설명
+
+- **Library**: 공유 라이브러리로 빌드되는 표준 모듈입니다. 대부분의 엔진 모듈이 이 타입을 사용합니다.
+- **Application**: GUI 기반 애플리케이션입니다. ApplicationCore, RenderCore 등의 의존성이 필요합니다.
+- **Console**: 콘솔 애플리케이션입니다. 
+  - Windows, Linux, macOS와 같은 데스크톱 플랫폼에서만 지원됩니다.
+  - ApplicationCore나 렌더링 API 없이도 동작합니다.
+  - CoreCLRScriptingBackend를 사용자가 직접 제어하여 선택적으로 스크립팅을 사용할 수 있습니다.
+- **Game**: 게임 로직 모듈입니다. Launch 애플리케이션을 통해 로드되어 실행됩니다.
+- **ThirdParty**: 외부 라이브러리입니다. 특별한 빌드 규칙이 적용됩니다.
+
+#### Console 애플리케이션 예제
+
+Console 타입은 순수 Native 코드로 작성된 커맨드라인 도구나 서버 애플리케이션을 만들 때 사용합니다:
+
+```csharp
+using AylaEngine;
+
+public class MyConsoleApp : ModuleRules
+{
+    public MyConsoleApp()
+    {
+        // Console 타입 설정
+        Type = ModuleType.Console;
+        
+        // Console 앱은 Core와 플랫폼 API만 필요
+        AddPublicDependencyModuleNames("Core");
+        
+        // 선택적으로 다른 모듈 추가 가능
+        // AddPublicDependencyModuleNames("Numerics");
+        
+        AddPublicIncludePaths("Public");
+        AddPrivateIncludePaths("Private");
+        
+        // Script.Enabled = true를 설정하면 C# 스크립트에서 이 모듈을 사용할 수 있음
+        // 모든 모듈은 기본적으로 네이티브만으로 동작 가능
+        // Script.Enabled = true;
+    }
 }
 ```
 
