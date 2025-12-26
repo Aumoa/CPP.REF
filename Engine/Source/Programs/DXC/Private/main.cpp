@@ -48,6 +48,7 @@ std::vector<ShaderCompilationTask> ParseCompilationList(const String& listFilePa
 		}
 
 		// Split by spaces to get tokens
+		// TODO: Handle quoted paths with spaces for better robustness
 		auto tokens = trimmedLine.Split(TEXT(" "));
 		if (tokens.size() < 5)
 		{
@@ -113,7 +114,9 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		arguments.push_back(L"main");
 		
 		// Target profile - use a versatile default (pixel shader 6.0)
-		// In a real implementation, this should be specified per-shader or detected
+		// TODO: Auto-detect shader type from source or add to compilation task
+		// Currently hardcoded to ps_6_0, which will fail for other shader types
+		// (vs = vertex, cs = compute, gs = geometry, hs = hull, ds = domain)
 		arguments.push_back(L"-T");
 		arguments.push_back(L"ps_6_0");
 		
@@ -203,6 +206,8 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		// In a real implementation, we'd parse includes from the shader
 		{
 			// Convert the dependency content to narrow string for writing
+			// NOTE: This is a simplified ASCII-only conversion
+			// A production implementation should use proper UTF-8 encoding
 			std::wstring depWideStr = task.SourceFile.c_str();
 			depWideStr += L"\n";
 			
@@ -273,6 +278,7 @@ int main(int argc, char** argv)
 		HR(DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&utils)));
 
 		// Compile shaders in parallel using Task system
+		// Note: IDxcCompiler3 is thread-safe according to DXC documentation
 		std::vector<Task<bool>> compilationTasks;
 		compilationTasks.reserve(tasks.size());
 
