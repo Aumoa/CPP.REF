@@ -1,0 +1,14 @@
+# Example shader compilation list
+# Format: <source> -o <output> -d <dependency-file>
+# Lines starting with # are comments
+
+# Vertex Shaders
+Shaders/BasicVertex.hlsl -o Intermediate/Shaders/BasicVertex.cso -d Intermediate/Shaders/BasicVertex.def
+Shaders/SkinnedVertex.hlsl -o Intermediate/Shaders/SkinnedVertex.cso -d Intermediate/Shaders/SkinnedVertex.def
+
+# Pixel Shaders
+Shaders/BasicPixel.hlsl -o Intermediate/Shaders/BasicPixel.cso -d Intermediate/Shaders/BasicPixel.def
+Shaders/LitPixel.hlsl -o Intermediate/Shaders/LitPixel.cso -d Intermediate/Shaders/LitPixel.def
+
+# Compute Shaders
+Shaders/ParticleUpdate.hlsl -o Intermediate/Shaders/ParticleUpdate.cso -d Intermediate/Shaders/ParticleUpdate.def
