@@ -113,12 +113,39 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		arguments.push_back(L"-E");
 		arguments.push_back(L"main");
 		
-		// Target profile - use a versatile default (pixel shader 6.0)
-		// TODO: Auto-detect shader type from source or add to compilation task
-		// Currently hardcoded to ps_6_0, which will fail for other shader types
-		// (vs = vertex, cs = compute, gs = geometry, hs = hull, ds = domain)
+		// Detect shader type from filename (common convention)
+		// vs/vertex = vertex shader, ps/pixel = pixel shader, cs/compute = compute shader
+		// gs = geometry, hs = hull, ds = domain
+		const wchar_t* shaderProfile = L"ps_6_0";  // Default to pixel shader
+		String lowerSource = task.SourceFile.ToLower();
+		
+		if (lowerSource.Contains(TEXT("vertex")) || lowerSource.Contains(TEXT("vs_")) || lowerSource.Contains(TEXT(".vs.")))
+		{
+			shaderProfile = L"vs_6_0";
+		}
+		else if (lowerSource.Contains(TEXT("pixel")) || lowerSource.Contains(TEXT("ps_")) || lowerSource.Contains(TEXT(".ps.")))
+		{
+			shaderProfile = L"ps_6_0";
+		}
+		else if (lowerSource.Contains(TEXT("compute")) || lowerSource.Contains(TEXT("cs_")) || lowerSource.Contains(TEXT(".cs.")))
+		{
+			shaderProfile = L"cs_6_0";
+		}
+		else if (lowerSource.Contains(TEXT("geometry")) || lowerSource.Contains(TEXT("gs_")) || lowerSource.Contains(TEXT(".gs.")))
+		{
+			shaderProfile = L"gs_6_0";
+		}
+		else if (lowerSource.Contains(TEXT("hull")) || lowerSource.Contains(TEXT("hs_")) || lowerSource.Contains(TEXT(".hs.")))
+		{
+			shaderProfile = L"hs_6_0";
+		}
+		else if (lowerSource.Contains(TEXT("domain")) || lowerSource.Contains(TEXT("ds_")) || lowerSource.Contains(TEXT(".ds.")))
+		{
+			shaderProfile = L"ds_6_0";
+		}
+		
 		arguments.push_back(L"-T");
-		arguments.push_back(L"ps_6_0");
+		arguments.push_back(shaderProfile);
 		
 		// Optimization
 		arguments.push_back(L"-O3");
@@ -129,7 +156,7 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		DxcBuffer sourceBuffer = {};
 		sourceBuffer.Ptr = sourceBlob->GetBufferPointer();
 		sourceBuffer.Size = sourceBlob->GetBufferSize();
-		sourceBuffer.Encoding = DXC_CP_ACP;
+		sourceBuffer.Encoding = DXC_CP_UTF8;  // Use UTF-8 for better Unicode support
 
 		// Compile
 		ComPtr<IDxcResult> compileResult;

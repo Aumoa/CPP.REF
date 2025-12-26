@@ -73,13 +73,24 @@ The DXC module is configured in `DXC.Module.cs`:
 
 ### Shader Compilation Options
 
-Currently configured with:
+The compiler automatically detects shader types from filenames using common naming conventions:
+- **Vertex Shaders**: Files containing "vertex", "vs_", or ".vs."
+- **Pixel Shaders**: Files containing "pixel", "ps_", or ".ps."
+- **Compute Shaders**: Files containing "compute", "cs_", or ".cs."
+- **Geometry Shaders**: Files containing "geometry", "gs_", or ".gs."
+- **Hull Shaders**: Files containing "hull", "hs_", or ".hs."
+- **Domain Shaders**: Files containing "domain", "ds_", or ".ds."
+
+If no pattern is matched, defaults to Pixel Shader (ps_6_0).
+
+**Compilation settings:**
 - Entry point: `main`
-- Target profile: `ps_6_0` (Shader Model 6.0, Pixel Shader)
+- Shader Model: 6.0 (all shader types)
 - Optimization: `-O3` (maximum optimization)
 - Debug info: `-Zi` (for better error messages)
+- Encoding: UTF-8
 
-**Note**: In a production implementation, shader types (vs, ps, cs, etc.) and entry points should be configurable per-shader or auto-detected.
+**Note**: For non-standard shader types or custom entry points, you'll need to extend the detection logic or add explicit type specification to the input format.
 
 ### Multithreading
 
@@ -98,14 +109,15 @@ Dependency files (.def) contain a list of files that the shader depends on (incl
 
 ## Future Enhancements
 
-1. **Configurable Shader Types**: Parse shader type from filename or add to command-line
-2. **Entry Point Configuration**: Allow specifying entry points per-shader
-3. **Include Dependency Parsing**: Full include dependency tracking using DXC reflection
+1. **Explicit Shader Type Specification**: Add optional `-t <type>` flag to override auto-detection
+2. **Entry Point Configuration**: Allow specifying entry points per-shader with `-e <name>`
+3. **Include Dependency Parsing**: Full include dependency tracking using DXC reflection API
 4. **SPIRV Support**: Add `-spirv` flag for Vulkan compatibility (when needed)
-5. **Preprocessor Defines**: Support for `-D` defines
-6. **Profile Detection**: Auto-detect shader model from source or configuration
-7. **Incremental Compilation**: Skip shaders with up-to-date outputs
+5. **Preprocessor Defines**: Support for `-D` defines in the command list
+6. **Shader Model Configuration**: Support for different shader models (5.0, 5.1, 6.0+)
+7. **Incremental Compilation**: Skip shaders with up-to-date outputs based on timestamps
 8. **Statistics**: Report compilation times and bytecode sizes
+9. **Quoted Path Support**: Handle file paths with spaces using quote parsing
 
 ## Integration with AylaBuildTool
 
