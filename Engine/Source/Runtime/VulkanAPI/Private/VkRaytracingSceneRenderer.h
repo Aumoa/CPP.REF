@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "VkCommon.h"
+#include "Numerics/VectorInterface/Vector.h"
 #include <memory>
 
 namespace Ayla

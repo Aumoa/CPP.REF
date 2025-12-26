@@ -100,11 +100,12 @@ namespace Ayla
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, m_Pipeline->GetPipeline());
 
 		// Bind descriptor sets
+		auto descriptorSet = m_Pipeline->GetDescriptorSet();
 		vkCmdBindDescriptorSets(
 			commandBuffer,
 			VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
 			m_Pipeline->GetPipelineLayout(),
-			0, 1, &m_Pipeline->GetDescriptorSet(),
+			0, 1, &descriptorSet,
 			0, nullptr
 		);
 
