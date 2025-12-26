@@ -9,136 +9,29 @@
 #include "IO/FileMode.h"
 #include "IO/FileAccessMode.h"
 #include "Threading/Tasks/Task.h"
-#include <iostream>
+#include "ShaderCompilationTask.h"
 #include <vector>
 #include <sstream>
 
 using namespace Ayla;
 
-enum class ShaderType
-{
-	Vertex,
-	Pixel,
-	Compute,
-	Library
-};
-
-struct ShaderCompilationTask
-{
-	String SourceFile;
-	ShaderType Type;
-	String OutputBaseName;
-	std::vector<String> IncludePaths;  // Additional include directories
-};
-
-std::vector<ShaderCompilationTask> ParseCompilationList(const String& listFilePath)
-{
-	std::vector<ShaderCompilationTask> tasks;
-	
-	FileReference listFile(listFilePath);
-	if (!listFile.IsExists())
-	{
-		LogDXC::Error(TEXT("Compilation list file not found: {}"), listFilePath);
-		return tasks;
-	}
-
-	String content = listFile.ReadAllText();
-	// Handle both Unix (\n) and Windows (\r\n) line endings
-	auto lines = content.Split(TEXT("\n"));
-
-	for (const auto& line : lines)
-	{
-		// Trim whitespace including carriage returns
-		String trimmedLine = line.Trim();
-		if (trimmedLine.IsEmpty() || trimmedLine.StartsWith(TEXT("#")))
-		{
-			continue;
-		}
-
-		// Split by spaces to get tokens
-		// TODO: Handle quoted paths with spaces for better robustness
-		auto tokens = trimmedLine.Split(TEXT(" "), StringSplitOptions::TrimEntries | StringSplitOptions::RemoveEmptyEntries);
-		if (tokens.size() < 5)
-		{
-			LogDXC::Warning(TEXT("Invalid line format (expected: source -t type -o output [-I include_path]...): {}"), trimmedLine);
-			continue;
-		}
-
-		ShaderCompilationTask task;
-		task.SourceFile = tokens[0];
-
-		// Parse command-line arguments
-		for (size_t i = 1; i < tokens.size(); ++i)
-		{
-			if (tokens[i] == TEXT("-o") && i + 1 < tokens.size())
-			{
-				task.OutputBaseName = tokens[i + 1];
-				++i;
-			}
-			else if (tokens[i] == TEXT("-t") && i + 1 < tokens.size())
-			{
-				auto type = tokens[i + 1].Trim().ToLower();
-				if (type == TEXT("vertex"))
-				{
-					task.Type = ShaderType::Vertex;
-				}
-				else if (type == TEXT("pixel"))
-				{
-					task.Type = ShaderType::Pixel;
-				}
-				else if (type == TEXT("compute"))
-				{
-					task.Type = ShaderType::Compute;
-				}
-				else if (type == TEXT("library"))
-				{
-					task.Type = ShaderType::Library;
-				}
-				else
-				{
-					LogDXC::Warning(TEXT("Unknown shader type '{}' in line: {}"), type, trimmedLine);
-				}
-				++i;
-			}
-			else if (tokens[i] == TEXT("-I") && i + 1 < tokens.size())
-			{
-				// Add include path
-				task.IncludePaths.push_back(tokens[i + 1]);
-				++i;
-			}
-		}
-
-		// Validate that all required fields are present
-		if (task.SourceFile.IsEmpty() || task.OutputBaseName.IsEmpty())
-		{
-			LogDXC::Warning(TEXT("Incomplete compilation task: {}"), trimmedLine);
-			continue;
-		}
-
-		tasks.emplace_back(std::move(task));
-	}
-
-	LogDXC::Info(TEXT("Parsed {} valid compilation task(s) from list"), tasks.size());
-	return tasks;
-}
-
 bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompilationTask& task)
 {
 	try
 	{
-		LogDXC::Info(TEXT("Compiling shader: {}"), task.SourceFile);
+		LogDXC::Info(TEXT("Compiling shader: {}"), task.GetSourceFile());
 
 		// Check if source file exists
-		FileReference sourceFile(task.SourceFile);
+		FileReference sourceFile(task.GetSourceFile());
 		if (!sourceFile.IsExists())
 		{
-			LogDXC::Error(TEXT("Source file not found: {}"), task.SourceFile);
+			LogDXC::Error(TEXT("Source file not found: {}"), task.GetSourceFile());
 			return false;
 		}
 
 		// Load source file
 		ComPtr<IDxcBlobEncoding> sourceBlob;
-		HR(utils->LoadFile(task.SourceFile.c_str(), nullptr, &sourceBlob));
+		HR(utils->LoadFile(task.GetSourceFile().c_str(), nullptr, &sourceBlob));
 
 		// Create default include handler
 		// This allows #include directives to work with relative paths
@@ -158,19 +51,18 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		}
 		
 		// Add additional include paths from task
-		for (const auto& includePath : task.IncludePaths)
+		for (const auto& includePath : task.GetIncludePaths())
 		{
 			arguments.push_back(L"-I");
 			arguments.push_back(includePath.c_str());
 		}
 		
 		// Detect shader type from filename extension or naming convention
-		String lowerSource = task.SourceFile.ToLower();
 		const wchar_t* shaderProfile = nullptr;
 		const wchar_t* entryPoint = L"main";
 		bool isRaytracing = false;
 
-		switch (task.Type)
+		switch (task.GetType())
 		{
 			case ShaderType::Vertex:
 				shaderProfile = L"vs_6_0";
@@ -186,7 +78,7 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 				isRaytracing = true;
 				break;
 			default:
-				LogDXC::Error(TEXT("Unsupported shader type for file: {}"), task.SourceFile);
+				LogDXC::Error(TEXT("Unsupported shader type for file: {}"), task.GetSourceFile());
 				return false;
 		}
 		
@@ -247,11 +139,11 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 			String errorMsg = String::FromLiteral((const char*)errors->GetBufferPointer());
 			if (FAILED(hrStatus))
 			{
-				LogDXC::Error(TEXT("Compilation failed for {}: {}"), task.SourceFile, errorMsg);
+				LogDXC::Error(TEXT("Compilation failed for {}: {}"), task.GetSourceFile(), errorMsg);
 			}
 			else
 			{
-				LogDXC::Warning(TEXT("Compilation warnings for {}: {}"), task.SourceFile, errorMsg);
+				LogDXC::Warning(TEXT("Compilation warnings for {}: {}"), task.GetSourceFile(), errorMsg);
 			}
 		}
 
@@ -266,12 +158,12 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 
 		if (!shaderBlob || shaderBlob->GetBufferSize() == 0)
 		{
-			LogDXC::Error(TEXT("Compilation produced no output for: {}"), task.SourceFile);
+			LogDXC::Error(TEXT("Compilation produced no output for: {}"), task.GetSourceFile());
 			return false;
 		}
 
 		// Ensure output directory exists
-		String outputFileName = task.OutputBaseName + TEXT(".spv");
+		String outputFileName = task.GetOutputBasePath() + TEXT(".spv");
 		FileReference outputFile(outputFileName);
 		auto outputDir = outputFile.GetDirectory();
 		if (!outputDir.IsExists())
@@ -280,7 +172,7 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		}
 
 		// Ensure dependency directory exists
-		String dependencyFileName = task.OutputBaseName + TEXT(".deps");
+		String dependencyFileName = task.GetOutputBasePath() + TEXT(".deps");
 		FileReference depFile(dependencyFileName);
 		auto depDir = depFile.GetDirectory();
 		if (!depDir.IsExists())
@@ -299,7 +191,7 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 		
 		// Write dependency file
 		{
-			std::wstring depWideStr = task.SourceFile.c_str();
+			std::wstring depWideStr = task.GetSourceFile().c_str();
 			depWideStr += L"\n";
 			
 			// Convert wstring to UTF-8
@@ -323,17 +215,17 @@ bool CompileShader(IDxcCompiler3* compiler, IDxcUtils* utils, const ShaderCompil
 			depStream.Close();
 		}
 
-		LogDXC::Info(TEXT("Successfully compiled: {} -> {}"), task.SourceFile, outputFileName);
+		LogDXC::Info(TEXT("Successfully compiled: {} -> {}"), task.GetSourceFile(), outputFileName);
 		return true;
 	}
 	catch (const std::exception& e)
 	{
-		LogDXC::Error(TEXT("Exception while compiling {}: {}"), task.SourceFile, String::FromLiteral(e.what()));
+		LogDXC::Error(TEXT("Exception while compiling {}: {}"), task.GetSourceFile(), String::FromLiteral(e.what()));
 		return false;
 	}
 }
 
-int main(int argc, char** argv)
+Task<int> MainAsync(int argc, char** argv)
 {
 	try
 	{
@@ -342,20 +234,20 @@ int main(int argc, char** argv)
 			Console::WriteLine(TEXT("Usage: DXC <compilation-list-file>"));
 			Console::WriteLine(TEXT(""));
 			Console::WriteLine(TEXT("The compilation list file should contain lines in the format:"));
-			Console::WriteLine(TEXT("  Source/Shader.hlsl -o Intermediate/Shader.cso -d Intermediate/Shader.def"));
-			return 1;
+			Console::WriteLine(TEXT("  Source/Shader.hlsl -t library -o Intermediate/Shader -I Include/Path"));
+			co_return 1;
 		}
 
 		String listFilePath = String::FromLiteral(argv[1]);
 		LogDXC::Info(TEXT("DXC Shader Compiler"));
 		LogDXC::Info(TEXT("Reading compilation list: {}"), listFilePath);
 
-		// Parse compilation tasks
-		auto tasks = ParseCompilationList(listFilePath);
+		// Parse compilation tasks using the new ShaderCompilationTask class
+		auto tasks = co_await ShaderCompilationTask::ParseMakefileAsync(listFilePath);
 		if (tasks.empty())
 		{
 			LogDXC::Warning(TEXT("No valid compilation tasks found"));
-			return 0;
+			co_return 0;
 		}
 
 		LogDXC::Info(TEXT("Found {} shader(s) to compile"), tasks.size());
@@ -385,7 +277,7 @@ int main(int argc, char** argv)
 		}
 
 		// Wait for all compilations to complete
-		auto allResults = Task<>::WhenAll(compilationTasks).GetResult();
+		auto allResults = co_await Task<>::WhenAll(compilationTasks);
 
 		// Check results
 		size_t successCount = 0;
@@ -404,11 +296,16 @@ int main(int argc, char** argv)
 
 		LogDXC::Info(TEXT("Compilation complete: {} succeeded, {} failed"), successCount, failureCount);
 
-		return failureCount > 0 ? 1 : 0;
+		co_return failureCount > 0 ? 1 : 0;
 	}
 	catch (const std::exception& e)
 	{
 		LogDXC::Critical(TEXT("Fatal error: {}"), String::FromLiteral(e.what()));
-		return 1;
+		co_return 1;
 	}
+}
+
+int main(int argc, char** argv)
+{
+	return MainAsync(argc, argv).GetResult();
 }
