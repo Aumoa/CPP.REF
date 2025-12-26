@@ -1,0 +1,14 @@
+# Example shader compilation list for raytracing
+# Format: <source> -t <type> -o <output> [-I <include_path>]...
+# Lines starting with # are comments
+#
+# Shader types: vertex, pixel, compute, library (for raytracing)
+
+# Ray generation shader (library type for raytracing)
+F:/CPP.REF/Engine/Source/Programs/DXC/Private/RayGeneration.hlsl -t library -o F:/CPP.REF/Engine/Intermediate/DXC/Win64/Debug/Shaders/RayGeneration -I F:/CPP.REF/Engine/Source/Programs/DXC/Private
+
+# Closest hit shader (library type for raytracing)
+F:/CPP.REF/Engine/Source/Programs/DXC/Private/Hit.hlsl -t library -o F:/CPP.REF/Engine/Intermediate/DXC/Win64/Debug/Shaders/ClosestHit -I F:/CPP.REF/Engine/Source/Programs/DXC/Private
+
+# Miss shader (library type for raytracing)
+F:/CPP.REF/Engine/Source/Programs/DXC/Private/Miss.hlsl -t library -o F:/CPP.REF/Engine/Intermediate/DXC/Win64/Debug/Shaders/Miss -I F:/CPP.REF/Engine/Source/Programs/DXC/Private

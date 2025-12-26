@@ -28,7 +28,6 @@
 #include <gdiplus.h>
 #include <wrl/client.h>
 #include <wincodec.h>
-#include <dxcapi.h>
 #include <TlHelp32.h>
 
 #include "Platform/Windows/UndefWindowsPlatformMacros.h"

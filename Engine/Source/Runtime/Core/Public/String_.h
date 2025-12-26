@@ -947,7 +947,7 @@ namespace Ayla
 				{
 					if (bTrim)
 					{
-						View = Trim(View.value());
+						View = View->Trim();
 						if (bRemoveEmpty && View->Len == 0)
 						{
 							continue;

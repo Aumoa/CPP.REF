@@ -12,6 +12,8 @@ public class DXC : ModuleRules
         AddPublicDependencyModuleNames("Core");
         Type = ModuleType.Console;
 
-        AddPrivateAdditionalLibraries("dxcompiler.lib");
+        // TODO: Parse version string and select latest.
+        AddPrivateIncludePaths("C:\\VulkanSDK\\1.4.313.2\\Include\\dxc");
+        AddPrivateAdditionalLibraries("C:\\VulkanSDK\\1.4.313.2\\Lib\\dxcompiler.lib");
     }
 }

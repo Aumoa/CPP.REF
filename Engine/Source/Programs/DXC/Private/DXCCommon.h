@@ -7,7 +7,20 @@
 #include "CoreMinimal.h"
 #include "LogDXC.h"
 #include "Platform/PlatformCommon.h"
+
+#pragma push_macro("TEXT")
+#pragma warning(push)
+#pragma warning(disable: 4458)
+
+#undef TEXT
+
 #include <dxcapi.h>
+#include "ComPtr.inl"
+
+#undef CreateDirectory
+
+#pragma warning(pop)
+#pragma pop_macro("TEXT")
 
 inline void HR__impl(Ayla::String s)
 {
