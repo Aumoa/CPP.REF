@@ -4,6 +4,8 @@ internal static partial class BuildRunner
 {
     private class ShaderCompileTask : ITask
     {
+        private const int MaxShaderTypeDetectionLines = 20; // Maximum lines to scan for shader type annotation
+        
         private readonly ModuleProject m_Project;
         private readonly TargetInfo m_TargetInfo;
         private readonly List<SourceCodeDescriptor> m_ShaderFiles;
@@ -139,7 +141,7 @@ internal static partial class BuildRunner
         {
             // Read first few lines to detect shader type from comment
             var lines = await File.ReadAllLinesAsync(filePath, cancellationToken);
-            foreach (var line in lines.Take(20))
+            foreach (var line in lines.Take(MaxShaderTypeDetectionLines))
             {
                 var trimmed = line.Trim();
                 
@@ -235,9 +237,16 @@ internal static partial class BuildRunner
 
                 return false; // All dependencies are older than output
             }
-            catch
+            catch (IOException ex)
             {
-                // If we can't read deps, assume we need to recompile
+                // If we can't read the dependency file due to IO error, assume we need to recompile
+                Console.WriteLine($"Warning: Could not read dependency file {depsFile}: {ex.Message}");
+                return true;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // If we can't access the file, assume we need to recompile
+                Console.WriteLine($"Warning: Access denied to dependency file {depsFile}: {ex.Message}");
                 return true;
             }
         }

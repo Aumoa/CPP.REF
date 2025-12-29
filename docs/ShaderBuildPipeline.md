@@ -245,7 +245,7 @@ This format is compatible with standard build systems and enables incremental co
 **Solutions**:
 1. Build the DXC project first: `dotnet AylaBuildTool.dll build --target DXC`
 2. Ensure VulkanSDK is installed (required for DXC compilation)
-3. Check that the DXC executable is in `Engine/Binaries/DotNET/`
+3. Check that the DXC executable is in `Engine/Binaries/dotnet/`
 
 ### Dependency Tracking Issues
 
