@@ -48,6 +48,7 @@ namespace Ayla
 	void ShaderCompilationTask::ParseSingleTask(ParseContext& context, ParseScratch* scratch)
 	{
 		ShaderCompilationTask task;
+		task.m_EntryPoint = TEXT("main");
 
 		// Read source file path
 		task.m_SourceFile = ReadToken(context);
@@ -116,6 +117,23 @@ namespace Ayla
 				{
 					task.m_IncludePaths.emplace_back(std::move(includePath));
 				}
+			}
+			// Parse entry point (-e)
+			else if (token == TEXT("-e"))
+			{
+				task.m_EntryPoint = ReadToken(context);
+			}
+			// Parse Vulkan flag (--vulkan)
+			else if (token == TEXT("--vulkan"))
+			{
+				task.m_Vulkan = true;
+			}
+			else
+			{
+				throw CompilationException(
+					String::Format(TEXT("Unknown token '{}' in shader compilation task."), token),
+					task.m_SourceFile
+				);
 			}
 		}
 

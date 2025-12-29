@@ -7,6 +7,7 @@ using Microsoft::WRL::ComPtr;
 
 namespace Ayla
 {
+#error TODO: Support multi-threaded COM on non-Windows platforms.
 	template<class T>
 	class ComPtr
 	{

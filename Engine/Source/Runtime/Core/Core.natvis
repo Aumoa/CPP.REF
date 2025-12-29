@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="Ayla::String">
-		<DisplayString Condition="Buf._Which==0">{Buf._Head,su}</DisplayString>
-		<DisplayString Condition="Buf._Which==1">{Buf._Tail._Head._Ptr,su}</DisplayString>
-		<StringView Condition="Buf._Which==0">Buf._Head</StringView>
-		<StringView Condition="Buf._Which==1">Buf._Tail._Head._Ptr</StringView>
+		<DisplayString Condition="m_Buf._Which==0">{m_Buf._Head,su}</DisplayString>
+		<DisplayString Condition="m_Buf._Which==1">{m_Buf._Tail._Head._Ptr,su}</DisplayString>
+		<StringView Condition="m_Buf._Which==0">m_Buf._Head</StringView>
+		<StringView Condition="m_Buf._Which==1">m_Buf._Tail._Head._Ptr</StringView>
 		<Expand>
-			<Item Condition="Buf._Which==0" Name="[Text]">Buf._Head,su</Item>
-			<Item Condition="Buf._Which==1" Name="[Text]">Buf._Tail._Head._Ptr,sub</Item>
-			<Item Condition="Buf._Which==1" Name="[Refs]">Buf._Tail._Head._Rep->_Uses</Item>
+			<Item Condition="m_Buf._Which==0" Name="[Text]">m_Buf._Head,su</Item>
+			<Item Condition="m_Buf._Which==1" Name="[Text]">m_Buf._Tail._Head._Ptr,sub</Item>
+			<Item Condition="m_Buf._Which==1" Name="[Refs]">m_Buf._Tail._Head._Rep->_Uses</Item>
 		</Expand>
 	</Type>
 	<Type Name="Ayla::Type">
