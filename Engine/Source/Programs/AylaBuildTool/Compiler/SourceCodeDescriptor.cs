@@ -32,6 +32,12 @@ internal readonly struct SourceCodeDescriptor(GroupDescriptor Group, string Modu
             case ".natvis":
                 type = SourceCodeType.NativeVisualizer;
                 break;
+            case ".hlsl":
+                type = SourceCodeType.HLSLShader;
+                break;
+            case ".hlsli":
+                type = SourceCodeType.HLSLInclude;
+                break;
             default:
                 outValue = default;
                 return false;

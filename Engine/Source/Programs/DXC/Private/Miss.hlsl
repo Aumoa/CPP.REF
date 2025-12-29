@@ -1,3 +1,4 @@
+// Shader Type: library
 #include "Common.hlsli"
 
 [shader("miss")]

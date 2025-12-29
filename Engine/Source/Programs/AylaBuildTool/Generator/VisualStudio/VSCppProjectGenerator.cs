@@ -420,6 +420,8 @@ internal static class VSCppProjectGenerator
                 SourceCodeType.SourceCode or SourceCodeType.ModuleInterface => "ClCompile",
                 SourceCodeType.Header or SourceCodeType.Declaration => "ClInclude",
                 SourceCodeType.NativeVisualizer => "Natvis",
+                SourceCodeType.HLSLShader => "FXCompile",
+                SourceCodeType.HLSLInclude => "ClInclude",
                 _ => throw new NotSupportedException()
             };
         }

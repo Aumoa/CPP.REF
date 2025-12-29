@@ -136,6 +136,7 @@ internal static partial class BuildRunner
 
         List<ModuleTask> moduleTasks = [];
         List<ScriptTask> scriptTasks = [];
+        List<ShaderCompileTask> shaderTasks = [];
 
         foreach (var project in targetProjects)
         {
@@ -178,6 +179,16 @@ internal static partial class BuildRunner
                         }
                     }
                 }
+
+                // Collect HLSL shader files for compilation
+                var shaderFiles = project.GetSourceCodes()
+                    .Where(sc => sc.Type == SourceCodeType.HLSLShader)
+                    .ToList();
+
+                if (shaderFiles.Any())
+                {
+                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles));
+                }
             }
 
             moduleTasks.Add(new ModuleTask(installation, resolver, allCompiles.ToArray(), needCompiles.ToArray()));
@@ -191,7 +202,7 @@ internal static partial class BuildRunner
             }
         }
 
-        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length) + moduleTasks.Count(p => p.NeedLink(buildTarget)) + scriptTasks.Count();
+        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length) + moduleTasks.Count(p => p.NeedLink(buildTarget)) + scriptTasks.Count() + shaderTasks.Count();
         log = totalActions switch
         {
             >= 0 and < 10 => 1,
@@ -206,9 +217,10 @@ internal static partial class BuildRunner
         await ExecuteCMakeBuilds();
 
         DispatchCompileWorkers();
+        DispatchShaderCompileWorkers();
         DispatchLinkWorkers();
         DispatchScriptCompileWorkers();
-        await Task.WhenAll(moduleTasks.Select(p => p.Task).Concat(scriptTasks.Select(p => p.Task)));
+        await Task.WhenAll(moduleTasks.Select(p => p.Task).Concat(scriptTasks.Select(p => p.Task)).Concat(shaderTasks.Select(p => p.Task)));
 
         return;
 
@@ -332,6 +344,30 @@ internal static partial class BuildRunner
                 {
                     var output = r.Result;
                     Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                });
+            }
+        }
+
+        void DispatchShaderCompileWorkers()
+        {
+            foreach (var shaderTask in shaderTasks)
+            {
+                shaderTask.CompileAsync(installation, cancellationToken).ContinueWith(r =>
+                {
+                    try
+                    {
+                        var output = r.Result;
+                        if (output.Logs.Any())
+                        {
+                            Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(), shaderTask.Group.Name);
+                            Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
+                        }
+                    }
+                    catch (TerminalExecutionException e)
+                    {
+                        Console.Error.WriteLine(string.Join('\n', e.Output.Logs.Select(l => l.Value)));
+                        throw;
+                    }
                 });
             }
         }
