@@ -20,6 +20,7 @@
 #include "EaseFunction.h"
 #include "Math_.h"
 #include "String_.h"
+#include "StringBuilder.h"
 #include "AssertionMacros.h"
 #include "Radians.h"
 #include "Degrees.h"

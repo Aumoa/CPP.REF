@@ -25,67 +25,67 @@ namespace Ayla
 		using string_t = std::basic_string<char_t>;
 		using string_view_t = std::basic_string_view<char_t>;
 
-		std::variant<string_view_t, std::shared_ptr<char_t[]>> Buf;
-		size_t Len;
-		bool bNullTerminate;
+		std::variant<string_view_t, std::shared_ptr<char_t[]>> m_Buf;
+		size_t m_Len;
+		bool m_bNullTerminate;
 
 	private:
 		// FromLiteral specialized.
-		inline consteval String(string_view_t Str, size_t Len, std::in_place_t) noexcept
-			: Buf(std::move(Buf))
-			, Len(Len)
-			, bNullTerminate(true)
+		inline consteval String(string_view_t str, size_t len, std::in_place_t) noexcept
+			: m_Buf(std::move(m_Buf))
+			, m_Len(len)
+			, m_bNullTerminate(true)
 		{
 		}
 
-		inline constexpr String(decltype(Buf) Buf, size_t Len)
-			: Buf(std::move(Buf))
-			, Len(Len)
-			, bNullTerminate(true)
+		inline constexpr String(decltype(m_Buf) buf, size_t len)
+			: m_Buf(std::move(buf))
+			, m_Len(len)
+			, m_bNullTerminate(true)
 		{
 		}
 
 		inline constexpr const char_t* GetRaw() const noexcept
 		{
-			const char_t* Ptr = nullptr;
-			switch (Buf.index())
+			const char_t* ptr = nullptr;
+			switch (m_Buf.index())
 			{
 			case 0:
-				Ptr = std::get<0>(Buf).data();
+				ptr = std::get<0>(m_Buf).data();
 				break;
 			case 1:
-				Ptr = std::get<1>(Buf).get();
+				ptr = std::get<1>(m_Buf).get();
 				break;
 			}
 
-			return Ptr ? Ptr : &Char::NullChar;
+			return ptr ? ptr : &Char::NullChar;
 		}
 
-		static inline constexpr char_t SafeGet(const char_t* InBuf, size_t InLen, size_t Idx, bool bLowerCase = false) noexcept
+		static inline constexpr char_t SafeGet(const char_t* inBuf, size_t inLen, size_t idx, bool bLowerCase = false) noexcept
 		{
-			if (Idx >= InLen || InBuf == nullptr)
+			if (idx >= inLen || inBuf == nullptr)
 			{
 				return 0;
 			}
 			else
 			{
-				return bLowerCase ? Char::ToLower(InBuf[Idx]) : InBuf[Idx];
+				return bLowerCase ? Char::ToLower(inBuf[idx]) : inBuf[idx];
 			}
 		}
 
-		inline constexpr std::strong_ordering CompareTo(const char_t* InBuf, size_t InLen, StringComparison Comparison) const noexcept
+		inline constexpr std::strong_ordering CompareTo(const char_t* inBuf, size_t inLen, StringComparison comparison) const noexcept
 		{
-			size_t Length = Math::Min(Len, InLen) + 1;
-			const char_t* MyBuf = GetRaw();
+			size_t length = Math::Min(m_Len, inLen) + 1;
+			const char_t* myBuf = GetRaw();
 
-			bool bLowerCase = Comparison == StringComparison::CurrentCultureIgnoreCase;
+			bool bLowerCase = comparison == StringComparison::CurrentCultureIgnoreCase;
 
-			for (size_t i = 0; i < Length; ++i)
+			for (size_t i = 0; i < length; ++i)
 			{
-				auto Cmp = SafeGet(MyBuf, Len, i, bLowerCase) <=> SafeGet(InBuf, InLen, i, bLowerCase);
-				if (Cmp != 0)
+				auto cmp = SafeGet(myBuf, m_Len, i, bLowerCase) <=> SafeGet(inBuf, inLen, i, bLowerCase);
+				if (cmp != 0)
 				{
-					return Cmp;
+					return cmp;
 				}
 			}
 
@@ -102,120 +102,120 @@ namespace Ayla
 		};
 
 		template<std::ranges::input_range T> requires std::convertible_to<std::ranges::range_value_t<T>, char_t>
-		constexpr String TrimAll(TrimType trimType, const T& Chars) const
+		constexpr String TrimAll(TrimType trimType, const T& chars) const
 		{
-			if (Len == 0)
+			if (m_Len == 0)
 			{
 				return String();
 			}
 
-			const char_t* const MyBuf = GetRaw();
+			const char_t* const myBuf = GetRaw();
 
-			size_t Head = 0;
+			size_t head = 0;
 			if (((int32)trimType & (int32)TrimType::Head) > 0)
 			{
-				for (; Head < Len; ++Head)
+				for (; head < m_Len; ++head)
 				{
-					char_t Wc = SafeGet(MyBuf, Len, Head);
-					if ((Chars | Linq::Contains(Wc)) == false)
+					char_t wc = SafeGet(myBuf, m_Len, head);
+					if ((chars | Linq::Contains(wc)) == false)
 					{
 						break;
 					}
 				}
 			}
 
-			if (Head >= Len)
+			if (head >= m_Len)
 			{
 				return String();
 			}
 
-			size_t Tail = Len;
+			size_t tail = m_Len;
 			if (((int32)trimType & (int32)TrimType::Tail) > 0)
 			{
-				for (; Tail > Head; --Tail)
+				for (; tail > head; --tail)
 				{
-					char_t Wc = SafeGet(MyBuf, Len, Tail - 1);
-					if ((Chars | Linq::Contains(Wc)) == false)
+					char_t wc = SafeGet(myBuf, m_Len, tail - 1);
+					if ((chars | Linq::Contains(wc)) == false)
 					{
 						break;
 					}
 				}
 			}
 
-			if (Tail <= Head)
+			if (tail <= head)
 			{
 				return String();
 			}
 
-			size_t Span = Tail - Head;
-			return Substring(Head, Span);
+			size_t span = tail - head;
+			return Substring(head, span);
 		}
 
 		template<std::ranges::input_range T> requires std::convertible_to<std::ranges::range_value_t<T>, string_view_t>
-		static String InternalConcat(const T& InElements)
+		static String InternalConcat(const T& inElements)
 		{
-			size_t Length = 0;
-			for (const string_view_t& Elem : InElements)
+			size_t length = 0;
+			for (const string_view_t& elem : inElements)
 			{
-				Length += Elem.length();
+				length += elem.length();
 			}
 
-			decltype(Buf) Nbuf;
-			auto& Ptr = Nbuf.emplace<1>(std::make_shared<char_t[]>(Length + 1));
-			size_t AppendIdx = 0;
-			for (const string_view_t& Elem : InElements)
+			decltype(m_Buf) nbuf;
+			auto& ptr = nbuf.template emplace<1>(std::make_shared<char_t[]>(length + 1));
+			size_t appendIdx = 0;
+			for (const string_view_t& elem : inElements)
 			{
-				memcpy(Ptr.get() + AppendIdx, Elem.data(), sizeof(char_t) * Elem.length());
-				AppendIdx += Elem.length();
+				memcpy(ptr.get() + appendIdx, elem.data(), sizeof(char_t) * elem.length());
+				appendIdx += elem.length();
 			}
 
-			Ptr[Length] = 0;
-			return String(std::move(Nbuf), Length);
+			ptr[length] = 0;
+			return String(std::move(nbuf), length);
 		}
 
 	public:
 		inline constexpr String() noexcept
-			: Buf(&Char::NullChar)
-			, Len(0)
-			, bNullTerminate(true)
+			: m_Buf(&Char::NullChar)
+			, m_Len(0)
+			, m_bNullTerminate(true)
 		{
 		}
 
-		inline constexpr String(const String& Rhs) noexcept
-			: Buf(Rhs.Buf)
-			, Len(Rhs.Len)
-			, bNullTerminate(Rhs.bNullTerminate)
+		inline constexpr String(const String& rhs) noexcept
+			: m_Buf(rhs.m_Buf)
+			, m_Len(rhs.m_Len)
+			, m_bNullTerminate(rhs.m_bNullTerminate)
 		{
 		}
 
-		inline constexpr String(String&& Rhs) noexcept
-			: Buf(std::move(Rhs.Buf))
-			, Len(Rhs.Len)
-			, bNullTerminate(Rhs.bNullTerminate)
+		inline constexpr String(String&& rhs) noexcept
+			: m_Buf(std::move(rhs.m_Buf))
+			, m_Len(rhs.m_Len)
+			, m_bNullTerminate(rhs.m_bNullTerminate)
 		{
-			Rhs.Buf = &Char::NullChar;
-			Rhs.Len = 0;
-			Rhs.bNullTerminate = true;
+			rhs.m_Buf = &Char::NullChar;
+			rhs.m_Len = 0;
+			rhs.m_bNullTerminate = true;
 		}
 
 		template<class T>
-		explicit inline constexpr String(const T& Ch) noexcept requires
+		explicit inline constexpr String(const T& ch) noexcept requires
 			std::same_as<T, char> ||
 			std::same_as<T, char_t>
-			: String(&Ch, 1)
+			: String(&ch, 1)
 		{
 		}
 
-		explicit String(std::string_view Str);
-		String(const char* Buf, size_t Len);
+		explicit String(std::string_view str);
+		String(const char* buf, size_t len);
 
-		explicit inline String(std::wstring_view Sv)
+		explicit inline String(std::wstring_view sv)
 		{
-			this->AllocateAssign(Sv.data(), Sv.length());
+			this->AllocateAssign(sv.data(), sv.length());
 		}
 
-		inline String(const char_t* InBuf, size_t InLen)
-			: String(string_view_t(InBuf, InLen))
+		inline String(const char_t* inBuf, size_t inLen)
+			: String(string_view_t(inBuf, inLen))
 		{
 		}
 
@@ -224,92 +224,92 @@ namespace Ayla
 			this->AllocateAssign(buf, len);
 		}
 
-		inline String(char_t Ch, size_t InLen)
+		inline String(char_t ch, size_t inLen)
 		{
-			auto& Ptr = Buf.emplace<1>(std::make_shared<char_t[]>(InLen + 1));
-			auto* Rptr = Ptr.get();
+			auto& ptr = m_Buf.template emplace<1>(std::make_shared<char_t[]>(inLen + 1));
+			auto* rptr = ptr.get();
 
-			for (size_t i = 0; i < InLen; ++i)
+			for (size_t i = 0; i < inLen; ++i)
 			{
-				Rptr[i] = Ch;
+				rptr[i] = ch;
 			}
 
-			Rptr[InLen] = 0;
-			Len = InLen;
-			bNullTerminate = true;
+			rptr[inLen] = 0;
+			m_Len = inLen;
+			m_bNullTerminate = true;
 		}
 
 	public:
-		inline constexpr String& operator =(const String& Rhs) noexcept
+		inline constexpr String& operator =(const String& rhs) noexcept
 		{
-			Buf = Rhs.Buf;
-			Len = Rhs.Len;
-			bNullTerminate = Rhs.bNullTerminate;
+			m_Buf = rhs.m_Buf;
+			m_Len = rhs.m_Len;
+			m_bNullTerminate = rhs.m_bNullTerminate;
 			return *this;
 		}
 
-		inline constexpr String& operator =(String&& Rhs) noexcept
+		inline constexpr String& operator =(String&& rhs) noexcept
 		{
-			Buf = std::move(Rhs.Buf);
-			Len = Rhs.Len;
-			bNullTerminate = Rhs.bNullTerminate;
-			Rhs.Buf = &Char::NullChar;
-			Rhs.Len = 0;
-			Rhs.bNullTerminate = true;
+			m_Buf = std::move(rhs.m_Buf);
+			m_Len = rhs.m_Len;
+			m_bNullTerminate = rhs.m_bNullTerminate;
+			rhs.m_Buf = &Char::NullChar;
+			rhs.m_Len = 0;
+			rhs.m_bNullTerminate = true;
 			return *this;
 		}
 
-		inline constexpr const char_t& operator [](size_t Idx) const noexcept
+		inline constexpr const char_t& operator [](size_t idx) const noexcept
 		{
-			const char_t* MyBuf = this->GetRaw();
-			if (MyBuf != nullptr)
+			const char_t* myBuf = this->GetRaw();
+			if (myBuf != nullptr)
 			{
-				return MyBuf[Idx];
+				return myBuf[idx];
 			}
 			return Char::NullChar;
 		}
 
-		inline constexpr bool operator ==(const String& Rhs) const noexcept
+		inline constexpr bool operator ==(const String& rhs) const noexcept
 		{
-			if (Len != Rhs.Len)
+			if (m_Len != rhs.m_Len)
 			{
 				return false;
 			}
 
-			return this->operator <=>(Rhs) == 0;
+			return this->operator <=>(rhs) == 0;
 		}
 
-		inline constexpr std::strong_ordering operator <=>(const String& Rhs) const noexcept
+		inline constexpr std::strong_ordering operator <=>(const String& rhs) const noexcept
 		{
-			return this->CompareTo(Rhs.GetRaw(), Rhs.Len, StringComparison::CurrentCulture);
+			return this->CompareTo(rhs.GetRaw(), rhs.m_Len, StringComparison::CurrentCulture);
 		}
 
-		inline String operator +(const String& Rhs) const
+		inline String operator +(const String& rhs) const
 		{
-			return Concat(*this, Rhs);
+			return Concat(*this, rhs);
 		}
 
-		inline String& operator +=(const String& Rhs)
+		inline String& operator +=(const String& rhs)
 		{
-			return this->operator =(*this + Rhs);
+			return this->operator =(*this + rhs);
 		}
 
 		inline explicit operator std::string() const { return AsCodepage(); }
 		inline std::string string() const { return (std::string)*this; }
 
-		inline explicit operator std::wstring() const { return std::wstring(this->GetRaw(), Len); }
+		inline explicit operator std::wstring() const { return std::wstring(this->GetRaw(), m_Len); }
 		inline std::wstring wstring() const { return (std::wstring)*this; }
 
-		inline constexpr operator std::wstring_view() const noexcept { return std::wstring_view(this->GetRaw(), Len); }
+		inline constexpr operator std::wstring_view() const noexcept { return std::wstring_view(this->GetRaw(), m_Len); }
 		inline std::wstring_view wstring_view() const { return (std::wstring_view)*this; }
 
-		inline explicit operator std::filesystem::path() const { return std::filesystem::path(this->GetRaw(), this->GetRaw() + Len); }
+		inline explicit operator std::filesystem::path() const { return std::filesystem::path(this->GetRaw(), this->GetRaw() + m_Len); }
 		inline std::filesystem::path path() const { return (std::filesystem::path)*this; }
 
 		template<class... TArgs>
 		inline consteval operator std::basic_format_string<char_t, TArgs...>() const noexcept
 		{
-			return std::get<0>(Buf);
+			return std::get<0>(m_Buf);
 		}
 
 		inline constexpr explicit operator const char_t* () const noexcept
@@ -319,19 +319,19 @@ namespace Ayla
 
 		inline constexpr explicit operator size_t () const noexcept
 		{
-			return Len;
+			return m_Len;
 		}
 
 		inline constexpr explicit operator bool() const noexcept
 		{
-			return Len != 0;
+			return m_Len != 0;
 		}
 
 	public:
 #pragma region IEnumerable<char_t>
 		inline constexpr const char_t* begin() const noexcept
 		{
-			if (Len == 0)
+			if (m_Len == 0)
 			{
 				return &Char::NullChar;
 			}
@@ -343,46 +343,46 @@ namespace Ayla
 
 		inline constexpr const char_t* end() const noexcept
 		{
-			if (Len == 0)
+			if (m_Len == 0)
 			{
 				return &Char::NullChar;
 			}
 			else
 			{
-				return GetRaw() + Len;
+				return GetRaw() + m_Len;
 			}
 		}
 
 		[[nodiscard]] inline constexpr size_t size() const noexcept
 		{
-			return Len + 1;
+			return m_Len + 1;
 		}
 #pragma endregion
 
 #pragma region IEquatable<String>
 	public:
-		[[nodiscard]] constexpr inline bool Equals(const String& Rhs) const noexcept
+		[[nodiscard]] constexpr inline bool Equals(const String& rhs) const noexcept
 		{
-			return Equals(Rhs, StringComparison::CurrentCulture);
+			return Equals(rhs, StringComparison::CurrentCulture);
 		}
 #pragma endregion
 #pragma region IComparable<String>
 	public:
-		[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& Rhs) const noexcept
+		[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& rhs) const noexcept
 		{
-			return this->CompareTo(Rhs.GetRaw(), Rhs.Len, StringComparison::CurrentCulture);
+			return this->CompareTo(rhs.GetRaw(), rhs.m_Len, StringComparison::CurrentCulture);
 		}
 #pragma endregion
 
 	public:
-		[[nodiscard]] inline constexpr bool Equals(const String& Rhs, StringComparison Comparison) const noexcept
+		[[nodiscard]] inline constexpr bool Equals(const String& rhs, StringComparison comparison) const noexcept
 		{
-			if (Len != Rhs.Len)
+			if (m_Len != rhs.m_Len)
 			{
 				return false;
 			}
 
-			return this->CompareTo(Rhs.GetRaw(), Rhs.Len, Comparison) == 0;
+			return this->CompareTo(rhs.GetRaw(), rhs.m_Len, comparison) == 0;
 		}
 
 		[[nodiscard]] inline constexpr String ToString() const noexcept
@@ -392,7 +392,7 @@ namespace Ayla
 
 		[[nodiscard]] inline String Clone() const
 		{
-			return String(this->GetRaw(), this->Len);
+			return String(this->GetRaw(), this->m_Len);
 		}
 
 		[[nodiscard]] inline constexpr size_t length() const noexcept
@@ -412,67 +412,67 @@ namespace Ayla
 			return scoped.c_str();
 		}
 
-		[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& Rhs, StringComparison Comparison) const noexcept
+		[[nodiscard]] constexpr std::strong_ordering CompareTo(const String& rhs, StringComparison comparison) const noexcept
 		{
-			return this->CompareTo(Rhs.GetRaw(), Rhs.Len, Comparison);
+			return this->CompareTo(rhs.GetRaw(), rhs.m_Len, comparison);
 		}
 
-		[[nodiscard]] inline constexpr bool Contains(const String& InCompare, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr bool Contains(const String& compare, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOf(InCompare, 0, (size_t)-1, Comparison) != -1;
+			return IndexOf(compare, 0, (size_t)-1, comparison) != -1;
 		}
 
-		[[nodiscard]] inline constexpr bool Contains(const String& InCompare, size_t InIndexOf, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr bool Contains(const String& compare, size_t indexOf, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOf(InCompare, InIndexOf, (size_t)-1, Comparison) != -1;
+			return IndexOf(compare, indexOf, (size_t)-1, comparison) != -1;
 		}
 
-		[[nodiscard]] inline constexpr bool Contains(const String& InCompare, size_t InIndexOf, size_t InLength, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr bool Contains(const String& compare, size_t indexOf, size_t length, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOf(InCompare, InIndexOf, InLength, Comparison) != -1;
+			return IndexOf(compare, indexOf, length, comparison) != -1;
 		}
 
-		[[nodiscard]] inline constexpr size_t IndexOf(char_t InChar, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr size_t IndexOf(char_t ch, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOf(InChar, 0, (size_t)-1, Comparison);
+			return IndexOf(ch, 0, (size_t)-1, comparison);
 		}
 
-		[[nodiscard]] inline constexpr size_t IndexOf(char_t InChar, size_t InIndexOf, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr size_t IndexOf(char_t ch, size_t indexOf, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOf(InChar, InIndexOf, (size_t)-1, Comparison);
+			return IndexOf(ch, indexOf, (size_t)-1, comparison);
 		}
 
-		[[nodiscard]] constexpr size_t IndexOf(char_t InChar, size_t InIndexOf, size_t InLength, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] constexpr size_t IndexOf(char_t ch, size_t indexOf, size_t length, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			if (InLength > Len || InLength == -1)
+			if (length > m_Len || length == -1)
 			{
-				InLength = Len;
+				length = m_Len;
 			}
 
-			if (InLength == 0)
-			{
-				return (size_t)-1;
-			}
-
-			if (Len == 0)
+			if (length == 0)
 			{
 				return (size_t)-1;
 			}
 
-			const char_t* const Buf1 = this->GetRaw();
-			const bool bLowerCase = Comparison == StringComparison::CurrentCultureIgnoreCase;
+			if (m_Len == 0)
+			{
+				return (size_t)-1;
+			}
+
+			const char_t* const buf1 = this->GetRaw();
+			const bool bLowerCase = comparison == StringComparison::CurrentCultureIgnoreCase;
 
 			if (bLowerCase)
 			{
-				InChar = (char_t)std::tolower(InChar);
+				ch = (char_t)std::tolower(ch);
 			}
 
-			for (size_t i = InIndexOf; i < InLength; ++i)
+			for (size_t i = indexOf; i < length; ++i)
 			{
-				char_t Lch = SafeGet(Buf1, InLength, i, bLowerCase);
-				char_t Rch = InChar;
+				char_t lch = SafeGet(buf1, length, i, bLowerCase);
+				char_t rch = ch;
 
-				if (Lch == Rch)
+				if (lch == rch)
 				{
 					return i;
 				}
@@ -481,65 +481,65 @@ namespace Ayla
 			return (size_t)-1;
 		}
 
-		[[nodiscard]] inline constexpr size_t IndexOf(const String& InCompare, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr size_t IndexOf(const String& compare, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOf(InCompare, 0, (size_t)-1, Comparison);
+			return IndexOf(compare, 0, (size_t)-1, comparison);
 		}
 
-		[[nodiscard]] inline constexpr size_t IndexOf(const String& InCompare, size_t InIndexOf, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr size_t IndexOf(const String& compare, size_t indexOf, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOf(InCompare, InIndexOf, (size_t)-1, Comparison);
+			return IndexOf(compare, indexOf, (size_t)-1, comparison);
 		}
 
-		[[nodiscard]] constexpr size_t IndexOf(const String& InCompare, size_t InIndexOf, size_t InLength, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] constexpr size_t IndexOf(const String& compare, size_t indexOf, size_t length, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			if (InIndexOf > Len)
+			if (indexOf > m_Len)
 			{
 				return (size_t)-1;
 			}
 
-			size_t MaxLength = Len - InIndexOf;
-			if (InLength > MaxLength || InLength == -1)
+			size_t maxLength = m_Len - indexOf;
+			if (length > maxLength || length == -1)
 			{
-				InLength = MaxLength;
+				length = maxLength;
 			}
 
-			if (InLength == 0)
-			{
-				return (size_t)-1;
-			}
-
-			if (!InCompare)
+			if (length == 0)
 			{
 				return (size_t)-1;
 			}
 
-			if (InCompare.Len > InLength)
+			if (!compare)
 			{
 				return (size_t)-1;
 			}
 
-			if (InIndexOf >= Len - InCompare.Len)
+			if (compare.m_Len > length)
 			{
 				return (size_t)-1;
 			}
 
-			const char_t* const Buf1 = this->GetRaw();
-			const char_t* const Buf2 = InCompare.GetRaw();
-			const bool bLowerCase = Comparison == StringComparison::CurrentCultureIgnoreCase;
-			const size_t LastIndex = Len - InCompare.Len;
+			if (indexOf >= m_Len - compare.m_Len)
+			{
+				return (size_t)-1;
+			}
 
-			size_t Compares = 0;
+			const char_t* const buf1 = this->GetRaw();
+			const char_t* const buf2 = compare.GetRaw();
+			const bool bLowerCase = comparison == StringComparison::CurrentCultureIgnoreCase;
+			const size_t lastIndex = m_Len - compare.m_Len;
+
+			size_t compares = 0;
 			size_t i;
-			for (i = InIndexOf; i < Len;)
+			for (i = indexOf; i < m_Len;)
 			{
-				char_t Lch = SafeGet(Buf1, Len, i, bLowerCase);
-				char_t Rch = SafeGet(Buf2, InCompare.Len, Compares, bLowerCase);
+				char_t lch = SafeGet(buf1, m_Len, i, bLowerCase);
+				char_t rch = SafeGet(buf2, compare.m_Len, compares, bLowerCase);
 
-				if (Lch == Rch)
+				if (lch == rch)
 				{
-					++Compares;
-					if (Compares == InCompare.Len)
+					++compares;
+					if (compares == compare.m_Len)
 					{
 						++i;
 						break;
@@ -547,14 +547,14 @@ namespace Ayla
 				}
 				else
 				{
-					if (i > LastIndex)
+					if (i > lastIndex)
 					{
 						break;
 					}
 
-					if (Compares > 0)
+					if (compares > 0)
 					{
-						Compares = 0;
+						compares = 0;
 						continue;
 					}
 				}
@@ -562,96 +562,97 @@ namespace Ayla
 				++i;
 			}
 
-			if (Compares == InCompare.Len)
+			if (compares == compare.m_Len)
 			{
-				return i - InCompare.Len;
+				return i - compare.m_Len;
 			}
 			else
 			{
 				return (size_t)-1;
 			}
 		}
-		[[nodiscard]] inline constexpr size_t LastIndexOf(char_t InChar, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+
+		[[nodiscard]] inline constexpr size_t LastIndexOf(char_t ch, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return LastIndexOf(InChar, 0, (size_t)-1, Comparison);
+			return LastIndexOf(ch, 0, (size_t)-1, comparison);
 		}
 
-		[[nodiscard]] inline constexpr size_t LastIndexOf(char_t InChar, size_t InIndexOf, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr size_t LastIndexOf(char_t ch, size_t indexOf, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return LastIndexOf(InChar, InIndexOf, (size_t)-1, Comparison);
+			return LastIndexOf(ch, indexOf, (size_t)-1, comparison);
 		}
 
-		[[nodiscard]] constexpr size_t LastIndexOf(char_t InChar, size_t InIndexOf, size_t InLength, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] constexpr size_t LastIndexOf(char_t ch, size_t indexOf, size_t length, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			if (InLength > Len || InLength == -1)
+			if (length > m_Len || length == -1)
 			{
-				InLength = Len;
+				length = m_Len;
 			}
 
-			if (InLength == 0)
+			if (length == 0)
 			{
 				return (size_t)-1;
 			}
 
-			if (Len == 0)
+			if (m_Len == 0)
 			{
 				return (size_t)-1;
 			}
 
-			const char_t* const Buf1 = this->GetRaw();
-			const bool bLowerCase = Comparison == StringComparison::CurrentCultureIgnoreCase;
+			const char_t* const buf1 = this->GetRaw();
+			const bool bLowerCase = comparison == StringComparison::CurrentCultureIgnoreCase;
 
 			if (bLowerCase)
 			{
-				InChar = (char_t)std::tolower(InChar);
+				ch = (char_t)std::tolower(ch);
 			}
 
-			for (size_t i = InIndexOf; i < InLength; ++i)
+			for (size_t i = indexOf; i < length; ++i)
 			{
-				size_t Index = InLength - i - 1;
-				char_t Lch = SafeGet(Buf1, InLength, Index, bLowerCase);
-				char_t Rch = InChar;
+				size_t index = length - i - 1;
+				char_t lch = SafeGet(buf1, length, index, bLowerCase);
+				char_t rch = ch;
 
-				if (Lch == Rch)
+				if (lch == rch)
 				{
-					return Index;
+					return index;
 				}
 			}
 
 			return (size_t)-1;
 		}
 
-		[[nodiscard]] constexpr bool StartsWith(const String& InCompare, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] constexpr bool StartsWith(const String& compare, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			if (Len == 0)
+			if (m_Len == 0)
 			{
 				return false;
 			}
 
-			if (!InCompare)
+			if (!compare)
 			{
 				return false;
 			}
 
-			if (InCompare.Len > Len)
+			if (compare.m_Len > m_Len)
 			{
 				return false;
 			}
 
-			const char_t* const Buf1 = this->GetRaw();
-			const char_t* const Buf2 = InCompare.GetRaw();
-			const bool bLowerCase = Comparison == StringComparison::CurrentCultureIgnoreCase;
+			const char_t* const buf1 = this->GetRaw();
+			const char_t* const buf2 = compare.GetRaw();
+			const bool bLowerCase = comparison == StringComparison::CurrentCultureIgnoreCase;
 
-			size_t Compares = 0;
-			for (size_t i = 0; i < InCompare.Len; ++i)
+			size_t compares = 0;
+			for (size_t i = 0; i < compare.m_Len; ++i)
 			{
-				char_t Lch = SafeGet(Buf1, Len, i, bLowerCase);
-				char_t Rch = SafeGet(Buf2, InCompare.Len, Compares, bLowerCase);
+				char_t lch = SafeGet(buf1, m_Len, i, bLowerCase);
+				char_t rch = SafeGet(buf2, compare.m_Len, compares, bLowerCase);
 
-				if (Lch == Rch)
+				if (lch == rch)
 				{
-					++Compares;
-					if (Compares == InCompare.Len)
+					++compares;
+					if (compares == compare.m_Len)
 					{
 						return true;
 					}
@@ -665,38 +666,38 @@ namespace Ayla
 			return false;
 		}
 
-		[[nodiscard]] constexpr bool EndsWith(const String& InCompare, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] constexpr bool EndsWith(const String& compare, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			if (Len == 0)
+			if (m_Len == 0)
 			{
 				return false;
 			}
 
-			if (!InCompare)
+			if (!compare)
 			{
 				return false;
 			}
 
-			if (InCompare.Len > Len)
+			if (compare.m_Len > m_Len)
 			{
 				return false;
 			}
 
-			const char_t* const Buf1 = this->GetRaw();
-			const char_t* const Buf2 = InCompare.GetRaw();
-			const bool bLowerCase = Comparison == StringComparison::CurrentCultureIgnoreCase;
-			const size_t EndIndex = Len - InCompare.Len;
+			const char_t* const buf1 = this->GetRaw();
+			const char_t* const buf2 = compare.GetRaw();
+			const bool bLowerCase = comparison == StringComparison::CurrentCultureIgnoreCase;
+			const size_t endIndex = m_Len - compare.m_Len;
 
-			size_t Compares = 0;
-			for (size_t i = Len - 1; i >= EndIndex && i != -1; --i)
+			size_t compares = 0;
+			for (size_t i = m_Len - 1; i >= endIndex && i != -1; --i)
 			{
-				char_t Lch = SafeGet(Buf1, Len, i, bLowerCase);
-				char_t Rch = SafeGet(Buf2, InCompare.Len, InCompare.Len - (Compares + 1), bLowerCase);
+				char_t lch = SafeGet(buf1, m_Len, i, bLowerCase);
+				char_t rch = SafeGet(buf2, compare.m_Len, compare.m_Len - (compares + 1), bLowerCase);
 
-				if (Lch == Rch)
+				if (lch == rch)
 				{
-					++Compares;
-					if (Compares == InCompare.Len)
+					++compares;
+					if (compares == compare.m_Len)
 					{
 						return true;
 					}
@@ -712,53 +713,53 @@ namespace Ayla
 
 		[[nodiscard]] inline constexpr bool IsStringView() const noexcept
 		{
-			return Buf.index() == 0;
+			return m_Buf.index() == 0;
 		}
 
 		[[nodiscard]] inline constexpr bool IsNullTerminate() const noexcept
 		{
-			return bNullTerminate;
+			return m_bNullTerminate;
 		}
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] inline constexpr size_t IndexOfAny(const TCharArray& Chars, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] inline constexpr size_t IndexOfAny(const TCharArray& chars, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			return IndexOfAny(Chars, 0, Comparison);
+			return IndexOfAny(chars, 0, comparison);
 		}
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] constexpr size_t IndexOfAny(const TCharArray& Chars, size_t InIndexOf, StringComparison Comparison = StringComparison::CurrentCulture) const noexcept
+		[[nodiscard]] constexpr size_t IndexOfAny(const TCharArray& chars, size_t indexOf, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
-			if (Len == 0)
+			if (m_Len == 0)
 			{
 				return (size_t)-1;
 			}
 
-			if (std::ranges::size(Chars) == 0)
+			if (std::ranges::size(chars) == 0)
 			{
 				return (size_t)-1;
 			}
 
-			const char_t* const MyBuf = this->GetRaw();
-			const bool bLowerCase = Comparison == StringComparison::CurrentCultureIgnoreCase;
+			const char_t* const myBuf = this->GetRaw();
+			const bool bLowerCase = comparison == StringComparison::CurrentCultureIgnoreCase;
 
-			for (size_t i = InIndexOf; i < Len; ++i)
+			for (size_t i = indexOf; i < m_Len; ++i)
 			{
-				char_t Ch = SafeGet(MyBuf, Len, i, bLowerCase);
+				char_t ch = SafeGet(myBuf, m_Len, i, bLowerCase);
 
 				bool bFound = false;
 				if (bLowerCase)
 				{
-					bFound = Chars | Linq::Contains([&Ch](char_t Wc)
+					bFound = chars | Linq::Contains([&ch](char_t wc)
 						{
-							return Ch == (char_t)std::tolower(Wc);
+							return ch == (char_t)std::tolower(wc);
 						});
 				}
 				else
 				{
-					bFound = Chars | Linq::Contains(Ch);
+					bFound = chars | Linq::Contains(ch);
 				}
 
 				if (bFound)
@@ -772,12 +773,12 @@ namespace Ayla
 
 		[[nodiscard]] inline constexpr bool IsEmpty() const noexcept
 		{
-			return Len == 0;
+			return m_Len == 0;
 		}
 
-		[[nodiscard]] inline constexpr bool IsValidIndex(size_t InIndex) const noexcept
+		[[nodiscard]] inline constexpr bool IsValidIndex(size_t index) const noexcept
 		{
-			return InIndex < Len;
+			return index < m_Len;
 		}
 
 		[[nodiscard]] inline String Trim() const
@@ -787,15 +788,15 @@ namespace Ayla
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] inline String Trim(const TCharArray& Chars) const
+		[[nodiscard]] inline String Trim(const TCharArray& chars) const
 		{
-			return this->TrimAll((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), Chars);
+			return this->TrimAll((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), chars);
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
-		[[nodiscard]] inline String Trim(const TCharSequence&... Chars) const
+		[[nodiscard]] inline String Trim(const TCharSequence&... chars) const
 		{
-			return this->Trim(std::array{ (char_t)Chars... });
+			return this->Trim(std::array{ (char_t)chars... });
 		}
 
 		[[nodiscard]] inline String TrimStart() const
@@ -805,15 +806,15 @@ namespace Ayla
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] inline String TrimStart(const TCharArray& Chars) const
+		[[nodiscard]] inline String TrimStart(const TCharArray& chars) const
 		{
-			return this->TrimAll(TrimType::Head, Chars);
+			return this->TrimAll(TrimType::Head, chars);
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
-		[[nodiscard]] inline String TrimStart(const TCharSequence&... Chars) const
+		[[nodiscard]] inline String TrimStart(const TCharSequence&... chars) const
 		{
-			return TrimStart(std::array{ (char_t)Chars... });
+			return TrimStart(std::array{ (char_t)chars... });
 		}
 
 		[[nodiscard]] inline String TrimEnd() const
@@ -823,161 +824,159 @@ namespace Ayla
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] inline String TrimEnd(const TCharArray& Chars) const
+		[[nodiscard]] inline String TrimEnd(const TCharArray& chars) const
 		{
-			return this->TrimAll(TrimType::Tail, Chars);
+			return this->TrimAll(TrimType::Tail, chars);
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
-		[[nodiscard]] inline String TrimEnd(const TCharSequence&... Chars) const
+		[[nodiscard]] inline String TrimEnd(const TCharSequence&... chars) const
 		{
-			return TrimEnd(std::array{ (char_t)Chars... });
+			return TrimEnd(std::array{ (char_t)chars... });
 		}
 
-		[[nodiscard]] String Substring(size_t StartIndex, size_t InLength = -1) const
+		[[nodiscard]] String Substring(size_t startIndex, size_t length = -1) const
 		{
-			if (StartIndex >= Len)
+			if (startIndex >= m_Len)
 			{
 				return String();
 			}
 
-			InLength = std::min(InLength, Len - StartIndex);
-			return String(std::wstring_view(this->GetRaw() + StartIndex, InLength));
+			length = std::min(length, m_Len - startIndex);
+			return String(std::wstring_view(this->GetRaw() + startIndex, length));
 		}
 
-		[[nodiscard]] constexpr String SubstringView(size_t StartIndex, size_t InLength = -1) const noexcept
+		[[nodiscard]] constexpr String SubstringView(size_t startIndex, size_t length = -1) const noexcept
 		{
-			if (StartIndex >= Len)
+			if (startIndex >= m_Len)
 			{
 				return String::GetEmpty();
 			}
 
-			if (InLength > Len - StartIndex)
+			if (length > m_Len - startIndex)
 			{
-				InLength = Len - StartIndex;
+				length = m_Len - startIndex;
 			}
 
-			InLength = std::min(InLength, Len - StartIndex);
-			return String::FromLiteral(std::wstring_view(this->GetRaw() + StartIndex, InLength));
+			length = std::min(length, m_Len - startIndex);
+			return String::FromLiteral(std::wstring_view(this->GetRaw() + startIndex, length));
 		}
 
-		[[nodiscard]] inline std::vector<String> Split(char_t Separator, StringSplitOptions Options = StringSplitOptions::None) const
+		[[nodiscard]] inline std::vector<String> Split(char_t separator, StringSplitOptions options = StringSplitOptions::None) const
 		{
-			std::array<char_t, 1> Seps{ Separator };
-			return Split(Seps, Options);
+			std::array<char_t, 1> seps{ separator };
+			return Split(seps, options);
 		}
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] std::vector<String> Split(const TCharArray& Separators, StringSplitOptions Options = StringSplitOptions::None) const
+		[[nodiscard]] std::vector<String> Split(const TCharArray& separators, StringSplitOptions options = StringSplitOptions::None) const
 		{
-			std::vector<String> Results;
+			std::vector<String> results;
 
-			const bool bRemoveEmpty = (int32)(Options & StringSplitOptions::RemoveEmptyEntries) > 0;
-			const bool bTrim = (int32)(Options & StringSplitOptions::TrimEntries) > 0;
+			const bool bRemoveEmpty = (int32)(options & StringSplitOptions::RemoveEmptyEntries) > 0;
+			const bool bTrim = (int32)(options & StringSplitOptions::TrimEntries) > 0;
 
-			for (size_t i = 0; i < Len;)
+			for (size_t i = 0; i < m_Len;)
 			{
-				std::optional<String> View;
-				size_t Seekp = IndexOfAny(Separators, i);
+				std::optional<String> view;
+				size_t seekp = IndexOfAny(separators, i);
 
-				if (Seekp == -1)
+				if (seekp == -1)
 				{
-					// Could not found separator.
-					View = Substring(i);
+					view = Substring(i);
 					i = (size_t)-1;
 				}
 				else
 				{
-					size_t Length = Seekp - i;
-					if (Length != 0 || !bRemoveEmpty)
+					size_t length = seekp - i;
+					if (length != 0 || !bRemoveEmpty)
 					{
-						View = Substring(i, Length);
+						view = Substring(i, length);
 					}
-					i = Seekp + 1;
+					i = seekp + 1;
 				}
 
-				if (View)
+				if (view)
 				{
 					if (bTrim)
 					{
-						View = View->Trim();
-						if (bRemoveEmpty && View->Len == 0)
+						view = view->Trim();
+						if (bRemoveEmpty && view->m_Len == 0)
 						{
 							continue;
 						}
 					}
 
-					Results.emplace_back(View.value());
+					results.emplace_back(view.value());
 				}
 			}
 
-			return Results;
+			return results;
 		}
 
-		[[nodiscard]] std::vector<String> Split(const String& Separator, StringSplitOptions Options = StringSplitOptions::None) const
+		[[nodiscard]] std::vector<String> Split(const String& separator, StringSplitOptions options = StringSplitOptions::None) const
 		{
-			std::vector<String> Results;
+			std::vector<String> results;
 
-			const bool bRemoveEmpty = (int32)(Options & StringSplitOptions::RemoveEmptyEntries) > 0;
-			const bool bTrim = (int32)(Options & StringSplitOptions::TrimEntries) > 0;
+			const bool bRemoveEmpty = (int32)(options & StringSplitOptions::RemoveEmptyEntries) > 0;
+			const bool bTrim = (int32)(options & StringSplitOptions::TrimEntries) > 0;
 
-			for (size_t i = 0; i < Len;)
+			for (size_t i = 0; i < m_Len;)
 			{
-				std::optional<String> View;
-				size_t Seekp = IndexOf(Separator, i);
+				std::optional<String> view;
+				size_t seekp = IndexOf(separator, i);
 
-				if (Seekp == -1)
+				if (seekp == -1)
 				{
-					// Could not found separator.
-					View = Substring(i);
+					view = Substring(i);
 					i = (size_t)-1;
 				}
 				else
 				{
-					size_t Length = Seekp - i;
-					if (Length != 0 || !bRemoveEmpty)
+					size_t length = seekp - i;
+					if (length != 0 || !bRemoveEmpty)
 					{
-						View = Substring(i, Length);
+						view = Substring(i, length);
 					}
-					i = Seekp + Separator.Len;
+					i = seekp + separator.m_Len;
 				}
 
-				if (View)
+				if (view)
 				{
 					if (bTrim)
 					{
-						View = Trim(View.value());
-						if (bRemoveEmpty && View->Len == 0)
+						view = view->Trim();
+						if (bRemoveEmpty && view->m_Len == 0)
 						{
 							continue;
 						}
 					}
 
-					Results.emplace_back(View.value());
+					results.emplace_back(view.value());
 				}
 			}
 
-			return Results;
+			return results;
 		}
 
 		template<class TOp>
-		[[nodiscard]] String Transform(TOp&& Op) const requires
+		[[nodiscard]] String Transform(TOp&& op) const requires
 			std::convertible_to<std::invoke_result_t<TOp, char_t>, char_t>
 		{
-			decltype(Buf) Nbuf;
-			auto& Ptr = Nbuf.emplace<1>(std::make_shared<char_t[]>(Len + 1));
-			const char_t* const MyBuf = this->GetRaw();
+			decltype(m_Buf) nbuf;
+			auto& ptr = nbuf.template emplace<1>(std::make_shared<char_t[]>(m_Len + 1));
+			const char_t* const myBuf = this->GetRaw();
 
-			for (size_t i = 0; i < Len; ++i)
+			for (size_t i = 0; i < m_Len; ++i)
 			{
-				Ptr[i] = (char_t)Op(MyBuf[i]);
+				ptr[i] = (char_t)op(myBuf[i]);
 			}
 
-			String S;
-			S.Buf = std::move(Nbuf);
-			S.Len = Len;
-			return S;
+			String s;
+			s.m_Buf = std::move(nbuf);
+			s.m_Len = m_Len;
+			return s;
 		}
 
 		[[nodiscard]] inline String ToLower() const
@@ -990,162 +989,162 @@ namespace Ayla
 			return Transform((int(*)(int))std::toupper);
 		}
 
-		[[nodiscard]] String Replace(const String& OldValue, const String& NewValue, StringComparison Comparison = StringComparison::CurrentCulture) const
+		[[nodiscard]] String Replace(const String& oldValue, const String& newValue, StringComparison comparison = StringComparison::CurrentCulture) const
 		{
-			const char_t* const MyBuf = this->GetRaw();
+			const char_t* const myBuf = this->GetRaw();
 
-			std::vector<std::wstring_view> Concats;
+			std::vector<std::wstring_view> concats;
 
 			for (size_t i = 0;;)
 			{
-				size_t InIndexOf = IndexOf(OldValue, i, Comparison);
-				if (InIndexOf == -1)
+				size_t indexOf = IndexOf(oldValue, i, comparison);
+				if (indexOf == -1)
 				{
-					size_t len = Len - i;
-					Concats.emplace_back(std::wstring_view(MyBuf + i, len));
+					size_t len = m_Len - i;
+					concats.emplace_back(std::wstring_view(myBuf + i, len));
 					break;
 				}
 				else
 				{
-					size_t len = InIndexOf - i;
-					Concats.emplace_back(std::wstring_view(MyBuf + i, len));
-					Concats.emplace_back(std::wstring_view(NewValue.GetRaw(), NewValue.Len));
-					i = InIndexOf + OldValue.Len;
+					size_t len = indexOf - i;
+					concats.emplace_back(std::wstring_view(myBuf + i, len));
+					concats.emplace_back(std::wstring_view(newValue.GetRaw(), newValue.m_Len));
+					i = indexOf + oldValue.m_Len;
 				}
 			}
 
-			return InternalConcat(Concats);
+			return InternalConcat(concats);
 		}
 
-		[[nodiscard]] String ReplaceAt(size_t InIndexOf, size_t InLength, String NewValue) const
+		[[nodiscard]] String ReplaceAt(size_t indexOf, size_t length, String newValue) const
 		{
-			if (!NewValue)
+			if (!newValue)
 			{
 				return *this;
 			}
 
-			if (InIndexOf >= Len)
+			if (indexOf >= m_Len)
 			{
 				return *this;
 			}
 
-			InLength = std::min(InLength, Len - InIndexOf);
-			size_t Tail = InIndexOf + InLength;
+			length = std::min(length, m_Len - indexOf);
+			size_t tail = indexOf + length;
 
-			std::array<std::wstring_view, 3> Concats;
-			Concats[0] = std::wstring_view(this->GetRaw(), InIndexOf);
-			Concats[1] = std::wstring_view(NewValue.GetRaw(), NewValue.Len);
-			Concats[2] = std::wstring_view(this->GetRaw() + Tail, Len - Tail);
-			return InternalConcat(Concats);
+			std::array<std::wstring_view, 3> concats;
+			concats[0] = std::wstring_view(this->GetRaw(), indexOf);
+			concats[1] = std::wstring_view(newValue.GetRaw(), newValue.m_Len);
+			concats[2] = std::wstring_view(this->GetRaw() + tail, m_Len - tail);
+			return InternalConcat(concats);
 		}
 
-		[[nodiscard]] inline String Insert(size_t InIndexOf, String NewValue) const
+		[[nodiscard]] inline String Insert(size_t indexOf, String newValue) const
 		{
-			return ReplaceAt(InIndexOf, 0, NewValue);
+			return ReplaceAt(indexOf, 0, newValue);
 		}
 
-		[[nodiscard]] inline String Insert(size_t InIndexOf, char_t InCh) const
+		[[nodiscard]] inline String Insert(size_t indexOf, char_t ch) const
 		{
-			char_t LocalBuf[2] = { InCh, 0 };
-			return Insert(InIndexOf, String::FromLiteral(LocalBuf));
+			char_t localBuf[2] = { ch, 0 };
+			return Insert(indexOf, String::FromLiteral(localBuf));
 		}
 
-		[[nodiscard]] inline String Remove(size_t InIndexOf, size_t InLength = -1) const
+		[[nodiscard]] inline String Remove(size_t indexOf, size_t length = -1) const
 		{
-			const size_t Rem = Len - InIndexOf;
-			if (InLength > Rem || InLength == -1)
+			const size_t rem = m_Len - indexOf;
+			if (length > rem || length == -1)
 			{
-				InLength = Rem;
+				length = rem;
 			}
 
-			std::array<std::wstring_view, 2> Concats;
-			Concats[0] = std::wstring_view(this->GetRaw(), InIndexOf);
-			size_t App = InIndexOf + InLength;
-			Concats[1] = std::wstring_view(this->GetRaw() + App, Len - App);
-			return InternalConcat(Concats);
+			std::array<std::wstring_view, 2> concats;
+			concats[0] = std::wstring_view(this->GetRaw(), indexOf);
+			size_t app = indexOf + length;
+			concats[1] = std::wstring_view(this->GetRaw() + app, m_Len - app);
+			return InternalConcat(concats);
 		}
 
-		[[nodiscard]] inline String Quotes(char_t Ch = '"') const
+		[[nodiscard]] inline String Quotes(char_t ch = '"') const
 		{
-			std::array<std::wstring_view, 3> Concats;
-			Concats[0] = std::wstring_view(&Ch, 1);
-			Concats[1] = std::wstring_view(this->GetRaw(), Len);
-			Concats[2] = std::wstring_view(&Ch, 1);
-			return InternalConcat(Concats);
+			std::array<std::wstring_view, 3> concats;
+			concats[0] = std::wstring_view(&ch, 1);
+			concats[1] = std::wstring_view(this->GetRaw(), m_Len);
+			concats[2] = std::wstring_view(&ch, 1);
+			return InternalConcat(concats);
 		}
 
 	public:
-		[[nodiscard]] static inline constexpr String FromLiteral(std::wstring_view InStr) noexcept
+		[[nodiscard]] static inline constexpr String FromLiteral(std::wstring_view str) noexcept
 		{
-			return String(decltype(Buf)(InStr.data()), InStr.length());
+			return String(decltype(m_Buf)(str.data()), str.length());
 		}
 
-		[[nodiscard]] static String FromLiteral(std::string_view InStr);
+		[[nodiscard]] static String FromLiteral(std::string_view str);
 
 	public:
-		[[nodiscard]] static String FromCodepage(std::string_view Str, int32 Codepage = 0);
-		[[nodiscard]] std::string AsCodepage(int32 Codepage = 0) const;
+		[[nodiscard]] static String FromCodepage(std::string_view str, int32 codepage = 0);
+		[[nodiscard]] std::string AsCodepage(int32 codepage = 0) const;
 
 	public:
 		template<class... TArgs>
-		[[nodiscard]] static String Format(String InFormatStr, TArgs... InArgs)
+		[[nodiscard]] static String Format(String formatStr, TArgs... args)
 		{
-			return String(std::vformat(InFormatStr.wstring_view(), std::make_wformat_args(InArgs...)));
+			return String(std::vformat(formatStr.wstring_view(), std::make_wformat_args(args...)));
 		}
 
 		template<std::ranges::input_range TStringArray>
 			requires std::convertible_to<std::ranges::range_value_t<TStringArray>, String>
-		[[nodiscard]] static String Concat(const TStringArray& Strings)
+		[[nodiscard]] static String Concat(const TStringArray& strings)
 		{
-			std::vector<std::wstring_view> Buffers;
+			std::vector<std::wstring_view> buffers;
 
 			if constexpr (std::ranges::sized_range<TStringArray>)
 			{
-				Buffers.reserve(std::ranges::size(Strings));
+				buffers.reserve(std::ranges::size(strings));
 			}
 
-			for (const String& Item : Strings)
+			for (const String& item : strings)
 			{
-				Buffers.emplace_back(std::wstring_view(Item.GetRaw(), Item.Len));
+				buffers.emplace_back(std::wstring_view(item.GetRaw(), item.m_Len));
 			}
 
-			return InternalConcat(Buffers);
+			return InternalConcat(buffers);
 		}
 
 		template<std::convertible_to<String>... TStringSequence>
-		[[nodiscard]] static inline String Concat(const TStringSequence&... Strings)
+		[[nodiscard]] static inline String Concat(const TStringSequence&... strings)
 		{
-			return Concat(std::array{ (String)Strings... });
+			return Concat(std::array{ (String)strings... });
 		}
 
 		template<std::ranges::input_range TStringArray>
 			requires std::convertible_to<std::ranges::range_value_t<TStringArray>, String>
-		[[nodiscard]] static String Join(const String& Separator, TStringArray&& Strings)
+		[[nodiscard]] static String Join(const String& separator, TStringArray&& strings)
 		{
-			std::vector<String> Concats;
+			std::vector<String> concats;
 
 			if constexpr (std::ranges::sized_range<TStringArray>)
 			{
-				Concats.reserve(std::ranges::size(Strings));
+				concats.reserve(std::ranges::size(strings));
 			}
 
-			for (const auto& Item : Strings)
+			for (const auto& item : strings)
 			{
-				if (Concats.size() > 0)
+				if (concats.size() > 0)
 				{
-					Concats.emplace_back(Separator);
+					concats.emplace_back(separator);
 				}
 
-				Concats.emplace_back(Item);
+				concats.emplace_back(item);
 			}
 
-			return Concat(Concats);
+			return Concat(concats);
 		}
 
 		template<std::convertible_to<String>... TStringSequence>
-		[[nodiscard]] static inline String Join(const String& Separator, const TStringSequence&... Strings)
+		[[nodiscard]] static inline String Join(const String& separator, const TStringSequence&... strings)
 		{
-			return Join(Separator, std::array{ (String)Strings... });
+			return Join(separator, std::array{ (String)strings... });
 		}
 
 		[[nodiscard]] static inline constexpr String GetEmpty() noexcept
@@ -1156,14 +1155,14 @@ namespace Ayla
 	};
 
 	// Declared in CharType.h
-	constexpr FORCEINLINE String Char::ToStringView(const char_t& Ch) noexcept
+	constexpr FORCEINLINE String Char::ToStringView(const char_t& ch) noexcept
 	{
-		return String::FromLiteral(std::wstring_view(&Ch, 1));
+		return String::FromLiteral(std::wstring_view(&ch, 1));
 	}
 
-	FORCEINLINE String Char::ToString(char_t Ch)
+	FORCEINLINE String Char::ToString(char_t ch)
 	{
-		return ToStringView(Ch).Clone();
+		return ToStringView(ch).Clone();
 	}
 
 #define TEXT(X) (::Ayla::String::FromLiteral(L ## X))
@@ -1173,9 +1172,9 @@ template<>
 struct std::formatter<Ayla::String, wchar_t> : public std::formatter<std::wstring_view, wchar_t>
 {
 	template<class TFormatContext>
-	auto format(const Ayla::String& InStr, TFormatContext& Context) const
+	auto format(const Ayla::String& str, TFormatContext& context) const
 	{
-		return std::formatter<std::wstring_view, wchar_t>::format((std::wstring_view)InStr, Context);
+		return std::formatter<std::wstring_view, wchar_t>::format((std::wstring_view)str, context);
 	}
 };
 
@@ -1183,9 +1182,9 @@ template<>
 struct std::formatter<Ayla::String, char> : public std::formatter<std::string, char>
 {
 	template<class TFormatContext>
-	auto format(const Ayla::String& InStr, TFormatContext& Context) const
+	auto format(const Ayla::String& str, TFormatContext& context) const
 	{
-		return std::formatter<std::string_view, char>::format((std::string)InStr, Context);
+		return std::formatter<std::string_view, char>::format((std::string)str, context);
 	}
 };
 
@@ -1193,8 +1192,8 @@ template<class T, class TChar> requires requires { { std::declval<T>().ToString(
 struct std::formatter<T, TChar> : public std::formatter<::Ayla::String, TChar>
 {
 	template<class U, class TFormatContext>
-	auto format(U&& Obj, TFormatContext& Context) const
+	auto format(U&& obj, TFormatContext& context) const
 	{
-		return std::formatter<Ayla::String, TChar>::format(std::forward<U>(Obj).ToString(), Context);
+		return std::formatter<Ayla::String, TChar>::format(std::forward<U>(obj).ToString(), context);
 	}
 };
