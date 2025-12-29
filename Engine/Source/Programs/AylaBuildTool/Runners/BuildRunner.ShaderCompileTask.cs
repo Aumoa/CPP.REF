@@ -20,12 +20,10 @@ internal static partial class BuildRunner
         {
             try
             {
-                var output = new Terminal.Output();
-                
                 if (m_ShaderFiles.Count == 0)
                 {
                     m_CompletionSource.SetResult();
-                    return output;
+                    return Terminal.Output.Success("Shader Compiler", "No shaders to compile");
                 }
 
                 var resolver = m_Project.GetResolver(m_TargetInfo);
@@ -44,28 +42,31 @@ internal static partial class BuildRunner
                 {
                     // No shaders need compilation
                     m_CompletionSource.SetResult();
-                    return output;
+                    return Terminal.Output.Success("Shader Compiler", "All shaders up to date");
                 }
 
                 // Invoke DXC compiler
                 var dxcPath = Path.Combine(resolver.Group.BinariesDirectory, "DotNET", installation.GetExecutableFileName("DXC"));
                 if (!File.Exists(dxcPath))
                 {
-                    output.Logs.Add(new Terminal.Log(Terminal.LogKind.Warning, $"DXC compiler not found at {dxcPath}, skipping shader compilation"));
                     m_CompletionSource.SetResult();
-                    return output;
+                    return Terminal.Output.Success("Shader Compiler", $"DXC compiler not found at {dxcPath}, skipping shader compilation")
+                        .AppendLast(new Terminal.Log
+                        {
+                            Value = "Warning: Shader compilation skipped",
+                            Verbosity = Terminal.Verbose.Warning
+                        });
                 }
 
                 // Run DXC
-                var terminal = new Terminal();
-                var dxcOutput = await terminal.RunAsync(new Terminal.Args
+                var options = new Terminal.Options
                 {
-                    FileName = "dotnet",
-                    Arguments = [$"\"{dxcPath}\"", $"\"{makefilePath}\""],
-                    WorkingDirectory = resolver.Group.Current
-                }, cancellationToken);
+                    Executable = "dotnet",
+                    WorkingDirectory = resolver.Group.RootDirectory,
+                    Logging = Terminal.Logging.All
+                };
 
-                output.Logs.AddRange(dxcOutput.Logs);
+                var dxcOutput = await Terminal.ExecuteCommandAsync($"\"{dxcPath}\" \"{makefilePath}\"", options, cancellationToken);
 
                 if (dxcOutput.ExitCode != 0)
                 {
@@ -73,7 +74,7 @@ internal static partial class BuildRunner
                 }
 
                 m_CompletionSource.SetResult();
-                return output;
+                return dxcOutput;
             }
             catch (OperationCanceledException)
             {
@@ -147,7 +148,7 @@ internal static partial class BuildRunner
                 {
                     var comment = trimmed.TrimStart('/', '*').Trim().ToLower();
                     
-                    if (comment.Contains("shader:") || comment.Contains("type:"))
+                    if (comment.Contains("shader:") || comment.Contains("type:") || comment.Contains("shader type:"))
                     {
                         if (comment.Contains("vertex") || comment.Contains("vs"))
                             return "vertex";
