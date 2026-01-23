@@ -783,6 +783,12 @@ namespace Ayla
 			return m_Len == 0;
 		}
 
+		[[nodiscard]] inline constexpr bool IsWhiteSpace() const noexcept
+		{
+			auto trim = TrimStartView();
+			return trim.IsEmpty();
+		}
+
 		[[nodiscard]] inline constexpr bool IsValidIndex(size_t index) const noexcept
 		{
 			return index < m_Len;
