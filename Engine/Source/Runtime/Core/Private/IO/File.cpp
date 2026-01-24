@@ -29,6 +29,15 @@ namespace Ayla
 		Stream.Close();
 	}
 
+	Task<> File::WriteAllBytesAsync(String InPath, std::span<const uint8> InData, std::stop_token InCancellationToken)
+	{
+		FileStream Stream(InPath, FileMode::Create, FileAccessMode::Write);
+		Stream.Write(InData);
+		Stream.Flush();
+		Stream.Close();
+		co_return;
+	}
+
 	Task<bool> File::CompareAndWriteAllTextAsync(String InPath, String InContent, std::stop_token InCancellationToken)
 	{
 		if (Exists(InPath))

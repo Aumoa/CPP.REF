@@ -13,6 +13,18 @@ internal abstract class Installation
     public abstract ValueTask<string[]> ParseDependenciesAsync(string depsFileName, CancellationToken cancellationToken);
     public abstract string OutputFileName(string projectName, ModuleType moduleType);
 
+    public string GetExecutableFileName(string baseName)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return baseName + ".exe";
+        }
+        else
+        {
+            return baseName;
+        }
+    }
+
     public static Installation CreateDefaultInstallation()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

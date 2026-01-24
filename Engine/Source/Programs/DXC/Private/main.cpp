@@ -2,26 +2,72 @@
 
 #include "CoreMinimal.h"
 #include "Console.h"
-#include "ComPtr.h"
-#include "Helper.h"
-#include <iostream>
+#include "DXCCommon.h"
+#include "Threading/Tasks/Task.h"
+#include "ShaderCompilationTask.h"
+#include "DXCCompiler.h"
+#include <vector>
+#include <csignal>
 
 using namespace Ayla;
 
+Task<int> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
+{
+	try
+	{
+		if (argc < 2)
+		{
+			Console::WriteLine(TEXT("Usage: DXC <compilation-list-file>"));
+			Console::WriteLine(TEXT(""));
+			Console::WriteLine(TEXT("The compilation list file should contain lines in the format:"));
+			Console::WriteLine(TEXT("  Source/Shader.hlsl -t library -o Intermediate/Shader -I Include/Path -e main"));
+			co_return 1;
+		}
+
+		String listFilePath = String::FromLiteral(argv[1]);
+		LogDXC::Info(TEXT("DXC Shader Compiler"));
+		LogDXC::Info(TEXT("Reading compilation list: {}"), listFilePath);
+
+		// Parse compilation tasks using the new ShaderCompilationTask class
+		auto tasks = co_await ShaderCompilationTask::ParseMakefileAsync(listFilePath);
+		if (tasks.empty())
+		{
+			LogDXC::Warning(TEXT("No valid compilation tasks found"));
+			co_return 0;
+		}
+
+		LogDXC::Info(TEXT("Found {} shader(s) to compile"), tasks.size());
+
+		// Initialize DXC
+		auto compiler = DXCCompiler();
+
+		std::vector<Task<>> compilationTasks;
+		compilationTasks.reserve(tasks.size());
+		for (const auto& task : tasks)
+		{
+			compilationTasks.emplace_back(compiler.CompileShaderAsync(task, cancellationToken));
+		}
+
+		LogDXC::Info(TEXT("Compilation complete: {} succeeded"), compilationTasks.size());
+		co_return 0;
+	}
+	catch (const std::exception& e)
+	{
+		LogDXC::Critical(TEXT("Fatal error: {}"), String::FromLiteral(e.what()));
+		co_return 1;
+	}
+}
+
+std::stop_source g_ss;
+
+void sigint(int)
+{
+	g_ss.request_stop();
+}
+
 int main(int argc, char** argv)
 {
-	std::vector<String> args;
-	args.reserve((size_t)argc);
-	for (int i = 0; i < argc; ++i)
-	{
-		args.emplace_back(String::FromLiteral(argv[i]));
-	}
+	signal(SIGINT, sigint);
 
-	ComPtr<IDxcCompiler> compiler;
-	HR(DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&compiler)));
-
-	Console::WriteLine(TEXT("{}"), String::Join(TEXT(", "), args));
-	auto s = ReadLine();
-	Console::WriteLine(s);
-	return 0;
+	return MainAsync(argc, argv, g_ss.get_token()).GetResult();
 }

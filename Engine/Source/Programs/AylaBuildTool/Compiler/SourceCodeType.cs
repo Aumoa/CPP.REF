@@ -6,5 +6,7 @@ internal enum SourceCodeType
     Declaration,
     Header,
     NativeVisualizer,
-    ModuleInterface
+    ModuleInterface,
+    HLSLShader,
+    HLSLInclude
 }
