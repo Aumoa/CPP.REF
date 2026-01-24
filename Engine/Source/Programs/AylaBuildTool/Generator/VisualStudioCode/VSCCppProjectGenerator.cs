@@ -169,7 +169,13 @@ internal static class VSCCppProjectGenerator
                 string intelliSenseMode = await installation.GetIntelliSenseMode(targetInfo, cancellationToken);
                 var rule = resolver.Rules;
                 var outputFileName = project.Group.OutputFileName(installation, targetInfo, project.Name, rule.Type, FolderPolicy.PathType.Linux);
-                outputFileName = Path.Combine(Path.GetDirectoryName(outputFileName)!, Path.GetFileName(outputFileName)[3..^3]);
+                var fileName = Path.GetFileName(outputFileName);
+                if (fileName.StartsWith("lib") && fileName.EndsWith(".so"))
+                {
+                    fileName = fileName[3..^3];
+                }
+                
+                outputFileName = Path.Combine(Path.GetDirectoryName(outputFileName)!, fileName);
 
                 configurations.Add(new Configuration
                 {

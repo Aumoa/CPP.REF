@@ -101,7 +101,7 @@ namespace Ayla
 			Tail = 0x2,
 		};
 
-		template<std::ranges::input_range T> requires std::convertible_to<std::ranges::range_value_t<T>, char_t>
+		template<bool View, std::ranges::input_range T> requires std::convertible_to<std::ranges::range_value_t<T>, char_t>
 		constexpr String TrimAll(TrimType trimType, const T& chars) const
 		{
 			if (m_Len == 0)
@@ -148,7 +148,14 @@ namespace Ayla
 			}
 
 			size_t span = tail - head;
-			return Substring(head, span);
+			if constexpr (View)
+			{
+				return SubstringView(head, span);
+			}
+			else
+			{
+				return Substring(head, span);
+			}
 		}
 
 		template<std::ranges::input_range T> requires std::convertible_to<std::ranges::range_value_t<T>, string_view_t>
@@ -776,6 +783,12 @@ namespace Ayla
 			return m_Len == 0;
 		}
 
+		[[nodiscard]] inline constexpr bool IsWhiteSpace() const noexcept
+		{
+			auto trim = TrimStartView();
+			return trim.IsEmpty();
+		}
+
 		[[nodiscard]] inline constexpr bool IsValidIndex(size_t index) const noexcept
 		{
 			return index < m_Len;
@@ -786,11 +799,23 @@ namespace Ayla
 			return Trim(Char::WhiteSpaceChars);
 		}
 
+		[[nodiscard]] inline constexpr String TrimView() const
+		{
+			return TrimView(Char::WhiteSpaceChars);
+		}
+
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
 		[[nodiscard]] inline String Trim(const TCharArray& chars) const
 		{
-			return this->TrimAll((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), chars);
+			return this->TrimAll<false>((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), chars);
+		}
+
+		template<std::ranges::input_range TCharArray>
+			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
+		[[nodiscard]] inline constexpr String TrimView(const TCharArray& chars) const
+		{
+			return this->TrimAll<true>((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), chars);
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
@@ -799,16 +824,34 @@ namespace Ayla
 			return this->Trim(std::array{ (char_t)chars... });
 		}
 
+		template<std::convertible_to<char_t>... TCharSequence>
+		[[nodiscard]] inline constexpr String TrimView(const TCharSequence&... chars) const
+		{
+			return this->TrimView(std::array{ (char_t)chars... });
+		}
+
 		[[nodiscard]] inline String TrimStart() const
 		{
 			return TrimStart(Char::WhiteSpaceChars);
+		}
+
+		[[nodiscard]] inline constexpr String TrimStartView() const
+		{
+			return TrimStartView(Char::WhiteSpaceChars);
 		}
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
 		[[nodiscard]] inline String TrimStart(const TCharArray& chars) const
 		{
-			return this->TrimAll(TrimType::Head, chars);
+			return this->TrimAll<false>(TrimType::Head, chars);
+		}
+
+		template<std::ranges::input_range TCharArray>
+			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
+		[[nodiscard]] inline constexpr String TrimStartView(const TCharArray& chars) const
+		{
+			return this->TrimAll<true>(TrimType::Head, chars);
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
@@ -817,22 +860,46 @@ namespace Ayla
 			return TrimStart(std::array{ (char_t)chars... });
 		}
 
+		template<std::convertible_to<char_t>... TCharSequence>
+		[[nodiscard]] inline constexpr String TrimStartView(const TCharSequence&... chars) const
+		{
+			return TrimStartView(std::array{ (char_t)chars... });
+		}
+
 		[[nodiscard]] inline String TrimEnd() const
 		{
 			return TrimEnd(Char::WhiteSpaceChars);
+		}
+
+		[[nodiscard]] inline constexpr String TrimEndView() const
+		{
+			return TrimEndView(Char::WhiteSpaceChars);
 		}
 
 		template<std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
 		[[nodiscard]] inline String TrimEnd(const TCharArray& chars) const
 		{
-			return this->TrimAll(TrimType::Tail, chars);
+			return this->TrimAll<false>(TrimType::Tail, chars);
+		}
+
+		template<std::ranges::input_range TCharArray>
+			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
+		[[nodiscard]] inline constexpr String TrimEndView(const TCharArray& chars) const
+		{
+			return this->TrimAll<true>(TrimType::Tail, chars);
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
 		[[nodiscard]] inline String TrimEnd(const TCharSequence&... chars) const
 		{
 			return TrimEnd(std::array{ (char_t)chars... });
+		}
+
+		template<std::convertible_to<char_t>... TCharSequence>
+		[[nodiscard]] inline constexpr String TrimEndView(const TCharSequence&... chars) const
+		{
+			return TrimEndView(std::array{ (char_t)chars... });
 		}
 
 		[[nodiscard]] String Substring(size_t startIndex, size_t length = -1) const

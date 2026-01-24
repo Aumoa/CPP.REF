@@ -1,6 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "IO/StreamReader.h"
+#include "Text/Encoding.h"
 
 namespace Ayla
 {
@@ -85,7 +86,17 @@ namespace Ayla
 		}
 
 		const char* StringPtr = reinterpret_cast<const char*>(Buffer.data() + BufferPos);
-		String Str = String::FromCodepage(std::string_view(StringPtr, Length));
+		int32 codepage = 0;
+		size_t offset = Encoding::TryParseBOM({ StringPtr, StringPtr + Length }, &codepage);
+		StringPtr += offset;
+		Length -= offset;
+
+		if (codepage == 0)
+		{
+			codepage = 65001;  // UTF-8
+		}
+
+		String Str = String::FromCodepage(std::string_view(StringPtr, Length), codepage);
 		BufferPos = Buffer.size();
 		co_await TryShrinkAndFillAsync(InCancellationToken);
 		co_return Str;
