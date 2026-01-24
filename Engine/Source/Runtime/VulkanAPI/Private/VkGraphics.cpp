@@ -6,6 +6,7 @@
 #include "VkSwapchainExt.h"
 #include "Linq/Concat.h"
 #include <ranges>
+#include <array>
 
 namespace Ayla
 {
@@ -20,7 +21,7 @@ namespace Ayla
             .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
             .pEngineName = "AylaEngine",
             .engineVersion = VK_MAKE_VERSION(1, 0, 0),
-            .apiVersion = VK_API_VERSION_1_0
+            .apiVersion = VK_API_VERSION_1_2
         };
 
         uint32_t extCount = 0;
@@ -171,15 +172,49 @@ namespace Ayla
             .bufferDeviceAddressMultiDevice = VK_FALSE
         };
 
-        // Chain timelineFeatures -> bufferAddressFeatures
-        timelineFeatures.pNext = &bufferAddressFeatures;
-
-        std::vector<const char*> deviceExtensions = 
+        // Enable descriptor indexing features (required by VK_KHR_acceleration_structure)
+        VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures =
         {
-            "VK_KHR_swapchain"
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES,
+            .pNext = nullptr,
+            .runtimeDescriptorArray = VK_TRUE
         };
-        // Required for buffer device address usage (raytracing support may require additional extensions)
-        deviceExtensions.emplace_back("VK_KHR_buffer_device_address");
+
+        // Enable raytracing pipeline features
+        VkPhysicalDeviceRayTracingPipelineFeaturesKHR raytracingPipelineFeatures =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR,
+            .pNext = nullptr,
+            .rayTracingPipeline = VK_TRUE
+        };
+
+        // Enable acceleration structure features
+        VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR,
+            .pNext = nullptr,
+            .accelerationStructure = VK_TRUE
+        };
+
+        // Chain features: timelineFeatures -> bufferAddressFeatures -> descriptorIndexingFeatures -> raytracingPipelineFeatures -> accelerationStructureFeatures
+        timelineFeatures.pNext = &bufferAddressFeatures;
+        bufferAddressFeatures.pNext = &descriptorIndexingFeatures;
+        descriptorIndexingFeatures.pNext = &raytracingPipelineFeatures;
+        raytracingPipelineFeatures.pNext = &accelerationStructureFeatures;
+
+        auto deviceExtensions = std::array
+        {
+            "VK_KHR_swapchain",
+            // Core extensions for Vulkan 1.2 features when using extension names
+            "VK_KHR_buffer_device_address",
+            "VK_EXT_descriptor_indexing",
+            "VK_KHR_spirv_1_4",
+            "VK_KHR_shader_float_controls",
+            // Raytracing extensions
+            "VK_KHR_acceleration_structure",
+            "VK_KHR_ray_tracing_pipeline",
+            "VK_KHR_deferred_host_operations"
+        };
 
         VkDeviceCreateInfo vkDeviceInfo =
         {
