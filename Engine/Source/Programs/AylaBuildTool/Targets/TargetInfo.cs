@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using static AylaEngine.Terminal;
 
 namespace AylaEngine;
 
@@ -10,12 +11,43 @@ internal record TargetInfo : ITargetInfo
 
     public bool Editor { get; init; }
 
-    public static readonly TargetInfo Default = new()
+    public static readonly ITargetInfo Environment;
+
+    static TargetInfo()
     {
-        Platform = PlatformInfo.Win64,
-        Config = Configuration.Shipping,
-        Editor = false
-    };
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Environment = new TargetInfo
+            {
+                Platform = PlatformInfo.Win64,
+                Config = Configuration.Development,
+                Editor = true
+            };
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            Environment = new TargetInfo
+            {
+                Platform = PlatformInfo.Linux64,
+                Config = Configuration.Development,
+                Editor = true
+            };
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Environment = new TargetInfo
+            {
+                Platform = PlatformInfo.OSXArm64,
+                Config = Configuration.Development,
+                Editor = true
+            };
+        }
+        else
+        {
+            Console.Error.WriteLine("TargetInfo: Not supported platform. {0}", RuntimeInformation.OSDescription);
+            throw TerminateException.Internal();
+        }
+    }
 
     public static IEnumerable<TargetInfo> GetAllTargets()
     {

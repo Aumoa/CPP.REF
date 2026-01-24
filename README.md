@@ -187,6 +187,7 @@ dotnet AylaBuildTool.dll Clean
 - [⚡ Task System 가이드](docs/TaskSystem.md)
 - [🎨 렌더링 파이프라인](docs/Rendering.md)
 - [🔗 C# 스크립팅 API](docs/Scripting.md)
+- [🔺 HLSL 셰이더 빌드 파이프라인](docs/ShaderBuildPipeline.md)
 
 ## 🎓 참고 자료
 
