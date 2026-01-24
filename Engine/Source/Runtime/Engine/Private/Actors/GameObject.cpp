@@ -7,10 +7,15 @@ namespace Ayla
 {
 	GameObject::GameObject()
 	{
-		AddComponent<Transform>();
+		m_Transform = AddComponent<Transform>();
 	}
 
 	GameObject::~GameObject() noexcept
 	{
+	}
+
+	SharedPtr<Transform> GameObject::GetTransform() const noexcept
+	{
+		return m_Transform;
 	}
 }

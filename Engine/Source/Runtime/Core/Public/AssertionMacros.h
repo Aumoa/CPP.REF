@@ -14,6 +14,12 @@ namespace Ayla
 	{
 		return Verify();
 	}
+
+	template<class TBody>
+	[[noreturn]] void FORCEINLINE DispatchFailure(TBody&& body)
+	{
+		body();
+	}
 }
 
 #define AE_CHECK_IMPL(Capture, Expr, Msg) \
@@ -25,6 +31,16 @@ namespace Ayla
 
 #define check(Expr)						AE_CHECK_IMPL( , Expr, ::Ayla::String::Format(TEXT("Assertion failed: {}"), TEXT(#Expr)))
 #define checkf(Expr, Msgf, ...)			AE_CHECK_IMPL(&, Expr, ::Ayla::String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
+
+#define AE_FAILURE_IMPL(Capture, Msg) \
+	::Ayla::DispatchFailure([Capture]() FORCEINLINE_LAMBDA \
+	{ \
+		::Ayla::PlatformProcess::OutputDebugString(Msg + TEXT("\n")); \
+		PLATFORM_BREAK(); \
+	})
+
+#define fail()							AE_FAILURE_IMPL( , ::Ayla::String::Format(TEXT("Operation failed.")))
+#define failMsgf(Msgf, ...)				AE_FAILURE_IMPL(&, ::Ayla::String::Format(Msgf __VA_OPT__(,) __VA_ARGS__))
 
 #define AE_ENSURE_IMPL(Capture, Expr, Msg) \
 	(LIKELY(!!(Expr)) || (::Ayla::DispatchCheckVerify<bool>([Capture]() FORCEINLINE_LAMBDA \

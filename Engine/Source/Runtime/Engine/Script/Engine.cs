@@ -6,27 +6,13 @@ namespace Ayla;
 
 public partial class Engine
 {
-    private GenericActivity m_MainActivity = null!;
-    private Graphics m_Graphics = null!;
-    private List<GenericWindowSwapchainExtension> m_SwapchainExtensions = [];
-    private GameInstance m_GameInstance;
-    private SceneManager m_SceneManager;
+    private LaunchOptions m_Options;
 
     private static GetScriptTypeDelegate s_Get = () => typeof(Engine);
 
     public Engine(LaunchOptions options)
     {
-        m_MainActivity = GenericApplication.Get().CreateMainActivity();
-        m_MainActivity.BeforeInitialize();
-        InitializeMainActivity(m_MainActivity);
-
-        m_Graphics = Graphics.CreateGraphics(RenderFeatures.Vulkan);
-        m_SwapchainExtensions.Add(m_Graphics.InstallSwapChain(m_MainActivity.GetMainWindow()));
-        InitializeGraphics(m_Graphics);
-
-        m_GameInstance = InitializeGame(options);
-        m_SceneManager = new SceneManager();
-        SetupSwapchainExtensions([.. m_SwapchainExtensions]);
+        m_Options = options;
     }
 
     protected override void Dispose(bool disposing)
@@ -39,15 +25,14 @@ public partial class Engine
         base.Dispose(disposing);
     }
 
-    public void Start()
+    protected override Graphics InitializeGraphics()
     {
-        m_SceneManager.LoadScene(m_GameInstance.GetEntryScene(), LoadSceneMode.Single);
-        m_MainActivity.AfterInitialize();
+        return Graphics.CreateGraphics(RenderFeatures.Vulkan);
     }
 
-    private GameInstance InitializeGame(LaunchOptions options)
+    protected override GameInstance InitializeGameInstance()
     {
-        var gameAssemblyName = options.GetGameAssemblyName();
+        var gameAssemblyName = m_Options.GetGameAssemblyName();
         var gameAssembly = Assembly.Load(gameAssemblyName + ".Script");
 
         var gameInstanceType = gameAssembly.GetTypes()

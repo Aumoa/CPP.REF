@@ -140,7 +140,7 @@ namespace Ayla
 			}
 			else
 			{
-				throw InvalidOperationException(TEXT("The constructor is not constructible."));
+				failMsgf(TEXT("The construtor is not constructible."));
 			}
 		}
 

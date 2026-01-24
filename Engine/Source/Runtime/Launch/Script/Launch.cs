@@ -11,7 +11,7 @@ public partial class Launch
         LoadPlatformAssembly(options.GetPlatformAssemblyName());
         using (var engine = new Engine(options))
         {
-            engine.Start();
+            engine.Initialize();
             engine.GuardedLoop();
         }
         return 0;

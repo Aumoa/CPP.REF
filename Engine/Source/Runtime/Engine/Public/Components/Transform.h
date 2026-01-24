@@ -24,5 +24,16 @@ namespace Ayla
 		ACONSTRUCTOR()
 		Transform();
 		virtual ~Transform() noexcept override;
+
+		void GetLocalPositionAndRotation(Vector3F* outPosition, QuaternionF* outRotation) const
+		{
+			*outPosition = m_LocalPosition;
+			*outRotation = m_LocalRotation;
+		}
+
+		Vector3F GetLocalScale() const
+		{
+			return m_LocalRotation;
+		}
 	};
 }

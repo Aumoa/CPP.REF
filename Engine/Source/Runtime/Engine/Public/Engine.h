@@ -13,6 +13,8 @@ namespace Ayla
 	class CommandBuffer;
 	class TimerManager;
 	class GenericActivity;
+	class SceneManager;
+	class GameInstance;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -25,6 +27,8 @@ namespace Ayla
 		SharedPtr<RenderThread> m_RenderThread;
 		std::vector<SharedPtr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 		SharedPtr<CommandBuffer> m_CommandBuffer;
+		SharedPtr<SceneManager> m_SceneManager;
+		SharedPtr<GameInstance> m_GameInstance;
 		std::unique_ptr<TimerManager> m_TimerManager;
 		double m_FrameTime = 0;
 		size_t m_FrameCount = 0;
@@ -35,6 +39,8 @@ namespace Ayla
 		virtual ~Engine() noexcept override;
 
 		AFUNCTION()
+		virtual void Initialize();
+		AFUNCTION()
 		virtual void GuardedLoop();
 		AFUNCTION()
 		void Shutdown();
@@ -42,14 +48,16 @@ namespace Ayla
 		virtual void Tick();
 
 		AFUNCTION()
-		SharedPtr<Graphics> GetGraphics();
+		SharedPtr<Graphics> GetGraphics() const;
+		AFUNCTION()
+		SharedPtr<SceneManager> GetSceneManager() const;
 
 	protected:
 		AFUNCTION()
-		void InitializeMainActivity(SharedPtr<GenericActivity> mainActivity);
+		virtual SharedPtr<Graphics> InitializeGraphics();
 		AFUNCTION()
-		void InitializeGraphics(SharedPtr<Graphics> graphics);
+		virtual SharedPtr<GameInstance> InitializeGameInstance();
 		AFUNCTION()
-		void SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions);
+		virtual void InitializeGame();
 	};
 }

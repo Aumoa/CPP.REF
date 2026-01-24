@@ -11,6 +11,7 @@
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/SceneManager.h"
+#include "SceneManagement/Scene.h"
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "Rendering/SceneView.h"
 #include "Rendering/RenderTexture.h"
@@ -24,6 +25,23 @@ namespace Ayla
 
 	Engine::~Engine() noexcept
 	{
+	}
+
+	void Engine::Initialize_Implementation()
+	{
+		m_MainActivity = GenericApplication::Get().CreateMainActivity();
+		m_MainActivity->BeforeInitialize();
+
+		m_Graphics = InitializeGraphics();
+		m_RenderThread = New<RenderThread>(m_Graphics);
+		m_CommandBuffer = m_Graphics->CreateCommandBuffer();
+		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
+
+		m_GameInstance = InitializeGameInstance();
+		m_SceneManager = New<SceneManager>();
+		m_SceneManager->LoadScene(m_GameInstance->GetEntryScene(), LoadSceneMode::Single);
+
+		m_MainActivity->AfterInitialize();
 	}
 
 	void Engine::GuardedLoop_Implementation()
@@ -129,25 +147,28 @@ namespace Ayla
 		});
 	}
 
-	SharedPtr<Graphics> Engine::GetGraphics()
+	SharedPtr<Graphics> Engine::GetGraphics() const
 	{
 		return m_Graphics;
 	}
 
-	void Engine::InitializeMainActivity(SharedPtr<GenericActivity> mainActivity)
+	SharedPtr<SceneManager> Engine::GetSceneManager() const
 	{
-		m_MainActivity = mainActivity;
+		return m_SceneManager;
 	}
 
-	void Engine::InitializeGraphics(SharedPtr<Graphics> graphics)
+	SharedPtr<Graphics> Engine::InitializeGraphics_Implementation()
 	{
-		m_Graphics = graphics;
-		m_RenderThread = New<RenderThread>(graphics);
-		m_CommandBuffer = graphics->CreateCommandBuffer();
+		fail();
 	}
 
-	void Engine::SetupSwapchainExtensions(std::vector<SharedPtr<GenericWindowSwapchainExtension>> extensions)
+	SharedPtr<GameInstance> Engine::InitializeGameInstance_Implementation()
 	{
-		m_SwapchainExtensions = std::move(extensions);
+		fail();
+	}
+
+	void Engine::InitializeGame_Implementation()
+	{
+		fail();
 	}
 }

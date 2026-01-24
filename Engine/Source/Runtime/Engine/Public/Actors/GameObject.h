@@ -8,13 +8,20 @@
 
 namespace Ayla
 {
+	class Transform;
+
 	ACLASS()
 	class ENGINE_API GameObject : public Actor
 	{
 		GENERATED_BODY()
 
+	private:
+		SharedPtr<Transform> m_Transform;
+
 	public:
 		GameObject();
 		virtual ~GameObject() noexcept override;
+
+		SharedPtr<Transform> GetTransform() const noexcept;
 	};
 }
