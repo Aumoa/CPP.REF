@@ -183,7 +183,7 @@ internal static partial class BuildRunner
                 // Collect HLSL shader files for compilation
                 var shaderFiles = project.GetSourceCodes()
                     .Where(sc => sc.Type == SourceCodeType.HLSLShader)
-                    .ToList();
+                    .ToArray();
 
                 if (shaderFiles.Any())
                 {

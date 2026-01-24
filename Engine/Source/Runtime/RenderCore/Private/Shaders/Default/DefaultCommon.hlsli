@@ -1,5 +1,5 @@
-#ifndef __COMMON_HLSLI__
-#define __COMMON_HLSLI__
+#ifndef __DEFAULTCOMMON_HLSLI__
+#define __DEFAULTCOMMON_HLSLI__
 
 struct Payload
 {

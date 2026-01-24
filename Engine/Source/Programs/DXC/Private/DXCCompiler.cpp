@@ -105,14 +105,14 @@ namespace Ayla
 		// Write dependency file
 		{
 			StringBuilder depContent;
-			depContent.AppendFormat(TEXT("{}:"), outputFileName);
+			depContent.AppendFormat(TEXT("{}:\n"), outputFileName);
 			// Add source file as dependency
-			depContent.AppendFormat(TEXT(" \\\n  {}"), Path::GetFullPath(sct.GetSourceFile()));
+			depContent.AppendFormat(TEXT("  {}\n"), Path::GetFullPath(sct.GetSourceFile()));
 			// Add include files as dependencies
 			for (const auto& includedFile : includeHandler->GetDependentFiles())
-				{
-					depContent.AppendFormat(TEXT(" \\\n  {}"), Path::GetFullPath(includedFile));
-				}
+			{
+				depContent.AppendFormat(TEXT("  {}\n"), Path::GetFullPath(includedFile));
+			}
 			co_await File::WriteAllTextAsync(dependencyFileName, depContent.ToString(), cancellationToken);
 		}
 	}

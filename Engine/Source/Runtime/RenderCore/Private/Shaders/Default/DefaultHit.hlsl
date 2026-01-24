@@ -1,5 +1,6 @@
 // Shader Type: library
-#include "Common.hlsli"
+
+#include "DefaultCommon.hlsli"
 
 [shader("closesthit")]
 void main(inout Payload payload, Attributes attr)

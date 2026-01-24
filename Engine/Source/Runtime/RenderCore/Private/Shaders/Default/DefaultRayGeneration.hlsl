@@ -1,5 +1,6 @@
 // Shader Type: library
-#include "Common.hlsli"
+
+#include "DefaultCommon.hlsli"
 
 [shader("raygeneration")]
 void main()

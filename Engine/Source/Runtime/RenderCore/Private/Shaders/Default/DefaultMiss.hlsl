@@ -1,5 +1,6 @@
 // Shader Type: library
-#include "Common.hlsli"
+
+#include "DefaultCommon.hlsli"
 
 [shader("miss")]
 void main(inout Payload payload)

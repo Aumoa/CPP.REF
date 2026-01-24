@@ -8,10 +8,10 @@ internal static partial class BuildRunner
         
         private readonly ModuleProject m_Project;
         private readonly TargetInfo m_TargetInfo;
-        private readonly List<SourceCodeDescriptor> m_ShaderFiles;
+        private readonly SourceCodeDescriptor[] m_ShaderFiles;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public ShaderCompileTask(ModuleProject project, TargetInfo targetInfo, List<SourceCodeDescriptor> shaderFiles)
+        public ShaderCompileTask(ModuleProject project, TargetInfo targetInfo, SourceCodeDescriptor[] shaderFiles)
         {
             m_Project = project;
             m_TargetInfo = targetInfo;
@@ -22,7 +22,7 @@ internal static partial class BuildRunner
         {
             try
             {
-                if (m_ShaderFiles.Count == 0)
+                if (m_ShaderFiles.Length == 0)
                 {
                     m_CompletionSource.SetResult();
                     return Terminal.Output.Success("Shader Compiler", "No shaders to compile");
@@ -48,27 +48,22 @@ internal static partial class BuildRunner
                 }
 
                 // Invoke DXC compiler
-                var dxcPath = Path.Combine(resolver.Group.BinariesDirectory, "DotNET", installation.GetExecutableFileName("DXC"));
+                var targetInfo = TargetInfo.Environment;
+                var dxcPath = Path.Combine(resolver.Group.BinariesDirectory, targetInfo.Platform.Name, targetInfo.Config.ToString(), installation.GetExecutableFileName("DXC"));
                 if (!File.Exists(dxcPath))
                 {
-                    m_CompletionSource.SetResult();
-                    return Terminal.Output.Success("Shader Compiler", $"DXC compiler not found at {dxcPath}, skipping shader compilation")
-                        .AppendLast(new Terminal.Log
-                        {
-                            Value = "Warning: Shader compilation skipped",
-                            Verbosity = Terminal.Verbose.Warning
-                        });
+                    throw TerminateException.Abort();
                 }
 
                 // Run DXC
                 var options = new Terminal.Options
                 {
-                    Executable = "dotnet",
+                    Executable = dxcPath,
                     WorkingDirectory = resolver.Group.RootDirectory,
                     Logging = Terminal.Logging.All
                 };
 
-                var dxcOutput = await Terminal.ExecuteCommandAsync($"\"{dxcPath}\" \"{makefilePath}\"", options, cancellationToken);
+                var dxcOutput = await Terminal.ExecuteCommandAsync($"\"{makefilePath}\"", options, cancellationToken);
 
                 if (dxcOutput.ExitCode != 0)
                 {
