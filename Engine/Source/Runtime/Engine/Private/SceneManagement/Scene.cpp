@@ -34,4 +34,12 @@ namespace Ayla
 		m_GameObjects.emplace_back(obj);
 		return obj;
 	}
+
+	void Scene::DispatchTick(TickTiming timing)
+	{
+		for (auto& gameObject : m_GameObjects)
+		{
+			gameObject->Tick(timing);
+		}
+	}
 }

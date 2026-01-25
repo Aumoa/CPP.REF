@@ -27,4 +27,9 @@ namespace Ayla
 			m_ActiveScene->Activate();
 		}
 	}
+
+	void SceneManager::DispatchTick(TickTiming timing)
+	{
+		m_ActiveScene->DispatchTick(timing);
+	}
 }

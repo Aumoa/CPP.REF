@@ -10,7 +10,6 @@
 #include "TimerManager.h"
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
-#include "SceneManagement/SceneManager.h"
 #include "SceneManagement/Scene.h"
 #include "Rendering/RaytracingSceneRenderer.h"
 #include "Rendering/SceneView.h"
@@ -38,17 +37,13 @@ namespace Ayla
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
 
 		m_GameInstance = InitializeGameInstance();
-		m_SceneManager = New<SceneManager>();
-		m_SceneManager->LoadScene(m_GameInstance->GetEntryScene(), LoadSceneMode::Single);
+		m_GameInstance->Initialize();
 
 		m_MainActivity->AfterInitialize();
 	}
 
 	void Engine::GuardedLoop_Implementation()
 	{
-		auto syncContext = std::make_shared<MainSynchronizationContext>();
-		SynchronizationContext::SetSynchronizationContext(syncContext);
-
 		auto& app = GenericApplication::Get();
 		std::vector<GenericPlatformInputEvent> inputEvents;
 		m_TimerManager = std::make_unique<TimerManager>();
@@ -95,11 +90,22 @@ namespace Ayla
 	{
 		m_TimerManager->StartFrame();
 
-		MainSynchronizationContext::GetCurrent()->Tick();
-
 		m_FrameTime += m_TimerManager->GetDeltaTime().GetTotalSeconds();
 		m_FrameCount += 1;
 		m_TimerManager->UpdateTasks();
+
+		DispatchTick(TickTiming::Initialization);
+		DispatchTick(TickTiming::TimeUpdate);
+		DispatchTick(TickTiming::PreUpdate);
+		DispatchTick(TickTiming::Update);
+		DispatchTick(TickTiming::PostUpdate);
+		DispatchTick(TickTiming::Physics);
+		DispatchTick(TickTiming::PreLateUpdate);
+		DispatchTick(TickTiming::LateUpdate);
+		DispatchTick(TickTiming::PostLateUpdate);
+		DispatchTick(TickTiming::PreRender);
+		DispatchTick(TickTiming::PostRender);
+		DispatchTick(TickTiming::EndOfFrame);
 
 		static constexpr MinimalViewInfo kSampleView =
 		{
@@ -152,11 +158,6 @@ namespace Ayla
 		return m_Graphics;
 	}
 
-	SharedPtr<SceneManager> Engine::GetSceneManager() const
-	{
-		return m_SceneManager;
-	}
-
 	SharedPtr<Graphics> Engine::InitializeGraphics_Implementation()
 	{
 		fail();
@@ -170,5 +171,10 @@ namespace Ayla
 	void Engine::InitializeGame_Implementation()
 	{
 		fail();
+	}
+
+	void Engine::DispatchTick(TickTiming timing)
+	{
+		m_GameInstance->Tick(timing, m_TimerManager->GetDeltaTime());
 	}
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TickTiming.h"
 #include "Engine.gen.h"
 
 namespace Ayla
@@ -13,7 +14,6 @@ namespace Ayla
 	class CommandBuffer;
 	class TimerManager;
 	class GenericActivity;
-	class SceneManager;
 	class GameInstance;
 
 	ACLASS()
@@ -27,7 +27,6 @@ namespace Ayla
 		SharedPtr<RenderThread> m_RenderThread;
 		std::vector<SharedPtr<GenericWindowSwapchainExtension>> m_SwapchainExtensions;
 		SharedPtr<CommandBuffer> m_CommandBuffer;
-		SharedPtr<SceneManager> m_SceneManager;
 		SharedPtr<GameInstance> m_GameInstance;
 		std::unique_ptr<TimerManager> m_TimerManager;
 		double m_FrameTime = 0;
@@ -49,8 +48,6 @@ namespace Ayla
 
 		AFUNCTION()
 		SharedPtr<Graphics> GetGraphics() const;
-		AFUNCTION()
-		SharedPtr<SceneManager> GetSceneManager() const;
 
 	protected:
 		AFUNCTION()
@@ -59,5 +56,8 @@ namespace Ayla
 		virtual SharedPtr<GameInstance> InitializeGameInstance();
 		AFUNCTION()
 		virtual void InitializeGame();
+
+	private:
+		void DispatchTick(TickTiming timing);
 	};
 }

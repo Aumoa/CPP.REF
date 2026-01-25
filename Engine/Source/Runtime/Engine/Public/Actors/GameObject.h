@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TickTiming.h"
 #include "Actors/Actor.h"
 #include "GameObject.gen.h"
 
@@ -23,5 +24,7 @@ namespace Ayla
 		virtual ~GameObject() noexcept override;
 
 		SharedPtr<Transform> GetTransform() const noexcept;
+
+		void Tick(TickTiming timing);
 	};
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SerializableObject.h"
+#include "TickTiming.h"
 #include "Scene.gen.h"
 
 namespace Ayla
@@ -32,5 +33,8 @@ namespace Ayla
 
 		AFUNCTION()
 		SharedPtr<GameObject> SpawnGameObject();
+
+	public:
+		void DispatchTick(TickTiming timing);
 	};
 }

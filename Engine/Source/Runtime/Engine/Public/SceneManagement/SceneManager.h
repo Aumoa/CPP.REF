@@ -3,28 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TickTiming.h"
 #include "SceneManagement/LoadSceneMode.h"
-#include "SceneManager.gen.h"
 
 namespace Ayla
 {
 	class Scene;
 
-	ACLASS()
-	class ENGINE_API SceneManager : public Object
+	class ENGINE_API SceneManager : public NonCopyable
 	{
-		GENERATED_BODY()
-
-	private:
 		SharedPtr<Scene> m_ActiveScene;
 		std::vector<SharedPtr<Scene>> m_AdditiveScenes;
 
 	public:
-		ACONSTRUCTOR()
 		SceneManager();
-		virtual ~SceneManager() noexcept override;
+		virtual ~SceneManager() noexcept;
 
-		AFUNCTION()
 		void LoadScene(SharedPtr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single);
+
+	public:
+		void DispatchTick(TickTiming timing);
 	};
 }

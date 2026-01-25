@@ -18,4 +18,8 @@ namespace Ayla
 	{
 		return m_Transform;
 	}
+
+	void GameObject::Tick(TickTiming timing)
+	{
+	}
 }
