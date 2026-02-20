@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Threading/Tasks/Task.h"
+#include "Threading/Tasks/TaskScheduler.h"
 #include "Threading/Tasks/TaskCreationOptions.h"
 #include <memory>
 
