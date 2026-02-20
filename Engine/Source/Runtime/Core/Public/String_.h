@@ -794,9 +794,10 @@ namespace Ayla
 			return index < m_Len;
 		}
 
-		[[nodiscard]] inline String Trim() const
+		template<bool View = false>
+		[[nodiscard]] inline constexpr String Trim() const noexcept(View)
 		{
-			return Trim(Char::WhiteSpaceChars);
+			return Trim<View>(Char::WhiteSpaceChars);
 		}
 
 		[[nodiscard]] inline constexpr String TrimView() const
@@ -804,11 +805,11 @@ namespace Ayla
 			return TrimView(Char::WhiteSpaceChars);
 		}
 
-		template<std::ranges::input_range TCharArray>
+		template<bool View = false, std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] inline String Trim(const TCharArray& chars) const
+		[[nodiscard]] inline constexpr String Trim(const TCharArray& chars) const noexcept(View)
 		{
-			return this->TrimAll<false>((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), chars);
+			return this->TrimAll<View>((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), chars);
 		}
 
 		template<std::ranges::input_range TCharArray>
@@ -818,10 +819,10 @@ namespace Ayla
 			return this->TrimAll<true>((TrimType)((int32)TrimType::Head | (int32)TrimType::Tail), chars);
 		}
 
-		template<std::convertible_to<char_t>... TCharSequence>
-		[[nodiscard]] inline String Trim(const TCharSequence&... chars) const
+		template<bool View = false, std::convertible_to<char_t>... TCharSequence>
+		[[nodiscard]] inline constexpr String Trim(const TCharSequence&... chars) const noexcept(View)
 		{
-			return this->Trim(std::array{ (char_t)chars... });
+			return this->Trim<View>(std::array{ (char_t)chars... });
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
@@ -830,9 +831,10 @@ namespace Ayla
 			return this->TrimView(std::array{ (char_t)chars... });
 		}
 
-		[[nodiscard]] inline String TrimStart() const
+		template<bool View = false>
+		[[nodiscard]] inline constexpr String TrimStart() const noexcept(View)
 		{
-			return TrimStart(Char::WhiteSpaceChars);
+			return TrimStart<View>(Char::WhiteSpaceChars);
 		}
 
 		[[nodiscard]] inline constexpr String TrimStartView() const
@@ -840,11 +842,11 @@ namespace Ayla
 			return TrimStartView(Char::WhiteSpaceChars);
 		}
 
-		template<std::ranges::input_range TCharArray>
+		template<bool View = false, std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] inline String TrimStart(const TCharArray& chars) const
+		[[nodiscard]] inline constexpr String TrimStart(const TCharArray& chars) const noexcept(View)
 		{
-			return this->TrimAll<false>(TrimType::Head, chars);
+			return this->TrimAll<View>(TrimType::Head, chars);
 		}
 
 		template<std::ranges::input_range TCharArray>
@@ -854,10 +856,10 @@ namespace Ayla
 			return this->TrimAll<true>(TrimType::Head, chars);
 		}
 
-		template<std::convertible_to<char_t>... TCharSequence>
-		[[nodiscard]] inline String TrimStart(const TCharSequence&... chars) const
+		template<bool View = false, std::convertible_to<char_t>... TCharSequence>
+		[[nodiscard]] inline constexpr String TrimStart(const TCharSequence&... chars) const noexcept(View)
 		{
-			return TrimStart(std::array{ (char_t)chars... });
+			return TrimStart<View>(std::array{ (char_t)chars... });
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
@@ -866,9 +868,10 @@ namespace Ayla
 			return TrimStartView(std::array{ (char_t)chars... });
 		}
 
-		[[nodiscard]] inline String TrimEnd() const
+		template<bool View = false>
+		[[nodiscard]] inline constexpr String TrimEnd() const noexcept(View)
 		{
-			return TrimEnd(Char::WhiteSpaceChars);
+			return TrimEnd<View>(Char::WhiteSpaceChars);
 		}
 
 		[[nodiscard]] inline constexpr String TrimEndView() const
@@ -876,11 +879,11 @@ namespace Ayla
 			return TrimEndView(Char::WhiteSpaceChars);
 		}
 
-		template<std::ranges::input_range TCharArray>
+		template<bool View = false, std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] inline String TrimEnd(const TCharArray& chars) const
+		[[nodiscard]] inline constexpr String TrimEnd(const TCharArray& chars) const noexcept(View)
 		{
-			return this->TrimAll<false>(TrimType::Tail, chars);
+			return this->TrimAll<View>(TrimType::Tail, chars);
 		}
 
 		template<std::ranges::input_range TCharArray>
@@ -890,10 +893,10 @@ namespace Ayla
 			return this->TrimAll<true>(TrimType::Tail, chars);
 		}
 
-		template<std::convertible_to<char_t>... TCharSequence>
-		[[nodiscard]] inline String TrimEnd(const TCharSequence&... chars) const
+		template<bool View = false, std::convertible_to<char_t>... TCharSequence>
+		[[nodiscard]] inline constexpr String TrimEnd(const TCharSequence&... chars) const noexcept(View)
 		{
-			return TrimEnd(std::array{ (char_t)chars... });
+			return TrimEnd<View>(std::array{ (char_t)chars... });
 		}
 
 		template<std::convertible_to<char_t>... TCharSequence>
@@ -902,22 +905,12 @@ namespace Ayla
 			return TrimEndView(std::array{ (char_t)chars... });
 		}
 
-		[[nodiscard]] String Substring(size_t startIndex, size_t length = -1) const
+		template<bool View = false>
+		[[nodiscard]] constexpr String Substring(size_t startIndex, size_t length = -1) const noexcept(View)
 		{
 			if (startIndex >= m_Len)
 			{
-				return String();
-			}
-
-			length = std::min(length, m_Len - startIndex);
-			return String(std::wstring_view(this->GetRaw() + startIndex, length));
-		}
-
-		[[nodiscard]] constexpr String SubstringView(size_t startIndex, size_t length = -1) const noexcept
-		{
-			if (startIndex >= m_Len)
-			{
-				return String::GetEmpty();
+				return GetEmpty();
 			}
 
 			if (length > m_Len - startIndex)
@@ -926,18 +919,37 @@ namespace Ayla
 			}
 
 			length = std::min(length, m_Len - startIndex);
-			return String::FromLiteral(std::wstring_view(this->GetRaw() + startIndex, length));
+			if constexpr (View)
+			{
+				return String::FromLiteral(std::wstring_view(this->GetRaw() + startIndex, length));
+			}
+			else
+			{
+				return String(std::wstring_view(this->GetRaw() + startIndex, length));
+			}
 		}
 
-		[[nodiscard]] inline std::vector<String> Split(char_t separator, StringSplitOptions options = StringSplitOptions::None) const
+		[[nodiscard]] constexpr String SubstringView(size_t startIndex, size_t length = -1) const noexcept
+		{
+			return Substring<true>(startIndex, length);
+		}
+
+		template<bool View = false>
+		[[nodiscard]] inline constexpr std::vector<String> Split(char_t separator, StringSplitOptions options = StringSplitOptions::None) const noexcept(View)
 		{
 			std::array<char_t, 1> seps{ separator };
-			return Split(seps, options);
+			return Split<View>(seps, options);
 		}
 
-		template<std::ranges::input_range TCharArray>
+		[[nodiscard]] inline constexpr std::vector<String> SplitView(char_t separator, StringSplitOptions options = StringSplitOptions::None) const noexcept
+		{
+			std::array<char_t, 1> seps{ separator };
+			return SplitView(seps, options);
+		}
+
+		template<bool View = false, std::ranges::input_range TCharArray>
 			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
-		[[nodiscard]] std::vector<String> Split(const TCharArray& separators, StringSplitOptions options = StringSplitOptions::None) const
+		[[nodiscard]] constexpr std::vector<String> Split(const TCharArray& separators, StringSplitOptions options = StringSplitOptions::None) const noexcept(View)
 		{
 			std::vector<String> results;
 
@@ -951,7 +963,7 @@ namespace Ayla
 
 				if (seekp == -1)
 				{
-					view = Substring(i);
+					view = Substring<View>(i);
 					i = (size_t)-1;
 				}
 				else
@@ -959,7 +971,7 @@ namespace Ayla
 					size_t length = seekp - i;
 					if (length != 0 || !bRemoveEmpty)
 					{
-						view = Substring(i, length);
+						view = Substring<View>(i, length);
 					}
 					i = seekp + 1;
 				}
@@ -968,7 +980,7 @@ namespace Ayla
 				{
 					if (bTrim)
 					{
-						view = view->Trim();
+						view = view->Trim<View>();
 						if (bRemoveEmpty && view->m_Len == 0)
 						{
 							continue;
@@ -982,7 +994,15 @@ namespace Ayla
 			return results;
 		}
 
-		[[nodiscard]] std::vector<String> Split(const String& separator, StringSplitOptions options = StringSplitOptions::None) const
+		template<std::ranges::input_range TCharArray>
+			requires std::convertible_to<std::ranges::range_value_t<TCharArray>, char_t>
+		[[nodiscard]] constexpr std::vector<String> SplitView(const TCharArray& separators, StringSplitOptions options = StringSplitOptions::None) const noexcept
+		{
+			return Split<true>(separators, options);
+		}
+
+		template<bool View = false>
+		[[nodiscard]] constexpr std::vector<String> Split(const String& separator, StringSplitOptions options = StringSplitOptions::None) const noexcept(View)
 		{
 			std::vector<String> results;
 
@@ -996,7 +1016,7 @@ namespace Ayla
 
 				if (seekp == -1)
 				{
-					view = Substring(i);
+					view = Substring<View>(i);
 					i = (size_t)-1;
 				}
 				else
@@ -1004,7 +1024,7 @@ namespace Ayla
 					size_t length = seekp - i;
 					if (length != 0 || !bRemoveEmpty)
 					{
-						view = Substring(i, length);
+						view = Substring<View>(i, length);
 					}
 					i = seekp + separator.m_Len;
 				}
@@ -1013,7 +1033,7 @@ namespace Ayla
 				{
 					if (bTrim)
 					{
-						view = view->Trim();
+						view = view->Trim<View>();
 						if (bRemoveEmpty && view->m_Len == 0)
 						{
 							continue;
@@ -1025,6 +1045,11 @@ namespace Ayla
 			}
 
 			return results;
+		}
+
+		[[nodiscard]] constexpr std::vector<String> SplitView(const String& separator, StringSplitOptions options = StringSplitOptions::None) const noexcept
+		{
+			return Split<true>(separator, options);
 		}
 
 		template<class TOp>
@@ -1143,7 +1168,7 @@ namespace Ayla
 	public:
 		[[nodiscard]] static inline constexpr String FromLiteral(std::wstring_view str) noexcept
 		{
-			return String(decltype(m_Buf)(str.data()), str.length());
+			return String(decltype(m_Buf)(str), str.length());
 		}
 
 		[[nodiscard]] static String FromLiteral(std::string_view str);
