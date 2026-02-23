@@ -424,6 +424,11 @@ namespace Ayla
 			return this->CompareTo(rhs.GetRaw(), rhs.m_Len, comparison);
 		}
 
+		[[nodiscard]] inline constexpr bool Contains(char_t ch, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
+		{
+			return IndexOf(ch, 0, (size_t)-1, comparison) != -1;
+		}
+
 		[[nodiscard]] inline constexpr bool Contains(const String& compare, StringComparison comparison = StringComparison::CurrentCulture) const noexcept
 		{
 			return IndexOf(compare, 0, (size_t)-1, comparison) != -1;
