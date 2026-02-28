@@ -227,7 +227,7 @@ internal static partial class BuildRunner
 
         string MakeOutputPrefix(double elapsedSeconds)
         {
-            return string.Format($"[{{0,{log}}}/{{1,{log}}} {{2:000.0}}s]", Interlocked.Increment(ref compiled), totalActions, elapsedSeconds);
+            return string.Format($"[{{0,{log}}}/{{1,{log}}} {{2,5:F1}}s]", Interlocked.Increment(ref compiled), totalActions, elapsedSeconds);
         }
 
         async Task ExecuteCMakeBuilds()
