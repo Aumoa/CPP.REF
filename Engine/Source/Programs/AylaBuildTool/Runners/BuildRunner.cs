@@ -1,4 +1,5 @@
-﻿using static AylaEngine.CppCompiler;
+﻿using System.Diagnostics;
+using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
 
@@ -225,9 +226,9 @@ internal static partial class BuildRunner
 
         return;
 
-        string MakeOutputPrefix()
+        string MakeOutputPrefix(double elapsedSeconds)
         {
-            return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
+            return string.Format($"[{{0,{log}}}/{{1,{log}}} {{2:F1}}s]", Interlocked.Increment(ref compiled), totalActions, elapsedSeconds);
         }
 
         async Task ExecuteCMakeBuilds()
@@ -341,10 +342,12 @@ internal static partial class BuildRunner
 
             foreach (var scriptTask in scriptTasks)
             {
+                var sw = Stopwatch.StartNew();
                 scriptTask.BuildAsync(scriptTasks, virtualProjects, buildTarget, cancellationToken).ContinueWith(r =>
                 {
+                    sw.Stop();
                     var output = r.Result;
-                    Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                    Console.WriteLine("{0} {1}", MakeOutputPrefix(sw.Elapsed.TotalSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
                 });
             }
         }
@@ -353,14 +356,16 @@ internal static partial class BuildRunner
         {
             foreach (var shaderTask in shaderTasks)
             {
+                var sw = Stopwatch.StartNew();
                 shaderTask.CompileAsync(moduleTasks, installation, cancellationToken).ContinueWith(r =>
                 {
+                    sw.Stop();
                     try
                     {
                         var output = r.Result;
                         if (output.Logs.Any())
                         {
-                            Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(), shaderTask.Group.Name);
+                            Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(sw.Elapsed.TotalSeconds), shaderTask.Group.Name);
                             Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
                         }
                     }
@@ -379,12 +384,14 @@ internal static partial class BuildRunner
             {
                 if (moduleTask.NeedLink(buildTarget))
                 {
+                    var sw = Stopwatch.StartNew();
                     moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                     {
+                        sw.Stop();
                         try
                         {
                             var output = r.Result;
-                            Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                            Console.WriteLine("{0} {1}", MakeOutputPrefix(sw.Elapsed.TotalSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
                         }
                         catch (TerminalExecutionException e)
                         {
@@ -405,10 +412,12 @@ internal static partial class BuildRunner
             var allCompiles = moduleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
             foreach (var compileTask in allCompiles)
             {
+                var sw = Stopwatch.StartNew();
                 compileTask.CompileAsync(installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
+                    sw.Stop();
                     var output = r.Result;
-                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(), compileTask.Item.SourceCode.FilePath);
+                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(sw.Elapsed.TotalSeconds), compileTask.Item.SourceCode.FilePath);
                     string[] outputs = [fileText, .. output.Logs.Select(l => l.Value)];
                     Console.WriteLine(string.Join('\n', outputs));
                 });
