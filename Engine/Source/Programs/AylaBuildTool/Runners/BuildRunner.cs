@@ -225,9 +225,9 @@ internal static partial class BuildRunner
 
         return;
 
-        string MakeOutputPrefix()
+        string MakeOutputPrefix(double elapsedSeconds)
         {
-            return string.Format($"[{{0,{log}}}/{{1,{log}}}]", Interlocked.Increment(ref compiled), totalActions);
+            return string.Format($"[{{0,{log}}}/{{1,{log}}} {{2,5:F1}}s]", Interlocked.Increment(ref compiled), totalActions, elapsedSeconds);
         }
 
         async Task ExecuteCMakeBuilds()
@@ -344,7 +344,7 @@ internal static partial class BuildRunner
                 scriptTask.BuildAsync(scriptTasks, virtualProjects, buildTarget, cancellationToken).ContinueWith(r =>
                 {
                     var output = r.Result;
-                    Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                    Console.WriteLine("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
                 });
             }
         }
@@ -360,7 +360,7 @@ internal static partial class BuildRunner
                         var output = r.Result;
                         if (output.Logs.Any())
                         {
-                            Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(), shaderTask.Group.Name);
+                            Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(output.ElapsedSeconds), shaderTask.Group.Name);
                             Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
                         }
                     }
@@ -384,7 +384,7 @@ internal static partial class BuildRunner
                         try
                         {
                             var output = r.Result;
-                            Console.WriteLine("{0} {1}", MakeOutputPrefix(), string.Join('\n', output.Logs.Select(p => p.Value)));
+                            Console.WriteLine("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
                         }
                         catch (TerminalExecutionException e)
                         {
@@ -408,7 +408,7 @@ internal static partial class BuildRunner
                 compileTask.CompileAsync(installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
                     var output = r.Result;
-                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(), compileTask.Item.SourceCode.FilePath);
+                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), compileTask.Item.SourceCode.FilePath);
                     string[] outputs = [fileText, .. output.Logs.Select(l => l.Value)];
                     Console.WriteLine(string.Join('\n', outputs));
                 });

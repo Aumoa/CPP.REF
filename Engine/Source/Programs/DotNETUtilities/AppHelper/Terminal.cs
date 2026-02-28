@@ -44,6 +44,8 @@ public static class Terminal
 
         public required Log[] StdErr { get; init; }
 
+        public double ElapsedSeconds { get; init; } = 0.0;
+
         public bool IsCompletedSuccessfully => ExitCode == 0;
 
         public bool IsFailure => ExitCode != 0;
@@ -122,6 +124,7 @@ public static class Terminal
 
     public static async ValueTask<Output> ExecuteCommandAsync(string command, Options options, CancellationToken cancellationToken = default)
     {
+        var sw = Stopwatch.StartNew();
         var process = StartProcess(options.Executable, command, options.WorkingDirectory);
 
         List<Log> logs = [];
@@ -179,6 +182,7 @@ public static class Terminal
         {
             await process.WaitForExitAsync(cancellationToken);
         }
+        sw.Stop();
 
         return new Output
         {
@@ -187,7 +191,8 @@ public static class Terminal
             ExitCode = process.ExitCode,
             Logs = logs.ToArray(),
             StdOut = stdout.ToArray(),
-            StdErr = stderr.ToArray()
+            StdErr = stderr.ToArray(),
+            ElapsedSeconds = sw.Elapsed.TotalSeconds
         };
     }
 

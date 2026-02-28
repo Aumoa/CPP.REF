@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Xml;
 
 namespace AylaEngine;
@@ -80,7 +81,9 @@ internal static partial class BuildRunner
                     .Append(csproj.GenerateAssemblyAttribute(null, config, null, assemblyName, Version.Parse("1.0.0.0")))
                     .Append(csproj.GenerateGlobals());
 
+                var sw = Stopwatch.StartNew();
                 var outputFileName = await CSCompiler.CompileAsAsync(sourceCodes, csproj, virtualProjects, resolver.Project.ScriptSourceDirectory, resolver.Name + ".Script", cancellationToken);
+                sw.Stop();
                 Terminal.Log[] logs = [new() { Verbosity = Terminal.Verbose.Info, Value = "Script: " + outputFileName }];
                 GenerateCache(targetInfo);
                 m_CompletionSource.SetResult();
@@ -91,7 +94,8 @@ internal static partial class BuildRunner
                     ExitCode = 0,
                     Logs = logs,
                     StdOut = logs,
-                    StdErr = []
+                    StdErr = [],
+                    ElapsedSeconds = sw.Elapsed.TotalSeconds
                 };
             }
             catch (OperationCanceledException)
