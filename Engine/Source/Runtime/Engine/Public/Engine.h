@@ -54,8 +54,6 @@ namespace Ayla
 		virtual SharedPtr<Graphics> InitializeGraphics();
 		AFUNCTION()
 		virtual SharedPtr<GameInstance> InitializeGameInstance();
-		AFUNCTION()
-		virtual void InitializeGame();
 
 	private:
 		void DispatchTick(TickTiming timing);

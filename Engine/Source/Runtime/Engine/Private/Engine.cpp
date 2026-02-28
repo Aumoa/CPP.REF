@@ -168,11 +168,6 @@ namespace Ayla
 		fail();
 	}
 
-	void Engine::InitializeGame_Implementation()
-	{
-		fail();
-	}
-
 	void Engine::DispatchTick(TickTiming timing)
 	{
 		m_GameInstance->Tick(timing, m_TimerManager->GetDeltaTime());

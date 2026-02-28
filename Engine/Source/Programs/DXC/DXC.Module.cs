@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 using System;
+using System.IO;
 using AylaEngine;
 
 public class DXC : ModuleRules
@@ -12,8 +13,28 @@ public class DXC : ModuleRules
         AddPublicDependencyModuleNames("Core");
         Type = ModuleType.Console;
 
-        // TODO: Parse version string and select latest.
-        AddPrivateIncludePaths("C:\\VulkanSDK\\1.4.313.2\\Include\\dxc");
-        AddPrivateAdditionalLibraries("C:\\VulkanSDK\\1.4.313.2\\Lib\\dxcompiler.lib");
+        string? vulkanSdk = Environment.GetEnvironmentVariable("VULKAN_SDK");
+        if (string.IsNullOrEmpty(vulkanSdk))
+        {
+            AddError("VULKAN_SDK environment variable is not set. Please install the Vulkan SDK and ensure the environment variable is configured.");
+            return;
+        }
+
+        var includePath = Path.Combine(vulkanSdk, "Include", "dxc");
+        if (!Directory.Exists(includePath))
+        {
+            AddError($"Could not find the Include directory in the Vulkan SDK directory: {vulkanSdk}. Please ensure the Vulkan SDK is installed correctly.");
+            return;
+        }
+
+        var libPath = Path.Combine(vulkanSdk, "Lib", "dxcompiler.lib");
+        if (!File.Exists(libPath))
+        {
+            AddError($"Could not find dxcompiler.lib in the Vulkan SDK directory: {vulkanSdk}. Please ensure the Vulkan SDK is installed correctly.");
+            return;
+        }
+
+        AddPrivateIncludePaths(includePath);
+        AddPrivateAdditionalLibraries(libPath);
     }
 }
