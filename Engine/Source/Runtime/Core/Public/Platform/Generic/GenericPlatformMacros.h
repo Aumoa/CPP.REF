@@ -44,6 +44,10 @@
 #	define PLATFORM_LINUX 0
 #endif
 
+#if !defined(PLATFORM_OSX)
+#	define PLATFORM_OSX 0
+#endif
+
 #if !defined(PLATFORM_UNIX)
 #	define PLATFORM_UNIX 0
 #endif

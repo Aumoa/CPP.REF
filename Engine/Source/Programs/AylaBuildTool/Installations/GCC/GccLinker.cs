@@ -18,7 +18,7 @@ internal class GccLinker : Linker
     {
         var options = new Terminal.Options
         {
-            Executable = "g++",
+            Executable = m_TargetInfo.Platform.Group == PlatformGroup.OSX ? "clang++" : "g++",
             Logging = Terminal.Logging.None
         };
 
@@ -30,9 +30,14 @@ internal class GccLinker : Linker
 
         if (module.Rules.IsSharedLibrary())
         {
-            linkCommands.Append(
-                "-shared "
-            );
+            if (m_TargetInfo.Platform.Group == PlatformGroup.OSX)
+            {
+                linkCommands.Append("-dynamiclib ");
+            }
+            else
+            {
+                linkCommands.Append("-shared ");
+            }
         }
 
         for (int i = 0; i < sourceObjects.Length; ++i)
@@ -52,12 +57,23 @@ internal class GccLinker : Linker
             linkCommands.AppendFormat("-Wl,-rpath,\"{0}\" ", libPath);
         }
 
-        foreach (var additionalLibrary in module.AdditionalLibraries
-            .Concat(module.DependencyModuleNames)
-            .Append("stdc++")
-            .Append("stdc++exp"))
+        if (m_TargetInfo.Platform.Group == PlatformGroup.OSX)
         {
-            linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
+            foreach (var additionalLibrary in module.AdditionalLibraries
+                .Concat(module.DependencyModuleNames))
+            {
+                linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
+            }
+        }
+        else
+        {
+            foreach (var additionalLibrary in module.AdditionalLibraries
+                .Concat(module.DependencyModuleNames)
+                .Append("stdc++")
+                .Append("stdc++exp"))
+            {
+                linkCommands.AppendFormat("-l\"{0}\" ", additionalLibrary);
+            }
         }
 
         var result = await Terminal.ExecuteCommandAsync(linkCommands.ToString(), options, cancellationToken);

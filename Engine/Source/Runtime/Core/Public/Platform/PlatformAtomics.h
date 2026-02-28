@@ -4,3 +4,4 @@
 
 #include "Platform/Windows/WindowsPlatformAtomics.h"
 #include "Platform/Linux/LinuxPlatformAtomics.h"
+#include "Platform/OSX/OSXPlatformAtomics.h"

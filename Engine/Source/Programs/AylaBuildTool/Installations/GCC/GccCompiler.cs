@@ -17,7 +17,7 @@ internal class GccCompiler : CppCompiler
     {
         var options = new Terminal.Options
         {
-            Executable = "g++",
+            Executable = m_TargetInfo.Platform.Group == PlatformGroup.OSX ? "clang++" : "g++",
             Logging = Terminal.Logging.None
         };
 

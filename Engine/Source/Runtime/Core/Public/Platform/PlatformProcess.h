@@ -4,3 +4,4 @@
 
 #include "Platform/Windows/WindowsPlatformProcess.h"
 #include "Platform/Linux/LinuxPlatformProcess.h"
+#include "Platform/OSX/OSXPlatformProcess.h"

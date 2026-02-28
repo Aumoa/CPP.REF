@@ -4,6 +4,7 @@
 
 #include "Windows/WindowsPlatformMacros.h"
 #include "Linux/LinuxPlatformMacros.h"
+#include "OSX/OSXPlatformMacros.h"
 
 #ifndef PLATFORM_YIELD
 #error PLATFORM_YIELD is not defined.

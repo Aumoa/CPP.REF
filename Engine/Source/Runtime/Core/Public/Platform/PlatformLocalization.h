@@ -4,3 +4,4 @@
 
 #include "Platform/Windows/WindowsPlatformLocalization.h"
 #include "Platform/Linux/LinuxPlatformLocalization.h"
+#include "Platform/OSX/OSXPlatformLocalization.h"
