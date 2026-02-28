@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - copilot/fix-macos-build-issues
 
 jobs:
   build:
