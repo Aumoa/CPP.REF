@@ -92,8 +92,9 @@ namespace Ayla
 		pid_t pid = fork();
 		if (pid == 0)
 		{
+			std::string fileNameStr = InStartInfo.FileName.AsCodepage();
 			std::vector<char*> args;
-			args.push_back(const_cast<char*>(InStartInfo.FileName.AsCodepage().c_str()));
+			args.push_back(const_cast<char*>(fileNameStr.c_str()));
 			std::string argStr = InStartInfo.Arguments.string();
 			std::istringstream iss(argStr);
 			std::string token;
@@ -103,7 +104,7 @@ namespace Ayla
 			}
 			args.push_back(nullptr);
 
-			execvp(InStartInfo.FileName.AsCodepage().c_str(), args.data());
+			execvp(fileNameStr.c_str(), args.data());
 			_exit(127);
 		}
 		else if (pid > 0)
