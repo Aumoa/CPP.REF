@@ -44,6 +44,8 @@ public static class Terminal
 
         public required Log[] StdErr { get; init; }
 
+        public double ElapsedSeconds { get; init; } = 0.0;
+
         public bool IsCompletedSuccessfully => ExitCode == 0;
 
         public bool IsFailure => ExitCode != 0;

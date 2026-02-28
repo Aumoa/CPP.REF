@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -84,7 +85,10 @@ internal class MSLinker : Linker
         }
 
         var commandParameters = m_CommandBuilder.ToString();
+        var sw = Stopwatch.StartNew();
         var result = await Terminal.ExecuteCommandAsync(commandParameters, options, cancellationToken);
+        sw.Stop();
+        result = result with { ElapsedSeconds = sw.Elapsed.TotalSeconds };
         if (result.IsCompletedSuccessfully && ((result.StdOut.Length == 0 && result.Logs.Length == 0) || (result.StdOut.Length == 1 && result.Logs.Length == 1 && string.IsNullOrWhiteSpace(result.StdOut[0].Value))))
         {
             Terminal.Log[] outputs =

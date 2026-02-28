@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -170,7 +171,10 @@ internal class ClCompiler : CppCompiler
         Terminal.Output output;
         using (await GetAccess(cancellationToken))
         {
+            var sw = Stopwatch.StartNew();
             output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+            sw.Stop();
+            output = output with { ElapsedSeconds = sw.Elapsed.TotalSeconds };
         }
         
         if (output.ExitCode == 0)

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace AylaEngine;
 
 internal static partial class BuildRunner
@@ -70,7 +72,10 @@ internal static partial class BuildRunner
                     Logging = Terminal.Logging.All
                 };
 
+                var sw = Stopwatch.StartNew();
                 var dxcOutput = await Terminal.ExecuteCommandAsync($"\"{makefilePath}\"", options, cancellationToken);
+                sw.Stop();
+                dxcOutput = dxcOutput with { ElapsedSeconds = sw.Elapsed.TotalSeconds };
 
                 if (dxcOutput.ExitCode != 0)
                 {
