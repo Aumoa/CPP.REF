@@ -16,3 +16,4 @@ Engine/.vs
 *.Script.csproj
 **/Script/bin
 **/Script/obj
+_codeql_detected_source_root
