@@ -120,7 +120,12 @@ namespace Ayla
 
 	bool IPAddress::TryParseIPv6(const String& address, IPAddress& result)
 	{
-		// Simple IPv6 parsing - handle basic cases
+		if (address.IsEmpty())
+		{
+			return false;
+		}
+
+		// Handle simple cases first
 		if (address == TEXT("::"))
 		{
 			result = IPv6Any();
