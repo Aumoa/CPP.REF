@@ -12,13 +12,12 @@ try
     var pass = Parser.Default.ParseArguments<GenerateOptions, BuildOptions>(args);
     pass = await pass.WithParsedAsync<GenerateOptions>(options => GenerateRunner.RunAsync(options, cts.Token).AsTask());
     pass = await pass.WithParsedAsync<BuildOptions>(options => BuildRunner.RunAsync(options, cts.Token).AsTask());
+    return pass.Errors.Any() ? 1 : 0;
 }
 catch (TerminateException e)
 {
     return e.ReturnCode;
 }
-
-return 0;
 
 void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs args)
 {
