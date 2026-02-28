@@ -32,7 +32,7 @@ namespace Ayla
 	private:
 		// FromLiteral specialized.
 		inline consteval String(string_view_t str, size_t len, std::in_place_t) noexcept
-			: m_Buf(std::move(m_Buf))
+			: m_Buf(str)
 			, m_Len(len)
 			, m_bNullTerminate(true)
 		{
