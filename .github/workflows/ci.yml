@@ -1,0 +1,36 @@
+name: Check Compile Errors
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Run Setup Script (Linux/Mac)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x ./Setup.sh
+          ./Setup.sh
+
+      - name: Run Setup Script (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          ./Setup.bat
+
+      - name: Build
+        run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll --target "Engine" --config Shipping
