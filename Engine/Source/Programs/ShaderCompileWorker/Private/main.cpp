@@ -48,7 +48,8 @@ Task<int> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 			compilationTasks.emplace_back(compiler.CompileShaderAsync(task, cancellationToken));
 		}
 
-		LogDXC::Info(TEXT("Compilation complete: {} succeeded"), compilationTasks.size());
+		co_await Task<>::WhenAll(std::move(compilationTasks));
+		LogDXC::Info(TEXT("Compilation complete: {} succeeded"), tasks.size());
 		co_return 0;
 	}
 	catch (const std::exception& e)
