@@ -37,6 +37,7 @@ internal static partial class BuildRunner
                 requiredProjects.Add("Launch");
                 requiredProjects.Add("VulkanAPI");
                 requiredProjects.Add("WindowsAPI");
+                requiredProjects.Add("ShaderCompileWorker");
             }
             else if (mp.GetRule(buildTarget).Type == ModuleType.Application)
             {
@@ -352,7 +353,7 @@ internal static partial class BuildRunner
         {
             foreach (var shaderTask in shaderTasks)
             {
-                shaderTask.CompileAsync(installation, cancellationToken).ContinueWith(r =>
+                shaderTask.CompileAsync(moduleTasks, installation, cancellationToken).ContinueWith(r =>
                 {
                     try
                     {

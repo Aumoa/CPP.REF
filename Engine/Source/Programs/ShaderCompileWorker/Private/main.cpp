@@ -17,7 +17,7 @@ Task<int> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 	{
 		if (argc < 2)
 		{
-			Console::WriteLine(TEXT("Usage: DXC <compilation-list-file>"));
+			Console::WriteLine(TEXT("Usage: ShaderCompileWorker <compilation-list-file>"));
 			Console::WriteLine(TEXT(""));
 			Console::WriteLine(TEXT("The compilation list file should contain lines in the format:"));
 			Console::WriteLine(TEXT("  Source/Shader.hlsl -t library -o Intermediate/Shader -I Include/Path -e main"));
@@ -25,7 +25,7 @@ Task<int> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 		}
 
 		String listFilePath = String::FromLiteral(argv[1]);
-		LogDXC::Info(TEXT("DXC Shader Compiler"));
+		LogDXC::Info(TEXT("Shader Compile Worker"));
 		LogDXC::Info(TEXT("Reading compilation list: {}"), listFilePath);
 
 		// Parse compilation tasks using the new ShaderCompilationTask class

@@ -18,7 +18,7 @@ internal static partial class BuildRunner
             m_ShaderFiles = shaderFiles;
         }
 
-        public async Task<Terminal.Output> CompileAsync(Installation installation, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> CompileAsync(IList<ModuleTask> moduleTasks, Installation installation, CancellationToken cancellationToken)
         {
             try
             {
@@ -26,6 +26,13 @@ internal static partial class BuildRunner
                 {
                     m_CompletionSource.SetResult();
                     return Terminal.Output.Success("Shader Compiler", "No shaders to compile");
+                }
+
+                var shaderCompileWorkerTask = moduleTasks.FirstOrDefault(m => m.Resolver.Name == "ShaderCompileWorker");
+                if (shaderCompileWorkerTask != null)
+                {
+                    // Wait for the shader compile worker to be built before proceeding, since we need its executable
+                    await shaderCompileWorkerTask.Task;
                 }
 
                 var resolver = m_Project.GetResolver(m_TargetInfo);
@@ -49,8 +56,8 @@ internal static partial class BuildRunner
 
                 // Invoke DXC compiler
                 var targetInfo = TargetInfo.Environment;
-                var dxcPath = Path.Combine(resolver.Group.BinariesDirectory, targetInfo.Platform.Name, targetInfo.Config.ToString(), installation.GetExecutableFileName("DXC"));
-                if (!File.Exists(dxcPath))
+                var workerPath = Path.Combine(resolver.Group.BinariesDirectory, targetInfo.Platform.Name, targetInfo.Config.ToString(), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
+                if (!File.Exists(workerPath))
                 {
                     throw TerminateException.Abort();
                 }
@@ -58,7 +65,7 @@ internal static partial class BuildRunner
                 // Run DXC
                 var options = new Terminal.Options
                 {
-                    Executable = dxcPath,
+                    Executable = workerPath,
                     WorkingDirectory = resolver.Group.RootDirectory,
                     Logging = Terminal.Logging.All
                 };

@@ -4,9 +4,9 @@ using System;
 using System.IO;
 using AylaEngine;
 
-public class DXC : ModuleRules
+public class ShaderCompileWorker : ModuleRules
 {
-    public DXC()
+    public ShaderCompileWorker()
     {
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
