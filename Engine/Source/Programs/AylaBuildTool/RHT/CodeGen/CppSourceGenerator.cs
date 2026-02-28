@@ -39,6 +39,16 @@ internal class CppSourceGenerator
             }
         }
 
+        // Restore warning settings at the end of file
+        m_SourceCode += """
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#elif defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
+""";
+
         return m_SourceCode;
     }
 
@@ -55,6 +65,14 @@ internal class CppSourceGenerator
         m_SourceCode = $"""
 // Copyright 2020-2025 AylaEngine. All Rights Reserved.
 // This file is auto-generated. Do not edit it manually.
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4702) // unreachable code
+#elif defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunreachable-code"
+#endif
 
 #include "CoreMinimal.h"
 #include "Reflection/TypeCollector.h"{headersInclude}

@@ -36,3 +36,7 @@
 #ifndef PLATFORM_NEWLINE
 #error PLATFORM_NEWLINE is not defined.
 #endif
+
+#ifndef PLATFORM_UNREACHABLE
+#error PLATFORM_UNREACHABLE is not defined.
+#endif

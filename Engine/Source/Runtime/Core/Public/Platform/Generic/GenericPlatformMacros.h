@@ -60,6 +60,14 @@
 #	define UNLIKELY(X) (X)
 #endif
 
+#if defined(__clang__) || defined(__GNUC__)
+#	define PLATFORM_UNREACHABLE() __builtin_unreachable()
+#elif defined(_MSC_VER)
+#	define PLATFORM_UNREACHABLE() __assume(0)
+#else
+#	define PLATFORM_UNREACHABLE() ((void)0)
+#endif
+
 
 namespace Ayla::GenericPlatformMacros
 {
