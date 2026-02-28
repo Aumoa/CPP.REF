@@ -23,7 +23,12 @@ internal class GccCompiler : CppCompiler
 
         var compileCommands = new StringBuilder();
 
-        AddCompilerCommands("-std=c++23", "-g", "-fPIC", "-msse", "-Wno-invalid-offsetof");
+        AddCompilerCommands("-std=c++23", "-g", "-fPIC", "-Wno-invalid-offsetof");
+
+        if (m_TargetInfo.Platform.Architecture == Architecture.X64)
+        {
+            AddCompilerCommands("-msse");
+        }
 
         switch (m_TargetInfo.Config)
         {
@@ -33,7 +38,14 @@ internal class GccCompiler : CppCompiler
                 break;
             case Configuration.Development:
             case Configuration.Shipping:
-                AddCompilerCommands("-O3", "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections");
+                if (m_TargetInfo.Platform.Group == PlatformGroup.OSX)
+                {
+                    AddCompilerCommands("-O3", "-Wl,-dead_strip");
+                }
+                else
+                {
+                    AddCompilerCommands("-O3", "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections");
+                }
                 break;
         }
 
