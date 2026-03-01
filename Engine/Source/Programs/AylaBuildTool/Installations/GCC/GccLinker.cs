@@ -6,9 +6,23 @@ internal class GccLinker : UnixLinker
     {
     }
 
-    protected override ValueTask<string[]> ConfigureCommandsForSharedLibraryAsync(CancellationToken cancellationToken)
+    protected override ValueTask<string[]> ConfigureCommandsAsync(bool isShared, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult<string[]>(["-shared"]);
+        List<string> commands = [];
+
+        if (isShared)
+        {
+            commands.Add("-shared");
+        }
+
+        if (m_TargetInfo.Config is Configuration.Development or Configuration.Shipping)
+        {
+            commands.Add("-ffunction-sections");
+            commands.Add("-fdata-sections");
+            commands.Add("-Wl,--gc-sections");
+        }
+
+        return ValueTask.FromResult(commands.ToArray());
     }
 
     protected override ValueTask<string[]> ConfigureLibrariesAsync(IEnumerable<string> libraries, CancellationToken cancellationToken)

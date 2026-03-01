@@ -4,8 +4,8 @@ namespace AylaEngine;
 
 internal abstract class UnixLinker : Linker
 {
-    private readonly Installation m_Installation;
-    private readonly TargetInfo m_TargetInfo;
+    protected readonly Installation m_Installation;
+    protected readonly TargetInfo m_TargetInfo;
 
     protected UnixLinker(Installation installation, TargetInfo targetInfo)
     {
@@ -13,7 +13,7 @@ internal abstract class UnixLinker : Linker
         m_TargetInfo = targetInfo;
     }
 
-    protected virtual ValueTask<string[]> ConfigureCommandsForSharedLibraryAsync(CancellationToken cancellationToken)
+    protected virtual ValueTask<string[]> ConfigureCommandsAsync(bool isShared, CancellationToken cancellationToken)
     {
         return ValueTask.FromResult<string[]>([]);
     }
@@ -37,12 +37,9 @@ internal abstract class UnixLinker : Linker
         var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
-        if (module.Rules.IsSharedLibrary())
+        foreach (var command in await ConfigureCommandsAsync(module.Rules.IsSharedLibrary(), cancellationToken))
         {
-            foreach (var command in await ConfigureCommandsForSharedLibraryAsync(cancellationToken))
-            {
-                linkCommands.Append(command + " ");
-            }
+            linkCommands.Append(command + " ");
         }
 
         for (int i = 0; i < sourceObjects.Length; ++i)

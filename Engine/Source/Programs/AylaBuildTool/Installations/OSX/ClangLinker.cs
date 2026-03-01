@@ -6,9 +6,21 @@ internal class ClangLinker : UnixLinker
     {
     }
 
-    protected override ValueTask<string[]> ConfigureCommandsForSharedLibraryAsync(CancellationToken cancellationToken)
+    protected override ValueTask<string[]> ConfigureCommandsAsync(bool isShared, CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult<string[]>(["-dynamiclib"]);
+        List<string> commands = [];
+
+        if (isShared)
+        {
+            commands.Add("-dynamiclib");
+        }
+
+        if (m_TargetInfo.Config is Configuration.Development or Configuration.Shipping)
+        {
+            commands.Add("-Wl,-dead_strip");
+        }
+
+        return ValueTask.FromResult<string[]>(commands.ToArray());
     }
 
     protected override ValueTask<string[]> ConfigureLibrariesAsync(IEnumerable<string> libraries, CancellationToken cancellationToken)
