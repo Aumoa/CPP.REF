@@ -4,15 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Numerics/VectorInterface/Vector.h"
-#include "Numerics/TransformInterface/Quaternion.h"
 
 namespace Ayla
 {
-	struct MinimalViewInfo
+	struct PrimitiveVertex
 	{
 		Vector3F Position;
-		QuaternionF Rotation;
-		float FieldOfView;
-		std::optional<float> AspectRatio;
+		Vector3F Normal;
+		Vector2F Tex;
 	};
 }

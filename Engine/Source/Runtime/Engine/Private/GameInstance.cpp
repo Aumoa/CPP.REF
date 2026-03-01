@@ -17,7 +17,7 @@ namespace Ayla
 	{
 	}
 
-	void GameInstance::Initialize()
+	Task<> GameInstance::InitializeAsync(std::stop_token cancellationToken)
 	{
 		m_SyncContext = std::make_shared<MainSynchronizationContext>();
 		SynchronizationContext::SetSynchronizationContext(m_SyncContext);
@@ -36,6 +36,8 @@ namespace Ayla
 			SynchronizationContext::SetSynchronizationContext(nullptr);
 		}
 		end_try__;
+
+		co_return;
 	}
 
 	void GameInstance::Tick(TickTiming timing, const TimeSpan& deltaTime)

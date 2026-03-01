@@ -30,7 +30,7 @@ namespace Ayla
 		GameInstance();
 		virtual ~GameInstance() noexcept override;
 
-		void Initialize();
+		virtual Task<> InitializeAsync(std::stop_token cancellationToken);
 		void Tick(TickTiming timing, const TimeSpan& deltaTime);
 
 		AFUNCTION()

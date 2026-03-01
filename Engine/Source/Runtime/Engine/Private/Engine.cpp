@@ -37,8 +37,13 @@ namespace Ayla
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
 
 		m_GameInstance = InitializeGameInstance();
-		m_GameInstance->Initialize();
+		auto initializeTask = m_GameInstance->InitializeAsync({});
+		while (initializeTask.GetStatus() == TaskStatus::Running)
+		{
+			PLATFORM_YIELD();
+		}
 
+		initializeTask.GetResult();
 		m_MainActivity->AfterInitialize();
 	}
 
