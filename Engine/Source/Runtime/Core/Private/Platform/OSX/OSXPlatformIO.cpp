@@ -10,7 +10,7 @@
 #include "SystemException.h"
 #include "Threading/ThreadPool.h"
 #include "Platform/PlatformCommon.h"
-#include "UnixStandardStreamTextWriter.h"
+#include "Platform/Unix/UnixStandardStreamTextWriter.h"
 #include "IO/IOCompletionOverlapped.h"
 #include <fcntl.h>
 #include <unistd.h>
