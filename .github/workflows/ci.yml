@@ -31,7 +31,7 @@ jobs:
       - name: Run Setup Script (Windows)
         if: runner.os == 'Windows'
         run: |
-          dir "C:\Program Files\Microsoft Visual Studio"
+          dir "C:\Program Files\Microsoft Visual Studio\2022"
           ./Setup.bat
 
       - name: Build
