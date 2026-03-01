@@ -41,7 +41,7 @@ namespace Ayla
 
 #if PLATFORM_WINDOWS
 		String coreclr = TEXT("C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App");
-#elif PLATFORM_LINUX
+#elif PLATFORM_LINUX || PLATFORM_OSX
 		String coreclr = TEXT("/usr/lib/dotnet/shared/Microsoft.NETCore.App");
 #else
 #error TODO: Add other platform support.
