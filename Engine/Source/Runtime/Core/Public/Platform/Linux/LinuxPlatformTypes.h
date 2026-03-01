@@ -10,11 +10,11 @@
 
 namespace Ayla
 {
-	struct LinuxPlatformMacros : public UnixPlatformTypes
+	struct LinuxPlatformTypes : public UnixPlatformTypes
 	{
 	};
 
-	using PlatformTypes = LinuxPlatformMacros;
+	using PlatformTypes = LinuxPlatformTypes;
 }
 
 #endif

@@ -6,7 +6,7 @@
 
 #if PLATFORM_OSX
 
-#include "Platform/Generic/UnixPlatformTypes.h"
+#include "Platform/Unix/UnixPlatformTypes.h"
 
 namespace Ayla
 {
