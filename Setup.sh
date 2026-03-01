@@ -2,7 +2,7 @@
 
 echo Setup
 
-if [[ "$(uname)" == "Linux" ]]; then
+if [ "$(uname)" -eq "Linux" ]; then
     echo "Installing Linux dependencies..."
     sudo apt-get update
     sudo apt-get install -y \
