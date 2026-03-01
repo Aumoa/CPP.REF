@@ -191,7 +191,7 @@ namespace Ayla
         case FileAccessMode::Read:    flags |= O_RDONLY; break;
         case FileAccessMode::Write:   flags |= O_WRONLY; break;
         case FileAccessMode::Append:  flags |= O_APPEND | O_CREAT; break;
-        case (FileAccessMode::Read | FileAccessMode::Write):
+        case (FileAccessMode)((uint32)FileAccessMode::Read | (uint32)FileAccessMode::Write):
             flags |= O_RDWR;
             break;
         }
