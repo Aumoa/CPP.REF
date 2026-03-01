@@ -235,11 +235,9 @@ namespace Ayla
 		IPAddress addr2 = IPAddress::Parse(addr2String);
 		IPAddress addr3 = IPAddress::Parse(addr3String);
 
-		// addr1�� addr2�� ���ƾ� ��
 		Assert::True(addr1 == addr2);
 		Assert::False(addr1 != addr2);
 		
-		// addr1�� addr3�� �޶�� ��
 		Assert::False(addr1 == addr3);
 		Assert::True(addr1 != addr3);
 		

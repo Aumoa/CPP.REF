@@ -13,9 +13,15 @@ namespace Ayla
 		{
 			auto now = std::time(nullptr);
 			std::tm local;
-			localtime_s(&local, &now);
 			std::tm gm;
+
+#if PLATFORM_WINDOWS
+			localtime_s(&local, &now);
 			gmtime_s(&gm, &now);
+#else
+			localtime_r(&now, &local);
+			gmtime_r(&now, &gm);
+#endif
 			s_UTCOffset = local.tm_hour - gm.tm_hour;
 			return 0;
 		}();
