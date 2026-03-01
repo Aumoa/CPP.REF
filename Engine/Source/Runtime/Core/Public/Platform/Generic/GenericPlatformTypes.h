@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <type_traits>
+#include <cstddef>
 #include "StaticClass.h"
 
 namespace Ayla::details
@@ -61,7 +62,9 @@ namespace Ayla
 
 		using char_t = WIDECHAR;
 		using ptrdiff_t = details::select_arch_t<sizeof(void*), int16, int32, int64>;
-		using size_t = details::select_arch_t<sizeof(void*), uint16, uint32, uint64>;
-		using ssize_t = details::select_arch_t<sizeof(void*), int16, int32, int64>;
+		using size_t = ::std::size_t;
+
+		using intptr_t = ::std::intptr_t;
+		using uintptr_t = ::std::uintptr_t;
 	};
 }

@@ -6,11 +6,11 @@
 
 #if PLATFORM_OSX
 
-#include "Platform/Generic/GenericPlatformTypes.h"
+#include "Platform/Generic/UnixPlatformTypes.h"
 
 namespace Ayla
 {
-	struct OSXPlatformTypes : public GenericPlatformTypes
+	struct OSXPlatformTypes : public UnixPlatformTypes
 	{
 	};
 
