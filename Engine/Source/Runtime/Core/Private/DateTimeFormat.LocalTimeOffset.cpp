@@ -15,7 +15,7 @@ namespace Ayla::DateTimeFormat
 	{
 		using namespace std::chrono_literals;
 
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 		// Windows implementation using GetTimeZoneInformation
 		TIME_ZONE_INFORMATION tzi;
 		DWORD result = GetTimeZoneInformation(&tzi);
