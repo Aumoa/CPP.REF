@@ -12,6 +12,7 @@ internal class VisualStudioInstallation : Installation
 {
     public enum License
     {
+        BuildTool,
         Community,
         Professional
     }
@@ -106,10 +107,18 @@ internal class VisualStudioInstallation : Installation
                     continue;
                 }
 
-                var msvc = Path.Combine(licenseDirectory, "VC", "Tools", "MSVC");
+                CheckFolder(license, licenseDirectory);
+            }
+
+            CheckFolder(License.BuildTool, visualStudioVersionDirectory);
+            continue;
+
+            void CheckFolder(License license, string folder)
+            {
+                var msvc = Path.Combine(folder, "VC", "Tools", "MSVC");
                 if (Directory.Exists(msvc) == false)
                 {
-                    continue;
+                    return;
                 }
 
                 foreach (var versionDir in Directory.GetDirectories(msvc))
