@@ -14,7 +14,8 @@ internal class VisualStudioInstallation : Installation
     {
         BuildTool,
         Community,
-        Professional
+        Professional,
+        Enterprise
     }
 
     public enum VSVersion
