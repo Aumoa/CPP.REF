@@ -1,21 +1,19 @@
-namespace AylaEngine;
+﻿namespace AylaEngine;
 
-internal class GccLinker : UnixLinker
+internal class ClangLinker : UnixLinker
 {
-    public GccLinker(Installation installation, TargetInfo targetInfo) : base(installation, targetInfo)
+    public ClangLinker(Installation installation, TargetInfo targetInfo) : base(installation, targetInfo)
     {
     }
 
     protected override ValueTask<string[]> ConfigureCommandsForSharedLibraryAsync(CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult<string[]>(["-shared"]);
+        return ValueTask.FromResult<string[]>(["-dynamiclib"]);
     }
 
     protected override ValueTask<string[]> ConfigureLibrariesAsync(IEnumerable<string> libraries, CancellationToken cancellationToken)
     {
         return ValueTask.FromResult<string[]>(libraries
-            .Append("stdc++")
-            .Append("stdc++exp")
             .Select(l => $"-l\"{l}\"")
             .ToArray());
     }

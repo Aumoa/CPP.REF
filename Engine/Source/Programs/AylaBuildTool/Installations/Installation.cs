@@ -25,7 +25,7 @@ internal abstract class Installation
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            return new GccInstallation();
+            return new OSXInstallation();
         }
         else
         {

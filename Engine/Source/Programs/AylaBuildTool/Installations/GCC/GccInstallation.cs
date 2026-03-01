@@ -1,16 +1,11 @@
-
 using System.Runtime.InteropServices;
 
 namespace AylaEngine;
 
-internal class GccInstallation : Installation
+internal class GccInstallation : UnixInstallation
 {
     public override ValueTask<string> GetCompilerPath(TargetInfo targetInfo, CancellationToken cancellationToken)
     {
-        if (targetInfo.Platform.Group == PlatformGroup.OSX)
-        {
-            return ValueTask.FromResult("/usr/bin/clang");
-        }
         return ValueTask.FromResult("/usr/bin/gcc");
     }
 
@@ -26,17 +21,11 @@ internal class GccInstallation : Installation
                 }
                 break;
             case PlatformGroup.Linux:
+            default:
                 switch (targetInfo.Platform.Architecture)
                 {
                     case Architecture.X64:
                         return ValueTask.FromResult("linux-gcc-x64");
-                }
-                break;
-            case PlatformGroup.OSX:
-                switch (targetInfo.Platform.Architecture)
-                {
-                    case Architecture.Arm64:
-                        return ValueTask.FromResult("macos-clang-arm64");
                 }
                 break;
         }
@@ -69,11 +58,11 @@ internal class GccInstallation : Installation
 
     public override string OutputFileName(string projectName, ModuleType moduleType)
     {
-        string sharedLibExt = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "dylib" : "so";
+        const string kSharedLibExt = "so";
         return moduleType switch
         {
-            ModuleType.Library => $"lib{projectName}.{sharedLibExt}",
-            ModuleType.Game => $"lib{projectName}.{sharedLibExt}",
+            ModuleType.Library => $"lib{projectName}.{kSharedLibExt}",
+            ModuleType.Game => $"lib{projectName}.{kSharedLibExt}",
             ModuleType.Application => projectName,
             ModuleType.Console => projectName,
             ModuleType.ThirdParty => projectName,
