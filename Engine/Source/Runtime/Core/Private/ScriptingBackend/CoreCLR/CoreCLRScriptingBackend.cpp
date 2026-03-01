@@ -102,7 +102,7 @@ namespace Ayla
 
 #if PLATFORM_WINDOWS
 		String tpaList_s = String::Join(TEXT(";"), tpaList);
-#elif PLATFORM_LINUX
+#elif PLATFORM_LINUX || PLATFORM_OSX
 		String tpaList_s = String::Join(TEXT(":"), tpaList);
 #else
 #error TODO: Add other platform support.
