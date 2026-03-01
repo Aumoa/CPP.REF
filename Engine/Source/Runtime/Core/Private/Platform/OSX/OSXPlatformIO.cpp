@@ -10,7 +10,7 @@
 #include "SystemException.h"
 #include "Threading/ThreadPool.h"
 #include "Platform/PlatformCommon.h"
-#include "OSXStandardStreamTextWriter.h"
+#include "UnixStandardStreamTextWriter.h"
 #include "IO/IOCompletionOverlapped.h"
 #include <fcntl.h>
 #include <unistd.h>
@@ -123,13 +123,13 @@ namespace Ayla
 
     TextWriter& OSXPlatformIO::GetStandardOutput() noexcept
     {
-        static OSXStandardStreamTextWriter writer(STDOUT_FILENO);
+        static UnixStandardStreamTextWriter writer(STDOUT_FILENO);
         return writer;
     }
 
     TextWriter& OSXPlatformIO::GetStandardError() noexcept
     {
-        static OSXStandardStreamTextWriter writer(STDERR_FILENO);
+        static UnixStandardStreamTextWriter writer(STDERR_FILENO);
         return writer;
     }
 
