@@ -6,15 +6,15 @@
 
 #if PLATFORM_LINUX
 
-#include "Platform/Generic/GenericPlatformTypes.h"
+#include "Platform/Unix/UnixPlatformTypes.h"
 
 namespace Ayla
 {
-	struct LinuxPlatformMacros : public GenericPlatformTypes
+	struct LinuxPlatformTypes : public UnixPlatformTypes
 	{
 	};
 
-	using PlatformTypes = LinuxPlatformMacros;
+	using PlatformTypes = LinuxPlatformTypes;
 }
 
 #endif

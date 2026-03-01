@@ -1,8 +1,8 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "Platform/Linux/LinuxPlatformAtomics.h"
+#include "Platform/Unix/UnixPlatformAtomics.h"
 
-#if PLATFORM_LINUX
+#if PLATFORM_LINUX || PLATFORM_OSX
 
 #include <pthread.h>
 #include <time.h>
@@ -25,14 +25,14 @@ namespace Ayla
         }
     }
 
-    void LinuxPlatformAtomics::InitializeSpinlock(void*& LockVal) noexcept
+    void UnixPlatformAtomics::InitializeSpinlock(void*& LockVal) noexcept
     {
         auto* mutex = new pthread_mutex_t();
         pthread_mutex_init(mutex, nullptr);
         LockVal = mutex;
     }
 
-    void LinuxPlatformAtomics::DestroySpinlock(void*& LockVal) noexcept
+    void UnixPlatformAtomics::DestroySpinlock(void*& LockVal) noexcept
     {
         if (LockVal)
         {
@@ -42,32 +42,32 @@ namespace Ayla
         }
     }
 
-    void LinuxPlatformAtomics::AcquireSpinlock(void*& LockVal, bool bShared) noexcept
+    void UnixPlatformAtomics::AcquireSpinlock(void*& LockVal, bool bShared) noexcept
     {
         PLATFORM_UNREFERENCED_PARAMETER(bShared);
         pthread_mutex_lock(GetRWLock(LockVal));
     }
 
-    void LinuxPlatformAtomics::ReleaseSpinlock(void*& LockVal, bool bShared) noexcept
+    void UnixPlatformAtomics::ReleaseSpinlock(void*& LockVal, bool bShared) noexcept
     {
         PLATFORM_UNREFERENCED_PARAMETER(bShared);
         pthread_mutex_unlock(GetRWLock(LockVal));
     }
 
-    bool LinuxPlatformAtomics::TryAcquireSpinlock(void*& LockVal, bool bShared) noexcept
+    bool UnixPlatformAtomics::TryAcquireSpinlock(void*& LockVal, bool bShared) noexcept
     {
         PLATFORM_UNREFERENCED_PARAMETER(bShared);
         return pthread_mutex_trylock(GetRWLock(LockVal)) == 0;
     }
 
-    void LinuxPlatformAtomics::InitializeSpinlockConditionVariable(void*& CondVal) noexcept
+    void UnixPlatformAtomics::InitializeSpinlockConditionVariable(void*& CondVal) noexcept
     {
         auto* cond = new pthread_cond_t();
         pthread_cond_init(cond, nullptr);
         CondVal = cond;
     }
 
-    void LinuxPlatformAtomics::DestroySpinlockConditionVariable(void*& CondVal) noexcept
+    void UnixPlatformAtomics::DestroySpinlockConditionVariable(void*& CondVal) noexcept
     {
         if (CondVal)
         {
@@ -77,13 +77,13 @@ namespace Ayla
         }
     }
 
-    void LinuxPlatformAtomics::WaitSpinlockConditionVariable(void*& CondVal, void*& LockVal, bool bShared) noexcept
+    void UnixPlatformAtomics::WaitSpinlockConditionVariable(void*& CondVal, void*& LockVal, bool bShared) noexcept
     {
         PLATFORM_UNREFERENCED_PARAMETER(bShared);
         pthread_cond_wait(GetCondVar(CondVal), GetRWLock(LockVal));
     }
 
-    bool LinuxPlatformAtomics::WaitForSpinlockConditionVariable(void*& CondVal, void*& LockVal, size_t Sleep, bool bShared) noexcept
+    bool UnixPlatformAtomics::WaitForSpinlockConditionVariable(void*& CondVal, void*& LockVal, size_t Sleep, bool bShared) noexcept
     {
         PLATFORM_UNREFERENCED_PARAMETER(bShared);
         struct timespec ts;
@@ -101,12 +101,12 @@ namespace Ayla
         return ret == 0;
     }
 
-    void LinuxPlatformAtomics::NotifyOneSpinlockConditionVariable(void*& CondVal) noexcept
+    void UnixPlatformAtomics::NotifyOneSpinlockConditionVariable(void*& CondVal) noexcept
     {
         pthread_cond_signal(GetCondVar(CondVal));
     }
 
-    void LinuxPlatformAtomics::NotifyAllSpinlockConditionVariable(void*& CondVal) noexcept
+    void UnixPlatformAtomics::NotifyAllSpinlockConditionVariable(void*& CondVal) noexcept
     {
         pthread_cond_broadcast(GetCondVar(CondVal));
     }

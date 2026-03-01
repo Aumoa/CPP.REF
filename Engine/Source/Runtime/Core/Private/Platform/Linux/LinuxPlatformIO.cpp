@@ -10,7 +10,7 @@
 #include "SystemException.h"
 #include "Threading/ThreadPool.h"
 #include "Platform/PlatformCommon.h"
-#include "LinuxStandardStreamTextWriter.h"
+#include "Platform/Unix/UnixStandardStreamTextWriter.h"
 #include "IO/IOCompletionOverlapped.h"
 #include <fcntl.h>
 #include <unistd.h>
@@ -183,13 +183,13 @@ namespace Ayla
 
     TextWriter& LinuxPlatformIO::GetStandardOutput() noexcept
     {
-        static LinuxStandardStreamTextWriter writer(STDOUT_FILENO);
+        static UnixStandardStreamTextWriter writer(STDOUT_FILENO);
         return writer;
     }
 
     TextWriter& LinuxPlatformIO::GetStandardError() noexcept
     {
-        static LinuxStandardStreamTextWriter writer(STDERR_FILENO);
+        static UnixStandardStreamTextWriter writer(STDERR_FILENO);
         return writer;
     }
 

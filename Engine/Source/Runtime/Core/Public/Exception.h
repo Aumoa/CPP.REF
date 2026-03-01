@@ -6,7 +6,9 @@
 #include "Platform/PlatformLocalization.h"
 #include <exception>
 #include <source_location>
+#if __has_include(<stacktrace>)
 #include <stacktrace>
+#endif
 
 namespace Ayla
 {
@@ -15,7 +17,9 @@ namespace Ayla
 		String m_Message;
 		std::exception_ptr m_InnerException;
 		std::source_location m_Src;
+#if __has_include(<stacktrace>)
 		std::stacktrace m_Stacktrace;
+#endif
 
 		mutable std::string m_WhatCache;
 
@@ -30,7 +34,9 @@ namespace Ayla
 		virtual String GetMessage() const noexcept { return m_Message; }
 		virtual std::exception_ptr GetInnerException() const noexcept { return m_InnerException; }
 		virtual std::source_location GetSourceLocation() const noexcept { return m_Src; }
+#if __has_include(<stacktrace>)
 		virtual std::stacktrace GetStackTrace() const noexcept { return m_Stacktrace; }
+#endif
 
 		virtual const char* what() const noexcept override
 		{

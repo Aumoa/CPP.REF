@@ -62,8 +62,8 @@ namespace Ayla
 
 #define check(Expr)						PLATFORM_UNREFERENCED_PARAMETER(Expr)
 #define checkf(Expr, Msgf, ...)			PLATFORM_UNREFERENCED_PARAMETER(Expr)
-#define ensure(Expr)					(Expr)
-#define ensureMsgf(Expr, Msgf, ...)		(Expr)
+#define ensure(Expr)					(!!(Expr))
+#define ensureMsgf(Expr, Msgf, ...)		(!!(Expr))
 #define fail()							PLATFORM_UNREACHABLE()
 #define failMsgf(Msgf, ...)				PLATFORM_UNREACHABLE()
 

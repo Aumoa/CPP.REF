@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "Threading/Spinlock.h"
 #include <functional>
 #include <vector>
-#include "Threading/Spinlock.h"
+#include <concepts>
 
 namespace Ayla
 {
@@ -31,7 +32,7 @@ namespace Ayla
 		}
 
 		template<class... UArgs>
-		inline Action(UArgs&&... args) requires std::constructible_from<function_t, UArgs...>
+		inline Action(UArgs&&... args)
 			: m_InvocationList{ std::make_shared<vector_t>(vector_t{ function_t(std::forward<UArgs>(args)...) }) }
 		{
 		}

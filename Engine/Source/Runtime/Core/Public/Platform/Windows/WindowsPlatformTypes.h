@@ -12,6 +12,7 @@ namespace Ayla
 {
 	struct WindowsPlatformTypes : public GenericPlatformTypes
 	{
+		using ssize_t = details::select_arch_t<sizeof(void*), int16, int32, int64>;
 	};
 
 	using PlatformTypes = WindowsPlatformTypes;

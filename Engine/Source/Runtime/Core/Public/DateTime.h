@@ -8,12 +8,19 @@
 
 namespace Ayla
 {
-	class DateTime
+	class CORE_API DateTime
 	{
 	public:
 		using clock = std::chrono::system_clock;
 		using time_point = clock::time_point;
 		using local_time = std::chrono::local_time<clock::duration>;
+
+	private:
+		static int32 s_UTCOffset;
+
+		static void TryStaticInitialize();
+		static time_point ToLocal(const time_point& value);
+		static time_point ToSys(const local_time& value);
 
 	private:
 		std::variant<time_point, local_time> TimePoint;
@@ -101,7 +108,7 @@ namespace Ayla
 	public:
 		static DateTime Now() noexcept
 		{
-			return DateTime(std::chrono::current_zone()->to_local(clock::now()));
+			return DateTime(ToLocal(clock::now()));
 		}
 
 		static DateTime UtcNow() noexcept
@@ -113,7 +120,7 @@ namespace Ayla
 		{
 			if (IsUTC())
 			{
-				return DateTime(std::chrono::current_zone()->to_local(GetTimePoint()));
+				return DateTime(ToLocal(GetTimePoint()));
 			}
 			else if (bReinterpret)
 			{
@@ -139,7 +146,7 @@ namespace Ayla
 			}
 			else
 			{
-				return DateTime(std::chrono::current_zone()->to_sys(GetLocalTime()));
+				return DateTime(ToSys(GetLocalTime()));
 			}
 		}
 

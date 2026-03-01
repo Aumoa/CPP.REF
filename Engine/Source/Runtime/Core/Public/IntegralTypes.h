@@ -19,6 +19,8 @@ namespace Ayla
 	using byte = PlatformTypes::byte;
 	using size_t = PlatformTypes::size_t;
 	using ssize_t = PlatformTypes::ssize_t;
+	using intptr_t = PlatformTypes::intptr_t;
+	using uintptr_t = PlatformTypes::uintptr_t;
 
 	class String;
 

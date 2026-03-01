@@ -32,7 +32,7 @@ namespace Ayla
 	private:
 		// FromLiteral specialized.
 		inline consteval String(string_view_t str, size_t len, std::in_place_t) noexcept
-			: m_Buf(std::move(m_Buf))
+			: m_Buf(str)
 			, m_Len(len)
 			, m_bNullTerminate(true)
 		{
@@ -1281,7 +1281,7 @@ struct std::formatter<Ayla::String, char> : public std::formatter<std::string, c
 	template<class TFormatContext>
 	auto format(const Ayla::String& str, TFormatContext& context) const
 	{
-		return std::formatter<std::string_view, char>::format((std::string)str, context);
+		return std::formatter<std::string, char>::format((std::string)str, context);
 	}
 };
 

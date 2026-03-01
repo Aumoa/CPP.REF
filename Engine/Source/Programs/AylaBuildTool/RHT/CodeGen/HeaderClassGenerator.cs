@@ -135,7 +135,8 @@ internal class HeaderClassGenerator
                 {
                     var parameterDeclare2 = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName));
                     m_Parent.HeaderText += m_Parent.IndentedMacroLine($"using signature_t = ::Ayla::SharedPtr<::Ayla::Object>(*)({parameterDeclare2});");
-                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"return ::std::experimental::reflect::reflexpr_constructor<{access}, signature_t, (signature_t)&constructor__{i}__{constructor.Name}>();");
+                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"constexpr auto ptr = (signature_t)&constructor__{i}__{constructor.Name};");
+                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"return ::std::experimental::reflect::reflexpr_constructor<{access}, signature_t, ptr>();");
                 });
                 m_Parent.HeaderText += m_Parent.IndentedMacroLine("}");
                 m_Parent.HeaderText += m_Parent.IndentedMacroLine("");
@@ -159,7 +160,8 @@ internal class HeaderClassGenerator
                 {
                     var owned = function.Flags.HasFlag(SFunction.FFlags.Static) ? string.Empty : $"{className}::";
                     m_Parent.HeaderText += m_Parent.IndentedMacroLine($"using signature_t = {function.ReturnType.FullName}({owned}*)({string.Join(", ", function.Parameters.Select(p => p.Variable.TypeName.FullName))});");
-                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"return ::std::experimental::reflect::reflexpr_method<{access}, signature_t, (signature_t)&{className}::{function.Name}>();");
+                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"constexpr auto ptr = (signature_t)&{className}::{function.Name};");
+                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"return ::std::experimental::reflect::reflexpr_method<{access}, signature_t, ptr>();");
                 });
                 m_Parent.HeaderText += m_Parent.IndentedMacroLine("}");
                 m_Parent.HeaderText += m_Parent.IndentedMacroLine("");

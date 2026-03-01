@@ -1,7 +1,8 @@
+using System.Runtime.InteropServices;
 
 namespace AylaEngine;
 
-internal class GccInstallation : Installation
+internal class GccInstallation : UnixInstallation
 {
     public override ValueTask<string> GetCompilerPath(TargetInfo targetInfo, CancellationToken cancellationToken)
     {
@@ -20,17 +21,11 @@ internal class GccInstallation : Installation
                 }
                 break;
             case PlatformGroup.Linux:
+            default:
                 switch (targetInfo.Platform.Architecture)
                 {
                     case Architecture.X64:
                         return ValueTask.FromResult("linux-gcc-x64");
-                }
-                break;
-            case PlatformGroup.OSX:
-                switch (targetInfo.Platform.Architecture)
-                {
-                    case Architecture.Arm64:
-                        return ValueTask.FromResult("macos-gcc-arm64");
                 }
                 break;
         }
@@ -63,10 +58,11 @@ internal class GccInstallation : Installation
 
     public override string OutputFileName(string projectName, ModuleType moduleType)
     {
+        const string kSharedLibExt = "so";
         return moduleType switch
         {
-            ModuleType.Library => $"lib{projectName}.so",
-            ModuleType.Game => $"lib{projectName}.so",
+            ModuleType.Library => $"lib{projectName}.{kSharedLibExt}",
+            ModuleType.Game => $"lib{projectName}.{kSharedLibExt}",
             ModuleType.Application => projectName,
             ModuleType.Console => projectName,
             ModuleType.ThirdParty => projectName,

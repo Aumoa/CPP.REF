@@ -299,6 +299,9 @@ internal static class VSCCppProjectGenerator
                     case PlatformGroup.Linux:
                         set = set.Append("PLATFORM_LINUX=1");
                         break;
+                    case PlatformGroup.OSX:
+                        set = set.Append("PLATFORM_OSX=1");
+                        break;
                 }
                 
                 if (targetInfo.Config != AylaEngine.Configuration.Shipping)

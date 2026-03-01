@@ -107,7 +107,7 @@ namespace Ayla
 		template<std::floating_point T>
 		inline static constexpr T Sqrt(const T& value, const T& guess = (T)1)
 		{
-			if constexpr (std::is_constant_evaluated())
+			if consteval
 			{
 				return (guess * guess - value) < 1e-10 && (value - guess * guess) < 1e-10
 					? guess
@@ -337,13 +337,22 @@ namespace Ayla
 		template<Ayla::EaseFunction Function>
 		static double EaseFunction(double t) requires (Function == EaseFunction::OutCubic)
 		{
-			return 1 + (--t) * t * t;
+			--t;
+			return 1 + t * t * t;
 		}
 
 		template<Ayla::EaseFunction Function>
 		static double EaseFunction(double t) requires (Function == EaseFunction::InOutCubic)
 		{
-			return t < 0.5 ? 4 * t * t * t : 1 + (--t) * (2 * (--t)) * (2 * t);
+			if (t < 0.5)
+			{
+				return 4 * t * t * t;
+			}
+			else
+			{
+				--t;
+				return 1 + 4 * t * t * t;
+			}
 		}
 
 		template<Ayla::EaseFunction Function>
@@ -356,7 +365,8 @@ namespace Ayla
 		template<Ayla::EaseFunction Function>
 		static double EaseFunction(double t) requires (Function == EaseFunction::OutQuart)
 		{
-			t = (--t) * t;
+			--t;
+			t *= t;
 			return 1 - t * t;
 		}
 
@@ -370,7 +380,8 @@ namespace Ayla
 			}
 			else
 			{
-				t = (--t) * t;
+				--t;
+				t *= t;
 				return 1 - 8 * t * t;
 			}
 		}
@@ -385,7 +396,8 @@ namespace Ayla
 		template<Ayla::EaseFunction Function>
 		static double EaseFunction(double t) requires (Function == EaseFunction::OutQuint)
 		{
-			double t2 = (--t) * t;
+			--t;
+			double t2 = t * t;
 			return 1 + t * t2 * t2;
 		}
 
@@ -400,7 +412,8 @@ namespace Ayla
 			}
 			else
 			{
-				t2 = (--t) * t;
+				--t;
+				t2 = t * t;
 				return 1 + 16 * t * t2 * t2;
 			}
 		}
@@ -464,7 +477,8 @@ namespace Ayla
 		template<Ayla::EaseFunction Function>
 		static double EaseFunction(double t) requires (Function == EaseFunction::OutBack)
 		{
-			return 1 + (--t) * t * (2.70158 * t + 1.70158);
+			--t;
+			return 1 + t * t * (2.70158 * t + 1.70158);
 		}
 
 		template<Ayla::EaseFunction Function>
@@ -476,7 +490,8 @@ namespace Ayla
 			}
 			else
 			{
-				return 1 + (--t) * t * 2 * (7 * t + 2.5);
+				--t;
+				return 1 + t * t * 2 * (7 * t + 2.5);
 			}
 		}
 

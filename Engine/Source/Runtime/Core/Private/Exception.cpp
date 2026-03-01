@@ -9,7 +9,9 @@ namespace Ayla
 		: m_Message(InMessage)
 		, m_InnerException(InInnerException)
 		, m_Src(Src)
+#if __has_include(<stacktrace>)
 		, m_Stacktrace(std::stacktrace::current())
+#endif
 	{
 	}
 
@@ -39,14 +41,22 @@ namespace Ayla
 				Composed += String::Format(TEXT("---> Unknown exception.\n"));
 			}
 
+#if __has_include(<stacktrace>)
 			auto ss = std::format("{}", m_Stacktrace);
 			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), String::FromCodepage(ss));
+#else
+			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n"));
+#endif
 			return Composed;
 		}
 		else
 		{
+#if __has_include(<stacktrace>)
 			auto ss = std::format("{}", m_Stacktrace);
 			return String::Format(TEXT("{}: {}\n{}"), String::FromCodepage(typeid(*this).name()), m_Message, String::FromCodepage(ss));
+#else
+			return String::Format(TEXT("{}: {}"), String::FromCodepage(typeid(*this).name()), m_Message);
+#endif
 		}
 	}
 }

@@ -1,7 +1,5 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#if PLATFORM_WINDOWS
-
 #define __ALLOW_PLATFORM_COMMON_H__
 
 #include "Platform/PlatformCommon.h"
@@ -26,5 +24,3 @@ namespace Ayla
 }
 
 #undef __ALLOW_PLATFORM_COMMON_H__
-
-#endif
