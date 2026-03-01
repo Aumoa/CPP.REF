@@ -95,7 +95,7 @@ namespace Ayla
             return __sync_sub_and_fetch(Value, 1);
         }
 
-        static FORCEINLINE int8 InterlockedAdd(volatile int8* Value, int8 Acount) noexcept
+        static FORCEINLINE int8 InterlockedAdd(volatile int8* Value, int8 Amount) noexcept
         {
             return __sync_fetch_and_add(Value, Amount);
         }
@@ -523,8 +523,6 @@ namespace Ayla
         static void NotifyOneSpinlockConditionVariable(void*& CondVal) noexcept;
         static void NotifyAllSpinlockConditionVariable(void*& CondVal) noexcept;
     };
-
-    using PlatformAtomics = UnixPlatformAtomics;
 }
 
 #endif
