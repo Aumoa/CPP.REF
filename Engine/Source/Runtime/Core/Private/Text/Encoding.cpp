@@ -11,15 +11,15 @@ namespace Ayla
 	constexpr std::array<char, 2> BOM_UTF16LE = { static_cast<char>(0xFF), static_cast<char>(0xFE) };
 	constexpr std::array<char, 2> BOM_UTF16BE = { static_cast<char>(0xFE), static_cast<char>(0xFF) };
 
-	template<size_t ArraySize>
+	template<auto ArraySize>
 	static bool BOMCheck(const std::array<char, ArraySize>& bom, const std::span<const char>& c_str, int32 codepage, int32* outCodepage, size_t* outOffset)
 	{
-		if (c_str.size() < ArraySize)
+		if (c_str.size() < (size_t)ArraySize)
 		{
 			return false;
 		}
 
-		for (size_t i = 0; i < ArraySize; ++i)
+		for (size_t i = 0; i < (size_t)ArraySize; ++i)
 		{
 			if (c_str[i] != bom[i])
 			{
@@ -27,7 +27,7 @@ namespace Ayla
 			}
 		}
 
-		*outOffset = ArraySize;
+		*outOffset = (size_t)ArraySize;
 		*outCodepage = codepage;
 		return true;
 	}

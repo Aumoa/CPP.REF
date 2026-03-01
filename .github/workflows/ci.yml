@@ -31,6 +31,7 @@ jobs:
       - name: Run Setup Script (Windows)
         if: runner.os == 'Windows'
         run: |
+          where cl
           ./Setup.bat
 
       - name: Build
