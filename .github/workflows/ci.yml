@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev
-      - copilot/fix-macos-build-issues
 
 jobs:
   build:
@@ -30,9 +29,7 @@ jobs:
 
       - name: Run Setup Script (Windows)
         if: runner.os == 'Windows'
-        run: |
-          dir "C:\Program Files\Microsoft Visual Studio\2022"
-          ./Setup.bat
+        run: ./Setup.bat
 
       - name: Build
         run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll build --target "Engine" --config Shipping
