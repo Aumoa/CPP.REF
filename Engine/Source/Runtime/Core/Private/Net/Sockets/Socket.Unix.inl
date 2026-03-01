@@ -1,7 +1,5 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#if PLATFORM_LINUX
-
 #include <arpa/inet.h>
 #include "Socket.Common.inl"
 
@@ -13,8 +11,7 @@ namespace Ayla
 
 		PlatformSocket(AddressFamily af, SocketType st)
 			: m_Socket{ socket(AddressFamilyToInt32(af), SocketTypeToInt32(st), 0) }
-		{
-		}
+		{}
 
 		~PlatformSocket() noexcept
 		{
@@ -22,5 +19,3 @@ namespace Ayla
 		}
 	};
 }
-
-#endif

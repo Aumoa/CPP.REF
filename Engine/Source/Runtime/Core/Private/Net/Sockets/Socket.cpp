@@ -3,8 +3,11 @@
 #include "Net/Sockets/Socket.h"
 #include "ArgumentException.h"
 
-#include "Socket.Linux.inl"
+#if PLATFORM_LINUX || PLATFORM_OSX
+#include "Socket.Unix.inl"
+#elif PLATFORM_WINDOWS
 #include "Socket.Windows.inl"
+#endif
 
 namespace Ayla
 {
