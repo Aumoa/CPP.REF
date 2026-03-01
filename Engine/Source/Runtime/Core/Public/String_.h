@@ -1281,7 +1281,7 @@ struct std::formatter<Ayla::String, char> : public std::formatter<std::string, c
 	template<class TFormatContext>
 	auto format(const Ayla::String& str, TFormatContext& context) const
 	{
-		return std::formatter<std::string_view, char>::format((std::string)str, context);
+		return std::formatter<std::string, char>::format((std::string)str, context);
 	}
 };
 
