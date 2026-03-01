@@ -2,7 +2,7 @@
 
 #pragma once
 
-int raise(int sig);
+#include <csignal>
 
 #define FORCEINLINE __attribute__((always_inline)) inline
 #define FORCEINLINE_LAMBDA 
