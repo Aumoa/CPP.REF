@@ -48,14 +48,7 @@ internal abstract class UnixCompiler : CppCompiler
                 break;
             case Configuration.Development:
             case Configuration.Shipping:
-                if (m_TargetInfo.Platform.Group == PlatformGroup.OSX)
-                {
-                    AddCompilerCommands("-O3", "-Wl,-dead_strip");
-                }
-                else
-                {
-                    AddCompilerCommands("-O3", "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections");
-                }
+                AddCompilerCommands("-O3");
                 break;
         }
 
