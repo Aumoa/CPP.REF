@@ -355,19 +355,24 @@ internal static partial class BuildRunner
             {
                 shaderTask.CompileAsync(moduleTasks, installation, cancellationToken).ContinueWith(r =>
                 {
-                    try
+                    if (r.IsFaulted)
                     {
-                        var output = r.Result;
-                        if (output.Logs.Any())
+                        foreach (var ex in r.Exception!.InnerExceptions)
                         {
-                            Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(output.ElapsedSeconds), shaderTask.Group.Name);
-                            Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
+                            if (ex is TerminalExecutionException e)
+                            {
+                                Console.Error.WriteLine(string.Join('\n', e.Output.Logs.Select(l => l.Value)));
+                            }
                         }
+
+                        throw r.Exception;
                     }
-                    catch (TerminalExecutionException e)
+
+                    var output = r.Result;
+                    if (output.Logs.Any())
                     {
-                        Console.Error.WriteLine(string.Join('\n', e.Output.Logs.Select(l => l.Value)));
-                        throw;
+                        Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(output.ElapsedSeconds), shaderTask.Group.Name);
+                        Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
                     }
                 });
             }
