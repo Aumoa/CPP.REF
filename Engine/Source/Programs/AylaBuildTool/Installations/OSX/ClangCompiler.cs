@@ -8,6 +8,6 @@ internal class ClangCompiler : UnixCompiler
 
     protected override ValueTask<string[]> GetCompilerArgumentsAsync(CancellationToken cancellationToken)
     {
-        return ValueTask.FromResult<string[]>(["-fexperimental-library"]);
+        return ValueTask.FromResult<string[]>(["-fexperimental-library", "-Wswitch", "-Wswitch-enum"]);
     }
 }
