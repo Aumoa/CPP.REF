@@ -10,6 +10,7 @@
 #include <chrono>
 #include <queue>
 #include <map>
+#include <thread>
 
 namespace Ayla
 {
