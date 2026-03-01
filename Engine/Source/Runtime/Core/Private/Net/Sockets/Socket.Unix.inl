@@ -1,6 +1,8 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #include "Socket.Common.inl"
 
 namespace Ayla
