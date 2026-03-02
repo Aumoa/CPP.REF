@@ -17,9 +17,10 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		ID3D12CommandQueue* m_Queue;
+		D3D12Graphics* m_Graphics;
 		ComPtr<ID3D12CommandAllocator> m_CommandPool;
 		ComPtr<ID3D12GraphicsCommandList> m_CommandBuffer;
+		uint64 m_FenceValue;
 
 	public:
 		D3D12CommandBuffer(D3D12Graphics* graphics);
@@ -29,6 +30,7 @@ namespace Ayla
 
 		virtual void BeginCommands_Implementation() override;
 		virtual void EndCommands_Implementation() override;
+		virtual void WaitForCompletion(const TimeSpan& timeout) override;
 
 		inline ID3D12GraphicsCommandList* GetCommandBuffer() const noexcept { return m_CommandBuffer.Get(); }
 	};

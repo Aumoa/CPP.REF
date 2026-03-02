@@ -37,3 +37,17 @@ if (auto HR_res__ = (expr); FAILED(HR_res__)) \
 { \
 	HR__impl(HR__format(HR_res__)); \
 }
+
+#if DO_CHECK
+inline void DXSetName_Implementation(auto* class_, auto ptr, const wchar_t* callerName)
+{
+	std::string_view className1 = typeid(*class_).name();
+	std::wstring className2(className1.begin(), className1.end());
+	std::wstring cmp = className2 + L"." + callerName;
+	HR(ptr->SetName(cmp.c_str()));
+}
+
+#define DXSetName(ptr) DXSetName_Implementation(this, ptr, L ## #ptr)
+#else
+#define DXSetName(ptr) ((void)ptr)
+#endif

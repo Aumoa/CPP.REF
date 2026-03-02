@@ -2,11 +2,12 @@
 
 #include "D3D12CommandBuffer.h"
 #include "D3D12Graphics.h"
+#include "CommandQueue.h"
 
 namespace Ayla
 {
 	D3D12CommandBuffer::D3D12CommandBuffer(D3D12Graphics* graphics)
-		: m_Queue(graphics->GetCommandQueue())
+		: m_Graphics(graphics)
 	{
 		HR(graphics->GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandPool)));
 #if DO_CHECK
@@ -40,6 +41,14 @@ namespace Ayla
 		HR(m_CommandBuffer->Close());
 
 		ID3D12CommandList* targetCommandBuffer = m_CommandBuffer.Get();
-		m_Queue->ExecuteCommandLists(1, &targetCommandBuffer);
+		auto& queue = m_Graphics->GetCommandQueue();
+		queue.GetQueue()->ExecuteCommandLists(1, &targetCommandBuffer);
+		m_FenceValue = queue.Signal();
+	}
+
+	void D3D12CommandBuffer::WaitForCompletion(const TimeSpan& timeout)
+	{
+		auto& queue = m_Graphics->GetCommandQueue();
+		queue.WaitForCompletion(m_FenceValue, timeout);
 	}
 }

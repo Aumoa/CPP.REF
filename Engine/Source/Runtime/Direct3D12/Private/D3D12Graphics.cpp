@@ -4,6 +4,8 @@
 #include "GenericWindow.h"
 #include "DXGISwapchainExt.h"
 #include "D3D12CommandBuffer.h"
+#include "D3D12Buffer.h"
+#include "CommandQueue.h"
 
 namespace Ayla
 {
@@ -26,54 +28,25 @@ namespace Ayla
 
 		HR(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&m_DXGI)));
 		HR(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_Device)));
+		DXSetName(m_Device);
 		
-#if DO_CHECK
-		HR(m_Device->SetName(L"D3D12Graphics.m_Device"));
-#endif
-		
-		D3D12_COMMAND_QUEUE_DESC queueDesc =
-		{
-			.Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
-			.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL,
-			.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
-			.NodeMask = 0
-		};
-		HR(m_Device->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&m_CommandQueue)));
-#if DO_CHECK
-		HR(m_CommandQueue->SetName(L"D3D12Graphics.m_CommandQueue"));
-#endif
-
-		HR(m_Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_Fence)));
-#if DO_CHECK
-		HR(m_Fence->SetName(L"D3D12Graphics.m_Fence"));
-#endif
-		m_FenceEvent = CreateEventExW(NULL, NULL, 0, GENERIC_ALL);
+		m_CommandQueue[0] = std::make_unique<CommandQueue>(m_Device.Get(), D3D12_COMMAND_LIST_TYPE_DIRECT);
+		m_CommandQueue[1] = std::make_unique<CommandQueue>(m_Device.Get(), D3D12_COMMAND_LIST_TYPE_COMPUTE);
+		m_CommandQueue[2] = std::make_unique<CommandQueue>(m_Device.Get(), D3D12_COMMAND_LIST_TYPE_COPY);
 	}
 
 	D3D12Graphics::~D3D12Graphics() noexcept
 	{
-		if (m_FenceEvent)
-		{
-			CloseHandle(m_FenceEvent);
-			m_FenceEvent = NULL;
-		}
 	}
 
 	void D3D12Graphics::Dispose() noexcept
 	{
 		m_DXGI.Reset();
 		m_Device.Reset();
-		m_CommandQueue.Reset();
-		m_Fence.Reset();
-
-		if (m_FenceEvent)
-		{
-			CloseHandle(m_FenceEvent);
-			m_FenceEvent = NULL;
-		}
+		m_CommandQueue = {};
 	}
 
-	SharedPtr<GenericWindowSwapchainExtension> D3D12Graphics::InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow)
+	SharedPtr<GenericWindowSwapchainExtension> D3D12Graphics::InstallSwapChain(SharedPtr<GenericWindow> targetWindow)
 	{
 		auto windowSize = targetWindow->GetSize();
 
@@ -106,7 +79,7 @@ namespace Ayla
 		};
 
 		ComPtr<IDXGISwapChain> swapchain;
-		HR(m_DXGI->CreateSwapChain(m_CommandQueue.Get(), &swapchainDesc, &swapchain));
+		HR(m_DXGI->CreateSwapChain(m_CommandQueue[0]->GetQueue(), &swapchainDesc, &swapchain));
 
 		ComPtr<IDXGISwapChain3> swapchain3;
 		HR(swapchain.As(&swapchain3));
@@ -116,7 +89,7 @@ namespace Ayla
 		return extension;
 	}
 
-	SharedPtr<CommandBuffer> D3D12Graphics::CreateCommandBuffer_Implementation()
+	SharedPtr<CommandBuffer> D3D12Graphics::CreateCommandBuffer()
 	{
 		return New<D3D12CommandBuffer>(this);
 	}
@@ -124,28 +97,19 @@ namespace Ayla
 	void D3D12Graphics::BeginRenderFrame()
 	{
 		static constexpr TimeSpan _1s = TimeSpan::FromSeconds(1);
-
-		if (m_FenceValue > m_Fence->GetCompletedValue())
-		{
-			HR(m_Fence->SetEventOnCompletion((UINT64)m_FenceValue, m_FenceEvent));
-			auto w = WaitForSingleObject(m_FenceEvent, (DWORD)_1s.GetTotalMilliseconds());
-			check(w == WAIT_OBJECT_0);
-		}
+		m_CommandQueue[0]->WaitForCompletion(m_LastFrameFenceValue, _1s);
 	}
 
 	void D3D12Graphics::EndRenderFrame()
 	{
 		++m_FrameCount;
-		HR(m_CommandQueue->Signal(m_Fence.Get(), ++m_FenceValue));
+		m_LastFrameFenceValue = m_CommandQueue[0]->Signal();
 	}
 
 	void D3D12Graphics::WaitForCompletion()
 	{
-		if (m_FenceValue > m_Fence->GetCompletedValue())
-		{
-			HR(m_Fence->SetEventOnCompletion((UINT64)m_FenceValue, m_FenceEvent));
-			auto w = WaitForSingleObject(m_FenceEvent, INFINITE);
-			check(w == WAIT_OBJECT_0);
-		}
+		m_CommandQueue[0]->WaitForCompletion();
+		m_CommandQueue[1]->WaitForCompletion();
+		m_CommandQueue[2]->WaitForCompletion();
 	}
 }
