@@ -27,7 +27,7 @@ public partial class Engine
 
     protected override Graphics InitializeGraphics()
     {
-        return Graphics.CreateGraphics(RenderFeatures.Vulkan);
+        return Graphics.CreateGraphics(RenderFeatures.D3D12);
     }
 
     protected override GameInstance InitializeGameInstance()

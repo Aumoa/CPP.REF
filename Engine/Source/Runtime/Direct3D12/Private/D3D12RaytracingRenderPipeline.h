@@ -1,0 +1,25 @@
+// Copyright 2020-2025 Aumoa.lib. All right reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Rendering/RenderPipeline.h"
+#include "D3D12Common.h"
+#include "D3D12RaytracingRenderPipeline.gen.h"
+
+namespace Ayla
+{
+	class Shader;
+
+	ACLASS()
+	class D3D12RaytracingRenderPipeline : public RenderPipeline
+	{
+		GENERATED_BODY()
+
+	private:
+		ComPtr<ID3D12StateObject> m_StateObject;
+
+	public:
+		D3D12RaytracingRenderPipeline(ID3D12Device5* device, std::vector<SharedPtr<Shader>> shaders);
+	};
+}

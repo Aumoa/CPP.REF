@@ -3,19 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Buffer.gen.h"
+#include "RenderPipeline.gen.h"
 
 namespace Ayla
 {
 	ACLASS()
-	class RENDERCORE_API Buffer : public Object
+	class RENDERCORE_API RenderPipeline : public Object
 	{
 		GENERATED_BODY()
-
-	protected:
-		Buffer();
-
-	public:
-		virtual ~Buffer() noexcept override;
 	};
 }

@@ -15,6 +15,8 @@ namespace Ayla
 	class TimerManager;
 	class GenericActivity;
 	class GameInstance;
+	class Camera;
+	class Shader;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -31,6 +33,15 @@ namespace Ayla
 		std::unique_ptr<TimerManager> m_TimerManager;
 		double m_FrameTime = 0;
 		size_t m_FrameCount = 0;
+
+		SharedPtr<Shader> m_DefaultRaygenShader;
+		SharedPtr<Shader> m_DefaultClosestHitShader;
+		SharedPtr<Shader> m_DefaultMissShader;
+
+		struct Scratch
+		{
+			std::vector<Camera*> AllCameras;
+		} m_Scratch;
 
 	public:
 		ACONSTRUCTOR()

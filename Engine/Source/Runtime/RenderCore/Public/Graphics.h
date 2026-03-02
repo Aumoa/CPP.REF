@@ -14,6 +14,9 @@ namespace Ayla
     class GenericWindowSwapchainExtension;
     class CommandBuffer;
     class Buffer;
+    class RenderPipeline;
+    class Shader;
+    enum class ShaderType;
 
     ACLASS()
     class RENDERCORE_API Graphics : public Object
@@ -37,16 +40,12 @@ namespace Ayla
         virtual void Dispose() noexcept = 0;
         virtual RenderFeatures GetCurrentRenderFeature() noexcept = 0;
 
-        AFUNCTION()
-        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) APURE;
-        AFUNCTION()
-        virtual SharedPtr<CommandBuffer> CreateCommandBuffer() APURE;
-        AFUNCTION()
-        virtual SharedPtr<Buffer> CreateBuffer(BufferUsage usage) APURE;
+        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) = 0;
+        virtual SharedPtr<CommandBuffer> CreateCommandBuffer() = 0;
+        virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(std::vector<SharedPtr<Shader>> shaders) = 0;
+        virtual SharedPtr<Shader> CreateShader(std::vector<byte> bytecode, ShaderType type, String entrypointName) = 0;
 
-        AFUNCTION()
         SharedPtr<CommandBuffer> GetPooledCommandBuffer();
-        AFUNCTION()
         void ReleasePooledCommandBuffer(SharedPtr<CommandBuffer> cmd);
 
         virtual void BeginRenderFrame() = 0;

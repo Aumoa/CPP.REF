@@ -6,6 +6,7 @@
 #include <d3d12.h>
 #include <dxgi1_5.h>
 #include <d3d12sdklayers.h>
+#include <d3dcompiler.h>
 #include <wrl/client.h>
 #include <comdef.h>
 #include "Platform/Windows/UndefWindowsPlatformMacros.h"

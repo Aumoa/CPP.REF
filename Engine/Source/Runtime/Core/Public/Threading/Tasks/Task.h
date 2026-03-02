@@ -159,7 +159,24 @@ namespace Ayla
 			}, cancellationToken);
 		}
 
-		inline T GetResult() const
+	private:
+		template<class T>
+		struct add_reference_unless_void
+		{
+			using type = T&;
+		};
+
+		template<>
+		struct add_reference_unless_void<void>
+		{
+			using type = void;
+		};
+
+		template<class T>
+		using add_reference_unless_void_t = typename add_reference_unless_void<T>::type;
+
+	public:
+		inline add_reference_unless_void_t<T> GetResult() const
 		{
 			check(IsValid());
 			if constexpr (std::same_as<T, void>)
@@ -341,13 +358,21 @@ namespace Ayla
 				});
 			}
 
-			return Task<VoidableVector<V>>(state->m_Task).ContinueWith([state](auto p)
+			auto task = Task<VoidableVector<V>>(state->m_Task);
+			if constexpr (std::is_void_v<V>)
 			{
-				if constexpr (!std::is_void_v<V>)
+				return task;
+			}
+			else
+			{
+				return task.ContinueWith([state](auto p)
 				{
-					return std::vector<V>(p.GetResult());
-				}
-			});
+					if constexpr (!std::is_void_v<V>)
+					{
+						return std::vector<V>(p.GetResult());
+					}
+				});
+			}
 		}
 
 		template<class IR>

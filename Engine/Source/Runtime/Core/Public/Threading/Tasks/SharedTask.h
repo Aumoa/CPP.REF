@@ -235,7 +235,7 @@ namespace Ayla
 	template<class T> requires (!std::is_same_v<T, void>)
 	class SharedTask<T, 0> : public SharedTask<void, 0>
 	{
-		std::optional<T> m_Promise;
+		mutable std::optional<T> m_Promise;
 
 	public:
 		SharedTask(std::stop_token cancellationToken = {}) : SharedTask<void, 0>(std::move(cancellationToken))
@@ -248,7 +248,7 @@ namespace Ayla
 		{
 		}
 
-		T GetResult() const
+		T& GetResult() const
 		{
 			Wait();
 

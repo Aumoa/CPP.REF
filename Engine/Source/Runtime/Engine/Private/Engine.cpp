@@ -15,6 +15,10 @@
 #include "Rendering/SceneView.h"
 #include "Rendering/RenderTexture.h"
 #include "Threading/MainSynchronizationContext.h"
+#include "Rendering/Camera.h"
+#include "Rendering/Shader.h"
+#include "Rendering/ShaderType.h"
+#include "IO/File.h"
 
 namespace Ayla
 {
@@ -37,13 +41,25 @@ namespace Ayla
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
 
 		m_GameInstance = InitializeGameInstance();
-		auto initializeTask = m_GameInstance->InitializeAsync({});
-		while (initializeTask.GetStatus() == TaskStatus::Running)
+		std::vector<Task<>> tasks;
+		tasks.emplace_back(m_GameInstance->InitializeAsync({}));
+		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultRayGeneration.cso")).ContinueWith([&](auto r)
 		{
-			PLATFORM_YIELD();
-		}
+			auto& bytecode = r.GetResult();
+			m_DefaultRaygenShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::RayGeneration, TEXT("main"));
+		}));
+		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultHit.cso")).ContinueWith([&](auto r)
+		{
+			auto& bytecode = r.GetResult();
+			m_DefaultClosestHitShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::ClosestHit, TEXT("main"));
+		}));
+		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultMiss.cso")).ContinueWith([&](auto r)
+		{
+			auto& bytecode = r.GetResult();
+			m_DefaultMissShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::Miss, TEXT("main"));
+		}));
 
-		initializeTask.GetResult();
+		Task<>::WhenAll(tasks).GetResult();
 		m_MainActivity->AfterInitialize();
 	}
 

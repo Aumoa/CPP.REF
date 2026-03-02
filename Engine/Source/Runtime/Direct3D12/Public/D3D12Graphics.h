@@ -18,7 +18,7 @@ namespace Ayla
 
 	private:
 		ComPtr<IDXGIFactory5> m_DXGI;
-		ComPtr<ID3D12Device1> m_Device;
+		ComPtr<ID3D12Device5> m_Device;
 		std::array<std::unique_ptr<CommandQueue>, 3> m_CommandQueue;
 		std::atomic<std::size_t> m_FrameCount = 0;
 		uint64 m_LastFrameFenceValue = 0;
@@ -33,6 +33,8 @@ namespace Ayla
 
 		virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) override;
 		virtual SharedPtr<CommandBuffer> CreateCommandBuffer() override;
+		virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(std::vector<SharedPtr<Shader>> shaders) override;
+		virtual SharedPtr<Shader> CreateShader(std::vector<byte> bytecode, ShaderType type, String entrypointName) override;
 
 		virtual void BeginRenderFrame() override;
 		virtual void EndRenderFrame() override;

@@ -16,6 +16,15 @@ namespace Ayla
 		co_return Content;
 	}
 
+	Task<std::vector<uint8>> File::ReadAllBytesAsync(String InPath, std::stop_token InCancellationToken)
+	{
+		FileStream Stream(InPath, FileMode::Open, FileAccessMode::Read, FileSharedMode::Read);
+		std::vector<uint8> Data(Stream.GetLength());
+		co_await Stream.ReadAsync(Data, InCancellationToken);
+		Stream.Close();
+		co_return Data;
+	}
+
 	String File::ReadAllText(String InPath)
 	{
 		return ReadAllTextAsync(InPath).GetResult();
