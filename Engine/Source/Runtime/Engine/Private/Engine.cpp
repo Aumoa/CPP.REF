@@ -18,6 +18,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Shader.h"
 #include "Rendering/ShaderType.h"
+#include "Rendering/RenderPipeline.h"
 #include "IO/File.h"
 
 namespace Ayla
@@ -46,20 +47,22 @@ namespace Ayla
 		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultRayGeneration.cso")).ContinueWith([&](auto r)
 		{
 			auto& bytecode = r.GetResult();
-			m_DefaultRaygenShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::RayGeneration, TEXT("main"));
+			m_DefaultRaygenShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::RayGeneration, TEXT("DefaultRayGeneration"));
 		}));
 		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultHit.cso")).ContinueWith([&](auto r)
 		{
 			auto& bytecode = r.GetResult();
-			m_DefaultClosestHitShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::ClosestHit, TEXT("main"));
+			m_DefaultClosestHitShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::ClosestHit, TEXT("DefaultClosestHit"));
 		}));
 		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultMiss.cso")).ContinueWith([&](auto r)
 		{
 			auto& bytecode = r.GetResult();
-			m_DefaultMissShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::Miss, TEXT("main"));
+			m_DefaultMissShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::Miss, TEXT("DefaultMiss"));
 		}));
 
 		Task<>::WhenAll(tasks).GetResult();
+		m_DefaultRenderPipeline = m_Graphics->CreateRaytracingRenderPipeline({ m_DefaultRaygenShader, m_DefaultClosestHitShader, m_DefaultMissShader });
+
 		m_MainActivity->AfterInitialize();
 	}
 

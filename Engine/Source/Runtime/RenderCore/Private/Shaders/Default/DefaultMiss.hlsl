@@ -3,7 +3,7 @@
 #include "DefaultCommon.hlsli"
 
 [shader("miss")]
-void main(inout Payload payload)
+void DefaultMiss(inout Payload payload)
 {
     uint2 launchIndex = DispatchRaysIndex().xy;
     float2 dims = float2(DispatchRaysDimensions().xy);

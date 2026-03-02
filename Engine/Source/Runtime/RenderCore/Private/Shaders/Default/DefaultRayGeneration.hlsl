@@ -3,7 +3,7 @@
 #include "DefaultCommon.hlsli"
 
 [shader("raygeneration")]
-void main()
+void DefaultRayGeneration()
 {
     Payload payload;
     payload.ColorAndDistance = float4(0, 0, 0, 0);

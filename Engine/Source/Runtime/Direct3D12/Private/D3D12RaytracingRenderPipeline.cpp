@@ -25,7 +25,20 @@ namespace Ayla
 		HR(device->CreateRootSignature(0, globalRootSigBlob->GetBufferPointer(), globalRootSigBlob->GetBufferSize(), IID_PPV_ARGS(&globalRootSignature)));
 
 		// TODO: Test implementation
-		ComPtr<ID3D12RootSignature> localRootSignature = globalRootSignature;
+		D3D12_ROOT_SIGNATURE_DESC localRootSigDesc =
+		{
+			0,
+			nullptr,
+			0,
+			nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE
+		};
+
+		ComPtr<ID3DBlob> localRootSigBlob;
+		HR(D3D12SerializeRootSignature(&localRootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &localRootSigBlob, &errorBlob));
+
+		ComPtr<ID3D12RootSignature> localRootSignature;
+		HR(device->CreateRootSignature(0, localRootSigBlob->GetBufferPointer(), localRootSigBlob->GetBufferSize(), IID_PPV_ARGS(&localRootSignature)));
 
 		D3D12_STATE_OBJECT_DESC stateObjectDesc =
 		{
@@ -33,45 +46,48 @@ namespace Ayla
 			.NumSubobjects = 0
 		};
 
+		std::vector<String> entrypointNames;
+		entrypointNames.reserve(shaders.size());
 		std::vector<D3D12_SHADER_BYTECODE> shaderBytecodes;
 		shaderBytecodes.reserve(shaders.size());
 		std::vector<D3D12_DXIL_LIBRARY_DESC> dxilLibDesc;
-		dxilLibDesc.reserve(shaderBytecodes.size());
+		dxilLibDesc.reserve(shaders.size());
 		std::vector<D3D12_EXPORT_DESC> exports;
-		exports.reserve(shaderBytecodes.size());
+		exports.reserve(shaders.size());
+		std::vector<D3D12_STATE_SUBOBJECT> subobjects;
+		subobjects.reserve(shaders.size() + 5);
 		for (size_t i = 0; i < shaders.size(); ++i)
 		{
 			auto& shader = shaders[i];
+			auto& entrypointName = entrypointNames.emplace_back(shader->GetEntrypointName());
 			auto& shaderBytecode = shaderBytecodes.emplace_back(D3D12_SHADER_BYTECODE
 			{
 				.pShaderBytecode = shader->GetBytecode(),
 				.BytecodeLength = shader->GetBytecodeSize()
 			});
-			auto& dxil = dxilLibDesc.emplace_back(D3D12_DXIL_LIBRARY_DESC
-			{
-				.DXILLibrary = &shaderBytecode,
-				.NumExports = 1
-			});
 			auto& exp = exports.emplace_back(D3D12_EXPORT_DESC
 			{
-				.Name = shader->GetEntrypointName().c_str(),
+				.Name = entrypointName.c_str(),
 				.ExportToRename = nullptr,
 				.Flags = D3D12_EXPORT_FLAG_NONE
 			});
-			dxil.pExports = &exp;
+			auto& dxil = dxilLibDesc.emplace_back(D3D12_DXIL_LIBRARY_DESC
+			{
+				.DXILLibrary = shaderBytecode,
+				.NumExports = 1,
+				.pExports = &exp
+			});
+			subobjects.emplace_back(D3D12_STATE_SUBOBJECT
+			{
+				.Type = D3D12_STATE_SUBOBJECT_TYPE_DXIL_LIBRARY,
+				.pDesc = &dxil
+			});
 		}
-
-		std::vector<D3D12_STATE_SUBOBJECT> subobjects;
-
-		D3D12_STATE_SUBOBJECT dxilLibSubobject = {};
-		dxilLibSubobject.Type = D3D12_STATE_SUBOBJECT_TYPE_DXIL_LIBRARY;
-		dxilLibSubobject.pDesc = &dxilLibDesc;
-		subobjects.emplace_back(dxilLibSubobject);
 
 		D3D12_HIT_GROUP_DESC hitGroupDesc = {};
 		hitGroupDesc.HitGroupExport = L"DefaultHit";
 		hitGroupDesc.Type = D3D12_HIT_GROUP_TYPE_TRIANGLES;
-		hitGroupDesc.ClosestHitShaderImport = L"main";
+		hitGroupDesc.ClosestHitShaderImport = L"DefaultClosestHit";
 
 		D3D12_STATE_SUBOBJECT hitGroupSubobject = {};
 		hitGroupSubobject.Type = D3D12_STATE_SUBOBJECT_TYPE_HIT_GROUP;
@@ -85,7 +101,7 @@ namespace Ayla
 
 		D3D12_STATE_SUBOBJECT localRootSigSubobject = {};
 		localRootSigSubobject.Type = D3D12_STATE_SUBOBJECT_TYPE_LOCAL_ROOT_SIGNATURE;
-		localRootSigSubobject.pDesc = globalRootSignature.GetAddressOf();
+		localRootSigSubobject.pDesc = localRootSignature.GetAddressOf();
 		subobjects.emplace_back(localRootSigSubobject);
 
 		D3D12_RAYTRACING_SHADER_CONFIG shaderConfig = {};
