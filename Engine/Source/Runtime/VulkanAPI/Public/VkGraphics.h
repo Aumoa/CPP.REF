@@ -10,6 +10,7 @@
 namespace Ayla
 {
     class GenericApplication;
+    class VkCommandQueue;
 
     ACLASS()
     class VULKANAPI_API VkGraphics : public Graphics
@@ -28,9 +29,7 @@ namespace Ayla
         VkInstanceRef m_Instance;
         VkPhysicalDevice m_PhysicalDevice{ nullptr };
         VkDeviceRef m_Device;
-        VkQueue m_GraphicsQueue{ nullptr };
-		uint32_t m_GraphicsQueueFamilyIndex{ 0 };
-        uint32_t m_QueueCount{ 0 };
+        std::array<std::unique_ptr<VkCommandQueue>, 3> m_Queues;
 
         std::atomic<std::size_t> m_FrameCount = 0;
 
@@ -56,8 +55,7 @@ namespace Ayla
         VkInstance GetInstance() const noexcept { return m_Instance; }
         VkDevice GetDevice() const noexcept { return m_Device; }
         VkPhysicalDevice GetPhysicalDevice() const noexcept { return m_PhysicalDevice; }
-        VkQueue GetGraphicsQueue() const noexcept { return m_GraphicsQueue; }
-		uint32_t GetGraphicsQueueFamilyIndex() const noexcept { return m_GraphicsQueueFamilyIndex; }
+        VkCommandQueue* GetGraphicsQueue() const noexcept { return m_Queues[0].get(); }
 
         inline size_t GetFrameNumber() const noexcept { return m_FrameCount; }
         inline size_t GetFrameIndex() const noexcept { return m_FrameCount % kMaxFramesInFlight; }

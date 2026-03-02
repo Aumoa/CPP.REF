@@ -4,6 +4,7 @@
 #include "GenericApplication.h"
 #include "GenericWindowSwapchainExtension.h"
 #include "VkSwapchainExt.h"
+#include "VkCommandQueue.h"
 #include "Linq/Concat.h"
 #include <ranges>
 #include <array>
@@ -124,36 +125,122 @@ namespace Ayla
         }
 
         // Find a queue family that supports VK_QUEUE_GRAPHICS_BIT
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &m_QueueCount, nullptr);
-        std::vector<VkQueueFamilyProperties> queueFamilies(m_QueueCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &m_QueueCount, queueFamilies.data());
+        uint32_t queueCount;
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueCount, nullptr);
+        std::vector<VkQueueFamilyProperties> queueFamilies((size_t)queueCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueCount, queueFamilies.data());
 
-        m_GraphicsQueueFamilyIndex = (uint32_t)-1;
-        for (uint32_t i = 0; i < m_QueueCount; ++i)
+        struct QueueFamilyInfo
         {
-            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            uint32_t FamilyIndex;
+            int32 SupportsCount;
+            VkQueueFlags Flags;
+        };
+
+        std::array<QueueFamilyInfo, 3> queueFamilyInfos =
+        {
+            QueueFamilyInfo{ (uint32_t)-1, -1, 0 },
+            QueueFamilyInfo{ (uint32_t)-1, -1, 0 },
+            QueueFamilyInfo{ (uint32_t)-1, -1, 0 }
+        };
+        QueueFamilyInfo& bestPrimaryQueueFamily = queueFamilyInfos[0];
+		QueueFamilyInfo& bestComputeQueueFamily = queueFamilyInfos[1];
+		QueueFamilyInfo& bestTransferQueueFamily = queueFamilyInfos[2];
+
+        for (uint32_t i = 0; i < queueCount; ++i)
+        {
+			bool supportsGraphics = (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0;
+			bool supportsCompute = (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0;
+			bool supportsTransfer = (queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT) != 0;
+			int32 supportsCount = (supportsGraphics ? 1 : 0) + (supportsCompute ? 1 : 0) + (supportsTransfer ? 1 : 0);
+
+            if (supportsGraphics && supportsTransfer)
             {
-                m_GraphicsQueueFamilyIndex = i;
-                break;
+                if (bestPrimaryQueueFamily.FamilyIndex == (uint32_t)-1 || supportsCount > bestPrimaryQueueFamily.SupportsCount)
+                {
+                    bestPrimaryQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
+				}
+            }
+
+            if (supportsCompute)
+            {
+                if (bestComputeQueueFamily.FamilyIndex == (uint32_t)-1 || supportsCount < bestComputeQueueFamily.SupportsCount)
+                {
+                    bestComputeQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
+				}
+            }
+
+            if (supportsTransfer)
+            {
+                if (bestTransferQueueFamily.FamilyIndex == (uint32_t)-1 || supportsCount < bestTransferQueueFamily.SupportsCount)
+                {
+                    bestTransferQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
+                }
             }
         }
-        if (m_GraphicsQueueFamilyIndex == -1)
+
+        if (bestPrimaryQueueFamily.FamilyIndex == (uint32_t)-1)
         {
-            throw std::runtime_error("No queue family supports VK_QUEUE_GRAPHICS_BIT");
+			throw std::runtime_error("No queue family supports VK_QUEUE_GRAPHICS_BIT and VK_QUEUE_TRANSFER_BIT");
+		}
+
+        if (bestComputeQueueFamily.FamilyIndex == (uint32_t)-1)
+        {
+            throw std::runtime_error("No queue family supports VK_QUEUE_COMPUTE_BIT");
+		}
+
+        if (bestTransferQueueFamily.FamilyIndex == (uint32_t)-1)
+        {
+            throw std::runtime_error("No queue family supports VK_QUEUE_TRANSFER_BIT");
+		}
+
+		LogVulkan::Verbose(TEXT("Graphics queue family index: {} (supports {})"), bestPrimaryQueueFamily.FamilyIndex, bestPrimaryQueueFamily.SupportsCount);
+		LogVulkan::Verbose(TEXT("Compute queue family index: {} (supports {})"), bestComputeQueueFamily.FamilyIndex, bestComputeQueueFamily.SupportsCount);
+		LogVulkan::Verbose(TEXT("Transfer queue family index: {} (supports {})"), bestTransferQueueFamily.FamilyIndex, bestTransferQueueFamily.SupportsCount);
+
+        struct QueueCreateInfo
+        {
+            uint32_t FamilyIndex;
+            std::vector<int32> Types;
+            std::vector<float> Priorities;
+        };
+
+        std::vector<QueueCreateInfo> queueCreateInfos;
+        queueCreateInfos.reserve(3);
+
+        for (size_t i = 0; i < 3; ++i)
+        {
+			auto& familyInfo = queueFamilyInfos[i];
+            QueueCreateInfo* createInfo = nullptr;
+            for (auto& existingInfo : queueCreateInfos)
+            {
+                if (existingInfo.FamilyIndex == familyInfo.FamilyIndex)
+                {
+                    createInfo = &existingInfo;
+                    break;
+                }
+			}
+
+            if (createInfo == nullptr)
+            {
+                createInfo = &queueCreateInfos.emplace_back();
+                createInfo->FamilyIndex = familyInfo.FamilyIndex;
+            }
+
+            createInfo->Types.emplace_back((int32)i);
+            createInfo->Priorities.emplace_back(1.0f);
         }
 
-        const float queuePriorities[] = { 1.0f };
         std::vector<VkDeviceQueueCreateInfo> vkQueueInfos;
-		vkQueueInfos.reserve((size_t)m_QueueCount);
-        for (uint32_t i = 0; i < m_QueueCount; ++i)
+		for (auto& createInfo : queueCreateInfos)
         {
             vkQueueInfos.emplace_back(VkDeviceQueueCreateInfo
             {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                .queueFamilyIndex = i,
-                .queueCount = 1,
-                .pQueuePriorities = queuePriorities
-            });
+                .queueFamilyIndex = createInfo.FamilyIndex,
+                .queueCount = (uint32_t)createInfo.Types.size(),
+                .pQueuePriorities = createInfo.Priorities.data()
+			});
         }
 
         VkPhysicalDeviceTimelineSemaphoreFeatures timelineFeatures =
@@ -228,7 +315,20 @@ namespace Ayla
 
         LogVulkan::Verbose(TEXT("Logical device created using {} physical device."), String::FromLiteral(physicalDeviceProps[0].deviceName));
         VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
-        vkGetDeviceQueue(m_Device, m_GraphicsQueueFamilyIndex, 0, &m_GraphicsQueue);
+
+        for (auto& createInfo : queueCreateInfos)
+        {
+            for (size_t i = 0; i < createInfo.Types.size(); ++i)
+            {
+                int32 type = createInfo.Types[i];
+                check(m_Queues[(size_t)type] == nullptr);
+                VkQueue queue;
+                vkGetDeviceQueue(m_Device, createInfo.FamilyIndex, (uint32_t)i, &queue);
+                auto& queueFamilyInfo = queueFamilyInfos[(size_t)type];
+				m_Queues[(size_t)type] = std::make_unique<VkCommandQueue>(this, queue, queueFamilyInfo.FamilyIndex, queueFamilyInfo.Flags);
+			}
+		}
+
         m_PhysicalDevice = physicalDevices[0];
     }
 
@@ -239,7 +339,7 @@ namespace Ayla
 
     void VkGraphics::Dispose() noexcept
     {
-        m_GraphicsQueue = nullptr;
+        m_Queues = {};
         m_PhysicalDevice = nullptr;
     }
 
@@ -321,13 +421,14 @@ namespace Ayla
         };
 
         VkQueue suitableQueue = VK_NULL_HANDLE;
-        for (uint32_t i = 0; i < m_QueueCount; ++i)
+        for (auto& queue : m_Queues)
         {
             VkBool32 supported;
-            VKR(vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, surface, &supported));
+            VKR(vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, queue->GetQueueFamilyIndex(), surface, &supported));
             if (supported)
             {
-                vkGetDeviceQueue(m_Device, i, 0, &suitableQueue);
+                suitableQueue = queue->GetVkQueue();
+                break;
             }
         }
 

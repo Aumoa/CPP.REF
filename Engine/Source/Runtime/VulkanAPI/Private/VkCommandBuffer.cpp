@@ -2,6 +2,7 @@
 
 #include "VkCommandBuffer.h"
 #include "VkGraphics.h"
+#include "VkCommandQueue.h"
 
 namespace Ayla
 {
@@ -12,7 +13,7 @@ namespace Ayla
 		{
 			.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 			.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-			.queueFamilyIndex = (uint32_t)graphics->GetGraphicsQueueFamilyIndex()
+			.queueFamilyIndex = (uint32_t)graphics->GetGraphicsQueue()->GetQueueFamilyIndex()
 		};
 
 		VKR(vkCreateCommandPool(graphics->GetDevice(), &commandPoolCreateInfo, nullptr, &m_CommandPool));
@@ -120,7 +121,7 @@ namespace Ayla
 		submitInfo.waitSemaphoreCount = (uint32_t)m_WaitSemaphores.size();
 		submitInfo.pWaitSemaphores = m_WaitSemaphores.data();
 		auto fence = m_Fences.size() > 0 ? m_Fences[frameIndex] : VK_NULL_HANDLE;
-		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue(), 1, &submitInfo, fence));
+		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue()->GetVkQueue(), 1, &submitInfo, fence));
 	}
 
 	void VkCommandBuffer::WaitForCompletion(const TimeSpan& timeout)
