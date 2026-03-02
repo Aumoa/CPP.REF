@@ -35,7 +35,7 @@ internal static partial class BuildRunner
             {
                 requiredProjects.Add("Engine");
                 requiredProjects.Add("Launch");
-                requiredProjects.Add("VulkanAPI");
+                requiredProjects.Add("Direct3D12");
                 requiredProjects.Add("WindowsAPI");
                 requiredProjects.Add("ShaderCompileWorker");
             }
