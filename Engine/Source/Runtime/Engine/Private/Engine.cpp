@@ -134,6 +134,7 @@ namespace Ayla
 		DispatchTick(TickTiming::PostRender);
 		DispatchTick(TickTiming::EndOfFrame);
 
+		m_Scratch.AllCameras.clear();
 		m_GameInstance->GetSceneManager()->GetAllCameraComponents(&m_Scratch.AllCameras);
 		m_Scratch.AllCameraViews.resize(m_Scratch.AllCameras.size());
 		for (size_t i = 0; i < m_Scratch.AllCameras.size(); i++)
