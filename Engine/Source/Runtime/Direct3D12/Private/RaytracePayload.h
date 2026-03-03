@@ -10,6 +10,7 @@ namespace Ayla
 {
 	struct RaytracePayload
 	{
-		Color Color;
+		Vector3F Color;
+		float Distance;
 	};
 }

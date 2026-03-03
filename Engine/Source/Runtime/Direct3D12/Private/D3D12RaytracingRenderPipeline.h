@@ -17,9 +17,13 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
+		ComPtr<ID3D12RootSignature> m_GlobalRootSignature;
+		ComPtr<ID3D12RootSignature> m_LocalRootSignature;
 		ComPtr<ID3D12StateObject> m_StateObject;
 
 	public:
 		D3D12RaytracingRenderPipeline(ID3D12Device5* device, std::vector<SharedPtr<Shader>> shaders);
+
+		ID3D12StateObject* GetPipelineStateObject() const noexcept { return m_StateObject.Get(); }
 	};
 }

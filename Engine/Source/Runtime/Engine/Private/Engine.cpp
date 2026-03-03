@@ -144,6 +144,7 @@ namespace Ayla
 			graphics = m_Graphics,
 			commandBuffer = m_CommandBuffer,
 			self = m_RenderThread.Get(),
+			renderPipeline = m_DefaultRenderPipeline.Get(),
 			views = &m_Scratch.AllCameraViews
 		]()
 		{

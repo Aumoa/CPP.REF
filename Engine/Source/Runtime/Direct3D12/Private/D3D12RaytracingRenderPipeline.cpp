@@ -9,10 +9,43 @@ namespace Ayla
 {
 	D3D12RaytracingRenderPipeline::D3D12RaytracingRenderPipeline(ID3D12Device5* device, std::vector<SharedPtr<Shader>> shaders)
 	{
+		D3D12_DESCRIPTOR_RANGE outputTextureRange =
+		{
+			.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV,
+			.NumDescriptors = 1,
+			.BaseShaderRegister = 0,
+			.RegisterSpace = 0,
+			.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
+		};
+
+		std::array<D3D12_ROOT_PARAMETER, 2> rootParams =
+		{
+			D3D12_ROOT_PARAMETER
+			{
+				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
+				.DescriptorTable =
+				{
+					.NumDescriptorRanges = 1,
+					.pDescriptorRanges = &outputTextureRange
+				},
+				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+			},
+			D3D12_ROOT_PARAMETER
+			{
+				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV,
+				.Descriptor =
+				{
+					.ShaderRegister = 0,
+					.RegisterSpace = 0
+				},
+				.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
+			}
+		};
+
 		D3D12_ROOT_SIGNATURE_DESC globalRootSigDesc =
 		{
-			0,
-			nullptr,
+			static_cast<UINT>(rootParams.size()),
+			rootParams.data(),
 			0,
 			nullptr,
 			D3D12_ROOT_SIGNATURE_FLAG_NONE
@@ -20,9 +53,7 @@ namespace Ayla
 
 		ComPtr<ID3DBlob> globalRootSigBlob, errorBlob;
 		HR(D3D12SerializeRootSignature(&globalRootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &globalRootSigBlob, &errorBlob));
-
-		ComPtr<ID3D12RootSignature> globalRootSignature;
-		HR(device->CreateRootSignature(0, globalRootSigBlob->GetBufferPointer(), globalRootSigBlob->GetBufferSize(), IID_PPV_ARGS(&globalRootSignature)));
+		HR(device->CreateRootSignature(0, globalRootSigBlob->GetBufferPointer(), globalRootSigBlob->GetBufferSize(), IID_PPV_ARGS(&m_GlobalRootSignature)));
 
 		// TODO: Test implementation
 		D3D12_ROOT_SIGNATURE_DESC localRootSigDesc =
@@ -36,15 +67,7 @@ namespace Ayla
 
 		ComPtr<ID3DBlob> localRootSigBlob;
 		HR(D3D12SerializeRootSignature(&localRootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &localRootSigBlob, &errorBlob));
-
-		ComPtr<ID3D12RootSignature> localRootSignature;
-		HR(device->CreateRootSignature(0, localRootSigBlob->GetBufferPointer(), localRootSigBlob->GetBufferSize(), IID_PPV_ARGS(&localRootSignature)));
-
-		D3D12_STATE_OBJECT_DESC stateObjectDesc =
-		{
-			.Type = D3D12_STATE_OBJECT_TYPE_RAYTRACING_PIPELINE,
-			.NumSubobjects = 0
-		};
+		HR(device->CreateRootSignature(0, localRootSigBlob->GetBufferPointer(), localRootSigBlob->GetBufferSize(), IID_PPV_ARGS(&m_LocalRootSignature)));
 
 		std::vector<String> entrypointNames;
 		entrypointNames.reserve(shaders.size());
@@ -96,12 +119,12 @@ namespace Ayla
 
 		D3D12_STATE_SUBOBJECT globalRootSigSubobject = {};
 		globalRootSigSubobject.Type = D3D12_STATE_SUBOBJECT_TYPE_GLOBAL_ROOT_SIGNATURE;
-		globalRootSigSubobject.pDesc = globalRootSignature.GetAddressOf();
+		globalRootSigSubobject.pDesc = m_GlobalRootSignature.GetAddressOf();
 		subobjects.emplace_back(globalRootSigSubobject);
 
 		D3D12_STATE_SUBOBJECT localRootSigSubobject = {};
 		localRootSigSubobject.Type = D3D12_STATE_SUBOBJECT_TYPE_LOCAL_ROOT_SIGNATURE;
-		localRootSigSubobject.pDesc = localRootSignature.GetAddressOf();
+		localRootSigSubobject.pDesc = m_LocalRootSignature.GetAddressOf();
 		subobjects.emplace_back(localRootSigSubobject);
 
 		D3D12_RAYTRACING_SHADER_CONFIG shaderConfig = {};
@@ -121,9 +144,12 @@ namespace Ayla
 		pipelineConfigSubobject.pDesc = &pipelineConfig;
 		subobjects.emplace_back(pipelineConfigSubobject);
 
-		stateObjectDesc.NumSubobjects = (UINT)subobjects.size();
-		stateObjectDesc.pSubobjects = subobjects.data();
-
+		D3D12_STATE_OBJECT_DESC stateObjectDesc =
+		{
+			.Type = D3D12_STATE_OBJECT_TYPE_RAYTRACING_PIPELINE,
+			.NumSubobjects = (UINT)subobjects.size(),
+			.pSubobjects = subobjects.data()
+		};
 		HR(device->CreateStateObject(&stateObjectDesc, IID_PPV_ARGS(&m_StateObject)));
 	}
 }

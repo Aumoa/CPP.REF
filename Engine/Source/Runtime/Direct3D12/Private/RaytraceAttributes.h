@@ -10,5 +10,6 @@ namespace Ayla
 {
 	struct RaytraceAttributes
 	{
+		Vector2F Bary;
 	};
 }
