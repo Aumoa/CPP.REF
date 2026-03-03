@@ -28,6 +28,10 @@ namespace Ayla
 	void Scene::Destroy()
 	{
 		ObjectDisposedException::ThrowIfDisposed(m_Disposed, TEXT("Scene"));
+		for (auto& gameObject : m_GameObjects)
+		{
+			gameObject->Destroy();
+		}
 		m_GameObjects.clear();
 		m_Active = false;
 		m_Disposed = true;

@@ -93,6 +93,8 @@ namespace Ayla
 
 			Tick();
 		}
+
+		m_GameInstance->Shutdown();
 	}
 
 	void Engine::Shutdown()

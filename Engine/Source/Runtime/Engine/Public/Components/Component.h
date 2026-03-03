@@ -24,7 +24,10 @@ namespace Ayla
 		Component();
 		virtual ~Component() noexcept override;
 
-		AFUNCTION()
-		SharedPtr<Actor> GetActor() const;
+		Actor* GetActor() const
+		{
+			ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
+			return m_ActorPtr;
+		}
 	};
 }

@@ -15,10 +15,13 @@ namespace Ayla
 
 	Actor::~Actor() noexcept
 	{
+		check(m_Disposed);
 	}
 
 	void Actor::SetActive(bool active)
 	{
+		ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
+
 		if (m_IsActive == active)
 		{
 			return;
@@ -48,6 +51,8 @@ namespace Ayla
 
 	SharedPtr<Component> Actor::AddComponent(ManagedTypeWrapper componentType)
 	{
+		ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
+
 		auto obj = Activator::CreateInstance(componentType);
 		SharedPtr<Component> comp;
 		if (obj.Is(&comp) == false)
@@ -67,5 +72,13 @@ namespace Ayla
 		comp->m_ActorPtr = this;
 		m_Components.emplace_back(comp);
 		return comp;
+	}
+
+	void Actor::Destroy()
+	{
+		ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
+		SetActive(false);
+		m_Components.clear();
+		m_Disposed = true;
 	}
 }

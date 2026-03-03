@@ -18,7 +18,7 @@ namespace Ayla
 
 	void Camera::GetMinimalViewInfo(MinimalViewInfo* output) const
 	{
-		auto gameObject = (SharedPtr<GameObject>)GetActor();
+		auto gameObject = (GameObject*)GetActor();
 		auto transform = gameObject->GetTransform();
 		transform->GetPositionAndRotation(&output->Position, &output->Rotation);
 		output->FieldOfView = 60.0f;
@@ -27,13 +27,13 @@ namespace Ayla
 
 	void Camera::OnEnable()
 	{
-		auto gameObject = (SharedPtr<GameObject>)GetActor();
+		auto gameObject = (GameObject*)GetActor();
 		gameObject->GetScene()->AddCameraComponent(this);
 	}
 
 	void Camera::OnDisable()
 	{
-		auto gameObject = (SharedPtr<GameObject>)GetActor();
+		auto gameObject = (GameObject*)GetActor();
 		gameObject->GetScene()->RemoveCameraComponent(this);
 	}
 }

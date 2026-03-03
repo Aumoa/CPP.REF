@@ -57,6 +57,11 @@ namespace Ayla
 		end_try__;
 	}
 
+	void GameInstance::Shutdown()
+	{
+		m_SceneManager->UnloadAllScenes();
+	}
+
 	SharedPtr<Engine> GameInstance::GetEngine()
 	{
 		return m_Engine->AsShared();

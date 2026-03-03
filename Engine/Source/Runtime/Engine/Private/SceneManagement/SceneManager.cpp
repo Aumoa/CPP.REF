@@ -28,6 +28,21 @@ namespace Ayla
 		}
 	}
 
+	void SceneManager::UnloadAllScenes()
+	{
+		for (auto& additiveScene : m_AdditiveScenes)
+		{
+			additiveScene->Destroy();
+		}
+
+		m_AdditiveScenes.clear();
+
+		if (m_ActiveScene)
+		{
+			m_ActiveScene->Destroy();
+		}
+	}
+
 	void SceneManager::GetAllCameraComponents(std::vector<Camera*>* output) const
 	{
 		if (m_ActiveScene)

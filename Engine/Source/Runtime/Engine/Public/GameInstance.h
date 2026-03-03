@@ -32,6 +32,7 @@ namespace Ayla
 
 		virtual Task<> InitializeAsync(std::stop_token cancellationToken);
 		void Tick(TickTiming timing, const TimeSpan& deltaTime);
+		void Shutdown();
 
 		AFUNCTION()
 		SharedPtr<Engine> GetEngine();

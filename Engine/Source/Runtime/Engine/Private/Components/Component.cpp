@@ -12,10 +12,4 @@ namespace Ayla
 	Component::~Component() noexcept
 	{
 	}
-
-	SharedPtr<Actor> Component::GetActor() const
-	{
-		ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
-		return m_ActorPtr->AsShared();
-	}
 }

@@ -16,7 +16,8 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		bool m_IsActive = false;
+		bool m_Disposed : 1 = false;
+		bool m_IsActive : 1 = false;
 		std::vector<SharedPtr<Component>> m_Components;
 
 	public:
@@ -29,6 +30,8 @@ namespace Ayla
 		bool IsActiveSelf() const { return m_IsActive; }
 		AFUNCTION()
 		SharedPtr<Component> AddComponent(ManagedTypeWrapper componentType);
+		AFUNCTION()
+		void Destroy();
 
 		template<std::derived_from<Component> TComponent>
 		SharedPtr<TComponent> AddComponent()

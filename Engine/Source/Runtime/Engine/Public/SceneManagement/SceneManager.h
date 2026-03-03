@@ -21,6 +21,7 @@ namespace Ayla
 		virtual ~SceneManager() noexcept;
 
 		void LoadScene(SharedPtr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single);
+		void UnloadAllScenes();
 		
 		void GetAllCameraComponents(std::vector<Camera*>* output) const;
 
