@@ -276,14 +276,14 @@ namespace Ayla
 		template<TIsMatrixBase IMatrix, TIsVectorBase IVector>
 		static constexpr auto TransformVector(const IMatrix& M, const IVector& V) requires
 			std::same_as<typename IMatrix::Type, typename IVector::Type> &&
-			(IMatrix::Row() == IVector::Size())
+			(IMatrix::Row() >= IVector::Size())
 		{
 			using T = typename IMatrix::Type;
 			Vector<T, IMatrix::Column()> R;
 
 			for (size_t j = 0; j < IMatrix::Column(); ++j)
 			{
-				for (size_t i = 0; i < IMatrix::Row(); ++i)
+				for (size_t i = 0; i < IVector::Size(); ++i)
 				{
 					R[j] += M[i][j] * V[i];
 				}
@@ -295,19 +295,19 @@ namespace Ayla
 		template<TIsMatrixBase IMatrix, TIsVectorBase IVector>
 		static constexpr auto TransformPoint(const IMatrix& M, const IVector& V) requires
 			std::same_as<typename IMatrix::Type, typename IVector::Type> &&
-			(IMatrix::Row() == IVector::Size())
+			(IMatrix::Row() >= IVector::Size())
 		{
 			using T = typename IMatrix::Type;
-			Vector<T, IMatrix::Column()> R;
+			Vector<T, IVector::Size()> R;
 
-			for (size_t j = 0; j < IMatrix::Column(); ++j)
+			for (size_t j = 0; j < IVector::Size(); ++j)
 			{
-				for (size_t i = 0; i < IMatrix::Row(); ++i)
+				for (size_t i = 0; i < IVector::Size(); ++i)
 				{
 					R[j] += M[i][j] * V[i];
 				}
 
-				R[j] += M[j][IMatrix::Column() - 1];
+				R[j] += M[IVector::Size()][j];
 			}
 
 			return R;

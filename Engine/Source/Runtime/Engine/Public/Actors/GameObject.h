@@ -19,13 +19,13 @@ namespace Ayla
 
 	private:
 		Scene* m_Scene;
-		SharedPtr<Transform> m_Transform;
+		Transform* m_Transform;
 
 	public:
 		GameObject(Scene* scene);
 		virtual ~GameObject() noexcept override;
 
-		SharedPtr<Transform> GetTransform() const noexcept;
+		Transform* GetTransform() const noexcept { return m_Transform; }
 		Scene* GetScene() const noexcept { return m_Scene; }
 
 		void Tick(TickTiming timing);

@@ -13,6 +13,6 @@ public class Numerics : ModuleRules
         AddPublicDependencyModuleNames("Core");
 
         // In C11, unnamed union structure is allowed actually.
-        AddPublicDisableWarnings(4201);
+        AddPublicDisableWarnings(4201, 5063);
     }
 }

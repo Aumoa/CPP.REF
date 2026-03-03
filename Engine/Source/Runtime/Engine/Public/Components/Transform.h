@@ -6,6 +6,7 @@
 #include "Components/Component.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Numerics/TransformInterface/Quaternion.h"
+#include "Numerics/MatrixInterface/Matrix4x4.h"
 #include "Transform.gen.h"
 
 namespace Ayla
@@ -20,22 +21,42 @@ namespace Ayla
 		Vector3F m_LocalScale = Vector3F(1.0f, 1.0f, 1.0f);
 		QuaternionF m_LocalRotation = QuaternionF::Identity();
 
+		Transform* m_Parent = nullptr;
+		mutable bool m_MatrixCached = false;
+		mutable Matrix4x4F m_WorldMatrix;
+		mutable Vector3F m_WorldPosition;
+		mutable QuaternionF m_WorldRotation;
+
 	public:
 		ACONSTRUCTOR()
 		Transform();
 		virtual ~Transform() noexcept override;
 
-		void GetLocalPositionAndRotation(Vector3F* outPosition, QuaternionF* outRotation) const
+		void SetParent(Transform* parent);
+		Transform* GetParent() const noexcept { return m_Parent; }
+
+		void GetLocalPositionAndRotation(Vector3F* outPosition, QuaternionF* outRotation) const noexcept
 		{
 			*outPosition = m_LocalPosition;
 			*outRotation = m_LocalRotation;
 		}
 
-		Vector3F GetLocalScale() const
+		Vector3F GetLocalScale() const noexcept
 		{
 			return m_LocalRotation;
 		}
 
-		void GetPositionAndRotation(Vector3F* outPosition, QuaternionF* outRotation) const;
+		void SetLocalPositionAndRotation(const Vector3F& position, const QuaternionF& rotation);
+		void SetLocalScale(const Vector3F& scale);
+
+		void GetPositionAndRotation(Vector3F* outPosition, QuaternionF* outRotation) const noexcept
+		{
+			TryCacheMatrix();
+			*outPosition = m_WorldPosition;
+			*outRotation = m_WorldRotation;
+		}
+
+	private:
+		void TryCacheMatrix() const noexcept;
 	};
 }

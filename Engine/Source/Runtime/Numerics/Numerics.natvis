@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<Type Name="Vector&lt;*,*&gt;">
+	<Type Name="Ayla::Vector&lt;*,*&gt;">
 		<DisplayString>{{Count={Size()}}}</DisplayString>
 		<Expand>
 			<Item Name="[Count]">Size()</Item>
-			<Item Name="[Size]">X*Y</Item>
 			<ArrayItems>
 				<Size>Size()</Size>
 				<ValuePointer>Scalars</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>
-	<Type Name="Vector&lt;*,2&gt;">
-		<DisplayString>{{X={X} Y={Y}}}</DisplayString>
+	<Type Name="Ayla::Vector&lt;*,2&gt;">
+		<DisplayString>{{X={X,g} Y={Y,g}}}</DisplayString>
 		<Expand>
 			<Item Name="[Count]">2</Item>
 			<Item Name="[Size]">X*Y</Item>
@@ -22,8 +21,8 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
-	<Type Name="Vector&lt;*,3&gt;">
-		<DisplayString>{{X={X} Y={Y} Z={Z}}}</DisplayString>
+	<Type Name="Ayla::Vector&lt;*,3&gt;">
+		<DisplayString>{{X={X,g} Y={Y,g} Z={Z,g}}}</DisplayString>
 		<Expand>
 			<Item Name="[Count]">3</Item>
 			<Item Name="[Size]">X*Y*Z</Item>
@@ -33,8 +32,8 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
-	<Type Name="Vector&lt;*,4&gt;">
-		<DisplayString>{{X={X} Y={Y} Z={Z}, W={W}}}</DisplayString>
+	<Type Name="Ayla::Vector&lt;*,4&gt;">
+		<DisplayString>{{X={X,g} Y={Y,g} Z={Z,g}, W={W,g}}}</DisplayString>
 		<Expand>
 			<Item Name="[Count]">4</Item>
 			<Item Name="[Size]">X*Y*Z*W</Item>
@@ -44,13 +43,13 @@
 			</ArrayItems>
 		</Expand>
 	</Type>
-	<Type Name="Quaternion">
-		<DisplayString>{{X={X} Y={Y} Z={Z} W={W}}}</DisplayString>
+	<Type Name="Ayla::Quaternion&lt;*&gt;">
+		<DisplayString>{{X={V.X,g} Y={V.Y,g} Z={V.Z,g} W={W,g}}}</DisplayString>
 		<Expand>
 			<Item Name="[Count]">4</Item>
 			<ArrayItems>
 				<Size>4</Size>
-				<ValuePointer>Scalars</ValuePointer>
+				<ValuePointer>V.Scalars</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>

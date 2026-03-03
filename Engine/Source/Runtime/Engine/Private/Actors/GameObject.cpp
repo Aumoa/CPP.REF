@@ -8,16 +8,11 @@ namespace Ayla
 	GameObject::GameObject(Scene* scene)
 		: m_Scene(scene)
 	{
-		m_Transform = AddComponent<Transform>();
+		m_Transform = AddComponent<Transform>().Get();
 	}
 
 	GameObject::~GameObject() noexcept
 	{
-	}
-
-	SharedPtr<Transform> GameObject::GetTransform() const noexcept
-	{
-		return m_Transform;
 	}
 
 	void GameObject::Tick(TickTiming timing)

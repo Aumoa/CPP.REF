@@ -177,6 +177,24 @@ namespace Ayla
 			}
 		}
 
+		static Quaternion FromEulerAngles(const Vector3<T>& eulerAngles)
+		{
+			float cX, sX;
+			Math::SinCos(Degrees<T>(eulerAngles.X).ToRadians() * (T)0.5, sX, cX);
+			
+			float cY, sY;
+			Math::SinCos(Degrees<T>(eulerAngles.Y).ToRadians() * (T)0.5, sY, cY);
+
+			float cZ, sZ;
+			Math::SinCos(Degrees<T>(eulerAngles.Z).ToRadians() * (T)0.5, sZ, cZ);
+
+			Quaternion qX(sX, 0, 0, cX);
+			Quaternion qY(0, sY, 0, cY);
+			Quaternion qZ(0, 0, sZ, cZ);
+
+			return qY.Multiply(qX).Multiply(qZ);
+		}
+
 		template<TIsVector<T, 3> IAxis>
 		static Quaternion FromAxisAngle(const IAxis& Axis, Degrees<T> Angle)
 		{
@@ -404,7 +422,7 @@ namespace Ayla
 		{
 			// Concatenate rotation is actually q2 * q1 instead of q1 * q2
 			// So that's why QR goes q1 and QL goes q2.
-			return Multiply(QR, QL);
+			return Quaternion<T>::Multiply(QR, QL);
 		}
 
 		template<class T, TIsVector<T, 4> IQuaternion, TIsVector<T, 3> IVector>
@@ -420,21 +438,21 @@ namespace Ayla
 	template<class T>
 	constexpr Quaternion<T> Quaternion<T>::Inverse() const
 	{
-		return Quaternion<>::Inverse(*this);
+		return Quaternion<>::Inverse<T>(*this);
 	}
 
 	template<class T>
 	template<TIsVector<T, 4> IQuaternion>
 	constexpr Quaternion<T> Quaternion<T>::Concatenate(const IQuaternion& Q) const
 	{
-		return Concatenate(*this, Q);
+		return Quaternion<>::Concatenate<T>(*this, Q);
 	}
 
 	template<class T>
 	template<TIsVector<T, 3> IVector>
 	constexpr IVector Quaternion<T>::TransformPoint(const IVector& V) const
 	{
-		return TransformPoint(*this, V);
+		return Quaternion<>::TransformPoint(*this, V);
 	}
 
 	using QuaternionF = Quaternion<float>;

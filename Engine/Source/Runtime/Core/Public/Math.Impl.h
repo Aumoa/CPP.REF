@@ -90,24 +90,24 @@ namespace Ayla
 	template<std::floating_point T>
 	constexpr void Math::SinCos(const Radians<T>& x, T& sin, T& cos)
 	{
-		constexpr T pi = std::numbers::pi_v<T>;
-		constexpr T half_pi = pi * 0.5;
-		constexpr T inv_pi = std::numbers::inv_pi_v<T>;
+		constexpr double pi = std::numbers::pi_v<double>;
+		constexpr double half_pi = pi * 0.5;
+		constexpr double inv_pi = std::numbers::inv_pi_v<double>;
 
 		// Map Value to y in [-pi,pi], x = 2*pi*quotient + remainder.
-		T quotient = (inv_pi * 0.5) * x.Value;
+		double quotient = (inv_pi * 0.5) * x.Value;
 		if (x.Value >= 0.0)
 		{
-			quotient = (T)((int)(quotient + 0.5));
+			quotient = (double)((int)(quotient + 0.5));
 		}
 		else
 		{
-			quotient = (T)((int)(quotient - 0.5));
+			quotient = (double)((int)(quotient - 0.5));
 		}
-		T y = x.Value - (2.0 * pi) * quotient;
+		double y = x.Value - (2.0 * pi) * quotient;
 
 		// Map y to [-pi/2,pi/2] with sin(y) = sin(Value).
-		T sign;
+		double sign;
 		if (y > half_pi)
 		{
 			y = pi - y;
@@ -123,13 +123,13 @@ namespace Ayla
 			sign = +1.0;
 		}
 
-		T y2 = y * y;
+		double y2 = y * y;
 
 		// 11-degree minimax approximation
-		sin = (((((-2.3889859e-08 * y2 + 2.7525562e-06) * y2 - 0.00019840874) * y2 + 0.0083333310) * y2 - 0.16666667) * y2 + 1.0) * y;
+		sin = (T)((((((-2.3889859e-08 * y2 + 2.7525562e-06) * y2 - 0.00019840874) * y2 + 0.0083333310) * y2 - 0.16666667) * y2 + 1.0) * y);
 
 		// 10-degree minimax approximation
-		T p = ((((-2.6051615e-07 * y2 + 2.4760495e-05) * y2 - 0.0013888378) * y2 + 0.041666638) * y2 - 0.5) * y2 + 1.0;
-		cos = sign * p;
+		double p = ((((-2.6051615e-07 * y2 + 2.4760495e-05) * y2 - 0.0013888378) * y2 + 0.041666638) * y2 - 0.5) * y2 + 1.0;
+		cos = (T)(sign * p);
 	}
 }

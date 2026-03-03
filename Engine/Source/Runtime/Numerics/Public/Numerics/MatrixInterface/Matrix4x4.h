@@ -156,21 +156,7 @@ namespace Ayla
 		}
 
 		template<TIsMatrix<T, 4, 3> IMatrix = Matrix4x4, TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
-		static auto AffineTransformation(const ITranslation& translate, const IScale& scale, const IQuaternion& rot)
-		{
-			Matrix4x4 M = AffineTransformation(Translate3D(translate), Scale3D(scale), Quaternion(rot));
-			IMatrix R = IMatrix::Identity();
-
-			for (size_t i = 0; i < 4; ++i)
-			{
-				for (size_t j = 0; j < 3; ++j)
-				{
-					R[i][j] = M[i][j];
-				}
-			}
-
-			return R;
-		}
+		static auto AffineTransformation(const ITranslation& translate, const IScale& scale, const IQuaternion& rot);
 
 		template<TIsVector<T, 3> ITranslation>
 		static auto Translation(const ITranslation& translate)
@@ -234,27 +220,24 @@ namespace Ayla
 		}
 
 		template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> IPoint>
-		static IPoint TransformPoint(const IMatrix& M, const IPoint& P)
-		{
-			return TransformPoint(Matrix4x4(M), Vector3(P));
-		}
+		static IPoint TransformPoint(const IMatrix& M, const IPoint& P);
 
 		template<TIsVector<T, 3> IPoint>
 		IPoint TransformPoint(const IPoint& P) const
 		{
-			return TransformPoint(*this, Vector3(P));
+			return TransformPoint(*this, Vector3<T>(P));
 		}
 
 		template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> IVector>
 		static IVector TransformVector(const IMatrix& M, const IVector& V)
 		{
-			return TransformVector(Matrix4x4(M), Vector3(V));
+			return TransformVector(Matrix4x4<T>(M), Vector3<T>(V));
 		}
 
 		template<TIsVector<T, 3> IVector>
 		IVector TransformVector(const IVector& V) const
 		{
-			return TransformVector(*this, Vector3(V));
+			return TransformVector(*this, Vector3<T>(V));
 		}
 	};
 
@@ -478,7 +461,10 @@ namespace Ayla
 			if constexpr (std::same_as<T, float>)
 			{
 				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixAffineTransformation(FLOAT3(scale), XMVectorZero(), FLOAT4(rotation), FLOAT3(translate)));
+				auto xmm = XMMatrixAffineTransformation(FLOAT3(scale), XMVectorZero(), FLOAT4(rotation), FLOAT3(translate));
+				Matrix4x4<T> o;
+				XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&o), xmm);
+				return o;
 			}
 			else
 			{
@@ -666,5 +652,30 @@ namespace Ayla
 	inline Matrix4x4<T> Matrix4x4<T>::Inverse() const
 	{
 		return Inverse(*this);
+	}
+
+	template<class T>
+	template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> IPoint>
+	static IPoint Matrix4x4<T>::TransformPoint(const IMatrix& M, const IPoint& P)
+	{
+		return Matrix4x4<>::TransformPoint(Matrix4x4<T>(M), Vector3<T>(P));
+	}
+
+	template<class T>
+	template<TIsMatrix<T, 4, 3> IMatrix, TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
+	static auto Matrix4x4<T>::AffineTransformation(const ITranslation& translate, const IScale& scale, const IQuaternion& rot)
+	{
+		Matrix4x4 M = Matrix4x4<>::AffineTransformation(Translate3D<T>(translate), Scale3D<T>(scale), Quaternion<T>(rot));
+		IMatrix R = IMatrix::Identity();
+
+		for (size_t i = 0; i < 4; ++i)
+		{
+			for (size_t j = 0; j < 3; ++j)
+			{
+				R[i][j] = M[i][j];
+			}
+		}
+
+		return R;
 	}
 }
