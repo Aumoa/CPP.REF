@@ -129,8 +129,8 @@ internal static partial class BuildRunner
                     lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main -o \"{outputBasePath}\" {includeArgs}");
 
                     // Add Vulkan compilation (SPIR-V)
-                    lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" {includeArgs}");
-                    lines.Add("");
+                    //lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" {includeArgs}");
+                    //lines.Add("");
                 }
             }
 
