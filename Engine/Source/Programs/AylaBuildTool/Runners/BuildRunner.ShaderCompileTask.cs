@@ -71,7 +71,6 @@ internal static partial class BuildRunner
                 };
 
                 var dxcOutput = await Terminal.ExecuteCommandAsync($"\"{makefilePath}\"", options, cancellationToken);
-
                 if (dxcOutput.ExitCode != 0)
                 {
                     throw new TerminalExecutionException(dxcOutput);

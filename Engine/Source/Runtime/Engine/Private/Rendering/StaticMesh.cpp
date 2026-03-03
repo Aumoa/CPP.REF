@@ -10,8 +10,6 @@ namespace Ayla
 {
 	StaticMesh::StaticMesh(SharedPtr<Graphics> graphics)
 		: Super(std::move(graphics))
-		, m_VertexBuffer(GetGraphics()->CreateBuffer(BufferUsage::VertexBuffer))
-		, m_IndexBuffer(GetGraphics()->CreateBuffer(BufferUsage::IndexBuffer))
 	{
 	}
 
@@ -22,13 +20,13 @@ namespace Ayla
 	void StaticMesh::SetVertices(std::span<const Vector3F> vertices)
 	{
 		// TODO: Convert to proper vertex format
-		m_VertexBuffer->UpdateData(std::span<const byte>(reinterpret_cast<const byte*>(vertices.data()), vertices.size() * sizeof(Vector3F)));
+		//m_VertexBuffer->UpdateData(std::span<const byte>(reinterpret_cast<const byte*>(vertices.data()), vertices.size() * sizeof(Vector3F)));
 	}
 
 	void StaticMesh::SetIndices(std::span<const uint16> indices)
 	{
 		// TODO: Support 32-bit indices
-		m_IndexBuffer->UpdateData(std::span<const byte>(reinterpret_cast<const byte*>(indices.data()), indices.size() * sizeof(uint16)));
+		//m_IndexBuffer->UpdateData(std::span<const byte>(reinterpret_cast<const byte*>(indices.data()), indices.size() * sizeof(uint16)));
 	}
 
 	Task<SharedPtr<StaticMesh>> StaticMesh::CreateBoxAsync(SharedPtr<Graphics> graphics, Vector3F size, bool rhcoords, bool invertNormal, std::stop_token cancellationToken)

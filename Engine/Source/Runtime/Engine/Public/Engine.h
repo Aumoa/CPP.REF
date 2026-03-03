@@ -17,6 +17,7 @@ namespace Ayla
 	class GameInstance;
 	class Camera;
 	class Shader;
+	class RenderPipeline;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -34,6 +35,7 @@ namespace Ayla
 		double m_FrameTime = 0;
 		size_t m_FrameCount = 0;
 
+		SharedPtr<RenderPipeline> m_DefaultRenderPipeline;
 		SharedPtr<Shader> m_DefaultRaygenShader;
 		SharedPtr<Shader> m_DefaultClosestHitShader;
 		SharedPtr<Shader> m_DefaultMissShader;

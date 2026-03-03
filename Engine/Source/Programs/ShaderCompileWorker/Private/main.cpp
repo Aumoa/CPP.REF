@@ -3,8 +3,8 @@
 #include "CoreMinimal.h"
 #include "Console.h"
 #include "DXCCommon.h"
-#include "Threading/Tasks/Task.h"
 #include "ShaderCompilationTask.h"
+#include "CompileErrorException.h"
 #include "DXCCompiler.h"
 #include <vector>
 #include <csignal>
@@ -54,7 +54,39 @@ Task<int> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 	}
 	catch (const std::exception& e)
 	{
+		std::vector<String> shaderCompileErrors;
+		if (auto ae = dynamic_cast<const AggregateException*>(&e); ae)
+		{
+			size_t i = 0;
+			for (auto& ie : ae->GetInnerExceptions())
+			{
+				try
+				{
+					std::rethrow_exception(ie);
+				}
+				catch (const CompileErrorException& cee)
+				{
+					shaderCompileErrors.emplace_back(cee.GetMessage());
+				}
+				catch (const Exception& e)
+				{
+					Console::WriteLine(TEXT("Inner Exception #{}: {}"), i, e);
+				}
+				catch (const std::exception& e)
+				{
+					Console::WriteLine(TEXT("Inner Exception #{}: {}"), i, String::FromLiteral(e.what()));
+				}
+
+				++i;
+			}
+		}
+		else if (auto cee = dynamic_cast<const CompileErrorException*>(&e); cee)
+		{
+			shaderCompileErrors.emplace_back(cee->GetMessage());
+		}
+
 		LogDXC::Critical(TEXT("Fatal error: {}"), String::FromLiteral(e.what()));
+		Console::Error.WriteLine(String::Join(TEXT("> "), shaderCompileErrors));
 		co_return 1;
 	}
 }

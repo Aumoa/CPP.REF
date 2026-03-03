@@ -37,7 +37,6 @@ internal static partial class BuildRunner
                 requiredProjects.Add("Launch");
                 requiredProjects.Add("Direct3D12");
                 requiredProjects.Add("WindowsAPI");
-                requiredProjects.Add("ShaderCompileWorker");
             }
             else if (mp.GetRule(buildTarget).Type == ModuleType.Application)
             {
@@ -357,22 +356,27 @@ internal static partial class BuildRunner
                 {
                     if (r.IsFaulted)
                     {
-                        foreach (var ex in r.Exception!.InnerExceptions)
+                        LogException(r.Exception);
+                        foreach (var ex in r.Exception.InnerExceptions)
                         {
-                            if (ex is TerminalExecutionException e)
-                            {
-                                Console.Error.WriteLine(string.Join('\n', e.Output.Logs.Select(l => l.Value)));
-                            }
+                            LogException(ex);
                         }
 
                         throw r.Exception;
+
+                        void LogException(Exception ex)
+                        {
+                            if (ex is TerminalExecutionException e)
+                            {
+                                Console.Error.WriteLine("{0} Terminal execution failed with code {1}\n{2}\n{3}", MakeOutputPrefix(e.Output.ElapsedSeconds), e.Output.ExitCode, e.Output.Command, string.Join('\n', e.Output.Logs.Select(l => l.Value)));
+                            }
+                        }
                     }
 
                     var output = r.Result;
                     if (output.Logs.Any())
                     {
                         Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(output.ElapsedSeconds), shaderTask.Group.Name);
-                        Console.WriteLine(string.Join('\n', output.Logs.Select(p => p.Value)));
                     }
                 });
             }

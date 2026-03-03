@@ -133,8 +133,8 @@ namespace Ayla
 
 		static constexpr MinimalViewInfo kSampleView =
 		{
-			.Position = Vector3D(0, 0, -10),
-			.Rotation = QuaternionD::Identity(),
+			.Position = Vector3F(0, 0, -10),
+			.Rotation = QuaternionF::Identity(),
 			.FieldOfView = 60.0,
 			.AspectRatio = std::nullopt
 		};

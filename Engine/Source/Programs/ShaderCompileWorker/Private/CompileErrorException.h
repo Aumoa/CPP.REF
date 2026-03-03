@@ -8,5 +8,13 @@ namespace Ayla
 {
 	class CompileErrorException : public Exception
 	{
+	public:
+		CompileErrorException(String errorMessage) : Exception(std::move(errorMessage))
+		{
+		}
+
+		virtual ~CompileErrorException() noexcept override
+		{
+		}
 	};
 }

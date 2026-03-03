@@ -55,12 +55,14 @@ namespace Ayla
 		// Get errors/warnings
 		ComPtr<IDxcBlobUtf8> errors;
 		compileResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
+		String errorMessage = TEXT("Compilation failed with unknown error.");
 		if (errors && errors->GetStringLength() > 0)
 		{
 			String errorMsg = String::FromLiteral((const char*)errors->GetBufferPointer());
 			if (FAILED(hrStatus))
 			{
-				LogDXC::Error(TEXT("Compilation failed for {}: {}"), sct.GetSourceFile(), errorMsg);
+				errorMessage = String::Format(TEXT("{}: {}"), sct.GetSourceFile(), errorMsg);
+				LogDXC::Error(TEXT("Compilation failed for {}"), errorMessage);
 			}
 			else
 			{
@@ -70,7 +72,7 @@ namespace Ayla
 
 		if (FAILED(hrStatus))
 		{
-			throw CompileErrorException();
+			throw CompileErrorException(errorMessage);
 		}
 
 		// Get compiled shader bytecode
