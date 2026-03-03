@@ -2,15 +2,29 @@
 
 #include "Rendering/SceneRenderer.h"
 #include "Rendering/RenderTexture.h"
+#include "RenderPasses/RenderPass.h"
 
 namespace Ayla
 {
-	SceneRenderer::SceneRenderer(SharedPtr<RenderTexture> outputTexture)
-		: m_OutputTexture(std::move(outputTexture))
+	SceneRenderer::SceneRenderer()
 	{
 	}
 
 	SceneRenderer::~SceneRenderer() noexcept
 	{
+	}
+
+	void SceneRenderer::AddPass(std::unique_ptr<RenderPass> pass)
+	{
+		m_Passes.emplace_back(std::move(pass));
+	}
+
+	void SceneRenderer::Render(CommandBuffer* commandBuffer, const SceneView& view)
+	{
+		for (const auto& pass : m_Passes)
+		{
+			pass->Setup();
+			pass->Execute(commandBuffer);
+		}
 	}
 }

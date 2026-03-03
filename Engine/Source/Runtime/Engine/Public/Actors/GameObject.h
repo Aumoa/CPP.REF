@@ -9,6 +9,7 @@
 
 namespace Ayla
 {
+	class Scene;
 	class Transform;
 
 	ACLASS()
@@ -17,13 +18,15 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
+		Scene* m_Scene;
 		SharedPtr<Transform> m_Transform;
 
 	public:
-		GameObject();
+		GameObject(Scene* scene);
 		virtual ~GameObject() noexcept override;
 
 		SharedPtr<Transform> GetTransform() const noexcept;
+		Scene* GetScene() const noexcept { return m_Scene; }
 
 		void Tick(TickTiming timing);
 	};

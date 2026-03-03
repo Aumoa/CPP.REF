@@ -8,21 +8,21 @@ namespace Ayla
 {
 	class SceneView;
 	class RenderTexture;
+	class CommandBuffer;
+	class RenderPass;
 
 	class RENDERCORE_API SceneRenderer : public NonCopyable
 	{
 	private:
-		SharedPtr<RenderTexture> m_OutputTexture;
-
-	protected:
-		SceneRenderer(SharedPtr<RenderTexture> outputTexture);
-		SceneRenderer(SceneRenderer&&) = delete;
+		std::vector<std::unique_ptr<RenderPass>> m_Passes;
 
 	public:
+		SceneRenderer();
+		SceneRenderer(SceneRenderer&&) = delete;
 		virtual ~SceneRenderer() noexcept;
 
-		virtual void Render(const SceneView& view) = 0;
+		void AddPass(std::unique_ptr<RenderPass> pass);
 
-		RenderTexture* GetOutputTexture() const { return m_OutputTexture.Get(); }
+		virtual void Render(CommandBuffer* commandBuffer, const SceneView& view);
 	};
 }

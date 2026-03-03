@@ -8,6 +8,8 @@
 
 namespace Ayla
 {
+	struct MinimalViewInfo;
+
 	ACLASS()
 	class ENGINE_API Camera : public Behavior
 	{
@@ -17,5 +19,11 @@ namespace Ayla
 		ACONSTRUCTOR()
 		Camera();
 		virtual ~Camera() noexcept override;
+
+		void GetMinimalViewInfo(MinimalViewInfo* output) const;
+
+	protected:
+		virtual void OnEnable() override;
+		virtual void OnDisable() override;
 	};
 }

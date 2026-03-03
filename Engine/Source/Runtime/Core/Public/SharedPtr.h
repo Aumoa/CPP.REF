@@ -140,6 +140,26 @@ namespace Ayla
 			return false;
 		}
 
+		template<std::derived_from<T> U>
+		inline bool Is(U** output) const
+		{
+			auto* cast = dynamic_cast<U*>(m_Ptr);
+			if (cast)
+			{
+				*output = cast;
+				return true;
+			}
+
+			*output = nullptr;
+			return false;
+		}
+
+		template<std::derived_from<T> U>
+		inline bool Is() const
+		{
+			return dynamic_cast<U*>(m_Ptr) != nullptr;
+		}
+
 		template<class S>
 		constexpr auto Get(this S&& self) noexcept { return const_cast<T*>(self.m_Ptr); }
 

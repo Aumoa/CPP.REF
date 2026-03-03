@@ -35,5 +35,7 @@ namespace Ayla
 		{
 			return m_LocalRotation;
 		}
+
+		void GetPositionAndRotation(Vector3F* outPosition, QuaternionF* outRotation) const;
 	};
 }

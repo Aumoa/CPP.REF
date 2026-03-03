@@ -28,6 +28,21 @@ namespace Ayla
 		}
 	}
 
+	void SceneManager::GetAllCameraComponents(std::vector<Camera*>* output) const
+	{
+		if (m_ActiveScene)
+		{
+			auto cameras = m_ActiveScene->GetCameraComponents();
+			output->insert(output->end(), cameras.begin(), cameras.end());
+		}
+
+		for (auto& scene : m_AdditiveScenes)
+		{
+			auto cameras = scene->GetCameraComponents();
+			output->insert(output->end(), cameras.begin(), cameras.end());
+		}
+	}
+
 	void SceneManager::DispatchTick(TickTiming timing)
 	{
 		m_ActiveScene->DispatchTick(timing);

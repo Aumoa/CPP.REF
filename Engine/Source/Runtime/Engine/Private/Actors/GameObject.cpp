@@ -5,7 +5,8 @@
 
 namespace Ayla
 {
-	GameObject::GameObject()
+	GameObject::GameObject(Scene* scene)
+		: m_Scene(scene)
 	{
 		m_Transform = AddComponent<Transform>();
 	}

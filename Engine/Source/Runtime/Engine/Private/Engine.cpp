@@ -11,7 +11,8 @@
 #include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/Scene.h"
-#include "Rendering/RaytracingSceneRenderer.h"
+#include "SceneManagement/SceneManager.h"
+#include "Rendering/SceneRenderer.h"
 #include "Rendering/SceneView.h"
 #include "Rendering/RenderTexture.h"
 #include "Threading/MainSynchronizationContext.h"
@@ -131,19 +132,19 @@ namespace Ayla
 		DispatchTick(TickTiming::PostRender);
 		DispatchTick(TickTiming::EndOfFrame);
 
-		static constexpr MinimalViewInfo kSampleView =
+		m_GameInstance->GetSceneManager()->GetAllCameraComponents(&m_Scratch.AllCameras);
+		m_Scratch.AllCameraViews.resize(m_Scratch.AllCameras.size());
+		for (size_t i = 0; i < m_Scratch.AllCameras.size(); i++)
 		{
-			.Position = Vector3F(0, 0, -10),
-			.Rotation = QuaternionF::Identity(),
-			.FieldOfView = 60.0,
-			.AspectRatio = std::nullopt
-		};
+			m_Scratch.AllCameras[i]->GetMinimalViewInfo(&m_Scratch.AllCameraViews[i]);
+		}
 
 		m_RenderThread->Dispatch([
 			swapchainExtensions = m_SwapchainExtensions,
 			graphics = m_Graphics,
 			commandBuffer = m_CommandBuffer,
-			self = m_RenderThread.Get()
+			self = m_RenderThread.Get(),
+			views = &m_Scratch.AllCameraViews
 		]()
 		{
 			commandBuffer->WaitForCompletion(TimeSpan::FromSeconds(1));
@@ -162,9 +163,12 @@ namespace Ayla
 			auto rt = swapchainExtensions[0]->GetRenderTexture();
 			rt->Acquire(commandBuffer.Get());
 
-			SceneView view(kSampleView);
-			RaytracingSceneRenderer renderer(rt);
-			renderer.Render(view);
+			for (auto& view : *views)
+			{
+				SceneRenderer renderer;
+				SceneView sceneView{ view };
+				renderer.Render(commandBuffer.Get(), sceneView);
+			}
 
 			commandBuffer->EndCommands();
 

@@ -8,22 +8,23 @@
 
 namespace Ayla
 {
-	class GameObject;
+	class Actor;
 
 	ACLASS()
 	class ENGINE_API Component : public SerializableObject
 	{
 		GENERATED_BODY()
+		friend class Actor;
 
 	private:
 		bool m_Disposed = false;
-		GameObject* m_GameObjectPtr = nullptr;
+		Actor* m_ActorPtr = nullptr;
 
 	public:
 		Component();
 		virtual ~Component() noexcept override;
 
 		AFUNCTION()
-		SharedPtr<GameObject> GetGameObject() const;
+		SharedPtr<Actor> GetActor() const;
 	};
 }

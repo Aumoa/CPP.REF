@@ -38,6 +38,8 @@ namespace Ayla
 		AFUNCTION()
 		virtual SharedPtr<Scene> GetEntryScene();
 
+		SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
+
 	protected:
 		AFUNCTION()
 		void InternalSetEngine(SharedPtr<Engine> engine);

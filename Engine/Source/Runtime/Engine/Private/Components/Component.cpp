@@ -13,9 +13,9 @@ namespace Ayla
 	{
 	}
 
-	SharedPtr<GameObject> Component::GetGameObject() const
+	SharedPtr<Actor> Component::GetActor() const
 	{
 		ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
-		return m_GameObjectPtr->AsShared();
+		return m_ActorPtr->AsShared();
 	}
 }

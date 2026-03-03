@@ -9,6 +9,7 @@
 namespace Ayla
 {
 	class Scene;
+	class Camera;
 
 	class ENGINE_API SceneManager : public NonCopyable
 	{
@@ -20,6 +21,8 @@ namespace Ayla
 		virtual ~SceneManager() noexcept;
 
 		void LoadScene(SharedPtr<Scene> scene, LoadSceneMode mode = LoadSceneMode::Single);
+		
+		void GetAllCameraComponents(std::vector<Camera*>* output) const;
 
 	public:
 		void DispatchTick(TickTiming timing);

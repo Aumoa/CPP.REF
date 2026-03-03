@@ -17,7 +17,7 @@ namespace Ayla
 
 	private:
 		bool m_IsActive = false;
-		std::vector<std::shared_ptr<Component>> m_Components;
+		std::vector<SharedPtr<Component>> m_Components;
 
 	public:
 		Actor();

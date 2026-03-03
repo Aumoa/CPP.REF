@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TickTiming.h"
+#include "Rendering/MinimalViewInfo.h"
 #include "Engine.gen.h"
 
 namespace Ayla
@@ -43,6 +44,7 @@ namespace Ayla
 		struct Scratch
 		{
 			std::vector<Camera*> AllCameras;
+			std::vector<MinimalViewInfo> AllCameraViews;
 		} m_Scratch;
 
 	public:
