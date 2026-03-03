@@ -15,6 +15,7 @@
 #include "IO/FileSharedMode.h"
 #include "IO/SeekOrigin.h"
 #include "Threading/Tasks/TaskCompletionSource.h"
+#include <functional>
 
 namespace Ayla
 {
@@ -42,10 +43,10 @@ namespace Ayla
 		static bool SetFileSeekPointer(void* Handle, int64 Seekpos, SeekOrigin InOrigin) noexcept;
 		static int64 GetFileSize(void* Handle) noexcept;
 
-		static Action<IOCompletionOverlapped*, size_t, int32> FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept;
+		static std::move_only_function<void(IOCompletionOverlapped*, size_t, int32)> FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept;
 		static bool WriteFile(void* Handle, std::span<const uint8> InBytes, IOCompletionOverlapped* Overlap) noexcept;
 
-		static Action<IOCompletionOverlapped*, size_t, int32> FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept;
+		static std::move_only_function<void(IOCompletionOverlapped*, size_t, int32)> FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept;
 		static bool ReadFile(void* Handle, std::span<uint8> OutBytes, IOCompletionOverlapped* Overlap) noexcept;
 	};
 

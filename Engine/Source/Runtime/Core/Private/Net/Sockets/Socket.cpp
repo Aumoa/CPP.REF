@@ -56,7 +56,7 @@ namespace Ayla
 		m_Socket->Connect(remoteEP);
 	}
 
-	std::unique_ptr<Socket> Socket::Accept()
+	std::shared_ptr<Socket> Socket::Accept()
 	{
 		EnsureSocket();
 		auto clientSocket = m_Socket->Accept();
@@ -87,7 +87,7 @@ namespace Ayla
 		return m_Socket->ReceiveFrom(buffer, remoteEP);
 	}
 
-	Task<std::unique_ptr<Socket>> Socket::AcceptAsync(std::stop_token cancellationToken)
+	Task<std::shared_ptr<Socket>> Socket::AcceptAsync(std::stop_token cancellationToken)
 	{
 		EnsureSocket();
 		return m_Socket->AcceptAsync(cancellationToken);
@@ -198,7 +198,7 @@ namespace Ayla
 		return m_Socket->GetSocketOptionBytes(level, optionName);
 	}
 
-	void Socket::Shutdown(int32 how)
+	void Socket::Shutdown(SocketShutdown how)
 	{
 		EnsureSocket();
 		m_Socket->Shutdown(how);
@@ -228,8 +228,8 @@ namespace Ayla
 		}
 	}
 
-	std::unique_ptr<Socket> Socket::CreateFromPlatformSocket(std::unique_ptr<PlatformSocket> platformSocket)
+	std::shared_ptr<Socket> Socket::CreateFromPlatformSocket(std::unique_ptr<PlatformSocket> platformSocket)
 	{
-		return std::unique_ptr<Socket>(new Socket(std::move(platformSocket)));
+		return std::shared_ptr<Socket>(new Socket(std::move(platformSocket)));
 	}
 }

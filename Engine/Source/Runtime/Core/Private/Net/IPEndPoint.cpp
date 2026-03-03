@@ -36,4 +36,9 @@ namespace Ayla
 	{
 		return !(*this == other);
 	}
+
+	IPEndPoint IPEndPoint::Any(uint16 port)
+	{
+		return IPEndPoint(IPAddress::Any(), port);
+	}
 }

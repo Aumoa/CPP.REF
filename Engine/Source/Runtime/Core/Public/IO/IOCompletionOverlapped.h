@@ -3,16 +3,20 @@
 #pragma once
 
 #include "Action.h"
+#include "NonCopyable.h"
 #include "IntegralTypes.h"
 #include "AssertionMacros.h"
 #include "Platform/PlatformIO.h"
+#include <functional>
 
 namespace Ayla
 {
-	class IOCompletionOverlapped
+	class CORE_API IOCompletionOverlapped : public NonCopyable
 	{
+		static size_t s_Refs;
+
 		uint8 OverlappedBuffer[PlatformIO::OVERLAPPED_SIZE + sizeof(void*)];
-		Action<IOCompletionOverlapped*, size_t, int32> Work;
+		std::move_only_function<void(size_t, int32)> m_CompletionWork;
 
 	private:
 		static IOCompletionOverlapped*& SelfPtr(uint8* Memory)
@@ -21,26 +25,25 @@ namespace Ayla
 		}
 
 	public:
-		IOCompletionOverlapped(Action<IOCompletionOverlapped*, size_t, int32> InWork)
-			: OverlappedBuffer{}
-			, Work(std::move(InWork))
-		{
-			SelfPtr(OverlappedBuffer) = this;
-		}
+		IOCompletionOverlapped();
+		~IOCompletionOverlapped() noexcept;
 
-		~IOCompletionOverlapped() noexcept
+		inline void SetOnCompletion(std::move_only_function<void(size_t, int32)> callback)
 		{
+			m_CompletionWork = std::move(callback);
 		}
 
 		inline void Complete(size_t Resolved)
 		{
-			Work(this, Resolved, 0);
+			std::exchange(m_CompletionWork, {})(Resolved, 0);
 		}
 
 		inline void Failed(int32 SystemCode)
 		{
-			Work(this, 0, SystemCode);
+			std::exchange(m_CompletionWork, {})(0, SystemCode);
 		}
+
+		static void Assert();
 
 	public:
 		inline void* ToOverlapped() noexcept

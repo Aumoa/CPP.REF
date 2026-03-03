@@ -53,17 +53,25 @@ namespace Ayla
 
 	Task<> FileStream::WriteAsync(std::span<const uint8> InBytes, std::stop_token InCancellationToken)
 	{
-		auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
-		auto Ptr = new IOCompletionOverlapped(PlatformIO::FileIOWrittenAction(TCS, IOCPWriteBuf));
-		memcpy(Ptr->ToOverlapped(), IOCPWriteBuf, sizeof(IOCPWriteBuf));
-
-		if (PlatformIO::WriteFile(FileHandle, InBytes, std::move(Ptr)) == false)
+		auto tcs = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
+		auto ptr = new IOCompletionOverlapped();
+		
+		auto completionCallback = PlatformIO::FileIOWrittenAction(tcs, IOCPWriteBuf);
+		ptr->SetOnCompletion([ptr, cc = std::move(completionCallback)](size_t size, int32 r) mutable
 		{
-			Ptr->Failed(PlatformMisc::GetLastError());
-			delete Ptr;
+			cc(ptr, size, r);
+			delete ptr;
+		});
+
+		memcpy(ptr->ToOverlapped(), IOCPWriteBuf, sizeof(IOCPWriteBuf));
+
+		if (PlatformIO::WriteFile(FileHandle, InBytes, ptr) == false)
+		{
+			ptr->Failed(PlatformMisc::GetLastError());
+			delete ptr;
 		}
 
-		return TCS.GetTask();
+		return tcs.GetTask();
 	}
 
 	void FileStream::Seek(int64 InSeekpos, SeekOrigin InOrigin)
@@ -81,17 +89,25 @@ namespace Ayla
 
 	Task<size_t> FileStream::ReadAsync(std::span<uint8> OutBytes, std::stop_token InCancellationToken)
 	{
-		auto TCS = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
-		auto Ptr = new IOCompletionOverlapped(PlatformIO::FileIOReadAction(TCS, IOCPReadBuf));
-		memcpy(Ptr->ToOverlapped(), IOCPReadBuf, sizeof(IOCPReadBuf));
+		auto tcs = TaskCompletionSource<>::Create<size_t>(InCancellationToken);
+		auto ptr = new IOCompletionOverlapped();
 
-		if (PlatformIO::ReadFile(FileHandle, OutBytes, Ptr) == false)
+		auto completionCallback = PlatformIO::FileIOReadAction(tcs, IOCPReadBuf);
+		ptr->SetOnCompletion([ptr, cc = std::move(completionCallback)](size_t size, int32 r) mutable
 		{
-			Ptr->Failed(PlatformMisc::GetLastError());
-			delete Ptr;
+			cc(ptr, size, r);
+			delete ptr;
+		});
+
+		memcpy(ptr->ToOverlapped(), IOCPReadBuf, sizeof(IOCPReadBuf));
+
+		if (PlatformIO::ReadFile(FileHandle, OutBytes, ptr) == false)
+		{
+			ptr->Failed(PlatformMisc::GetLastError());
+			delete ptr;
 		}
 
-		return TCS.GetTask();
+		return tcs.GetTask();
 	}
 
 	size_t FileStream::GetLength() const
