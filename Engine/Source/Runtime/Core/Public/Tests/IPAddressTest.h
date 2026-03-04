@@ -11,7 +11,7 @@ namespace Ayla
 	{
 	public:
 		IPAddressTest();
-		virtual ~IPAddressTest() noexcept;
+		virtual ~IPAddressTest() noexcept override;
 
 	protected:
 		virtual std::vector<TestCase> SetUp() override;

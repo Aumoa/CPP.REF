@@ -343,7 +343,7 @@ namespace Ayla
 			auto tcs = TaskCompletionSource<size_t>::Create(cancellationToken);
 			auto overlapped = new IOCompletionOverlapped();
 			auto* ovp = (OVERLAPPED*)overlapped->ToOverlapped();
-			overlapped->SetOnCompletion([&tcs, overlapped](size_t recv, int32 status)
+			overlapped->SetOnCompletion([tcs, overlapped](size_t recv, int32 status)
 			{
 				if (status != 0)
 				{
