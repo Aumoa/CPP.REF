@@ -38,7 +38,8 @@ namespace Ayla
 		// Basic socket operations
 		void Close();
 		void Bind(const IPEndPoint& localEP);
-		void Listen(int32 backlog = 10);
+		void Listen();
+		void Listen(int32 backlog);
 		void Connect(const IPEndPoint& remoteEP);
 		std::shared_ptr<Socket> Accept();
 

@@ -6,7 +6,6 @@
 #include "Socket.Common.inl"
 #include "Threading/Tasks/TaskCompletionSource.h"
 #include "Threading/Tasks/TaskFactory.h"
-#include "SystemException.h"
 #include "Net/Sockets/SocketException.h"
 #include "IO/IOCompletionOverlapped.h"
 #include <ws2tcpip.h>
@@ -87,103 +86,18 @@ namespace Ayla
 			}
 		}
 
-		void Bind(const IPEndPoint& localEP)
+		static void ThrowIfFailure(int resultCode)
 		{
-			sockaddr_storage addr;
-			int addrLen = IPEndPointToSockAddr(localEP, addr);
-
-			if (bind(m_Socket, reinterpret_cast<sockaddr*>(&addr), addrLen) == SOCKET_ERROR)
+			if (resultCode == SOCKET_ERROR)
 			{
 				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
-			m_IsBound = true;
 		}
 
-		void Listen(int32 backlog)
+		[[noreturn]]
+		static void Throw()
 		{
-			if (listen(m_Socket, backlog) == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-			m_IsListening = true;
-		}
-
-		void Connect(const IPEndPoint& remoteEP)
-		{
-			sockaddr_storage addr;
-			int addrLen = IPEndPointToSockAddr(remoteEP, addr);
-
-			if (connect(m_Socket, reinterpret_cast<sockaddr*>(&addr), addrLen) == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-			m_IsConnected = true;
-		}
-
-		std::unique_ptr<PlatformSocket> Accept()
-		{
-			sockaddr_storage clientAddr;
-			int clientAddrLen = sizeof(clientAddr);
-
-			SOCKET clientSocket = accept(m_Socket, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrLen);
-			if (clientSocket == INVALID_SOCKET)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-
-			return std::make_unique<PlatformSocket>(clientSocket);
-		}
-
-		size_t Send(std::span<const uint8> buffer)
-		{
-			int result = send(m_Socket, reinterpret_cast<const char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0);
-			if (result == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-			return static_cast<size_t>(result);
-		}
-
-		size_t Receive(std::span<uint8> buffer)
-		{
-			int result = recv(m_Socket, reinterpret_cast<char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0);
-			if (result == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-			return static_cast<size_t>(result);
-		}
-
-		size_t SendTo(std::span<const uint8> buffer, const IPEndPoint& remoteEP)
-		{
-			sockaddr_storage addr;
-			int addrLen = IPEndPointToSockAddr(remoteEP, addr);
-
-			int result = sendto(m_Socket, reinterpret_cast<const char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0, reinterpret_cast<sockaddr*>(&addr), addrLen);
-			if (result == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-			return static_cast<size_t>(result);
-		}
-
-		size_t ReceiveFrom(std::span<uint8> buffer, IPEndPoint& remoteEP)
-		{
-			sockaddr_storage addr;
-			int addrLen = sizeof(addr);
-
-			int result = recvfrom(m_Socket, reinterpret_cast<char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0, reinterpret_cast<sockaddr*>(&addr), &addrLen);
-			if (result == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-
-			remoteEP = SockAddrToIPEndPoint(addr);
-			return static_cast<size_t>(result);
+			throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 		}
 
 		// Async operations - implementation using IOCP
@@ -471,28 +385,6 @@ namespace Ayla
 		AddressFamily GetAddressFamily() const { return m_AddressFamily; }
 		SocketType GetSocketType() const { return m_SocketType; }
 
-		IPEndPoint GetLocalEndPoint() const
-		{
-			sockaddr_storage addr;
-			int addrLen = sizeof(addr);
-			if (getsockname(m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen) == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-			return SockAddrToIPEndPoint(addr);
-		}
-
-		IPEndPoint GetRemoteEndPoint() const
-		{
-			sockaddr_storage addr;
-			int addrLen = sizeof(addr);
-			if (getpeername(m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen) == SOCKET_ERROR)
-			{
-				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
-			}
-			return SockAddrToIPEndPoint(addr);
-		}
-
 		void SetSocketOption(int32 level, int32 optionName, bool optionValue)
 		{
 			BOOL value = optionValue ? TRUE : FALSE;
@@ -633,28 +525,6 @@ namespace Ayla
 				memcpy(&addr6->sin6_addr, bytes.data(), 16);
 				
 				return sizeof(sockaddr_in6);
-			}
-		}
-
-		static IPEndPoint SockAddrToIPEndPoint(const sockaddr_storage& addr)
-		{
-			if (addr.ss_family == AF_INET)
-			{
-				const auto* addr4 = reinterpret_cast<const sockaddr_in*>(&addr);
-				std::array<uint8, 4> bytes;
-				memcpy(bytes.data(), &addr4->sin_addr, 4);
-				return IPEndPoint(IPAddress(bytes), ntohs(addr4->sin_port));
-			}
-			else if (addr.ss_family == AF_INET6)
-			{
-				const auto* addr6 = reinterpret_cast<const sockaddr_in6*>(&addr);
-				std::array<uint8, 16> bytes;
-				memcpy(bytes.data(), &addr6->sin6_addr, 16);
-				return IPEndPoint(IPAddress(bytes), ntohs(addr6->sin6_port));
-			}
-			else
-			{
-				throw SocketException(static_cast<SocketError>(WSAEAFNOSUPPORT));
 			}
 		}
 	};

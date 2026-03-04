@@ -41,50 +41,89 @@ namespace Ayla
 	void Socket::Bind(const IPEndPoint& localEP)
 	{
 		EnsureSocket();
-		m_Socket->Bind(localEP);
+		sockaddr_storage addr;
+		int addrLen = IPEndPointToSockAddr(localEP, addr);
+		int result = bind(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&addr), addrLen);
+		PlatformSocket::ThrowIfFailure(result);
+		m_Socket->m_IsBound = true;
+	}
+
+	void Socket::Listen()
+	{
+		Listen(SOMAXCONN);
 	}
 
 	void Socket::Listen(int32 backlog)
 	{
 		EnsureSocket();
-		m_Socket->Listen(backlog);
+		int result = listen(m_Socket->m_Socket, backlog);
+		PlatformSocket::ThrowIfFailure(result);
+		m_Socket->m_IsListening = true;
 	}
 
 	void Socket::Connect(const IPEndPoint& remoteEP)
 	{
 		EnsureSocket();
-		m_Socket->Connect(remoteEP);
+		sockaddr_storage addr;
+		int addrLen = IPEndPointToSockAddr(remoteEP, addr);
+		int result = connect(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&addr), addrLen);
+		PlatformSocket::ThrowIfFailure(result);
+		m_Socket->m_IsConnected = true;
 	}
 
 	std::shared_ptr<Socket> Socket::Accept()
 	{
 		EnsureSocket();
-		auto clientSocket = m_Socket->Accept();
-		return CreateFromPlatformSocket(std::move(clientSocket));
+		sockaddr_storage clientAddr;
+		int clientAddrLen = sizeof(clientAddr);
+		auto clientSocket = accept(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrLen);
+		if (clientSocket == INVALID_SOCKET)
+		{
+			PlatformSocket::Throw();
+		}
+		return CreateFromPlatformSocket(std::make_unique<PlatformSocket>(clientSocket));
 	}
 
 	size_t Socket::Send(std::span<const uint8> buffer)
 	{
 		EnsureSocket();
-		return m_Socket->Send(buffer);
+		int result = send(m_Socket->m_Socket, reinterpret_cast<const char*>(buffer.data()),
+			static_cast<int>(buffer.size()), 0);
+		PlatformSocket::ThrowIfFailure(result);
+		return static_cast<size_t>(result);
 	}
 
 	size_t Socket::Receive(std::span<uint8> buffer)
 	{
 		EnsureSocket();
-		return m_Socket->Receive(buffer);
+		int result = recv(m_Socket->m_Socket, reinterpret_cast<char*>(buffer.data()),
+			static_cast<int>(buffer.size()), 0);
+		PlatformSocket::ThrowIfFailure(result);
+		return static_cast<size_t>(result);
 	}
 
 	size_t Socket::SendTo(std::span<const uint8> buffer, const IPEndPoint& remoteEP)
 	{
 		EnsureSocket();
-		return m_Socket->SendTo(buffer, remoteEP);
+		sockaddr_storage addr;
+		int addrLen = IPEndPointToSockAddr(remoteEP, addr);
+		int result = sendto(m_Socket->m_Socket, reinterpret_cast<const char*>(buffer.data()),
+			static_cast<int>(buffer.size()), 0, reinterpret_cast<sockaddr*>(&addr), addrLen);
+		PlatformSocket::ThrowIfFailure(result);
+		return static_cast<size_t>(result);
 	}
 
 	size_t Socket::ReceiveFrom(std::span<uint8> buffer, IPEndPoint& remoteEP)
 	{
 		EnsureSocket();
-		return m_Socket->ReceiveFrom(buffer, remoteEP);
+		sockaddr_storage addr;
+		int addrLen = sizeof(addr);
+
+		int result = recvfrom(m_Socket->m_Socket, reinterpret_cast<char*>(buffer.data()),
+			static_cast<int>(buffer.size()), 0, reinterpret_cast<sockaddr*>(&addr), &addrLen);
+		PlatformSocket::ThrowIfFailure(result);
+		remoteEP = SockAddrToIPEndPoint(addr);
+		return static_cast<size_t>(result);
 	}
 
 	Task<std::shared_ptr<Socket>> Socket::AcceptAsync(std::stop_token cancellationToken)
@@ -153,13 +192,21 @@ namespace Ayla
 	IPEndPoint Socket::GetLocalEndPoint() const
 	{
 		EnsureSocket();
-		return m_Socket->GetLocalEndPoint();
+		sockaddr_storage addr;
+		int addrLen = sizeof(addr);
+		int result = getsockname(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen);
+		PlatformSocket::ThrowIfFailure(result);
+		return SockAddrToIPEndPoint(addr);
 	}
 
 	IPEndPoint Socket::GetRemoteEndPoint() const
 	{
 		EnsureSocket();
-		return m_Socket->GetRemoteEndPoint();
+		sockaddr_storage addr;
+		int addrLen = sizeof(addr);
+		int result = getpeername(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen);
+		PlatformSocket::ThrowIfFailure(result);
+		return SockAddrToIPEndPoint(addr);
 	}
 
 	void Socket::SetSocketOption(int32 level, int32 optionName, bool optionValue)
