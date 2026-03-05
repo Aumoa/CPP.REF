@@ -187,8 +187,6 @@ namespace Ayla
 	{
 		return [TCS, WriteIO](IOCompletionOverlapped* Self, size_t Written, int32 ErrorCode)
 		{
-			auto ScopedPtr = std::unique_ptr<IOCompletionOverlapped>(Self);
-
 			auto* Overlap = reinterpret_cast<OVERLAPPED*>(Self->ToOverlapped());
 			(ULONG_PTR&)Overlap->Pointer += Written;
 			memcpy(WriteIO, Overlap, sizeof(OVERLAPPED));
