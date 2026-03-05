@@ -5,10 +5,9 @@
 #include "Platform/PlatformMacros.h"
 #include "Net/Sockets/AddressFamily.h"
 #include "Net/Sockets/SocketType.h"
-#include "Net/Sockets/SocketError.h"
+#include "Net/Sockets/SocketShutdown.h"
 #include "Net/IPEndPoint.h"
 #include "Threading/Tasks/Task.h"
-#include "Threading/Tasks/TaskFactory.h"
 #include <memory>
 #include <span>
 #include <stop_token>
@@ -39,9 +38,10 @@ namespace Ayla
 		// Basic socket operations
 		void Close();
 		void Bind(const IPEndPoint& localEP);
-		void Listen(int32 backlog = 10);
+		void Listen();
+		void Listen(int32 backlog);
 		void Connect(const IPEndPoint& remoteEP);
-		std::unique_ptr<Socket> Accept();
+		std::shared_ptr<Socket> Accept();
 
 		// Synchronous I/O
 		size_t Send(std::span<const uint8> buffer);
@@ -50,7 +50,7 @@ namespace Ayla
 		size_t ReceiveFrom(std::span<uint8> buffer, IPEndPoint& remoteEP);
 
 		// Asynchronous operations using Task
-		Task<std::unique_ptr<Socket>> AcceptAsync(std::stop_token cancellationToken = {});
+		Task<std::shared_ptr<Socket>> AcceptAsync(std::stop_token cancellationToken = {});
 		Task<> ConnectAsync(const IPEndPoint& remoteEP, std::stop_token cancellationToken = {});
 		Task<size_t> SendAsync(std::span<const uint8> buffer, std::stop_token cancellationToken = {});
 		Task<size_t> ReceiveAsync(std::span<uint8> buffer, std::stop_token cancellationToken = {});
@@ -74,14 +74,13 @@ namespace Ayla
 		int32 GetSocketOptionInt32(int32 level, int32 optionName) const;
 		std::vector<uint8> GetSocketOptionBytes(int32 level, int32 optionName) const;
 
-		// Utility methods
-		void Shutdown(int32 how);
+		void Shutdown(SocketShutdown how);
 		int32 GetAvailable() const;
 		bool Poll(int32 microSeconds, int32 mode) const;
 
 	private:
 		// Internal helper methods
 		void EnsureSocket() const;
-		static std::unique_ptr<Socket> CreateFromPlatformSocket(std::unique_ptr<PlatformSocket> platformSocket);
+		static std::shared_ptr<Socket> CreateFromPlatformSocket(std::unique_ptr<PlatformSocket> platformSocket);
 	};
 }

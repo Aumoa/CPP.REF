@@ -183,7 +183,7 @@ namespace Ayla
 		return (int64)LargeInteger.QuadPart;
 	}
 
-	Action<IOCompletionOverlapped*, size_t, int32> WindowsPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
+	std::move_only_function<void(IOCompletionOverlapped*, size_t, int32)> WindowsPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
 	{
 		return [TCS, WriteIO](IOCompletionOverlapped* Self, size_t Written, int32 ErrorCode)
 		{
@@ -232,12 +232,10 @@ namespace Ayla
 		return true;
 	}
 
-	Action<IOCompletionOverlapped*, size_t, int32> WindowsPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
+	std::move_only_function<void(IOCompletionOverlapped*, size_t, int32)> WindowsPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
 	{
 		return [TCS, ReadIO](IOCompletionOverlapped* Self, size_t Read, int32 ErrorCode)
 		{
-			auto ScopedPtr = std::unique_ptr<IOCompletionOverlapped>(Self);
-
 			auto* Overlap = reinterpret_cast<OVERLAPPED*>(Self->ToOverlapped());
 			(ULONG_PTR&)Overlap->Pointer += Read;
 			memcpy(ReadIO, Overlap, sizeof(OVERLAPPED));

@@ -7,6 +7,7 @@
 #include "LaunchOptions.h"
 #include "Platform/DynamicLibrary.h"
 #include "ScriptingBackend/CoreCLR/CoreCLRScriptingBackend.h"
+#include "IO/IOCompletionOverlapped.h"
 
 namespace Ayla
 {
@@ -31,7 +32,15 @@ namespace Ayla
         auto scriptingBackend = std::make_unique<CoreCLRScriptingBackend>();
         scriptingBackend->LoadAssembly(Path::GetDirectoryName(gameAssembly), Path::GetFileNameWithoutExtension(gameAssembly));
 
-        auto launch = New<Launch>();
-        return launch->GuardedMain(New<LaunchOptions>(platform, std::move(args)));
+        return try__
+        {
+            auto launch = New<Launch>();
+            return launch->GuardedMain(New<LaunchOptions>(platform, std::move(args)));
+        }
+        finally__
+        {
+            IOCompletionOverlapped::Assert();
+        }
+        end_try__;
 	}
 }

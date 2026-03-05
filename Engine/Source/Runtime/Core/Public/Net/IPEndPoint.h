@@ -26,5 +26,8 @@ namespace Ayla
 
 		bool operator ==(const IPEndPoint& other) const noexcept;
 		bool operator !=(const IPEndPoint& other) const noexcept;
+
+	public:
+		static IPEndPoint Any(uint16 port);
 	};
 }

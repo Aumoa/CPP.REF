@@ -93,6 +93,19 @@ namespace Ayla
 				check(s_Current);
 				s_Current->Failures.emplace_back(std::move(message));
 			}
+
+			static void NotNull(const auto& ptr)
+			{
+				check(s_Current);
+				if (ptr == nullptr)
+				{
+					s_Current->Failures.emplace_back(TEXT("Assert::NotNull failed: Pointer is null"));
+				}
+				else
+				{
+					s_Current->Passes++;
+				}
+			}
 		};
 
 	protected:

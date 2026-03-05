@@ -6,7 +6,7 @@
 #include "Socket.Common.inl"
 #include "Threading/Tasks/TaskCompletionSource.h"
 #include "Threading/Tasks/TaskFactory.h"
-#include "SystemException.h"
+#include "Net/Sockets/SocketException.h"
 #include "IO/IOCompletionOverlapped.h"
 #include <ws2tcpip.h>
 #include <memory>
@@ -27,7 +27,7 @@ namespace Ayla
 			static WSAData wsa;
 			if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("Failed to initialize Winsock"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 		}
 
@@ -40,7 +40,7 @@ namespace Ayla
 
 			if (m_Socket == INVALID_SOCKET)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("Failed to create socket"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 		}
 
@@ -81,127 +81,51 @@ namespace Ayla
 		{
 			if (m_Socket != INVALID_SOCKET)
 			{
+				ThreadPool::UnbindHandle((void*)m_Socket);
 				closesocket(m_Socket);
 			}
 		}
 
-		void Bind(const IPEndPoint& localEP)
+		static void ThrowIfFailure(int resultCode)
 		{
-			sockaddr_storage addr;
-			int addrLen = IPEndPointToSockAddr(localEP, addr);
-			
-			if (bind(m_Socket, reinterpret_cast<sockaddr*>(&addr), addrLen) == SOCKET_ERROR)
+			if (resultCode == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("Bind failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
-			m_IsBound = true;
 		}
 
-		void Listen(int32 backlog)
+		[[noreturn]]
+		static void Throw()
 		{
-			if (listen(m_Socket, backlog) == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("Listen failed"));
-			}
-			m_IsListening = true;
-		}
-
-		void Connect(const IPEndPoint& remoteEP)
-		{
-			sockaddr_storage addr;
-			int addrLen = IPEndPointToSockAddr(remoteEP, addr);
-			
-			if (connect(m_Socket, reinterpret_cast<sockaddr*>(&addr), addrLen) == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("Connect failed"));
-			}
-			m_IsConnected = true;
-		}
-
-		std::unique_ptr<PlatformSocket> Accept()
-		{
-			sockaddr_storage clientAddr;
-			int clientAddrLen = sizeof(clientAddr);
-			
-			SOCKET clientSocket = accept(m_Socket, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrLen);
-			if (clientSocket == INVALID_SOCKET)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("Accept failed"));
-			}
-
-			return std::make_unique<PlatformSocket>(clientSocket);
-		}
-
-		size_t Send(std::span<const uint8> buffer)
-		{
-			int result = send(m_Socket, reinterpret_cast<const char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0);
-			if (result == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("Send failed"));
-			}
-			return static_cast<size_t>(result);
-		}
-
-		size_t Receive(std::span<uint8> buffer)
-		{
-			int result = recv(m_Socket, reinterpret_cast<char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0);
-			if (result == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("Receive failed"));
-			}
-			return static_cast<size_t>(result);
-		}
-
-		size_t SendTo(std::span<const uint8> buffer, const IPEndPoint& remoteEP)
-		{
-			sockaddr_storage addr;
-			int addrLen = IPEndPointToSockAddr(remoteEP, addr);
-			
-			int result = sendto(m_Socket, reinterpret_cast<const char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0, reinterpret_cast<sockaddr*>(&addr), addrLen);
-			if (result == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("SendTo failed"));
-			}
-			return static_cast<size_t>(result);
-		}
-
-		size_t ReceiveFrom(std::span<uint8> buffer, IPEndPoint& remoteEP)
-		{
-			sockaddr_storage addr;
-			int addrLen = sizeof(addr);
-			
-			int result = recvfrom(m_Socket, reinterpret_cast<char*>(buffer.data()), 
-				static_cast<int>(buffer.size()), 0, reinterpret_cast<sockaddr*>(&addr), &addrLen);
-			if (result == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("ReceiveFrom failed"));
-			}
-
-			remoteEP = SockAddrToIPEndPoint(addr);
-			return static_cast<size_t>(result);
+			throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 		}
 
 		// Async operations - implementation using IOCP
-		Task<std::unique_ptr<Socket>> AcceptAsync(std::stop_token cancellationToken)
+		Task<std::shared_ptr<Socket>> AcceptAsync(std::stop_token cancellationToken)
 		{
 			SOCKET clientSock = WSASocketW(AddressFamilyToInt32(m_AddressFamily), SocketTypeToInt32(m_SocketType), 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
 			char buffer[(sizeof(sockaddr_in) + 16) * 2]; // Buffer for local and remote addresses
 			auto tcs = TaskCompletionSource<int32>::Create(cancellationToken);
-			auto overlapped = std::make_unique<IOCompletionOverlapped>([&tcs](IOCompletionOverlapped*, size_t, int32 status)
+			auto overlapped = new IOCompletionOverlapped();
+			overlapped->SetOnCompletion([tcs, overlapped](size_t, int32 status)
 			{
 				tcs.SetResult(status);
+				delete overlapped;
 			});
 
-			AcceptEx(m_Socket, clientSock, buffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, nullptr, (OVERLAPPED*)overlapped->ToOverlapped());
+			int32 status = AcceptEx(m_Socket, clientSock, buffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, nullptr, (OVERLAPPED*)overlapped->ToOverlapped());
+			if (status == SOCKET_ERROR && status != WSAEWOULDBLOCK)
+			{
+				closesocket(clientSock);
+				throw SocketException(static_cast<SocketError>(status));
+			}
+
 			try
 			{
-				int32 status = co_await tcs.GetTask();
+				status = co_await tcs.GetTask();
 				if (status != 0)
 				{
-					throw SystemException(status, TEXT("AcceptEx failed"));
+					throw SocketException(static_cast<SocketError>(status));
 				}
 			}
 			catch (...)
@@ -220,13 +144,25 @@ namespace Ayla
 
 		Task<> ConnectAsync(const IPEndPoint& remoteEP, std::stop_token cancellationToken)
 		{
+			if (!m_IsBound)
+			{
+				sockaddr_in anyAddr = {};
+				anyAddr.sin_family = AF_INET;
+				anyAddr.sin_addr.s_addr = INADDR_ANY;
+				anyAddr.sin_port = 0;
+				bind(m_Socket, (sockaddr*)&anyAddr, sizeof(anyAddr));
+				m_IsBound = true;
+			}
+
 			sockaddr_storage addr;
 			int addrLen = IPEndPointToSockAddr(remoteEP, addr);
 
 			auto tcs = TaskCompletionSource<int32>::Create(cancellationToken);
-			auto overlapped = std::make_unique<IOCompletionOverlapped>([&tcs](IOCompletionOverlapped*, size_t, int32 status)
+			auto overlapped = new IOCompletionOverlapped();
+			overlapped->SetOnCompletion([tcs, overlapped](size_t, int32 status)
 			{
 				tcs.SetResult(status);
+				delete overlapped;
 			});
 
 			LPFN_CONNECTEX lpfnConnectEx = NULL;
@@ -250,53 +186,196 @@ namespace Ayla
 					break;
 			}
 
-			int result = lpfnConnectEx(m_Socket, (sockaddr*)&addr, addrLen, NULL, NULL, NULL, (OVERLAPPED*)overlapped->ToOverlapped());
+			BOOL result = lpfnConnectEx(m_Socket, (sockaddr*)&addr, addrLen, NULL, NULL, NULL, (OVERLAPPED*)overlapped->ToOverlapped());
 			if (result == SOCKET_ERROR)
 			{
 				int err = WSAGetLastError();
 				if (err != WSA_IO_PENDING)
 				{
-					throw SystemException(err, TEXT("WSAConnect failed"));
+					throw SocketException(static_cast<SocketError>(err));
 				}
 
 				result = (int)co_await tcs.GetTask();
 				if (result != 0)
 				{
-					throw SystemException(result, TEXT("WSAConnect failed"));
+					throw SocketException(static_cast<SocketError>(result));
 				}
 			}
 		}
 
 		Task<size_t> SendAsync(std::span<const uint8> buffer, std::stop_token cancellationToken)
 		{
-			return Task<>::Run([this, buffer]() -> size_t
+			auto tcs = TaskCompletionSource<size_t>::Create(cancellationToken);
+			std::vector<uint8> sendBuffer(buffer.begin(), buffer.end());
+			auto overlapped = new IOCompletionOverlapped();
+			auto* ovp = (OVERLAPPED*)overlapped->ToOverlapped();
+			overlapped->SetOnCompletion([tcs, overlapped](size_t sent, int32 status)
 			{
-				return Send(buffer);
-			}, cancellationToken);
+				if (status != 0)
+				{
+					tcs.TrySetException(std::make_exception_ptr(SocketException(static_cast<SocketError>(status))));
+				}
+				else
+				{
+					tcs.SetResult(sent);
+				}
+
+				delete overlapped;
+			});
+
+			WSABUF buf
+			{
+				.len = (ULONG)buffer.size_bytes(),
+				.buf = (CHAR*)buffer.data()
+			};
+
+			DWORD sent;
+			BOOL result = WSASend(m_Socket, &buf, 1, &sent, 0, ovp, NULL);
+			if (result == SOCKET_ERROR)
+			{
+				int err = WSAGetLastError();
+				if (err != WSA_IO_PENDING)
+				{
+					delete overlapped;
+					throw SocketException(static_cast<SocketError>(err));
+				}
+
+				sent = (DWORD)co_await tcs.GetTask();
+			}
+
+			co_return (size_t)sent;
 		}
 
 		Task<size_t> ReceiveAsync(std::span<uint8> buffer, std::stop_token cancellationToken)
 		{
-			return Task<>::Run([this, buffer]() -> size_t
+			WSABUF buf =
 			{
-				return Receive(buffer);
-			}, cancellationToken);
+				.len = (ULONG)buffer.size_bytes(),
+				.buf = (CHAR*)buffer.data()
+			};
+
+			auto tcs = TaskCompletionSource<size_t>::Create(cancellationToken);
+			auto overlapped = new IOCompletionOverlapped();
+			auto* ovp = (OVERLAPPED*)overlapped->ToOverlapped();
+			overlapped->SetOnCompletion([tcs, overlapped](size_t recv, int32 status)
+			{
+				if (status != 0)
+				{
+					tcs.TrySetException(std::make_exception_ptr(SocketException(static_cast<SocketError>(status))));
+				}
+				else
+				{
+					tcs.SetResult(recv);
+				}
+
+				delete overlapped;
+			});
+
+			DWORD received, flags = 0;
+			BOOL result = WSARecv(m_Socket, &buf, 1, &received, &flags, ovp, NULL);
+			if (result == SOCKET_ERROR)
+			{
+				int err = WSAGetLastError();
+				if (err != WSA_IO_PENDING)
+				{
+					delete overlapped;
+					throw SocketException(static_cast<SocketError>(err));
+				}
+
+				received = (DWORD)co_await tcs.GetTask();
+			}
+
+			co_return (size_t)received;
 		}
 
 		Task<size_t> SendToAsync(std::span<const uint8> buffer, const IPEndPoint& remoteEP, std::stop_token cancellationToken)
 		{
-			return Task<>::Run([this, buffer, remoteEP]() -> size_t
+			sockaddr_storage addr;
+			int addrLen = IPEndPointToSockAddr(remoteEP, addr);
+
+			auto tcs = TaskCompletionSource<size_t>::Create(cancellationToken);
+			auto overlapped = new IOCompletionOverlapped();
+			overlapped->SetOnCompletion([tcs, overlapped](size_t sent, int32 status)
 			{
-				return SendTo(buffer, remoteEP);
-			}, cancellationToken);
+				if (status != 0)
+				{
+					tcs.TrySetException(std::make_exception_ptr(SocketException(static_cast<SocketError>(status))));
+				}
+				else
+				{
+					tcs.SetResult(sent);
+				}
+
+				delete overlapped;
+			});
+
+			WSABUF buf
+			{
+				.len = (ULONG)buffer.size_bytes(),
+				.buf = (CHAR*)buffer.data()
+			};
+
+			DWORD sent;
+			BOOL result = WSASendTo(m_Socket, &buf, 1, &sent, 0, reinterpret_cast<sockaddr*>(&addr), addrLen, (OVERLAPPED*)overlapped->ToOverlapped(), NULL);
+			if (result == SOCKET_ERROR)
+			{
+				int err = WSAGetLastError();
+				if (err != WSA_IO_PENDING)
+				{
+					delete overlapped;
+					throw SocketException(static_cast<SocketError>(err));
+				}
+
+				sent = (DWORD)co_await tcs.GetTask();
+			}
+
+			co_return (size_t)sent;
 		}
 
 		Task<size_t> ReceiveFromAsync(std::span<uint8> buffer, IPEndPoint& remoteEP, std::stop_token cancellationToken)
 		{
-			return Task<>::Run([this, buffer, &remoteEP]() -> size_t
+			sockaddr_storage addr;
+			int addrLen = sizeof(addr);
+
+			WSABUF buf =
 			{
-				return ReceiveFrom(buffer, remoteEP);
-			}, cancellationToken);
+				.len = (ULONG)buffer.size_bytes(),
+				.buf = (CHAR*)buffer.data()
+			};
+
+			auto tcs = TaskCompletionSource<size_t>::Create(cancellationToken);
+			auto overlapped = new IOCompletionOverlapped();
+			overlapped->SetOnCompletion([tcs, overlapped](size_t recv, int32 status)
+			{
+				if (status != 0)
+				{
+					tcs.TrySetException(std::make_exception_ptr(SocketException(static_cast<SocketError>(status))));
+				}
+				else
+				{
+					tcs.SetResult(recv);
+				}
+
+				delete overlapped;
+			});
+
+			DWORD received;
+			DWORD flags = 0;
+			BOOL result = WSARecvFrom(m_Socket, &buf, 1, &received, &flags, reinterpret_cast<sockaddr*>(&addr), &addrLen, (OVERLAPPED*)overlapped->ToOverlapped(), NULL);
+			if (result == SOCKET_ERROR)
+			{
+				int err = WSAGetLastError();
+				if (err != WSA_IO_PENDING)
+				{
+					delete overlapped;
+					throw SocketException(static_cast<SocketError>(err));
+				}
+
+				received = (DWORD)co_await tcs.GetTask();
+			}
+
+			remoteEP = SockAddrToIPEndPoint(addr);
+			co_return (size_t)received;
 		}
 
 		// Properties and utility methods
@@ -306,34 +385,12 @@ namespace Ayla
 		AddressFamily GetAddressFamily() const { return m_AddressFamily; }
 		SocketType GetSocketType() const { return m_SocketType; }
 
-		IPEndPoint GetLocalEndPoint() const
-		{
-			sockaddr_storage addr;
-			int addrLen = sizeof(addr);
-			if (getsockname(m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen) == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("getsockname failed"));
-			}
-			return SockAddrToIPEndPoint(addr);
-		}
-
-		IPEndPoint GetRemoteEndPoint() const
-		{
-			sockaddr_storage addr;
-			int addrLen = sizeof(addr);
-			if (getpeername(m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen) == SOCKET_ERROR)
-			{
-				throw SystemException(WSAGetLastError(), TEXT("getpeername failed"));
-			}
-			return SockAddrToIPEndPoint(addr);
-		}
-
 		void SetSocketOption(int32 level, int32 optionName, bool optionValue)
 		{
 			BOOL value = optionValue ? TRUE : FALSE;
 			if (setsockopt(m_Socket, level, optionName, reinterpret_cast<const char*>(&value), sizeof(value)) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("setsockopt failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 		}
 
@@ -341,7 +398,7 @@ namespace Ayla
 		{
 			if (setsockopt(m_Socket, level, optionName, reinterpret_cast<const char*>(&optionValue), sizeof(optionValue)) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("setsockopt failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 		}
 
@@ -350,7 +407,7 @@ namespace Ayla
 			if (setsockopt(m_Socket, level, optionName, reinterpret_cast<const char*>(optionValue.data()), 
 				static_cast<int>(optionValue.size())) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("setsockopt failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 		}
 
@@ -360,7 +417,7 @@ namespace Ayla
 			int valueLen = sizeof(value);
 			if (getsockopt(m_Socket, level, optionName, reinterpret_cast<char*>(&value), &valueLen) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("getsockopt failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 			return value != FALSE;
 		}
@@ -371,7 +428,7 @@ namespace Ayla
 			int valueLen = sizeof(value);
 			if (getsockopt(m_Socket, level, optionName, reinterpret_cast<char*>(&value), &valueLen) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("getsockopt failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 			return value;
 		}
@@ -380,21 +437,21 @@ namespace Ayla
 		{
 			std::vector<uint8> buffer(256);
 			int bufferLen = static_cast<int>(buffer.size());
-			
+
 			if (getsockopt(m_Socket, level, optionName, reinterpret_cast<char*>(buffer.data()), &bufferLen) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("getsockopt failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
-			
+
 			buffer.resize(bufferLen);
 			return buffer;
 		}
 
-		void Shutdown(int32 how)
+		void Shutdown(SocketShutdown how)
 		{
-			if (shutdown(m_Socket, how) == SOCKET_ERROR)
+			if (shutdown(m_Socket, (int)how) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("shutdown failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 		}
 
@@ -403,7 +460,7 @@ namespace Ayla
 			u_long available;
 			if (ioctlsocket(m_Socket, FIONREAD, &available) == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("ioctlsocket FIONREAD failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 			return static_cast<int32>(available);
 		}
@@ -431,12 +488,12 @@ namespace Ayla
 				result = select(0, nullptr, nullptr, &fds, &timeout);
 				break;
 			default:
-				throw SystemException(WSAEINVAL, TEXT("Invalid poll mode"));
+				throw SocketException(static_cast<SocketError>(WSAEINVAL));
 			}
 
 			if (result == SOCKET_ERROR)
 			{
-				throw SystemException(WSAGetLastError(), TEXT("select failed"));
+				throw SocketException(static_cast<SocketError>(WSAGetLastError()));
 			}
 
 			return result > 0;
@@ -468,28 +525,6 @@ namespace Ayla
 				memcpy(&addr6->sin6_addr, bytes.data(), 16);
 				
 				return sizeof(sockaddr_in6);
-			}
-		}
-
-		static IPEndPoint SockAddrToIPEndPoint(const sockaddr_storage& addr)
-		{
-			if (addr.ss_family == AF_INET)
-			{
-				const auto* addr4 = reinterpret_cast<const sockaddr_in*>(&addr);
-				std::array<uint8, 4> bytes;
-				memcpy(bytes.data(), &addr4->sin_addr, 4);
-				return IPEndPoint(IPAddress(bytes), ntohs(addr4->sin_port));
-			}
-			else if (addr.ss_family == AF_INET6)
-			{
-				const auto* addr6 = reinterpret_cast<const sockaddr_in6*>(&addr);
-				std::array<uint8, 16> bytes;
-				memcpy(bytes.data(), &addr6->sin6_addr, 16);
-				return IPEndPoint(IPAddress(bytes), ntohs(addr6->sin6_port));
-			}
-			else
-			{
-				throw SystemException(WSAEAFNOSUPPORT, TEXT("Unsupported address family"));
 			}
 		}
 	};
