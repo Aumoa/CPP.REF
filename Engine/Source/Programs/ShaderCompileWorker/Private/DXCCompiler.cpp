@@ -142,7 +142,7 @@ namespace Ayla
 		String entryPoint = sct.GetEntryPoint();
 		if (!entryPoint.IsEmpty())
 		{
-			arguments.emplace_back(TEXT("-E'"));
+			arguments.emplace_back(TEXT("-E"));
 			arguments.emplace_back(entryPoint);
 		}
 
@@ -152,23 +152,19 @@ namespace Ayla
 		switch (sct.GetType())
 		{
 		case ShaderType::Vertex:
-			shaderProfile = TEXT("vs_6_0");
-			entryPoint = TEXT("main");
+			shaderProfile = TEXT("vs_6_2");
 			isRaytracing = false;
 			break;
 		case ShaderType::Pixel:
-			shaderProfile = TEXT("ps_6_0");
-			entryPoint = TEXT("main");
+			shaderProfile = TEXT("ps_6_2");
 			isRaytracing = false;
 			break;
 		case ShaderType::Compute:
-			shaderProfile = TEXT("cs_6_0");
-			entryPoint = TEXT("main");
+			shaderProfile = TEXT("cs_6_2");
 			isRaytracing = false;
 			break;
 		case ShaderType::Library:
 			shaderProfile = TEXT("lib_6_3");
-			entryPoint = TEXT("main");
 			isRaytracing = true;
 			break;
 		}
