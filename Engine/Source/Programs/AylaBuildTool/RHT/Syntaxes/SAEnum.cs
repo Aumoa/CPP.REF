@@ -61,9 +61,10 @@ internal record SAEnum(CapturedContext Context, string Name, SNamespace[] Namesp
             {
                 context.Advance(1);
                 context.SkipWhiteSpace(true);
-                continue;
             }
-            else if (context.CurrentChar == '}')
+
+            // Allow trailing comma before closing brace
+            if (context.CurrentChar == '}')
             {
                 break;
             }
