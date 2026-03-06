@@ -1,6 +1,8 @@
 @ECHO OFF
 
-dir "C:\Program Files (x86)\Windows Kits\10\Lib"
+dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0"
+dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um"
+dir "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64"
 exit /b 1
 
 ECHO Setup
