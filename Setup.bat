@@ -1,6 +1,6 @@
 @ECHO OFF
 
-dir "C:\Program Files (x86)\Windows Kits\10"
+dir "C:\Program Files (x86)\Windows Kits\10\Lib"
 exit /b 1
 
 ECHO Setup
