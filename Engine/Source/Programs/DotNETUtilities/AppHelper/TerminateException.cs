@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace AylaEngine;
+﻿namespace AylaEngine;
 
 public class TerminateException : Exception
 {
@@ -16,7 +14,6 @@ public class TerminateException : Exception
 
     public TerminateException(int returnCode)
     {
-        Console.Error.WriteLine("TerminateException constructed from {0}", new StackTrace(1, true));
         ReturnCode = returnCode;
     }
 

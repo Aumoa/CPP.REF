@@ -247,7 +247,6 @@ internal static partial class BuildRunner
 
             if (hasFailure)
             {
-                Console.Error.WriteLine("One or more CMake builds failed. Check the logs above for details.");
                 throw TerminateException.User();
             }
         }
