@@ -1,5 +1,8 @@
 @ECHO OFF
 
+dir "C:\Program Files (x86)\Windows Kits\10"
+exit /b 1
+
 ECHO Setup
 
 cd "%~dp0"
