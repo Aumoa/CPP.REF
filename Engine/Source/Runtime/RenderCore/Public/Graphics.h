@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "RenderFeatures.h"
 #include "BufferUsage.h"
+#include "Rendering/ShaderCreationInfo.h"
 #include "Graphics.gen.h"
 
 namespace Ayla
@@ -43,7 +44,7 @@ namespace Ayla
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) = 0;
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer() = 0;
         virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(std::vector<SharedPtr<Shader>> shaders) = 0;
-        virtual SharedPtr<Shader> CreateShader(std::vector<byte> bytecode, ShaderType type, String entrypointName) = 0;
+        virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) = 0;
 
         SharedPtr<CommandBuffer> GetPooledCommandBuffer();
         void ReleasePooledCommandBuffer(SharedPtr<CommandBuffer> cmd);

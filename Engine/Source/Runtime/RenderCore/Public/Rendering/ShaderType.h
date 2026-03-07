@@ -10,6 +10,12 @@ namespace Ayla
 	AENUM()
 	enum class ShaderType
 	{
+		Vertex,
+		Pixel,
+		Domain,
+		Hull,
+		Geometry,
+		Compute,
 		RayGeneration,
 		ClosestHit,
 		Miss

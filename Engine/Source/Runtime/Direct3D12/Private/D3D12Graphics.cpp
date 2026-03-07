@@ -101,9 +101,9 @@ namespace Ayla
 		return New<D3D12RaytracingRenderPipeline>(m_Device.Get(), std::move(shaders));
 	}
 
-	SharedPtr<Shader> D3D12Graphics::CreateShader(std::vector<byte> bytecode, ShaderType type, String entrypointName)
+	SharedPtr<Shader> D3D12Graphics::CreateShader(ShaderCreationInfo shaderCreationInfo)
 	{
-		return New<D3D12Shader>(std::move(bytecode), type, std::move(entrypointName));
+		return New<D3D12Shader>(std::move(shaderCreationInfo));
 	}
 
 	void D3D12Graphics::BeginRenderFrame()

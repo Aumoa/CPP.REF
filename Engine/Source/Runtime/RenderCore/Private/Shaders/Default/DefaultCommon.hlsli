@@ -11,7 +11,21 @@ struct Attributes
     float2 Bary;
 };
 
-RWTexture2D<float4> u_OutputTexture : register(u0);
-RaytracingAccelerationStructure t_Scene : register(t0);
+struct Vertex
+{
+    float3 Position : POSITION;
+    float4 Color : COLOR;
+};
+
+struct Fragment
+{
+    float4 Position : SV_POSITION;
+    float4 Color : COLOR;
+};
+
+struct Pixel
+{
+    float4 Color : SV_TARGET;
+};
 
 #endif

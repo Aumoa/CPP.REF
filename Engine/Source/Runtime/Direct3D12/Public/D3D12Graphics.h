@@ -34,7 +34,7 @@ namespace Ayla
 		virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) override;
 		virtual SharedPtr<CommandBuffer> CreateCommandBuffer() override;
 		virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(std::vector<SharedPtr<Shader>> shaders) override;
-		virtual SharedPtr<Shader> CreateShader(std::vector<byte> bytecode, ShaderType type, String entrypointName) override;
+		virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) override;
 
 		virtual void BeginRenderFrame() override;
 		virtual void EndRenderFrame() override;

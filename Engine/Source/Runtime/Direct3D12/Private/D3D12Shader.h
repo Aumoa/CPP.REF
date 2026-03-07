@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Rendering/Shader.h"
+#include "Rendering/ShaderCreationInfo.h"
 #include "D3D12Common.h"
 #include "D3D12Shader.gen.h"
 
@@ -17,16 +18,10 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		std::vector<byte> m_Bytecode;
-		ShaderType m_Type;
-		String m_EntrypointName;
+		ShaderCreationInfo m_CreationInfo;
 
 	public:
-		D3D12Shader(std::vector<byte> bytecode, ShaderType type, String entrypointName);
+		D3D12Shader(ShaderCreationInfo shaderCreationInfo);
 		virtual ~D3D12Shader() noexcept override;
-
-		virtual String GetEntrypointName() const override { return m_EntrypointName; }
-		virtual const byte* GetBytecode() const override { return m_Bytecode.data(); }
-		virtual size_t GetBytecodeSize() const override { return m_Bytecode.size(); }
 	};
 }

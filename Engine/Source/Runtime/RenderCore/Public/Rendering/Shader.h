@@ -7,14 +7,14 @@
 
 namespace Ayla
 {
+	enum class ShaderType;
+
 	ACLASS()
 	class RENDERCORE_API Shader : public Object
 	{
 		GENERATED_BODY()
 
 	public:
-		virtual String GetEntrypointName() const = 0;
-		virtual const byte* GetBytecode() const = 0;
-		virtual size_t GetBytecodeSize() const = 0;
+		virtual bool Has(ShaderType type) const = 0;
 	};
 }
