@@ -59,6 +59,7 @@ internal static partial class BuildRunner
                 var workerPath = Path.Combine(resolver.Group.BinariesDirectory, targetInfo.Platform.Name, targetInfo.Config.ToString(), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
                 if (!File.Exists(workerPath))
                 {
+                    Console.Error.WriteLine("Error: Shader compile worker executable not found at {0}", workerPath);
                     throw TerminateException.Abort();
                 }
 
