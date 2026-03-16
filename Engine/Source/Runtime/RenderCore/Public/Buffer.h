@@ -17,5 +17,9 @@ namespace Ayla
 
 	public:
 		virtual ~Buffer() noexcept override;
+
+		virtual size_t GetByteSize() const noexcept = 0;
+		virtual size_t GetStride() const noexcept = 0;
+		virtual size_t GetCount() const noexcept { return GetStride() > 0 ? GetByteSize() / GetStride() : 0; }
 	};
 }

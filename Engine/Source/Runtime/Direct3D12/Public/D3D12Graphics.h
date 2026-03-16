@@ -35,6 +35,7 @@ namespace Ayla
 		virtual SharedPtr<CommandBuffer> CreateCommandBuffer() override;
 		virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(std::vector<SharedPtr<Shader>> shaders) override;
 		virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) override;
+		virtual SharedPtr<Buffer> CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage) override;
 
 		virtual void BeginRenderFrame() override;
 		virtual void EndRenderFrame() override;

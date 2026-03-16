@@ -106,6 +106,53 @@ namespace Ayla
 		return New<D3D12Shader>(std::move(shaderCreationInfo));
 	}
 
+	SharedPtr<Buffer> D3D12Graphics::CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage)
+	{
+		check(!data.empty());
+		const size_t byteSize = data.size();
+
+		D3D12_HEAP_PROPERTIES heapProps =
+		{
+			.Type = D3D12_HEAP_TYPE_UPLOAD,
+			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
+			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
+			.CreationNodeMask = 1,
+			.VisibleNodeMask = 1
+		};
+
+		D3D12_RESOURCE_DESC resourceDesc =
+		{
+			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+			.Alignment = 0,
+			.Width = byteSize,
+			.Height = 1,
+			.DepthOrArraySize = 1,
+			.MipLevels = 1,
+			.Format = DXGI_FORMAT_UNKNOWN,
+			.SampleDesc = { .Count = 1, .Quality = 0 },
+			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+			.Flags = D3D12_RESOURCE_FLAG_NONE
+		};
+
+		ComPtr<ID3D12Resource> resource;
+		HR(m_Device->CreateCommittedResource(
+			&heapProps,
+			D3D12_HEAP_FLAG_NONE,
+			&resourceDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&resource)
+		));
+
+		void* mappedData = nullptr;
+		D3D12_RANGE readRange = { 0, 0 };
+		HR(resource->Map(0, &readRange, &mappedData));
+		std::memcpy(mappedData, data.data(), byteSize);
+		resource->Unmap(0, nullptr);
+
+		return New<D3D12Buffer>(std::move(resource), usage, byteSize, stride);
+	}
+
 	void D3D12Graphics::BeginRenderFrame()
 	{
 		static constexpr TimeSpan _1s = TimeSpan::FromSeconds(1);
