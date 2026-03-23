@@ -12,7 +12,14 @@ internal class GenerateRunner
         switch (options.GeneratorType)
         {
             case GeneratorType.VisualStudio:
-                generator = new VSSolutionGenerator();
+                if (VisualStudioInstallation.BestProduct?.VisualStudioVersion == VisualStudioInstallation.VSVersion._2026)
+                {
+                    generator = new VSSlnxSolutionGenerator();
+                }
+                else
+                {
+                    generator = new VSSolutionGenerator();
+                }
                 break;
             case GeneratorType.VisualStudioCode:
                 generator = new VSCSolutionGenerator();

@@ -15,12 +15,14 @@ internal class VisualStudioInstallation : Installation
         BuildTool,
         Community,
         Professional,
-        Enterprise
+        Enterprise,
+        Preview
     }
 
     public enum VSVersion
     {
-        _2022
+        _2022,
+        _2026
     }
 
     public readonly struct Product
@@ -48,6 +50,8 @@ internal class VisualStudioInstallation : Installation
 
     private static Version? s_WindowsKitVersion;
     private static Product[] s_Products;
+
+    public static Product? BestProduct => s_Products.Length > 0 ? s_Products[0] : null;
 
     static VisualStudioInstallation()
     {
@@ -96,6 +100,9 @@ internal class VisualStudioInstallation : Installation
             {
                 case "2022":
                     visualStudioVersion = VSVersion._2022;
+                    break;
+                case "2026":
+                    visualStudioVersion = VSVersion._2026;
                     break;
                 default:
                     continue;

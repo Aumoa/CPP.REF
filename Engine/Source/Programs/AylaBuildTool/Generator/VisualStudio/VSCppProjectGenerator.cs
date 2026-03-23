@@ -6,9 +6,23 @@ namespace AylaEngine;
 
 internal static class VSCppProjectGenerator
 {
-    private static readonly Version VCProjectVersion = new Version(17, 0);
+    private static readonly Version VCProjectVersion;
     private static readonly Version WindowsTargetPlatformVersion = new Version(10, 0);
-    private const string PlatformToolset = "v143";
+    private static readonly string PlatformToolset;
+
+    static VSCppProjectGenerator()
+    {
+        if (VisualStudioInstallation.BestProduct?.VisualStudioVersion == VisualStudioInstallation.VSVersion._2026)
+        {
+            VCProjectVersion = new Version(18, 0);
+            PlatformToolset = "v144";
+        }
+        else
+        {
+            VCProjectVersion = new Version(17, 0);
+            PlatformToolset = "v143";
+        }
+    }
 
     public static async Task GenerateAsync(Solution solution, Dictionary<ModuleProject, string> vcxprojPaths, ModuleProject project, CancellationToken cancellationToken)
     {
