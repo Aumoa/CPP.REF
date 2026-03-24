@@ -2,11 +2,13 @@
 
 #include "RenderPasses/GeometryRenderPass.h"
 #include "CommandBuffer.h"
+#include "Rendering/SceneView.h"
 
 namespace Ayla
 {
-	GeometryRenderPass::GeometryRenderPass(RenderPipeline* renderPipeline)
+	GeometryRenderPass::GeometryRenderPass(RenderPipeline* renderPipeline, RenderTexture* renderTexture)
 		: m_RenderPipeline(renderPipeline)
+		, m_RenderTexture(renderTexture)
 	{
 	}
 
@@ -18,8 +20,11 @@ namespace Ayla
 	{
 	}
 
-	void GeometryRenderPass::Execute(CommandBuffer* commandBuffer)
+	void GeometryRenderPass::Execute(CommandBuffer* commandBuffer, const SceneView& sceneView)
 	{
+		commandBuffer->BeginRenderPass(m_RenderTexture);
 		commandBuffer->SetRenderPipeline(m_RenderPipeline);
+		commandBuffer->Draw();
+		commandBuffer->EndRenderPass(m_RenderTexture);
 	}
 }

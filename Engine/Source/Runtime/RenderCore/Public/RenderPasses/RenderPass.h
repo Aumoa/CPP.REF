@@ -7,6 +7,7 @@
 namespace Ayla
 {
 	class CommandBuffer;
+	class SceneView;
 
 	class RENDERCORE_API RenderPass
 	{
@@ -14,6 +15,6 @@ namespace Ayla
 		virtual ~RenderPass() noexcept;
 
 		virtual void Setup() = 0;
-		virtual void Execute(CommandBuffer* commandBuffer) = 0;
+		virtual void Execute(CommandBuffer* commandBuffer, const SceneView& view) = 0;
 	};
 }

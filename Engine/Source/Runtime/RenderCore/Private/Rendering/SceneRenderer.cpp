@@ -24,7 +24,7 @@ namespace Ayla
 		for (const auto& pass : m_Passes)
 		{
 			pass->Setup();
-			pass->Execute(commandBuffer);
+			pass->Execute(commandBuffer, view);
 		}
 	}
 }

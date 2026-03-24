@@ -8,6 +8,7 @@
 namespace Ayla
 {
 	class RenderPipeline;
+	class RenderTexture;
 
 	ACLASS()
 	class RENDERCORE_API CommandBuffer : public Object
@@ -26,7 +27,10 @@ namespace Ayla
 		virtual void BeginCommands() APURE;
 		AFUNCTION()
 		virtual void EndCommands() APURE;
+		virtual void BeginRenderPass(RenderTexture* renderTexture) = 0;
+		virtual void EndRenderPass(RenderTexture* renderTexture) = 0;
 		virtual void SetRenderPipeline(RenderPipeline* renderPipeline) = 0;
+		virtual void Draw() = 0;
 		virtual void WaitForCompletion(const TimeSpan& timeout) = 0;
 	};
 }

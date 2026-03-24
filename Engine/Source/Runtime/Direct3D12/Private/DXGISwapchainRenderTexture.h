@@ -15,13 +15,18 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
+		ID3D12Device* m_Device;
 		ComPtr<IDXGISwapChain3> m_Swapchain;
 		DXGI_SWAP_CHAIN_DESC m_SwapchainDesc;
 		std::vector<ComPtr<ID3D12Resource>> m_SwapchainResources;
+		ComPtr<ID3D12Resource> m_DepthStencilResource;
 		uint32 m_CurrentBackBufferIndex = 0;
 
+		ComPtr<ID3D12DescriptorHeap> m_RTVHeap;
+		ComPtr<ID3D12DescriptorHeap> m_DSVHeap;
+
 	public:
-		DXGISwapchainRenderTexture(ComPtr<IDXGISwapChain3> swapchain);
+		DXGISwapchainRenderTexture(ID3D12Device* device, ComPtr<IDXGISwapChain3> swapchain);
 		virtual ~DXGISwapchainRenderTexture() noexcept override;
 
 		virtual Vector2N GetSize() const override;
@@ -30,5 +35,9 @@ namespace Ayla
 
 		void ReleaseResources();
 		void AllocateResources();
+
+		ID3D12Resource* GetCurrentBackBuffer() const;
+		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandle() const;
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDSVDescriptorHandle() const;
 	};
 }

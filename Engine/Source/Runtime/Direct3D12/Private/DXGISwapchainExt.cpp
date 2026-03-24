@@ -10,7 +10,7 @@ namespace Ayla
 		: m_Owner(owner)
 		, m_Swapchain(std::move(swapchain))
 	{
-		m_SwapchainRenderTexture = New<DXGISwapchainRenderTexture>(m_Swapchain);
+		m_SwapchainRenderTexture = New<DXGISwapchainRenderTexture>(m_Owner->GetDevice(), m_Swapchain);
 	}
 
 	DXGISwapchainExt::~DXGISwapchainExt() noexcept
@@ -46,8 +46,11 @@ namespace Ayla
 		auto newSize = m_PendingResize.value();
 		m_PendingResize.reset();
 
+		DXGI_SWAP_CHAIN_DESC desc;
+		HR(m_Swapchain->GetDesc(&desc));
+
 		m_SwapchainRenderTexture->ReleaseResources();
-		HR(m_Swapchain->ResizeBuffers(0, (UINT)newSize.X, (UINT)newSize.Y, DXGI_FORMAT_B8G8R8A8_UNORM, 0));
+		HR(m_Swapchain->ResizeBuffers(0, (UINT)newSize.X, (UINT)newSize.Y, desc.BufferDesc.Format, 0));
 		m_SwapchainRenderTexture->AllocateResources();
 	}
 

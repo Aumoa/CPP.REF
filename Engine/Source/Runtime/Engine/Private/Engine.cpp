@@ -144,6 +144,9 @@ namespace Ayla
 
 		m_SwapchainExtensions.clear();
 
+		m_DefaultGeometryRenderPipeline.Release();
+		m_DefaultRaytracingRenderPipeline.Release();
+
 		m_CommandBuffer->Dispose();
 		m_Graphics->Dispose();
 	}
@@ -182,7 +185,7 @@ namespace Ayla
 			graphics = m_Graphics,
 			commandBuffer = m_CommandBuffer,
 			self = m_RenderThread.Get(),
-			renderPipeline = m_DefaultRaytracingRenderPipeline.Get(),
+			renderPipeline = m_DefaultGeometryRenderPipeline.Get(),
 			views = &m_Scratch.AllCameraViews
 		]()
 		{
@@ -204,7 +207,7 @@ namespace Ayla
 
 			SceneRenderer renderer;
 
-			GeometryRenderPass geometryPass(renderPipeline);
+			GeometryRenderPass geometryPass(renderPipeline, rt.Get());
 			renderer.AddPass(&geometryPass);
 
 			for (auto& view : *views)

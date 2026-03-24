@@ -44,9 +44,21 @@ namespace Ayla
 
 	void D3D12Graphics::Dispose() noexcept
 	{
-		m_DXGI.Reset();
-		m_Device.Reset();
+#if DO_CHECK
+		ComPtr<ID3D12DebugDevice> debugDevice;
+		bool canReport = SUCCEEDED(m_Device.As(&debugDevice));
+#endif
+
 		m_CommandQueue = {};
+		m_Device.Reset();
+		m_DXGI.Reset();
+
+#if DO_CHECK
+		if (canReport)
+		{
+			debugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
+		}
+#endif
 	}
 
 	SharedPtr<GenericWindowSwapchainExtension> D3D12Graphics::InstallSwapChain(SharedPtr<GenericWindow> targetWindow)
@@ -64,7 +76,7 @@ namespace Ayla
 					.Numerator = 0,
 					.Denominator = 1
 				},
-				.Format = DXGI_FORMAT_B8G8R8A8_UNORM,
+				.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
 				.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
 				.Scaling = DXGI_MODE_SCALING_UNSPECIFIED
 			},
