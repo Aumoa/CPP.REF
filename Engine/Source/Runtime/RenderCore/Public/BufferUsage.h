@@ -10,6 +10,7 @@ namespace Ayla
 	AENUM()
 	enum class BufferUsage
 	{
+		Upload,
 		VertexBuffer,
 		IndexBuffer
 	};

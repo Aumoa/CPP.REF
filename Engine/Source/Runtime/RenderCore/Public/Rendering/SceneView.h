@@ -7,19 +7,12 @@
 
 namespace Ayla
 {
-	class RenderTexture;
+	class Buffer;
 
-	class RENDERCORE_API SceneView
+	struct SceneView
 	{
-	private:
-		const MinimalViewInfo m_View;
-
-	public:
-		SceneView() = delete;
-		SceneView(MinimalViewInfo view);
-		SceneView(const SceneView&) = delete;
-		~SceneView() noexcept;
-
-		const MinimalViewInfo& GetViewInfo() const noexcept { return m_View; }
+		MinimalViewInfo View;
+		Buffer* CameraBuffer;
+		size_t CameraBufferOffset;
 	};
 }

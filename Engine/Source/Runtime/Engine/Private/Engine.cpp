@@ -8,6 +8,7 @@
 #include "GameInstance.h"
 #include "CommandBuffer.h"
 #include "TimerManager.h"
+#include "Buffer.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/Scene.h"
 #include "SceneManagement/SceneManager.h"
@@ -21,7 +22,9 @@
 #include "Rendering/ShaderType.h"
 #include "Rendering/RenderPipeline.h"
 #include "Rendering/PositionColorVertexFactory.h"
+#include "Rendering/CameraBuffer.h"
 #include "RenderPasses/GeometryRenderPass.h"
+#include "Misc/DefaultVectors.h"
 #include "Ticking/TickTiming.h"
 #include "IO/File.h"
 
@@ -176,9 +179,18 @@ namespace Ayla
 		m_Scratch.AllCameras.clear();
 		m_GameInstance->GetSceneManager()->GetAllCameraComponents(&m_Scratch.AllCameras);
 		m_Scratch.AllCameraViews.resize(m_Scratch.AllCameras.size());
+
+		size_t requiredBufferSize = sizeof(CameraBuffer) * m_Scratch.AllCameras.size();
+		if (!m_Scratch.CameraBuffers || m_Scratch.CameraBuffers->GetByteSize() != requiredBufferSize)
+		{
+			m_Scratch.CameraBuffers = m_Graphics->CreateUploadBuffer(requiredBufferSize);
+		}
+
+		CameraBuffer* cameraBufferPtr = reinterpret_cast<CameraBuffer*>(m_Scratch.CameraBuffers->Map());
 		for (size_t i = 0; i < m_Scratch.AllCameras.size(); i++)
 		{
-			m_Scratch.AllCameras[i]->GetMinimalViewInfo(&m_Scratch.AllCameraViews[i]);
+			auto& view = m_Scratch.AllCameraViews[i];
+			m_Scratch.AllCameras[i]->GetMinimalViewInfo(&view);
 		}
 
 		m_RenderThread->Dispatch([
@@ -187,7 +199,9 @@ namespace Ayla
 			commandBuffer = m_CommandBuffer,
 			self = m_RenderThread.Get(),
 			renderPipeline = m_DefaultGeometryRenderPipeline.Get(),
-			views = &m_Scratch.AllCameraViews
+			views = &m_Scratch.AllCameraViews,
+			cameraBuffer = m_Scratch.CameraBuffers,
+			cameraBufferPtr
 		]()
 		{
 			commandBuffer->WaitForCompletion(TimeSpan::FromSeconds(1));
@@ -205,16 +219,32 @@ namespace Ayla
 			// Camera: Overlay, Display #0
 			auto rt = swapchainExtensions[0]->GetRenderTexture();
 			rt->Acquire(commandBuffer.Get());
+			auto rtSize = rt->GetSize();
+			auto defaultAspectRatio = rtSize.X / (float)rtSize.Y;
 
 			SceneRenderer renderer;
 
 			GeometryRenderPass geometryPass(renderPipeline, rt.Get());
 			renderer.AddPass(&geometryPass);
 
+			size_t viewIndex = 0;
 			for (auto& view : *views)
 			{
-				SceneView sceneView{ view };
+				SceneView sceneView
+				{
+					.View = view,
+					.CameraBuffer = cameraBuffer.Get(),
+					.CameraBufferOffset = sizeof(CameraBuffer) * viewIndex
+				};
+
+				auto forward = view.Rotation.TransformVector(Ayla::DefaultVectors<3>::Forward);
+				auto up = view.Rotation.TransformVector(Ayla::DefaultVectors<3>::Up);
+				auto viewMatrix = Matrix4x4<>::LookToLH(view.Position, forward, up);
+				auto projMatrix = Matrix4x4<>::PerspectiveFovLH<float>(Degrees<float>(view.FieldOfView).ToRadians(), view.AspectRatio.value_or(defaultAspectRatio), 0.01f, 1000.0f);
+				cameraBufferPtr[viewIndex].ViewProjection = Matrix<>::Multiply(viewMatrix, projMatrix);
+
 				renderer.Render(commandBuffer.Get(), sceneView);
+				++viewIndex;
 			}
 
 			commandBuffer->EndCommands();

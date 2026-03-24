@@ -24,6 +24,8 @@ namespace Ayla
 	public:
 		D3D12RaytracingRenderPipeline(ID3D12Device5* device, SharedPtr<Shader> shader);
 
+		virtual void SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset) override;
+
 		ID3D12StateObject* GetPipelineStateObject() const noexcept { return m_StateObject.Get(); }
 	};
 }

@@ -41,12 +41,13 @@ namespace Ayla
 			*outRotation = m_LocalRotation;
 		}
 
-		Vector3F GetLocalScale() const noexcept
-		{
-			return m_LocalRotation;
-		}
+		Vector3F GetLocalPosition() const noexcept { return m_LocalPosition; }
+		QuaternionF GetLocalRotation() const noexcept { return m_LocalRotation; }
+		Vector3F GetLocalScale() const noexcept { return m_LocalScale; }
 
 		void SetLocalPositionAndRotation(const Vector3F& position, const QuaternionF& rotation);
+		void SetLocalPosition(const Vector3F& position);
+		void SetLocalRotation(const QuaternionF& rotation);
 		void SetLocalScale(const Vector3F& scale);
 
 		void GetPositionAndRotation(Vector3F* outPosition, QuaternionF* outRotation) const noexcept

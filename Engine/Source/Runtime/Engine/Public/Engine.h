@@ -19,6 +19,7 @@ namespace Ayla
 	class Camera;
 	class Shader;
 	class RenderPipeline;
+	class Buffer;
 
 	ACLASS()
 	class ENGINE_API Engine : public Object
@@ -43,6 +44,7 @@ namespace Ayla
 		{
 			std::vector<Camera*> AllCameras;
 			std::vector<MinimalViewInfo> AllCameraViews;
+			SharedPtr<Buffer> CameraBuffers;
 		} m_Scratch;
 
 	public:

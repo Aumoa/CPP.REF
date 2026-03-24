@@ -171,4 +171,8 @@ namespace Ayla
 		};
 		HR(device->CreateStateObject(&stateObjectDesc, IID_PPV_ARGS(&m_StateObject)));
 	}
+
+	void D3D12RaytracingRenderPipeline::SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset)
+	{
+	}
 }

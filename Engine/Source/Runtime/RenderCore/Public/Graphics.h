@@ -46,6 +46,7 @@ namespace Ayla
         virtual SharedPtr<RenderPipeline> CreateGeometryRenderPipeline(SharedPtr<Shader> shader) = 0;
         virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(SharedPtr<Shader> shader) = 0;
         virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) = 0;
+        virtual SharedPtr<Buffer> CreateUploadBuffer(size_t sizeInBytes) = 0;
         virtual SharedPtr<Buffer> CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage) = 0;
 
         SharedPtr<CommandBuffer> GetPooledCommandBuffer();

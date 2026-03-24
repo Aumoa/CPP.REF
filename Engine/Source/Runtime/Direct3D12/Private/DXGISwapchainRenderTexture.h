@@ -34,7 +34,7 @@ namespace Ayla
 		virtual void Acquire(CommandBuffer* cmd) override;
 
 		void ReleaseResources();
-		void AllocateResources();
+		void AllocateResources(bool resize);
 
 		ID3D12Resource* GetCurrentBackBuffer() const;
 		D3D12_CPU_DESCRIPTOR_HANDLE GetRTVDescriptorHandle() const;

@@ -3,6 +3,7 @@
 #include "RenderPasses/GeometryRenderPass.h"
 #include "CommandBuffer.h"
 #include "Rendering/SceneView.h"
+#include "Rendering/RenderPipeline.h"
 
 namespace Ayla
 {
@@ -24,6 +25,7 @@ namespace Ayla
 	{
 		commandBuffer->BeginRenderPass(m_RenderTexture);
 		commandBuffer->SetRenderPipeline(m_RenderPipeline);
+		m_RenderPipeline->SetCameraBufferView(commandBuffer, sceneView.CameraBuffer, sceneView.CameraBufferOffset);
 		commandBuffer->Draw();
 		commandBuffer->EndRenderPass(m_RenderTexture);
 	}

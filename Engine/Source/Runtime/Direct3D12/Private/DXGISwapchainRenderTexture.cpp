@@ -30,7 +30,7 @@ namespace Ayla
 		HR(m_Device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DSVHeap)));
 		DXSetName(m_DSVHeap);
 
-		AllocateResources();
+		AllocateResources(false);
 	}
 
 	DXGISwapchainRenderTexture::~DXGISwapchainRenderTexture() noexcept
@@ -53,8 +53,13 @@ namespace Ayla
 		m_SwapchainResources.clear();
 	}
 
-	void DXGISwapchainRenderTexture::AllocateResources()
+	void DXGISwapchainRenderTexture::AllocateResources(bool resize)
 	{
+		if (resize)
+		{
+			HR(m_Swapchain->GetDesc(&m_SwapchainDesc));
+		}
+
 		m_SwapchainResources.resize((size_t)m_SwapchainDesc.BufferCount);
 
 		auto rtvHandle = m_RTVHeap->GetCPUDescriptorHandleForHeapStart();

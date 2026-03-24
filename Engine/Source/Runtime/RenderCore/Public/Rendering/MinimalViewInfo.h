@@ -12,7 +12,7 @@ namespace Ayla
 	{
 		Vector3F Position;
 		QuaternionF Rotation;
-		float FieldOfView;
+		Degrees<float> FieldOfView;
 		std::optional<float> AspectRatio;
 	};
 }

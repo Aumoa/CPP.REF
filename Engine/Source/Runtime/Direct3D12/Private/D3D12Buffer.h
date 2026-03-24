@@ -29,6 +29,8 @@ namespace Ayla
 
 		virtual size_t GetByteSize() const noexcept override { return m_ByteSize; }
 		virtual size_t GetStride() const noexcept override { return m_Stride; }
+		virtual BufferUsage GetUsage() const noexcept override { return m_Usage; }
+		virtual void* Map() const override;
 
 		D3D12_VERTEX_BUFFER_VIEW GetVertexBufferView() const noexcept;
 		D3D12_INDEX_BUFFER_VIEW GetIndexBufferView() const noexcept;

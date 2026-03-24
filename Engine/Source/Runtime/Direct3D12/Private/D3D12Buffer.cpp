@@ -17,6 +17,13 @@ namespace Ayla
 	{
 	}
 
+	void* D3D12Buffer::Map() const
+	{
+		void* p;
+		HR(m_Buffer->Map(0, nullptr, &p));
+		return p;
+	}
+
 	D3D12_VERTEX_BUFFER_VIEW D3D12Buffer::GetVertexBufferView() const noexcept
 	{
 		return D3D12_VERTEX_BUFFER_VIEW

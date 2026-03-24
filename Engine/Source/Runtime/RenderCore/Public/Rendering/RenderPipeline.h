@@ -7,9 +7,15 @@
 
 namespace Ayla
 {
+	class CommandBuffer;
+	class Buffer;
+
 	ACLASS()
 	class RENDERCORE_API RenderPipeline : public Object
 	{
 		GENERATED_BODY()
+
+	public:
+		virtual void SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset) = 0;
 	};
 }

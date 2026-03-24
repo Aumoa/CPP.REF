@@ -6,7 +6,7 @@
 
 namespace Ayla
 {
-	class SceneView;
+	struct SceneView;
 	class RenderTexture;
 	class CommandBuffer;
 	class RenderPass;

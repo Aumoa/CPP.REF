@@ -11,5 +11,6 @@ public class RenderCore : ModuleRules
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics", "ApplicationCore");
+        AddPublicDisableWarnings(4324);
     }
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BufferUsage.h"
 #include "Buffer.gen.h"
 
 namespace Ayla
@@ -20,6 +21,9 @@ namespace Ayla
 
 		virtual size_t GetByteSize() const noexcept = 0;
 		virtual size_t GetStride() const noexcept = 0;
-		virtual size_t GetCount() const noexcept { return GetStride() > 0 ? GetByteSize() / GetStride() : 0; }
+		virtual BufferUsage GetUsage() const noexcept = 0;
+		virtual void* Map() const = 0;
+
+		size_t GetCount() const noexcept { return GetStride() > 0 ? GetByteSize() / GetStride() : 0; }
 	};
 }

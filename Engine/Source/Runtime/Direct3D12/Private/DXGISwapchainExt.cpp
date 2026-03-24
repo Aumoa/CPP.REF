@@ -43,7 +43,7 @@ namespace Ayla
 
 		m_PendingFrameNumber = -1;
 
-		auto newSize = m_PendingResize.value();
+		Vector2N newSize = m_PendingResize.value();
 		m_PendingResize.reset();
 
 		DXGI_SWAP_CHAIN_DESC desc;
@@ -51,7 +51,7 @@ namespace Ayla
 
 		m_SwapchainRenderTexture->ReleaseResources();
 		HR(m_Swapchain->ResizeBuffers(0, (UINT)newSize.X, (UINT)newSize.Y, desc.BufferDesc.Format, 0));
-		m_SwapchainRenderTexture->AllocateResources();
+		m_SwapchainRenderTexture->AllocateResources(true);
 	}
 
 	void DXGISwapchainExt::OnResize(const Vector2N& newSize)

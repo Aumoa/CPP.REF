@@ -23,6 +23,8 @@ namespace Ayla
 	public:
 		D3D12GeometryRenderPipeline(ID3D12Device5* device, SharedPtr<Shader> shader);
 
+		virtual void SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset) override;
+
 		ID3D12RootSignature* GetRootSignature() const noexcept { return m_RootSignature.Get(); }
 		ID3D12PipelineState* GetPipelineState() const noexcept { return m_PipelineState.Get(); }
 	};

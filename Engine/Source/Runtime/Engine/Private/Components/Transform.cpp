@@ -32,6 +32,24 @@ namespace Ayla
 		}
 	}
 
+	void Transform::SetLocalPosition(const Vector3F& position)
+	{
+		if (m_LocalPosition != position)
+		{
+			m_LocalPosition = position;
+			m_MatrixCached = false;
+		}
+	}
+
+	void Transform::SetLocalRotation(const QuaternionF& rotation)
+	{
+		if (rotation != m_LocalRotation)
+		{
+			m_LocalRotation = rotation;
+			m_MatrixCached = false;
+		}
+	}
+
 	void Transform::SetLocalScale(const Vector3F& scale)
 	{
 		if (m_LocalScale != scale)

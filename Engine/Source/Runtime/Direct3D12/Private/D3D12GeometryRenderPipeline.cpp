@@ -2,6 +2,8 @@
 
 #include "D3D12GeometryRenderPipeline.h"
 #include "D3D12Shader.h"
+#include "D3D12CommandBuffer.h"
+#include "D3D12Buffer.h"
 #include "Rendering/VertexFactory.h"
 #include "Rendering/ShaderType.h"
 
@@ -9,10 +11,22 @@ namespace Ayla
 {
 	D3D12GeometryRenderPipeline::D3D12GeometryRenderPipeline(ID3D12Device5* device, SharedPtr<Shader> shader)
 	{
+		D3D12_ROOT_PARAMETER rootParameters[1] =
+		{
+			{
+				.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV,
+				.Constants =
+				{
+					.ShaderRegister = 0
+				},
+				.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX
+			}
+		};
+
 		D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc =
 		{
-			.NumParameters = 0,
-			.pParameters = nullptr,
+			.NumParameters = AE_ARRAYSIZE(rootParameters),
+			.pParameters = rootParameters,
 			.NumStaticSamplers = 0,
 			.pStaticSamplers = nullptr,
 			.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
@@ -119,5 +133,12 @@ namespace Ayla
 		psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		psoDesc.SampleDesc.Count = 1;
 		HR(device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PipelineState)));
+	}
+
+	void D3D12GeometryRenderPipeline::SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset)
+	{
+		auto d3dCmd = (D3D12CommandBuffer*)cmd;
+		auto d3dBuffer = (D3D12Buffer*)buffer;
+		d3dCmd->GetCommandBuffer()->SetGraphicsRootConstantBufferView(0, d3dBuffer->GetResource()->GetGPUVirtualAddress() + offset);
 	}
 }

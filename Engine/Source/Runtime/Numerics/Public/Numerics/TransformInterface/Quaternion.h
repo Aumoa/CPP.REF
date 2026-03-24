@@ -105,16 +105,10 @@ namespace Ayla
 		constexpr IVector TransformPoint(const IVector& V) const;
 
 		template<TIsVector<T, 4> IQuaternion, TIsVector<T, 3> IVector>
-		static constexpr IVector TransformVector(const IQuaternion& QW, const IVector& V)
-		{
-			return TransformPoint(QW, V);
-		}
+		static constexpr IVector TransformVector(const IQuaternion& QW, const IVector& V);
 
 		template<TIsVector<T, 3> IVector>
-		constexpr auto TransformVector(const IVector& V) const
-		{
-			return TransformVector(*this, V);
-		}
+		constexpr auto TransformVector(const IVector& V) const;
 
 		static constexpr Quaternion Identity()
 		{
@@ -453,6 +447,20 @@ namespace Ayla
 	constexpr IVector Quaternion<T>::TransformPoint(const IVector& V) const
 	{
 		return Quaternion<>::TransformPoint(*this, V);
+	}
+
+	template<class T>
+	template<TIsVector<T, 4> IQuaternion, TIsVector<T, 3> IVector>
+	static constexpr IVector Quaternion<T>::TransformVector(const IQuaternion& QW, const IVector& V)
+	{
+		return Quaternion<>::TransformPoint<T>(QW, V);
+	}
+
+	template<class T>
+	template<TIsVector<T, 3> IVector>
+	constexpr auto Quaternion<T>::TransformVector(const IVector& V) const
+	{
+		return TransformVector(*this, V);
 	}
 
 	using QuaternionF = Quaternion<float>;

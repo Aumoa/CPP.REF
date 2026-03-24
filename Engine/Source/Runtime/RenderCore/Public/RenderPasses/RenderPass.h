@@ -7,7 +7,7 @@
 namespace Ayla
 {
 	class CommandBuffer;
-	class SceneView;
+	struct SceneView;
 
 	class RENDERCORE_API RenderPass
 	{
