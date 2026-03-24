@@ -22,7 +22,7 @@ namespace Ayla
 		ComPtr<ID3D12StateObject> m_StateObject;
 
 	public:
-		D3D12RaytracingRenderPipeline(ID3D12Device5* device, std::vector<SharedPtr<Shader>> shaders);
+		D3D12RaytracingRenderPipeline(ID3D12Device5* device, SharedPtr<Shader> shader);
 
 		ID3D12StateObject* GetPipelineStateObject() const noexcept { return m_StateObject.Get(); }
 	};

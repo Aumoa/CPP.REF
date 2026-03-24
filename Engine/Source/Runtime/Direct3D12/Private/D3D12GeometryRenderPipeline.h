@@ -21,7 +21,7 @@ namespace Ayla
 		ComPtr<ID3D12PipelineState> m_PipelineState;
 
 	public:
-		D3D12GeometryRenderPipeline(ID3D12Device5* device, std::vector<SharedPtr<Shader>> shaders);
+		D3D12GeometryRenderPipeline(ID3D12Device5* device, SharedPtr<Shader> shader);
 
 		ID3D12RootSignature* GetRootSignature() const noexcept { return m_RootSignature.Get(); }
 		ID3D12PipelineState* GetPipelineState() const noexcept { return m_PipelineState.Get(); }

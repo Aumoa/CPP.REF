@@ -7,7 +7,6 @@
 #include "Rendering/InputElementDescription.h"
 #include "Rendering/InputElementSemantic.h"
 #include "Rendering/GraphicsFormat.h"
-#include "PrimitiveVertexFactory.gen.h"
 
 namespace Ayla
 {
@@ -15,13 +14,9 @@ namespace Ayla
 	/// Vertex factory for PrimitiveVertex (Position + Normal + TexCoord).
 	/// This is the default vertex format used for standard mesh rendering.
 	/// </summary>
-	ACLASS()
 	class RENDERCORE_API PrimitiveVertexFactory : public VertexFactory
 	{
-		GENERATED_BODY()
-
 	public:
-		ACONSTRUCTOR()
 		PrimitiveVertexFactory() = default;
 
 		virtual std::vector<InputElementDescription> GetInputElements() const override

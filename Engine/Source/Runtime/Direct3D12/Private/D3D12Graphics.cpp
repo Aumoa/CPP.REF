@@ -7,6 +7,7 @@
 #include "D3D12Buffer.h"
 #include "CommandQueue.h"
 #include "D3D12RaytracingRenderPipeline.h"
+#include "D3D12GeometryRenderPipeline.h"
 #include "D3D12Shader.h"
 
 namespace Ayla
@@ -96,9 +97,14 @@ namespace Ayla
 		return New<D3D12CommandBuffer>(this);
 	}
 
-	SharedPtr<RenderPipeline> D3D12Graphics::CreateRaytracingRenderPipeline(std::vector<SharedPtr<Shader>> shaders)
+	SharedPtr<RenderPipeline> D3D12Graphics::CreateGeometryRenderPipeline(SharedPtr<Shader> shader)
 	{
-		return New<D3D12RaytracingRenderPipeline>(m_Device.Get(), std::move(shaders));
+		return New<D3D12GeometryRenderPipeline>(m_Device.Get(), std::move(shader));
+	}
+
+	SharedPtr<RenderPipeline> D3D12Graphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
+	{
+		return New<D3D12RaytracingRenderPipeline>(m_Device.Get(), std::move(shader));
 	}
 
 	SharedPtr<Shader> D3D12Graphics::CreateShader(ShaderCreationInfo shaderCreationInfo)

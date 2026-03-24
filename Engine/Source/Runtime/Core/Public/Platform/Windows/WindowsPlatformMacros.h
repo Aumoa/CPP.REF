@@ -30,5 +30,6 @@
 #define PLATFORM_SHARED_EXPORT __declspec(dllexport)
 #define PLATFORM_SHARED_IMPORT __declspec(dllimport)
 #define PLATFORM_NEWLINE TEXT("\r\n")
+#define PLATFORM_NOVTABLE __declspec(novtable)
 
 #endif

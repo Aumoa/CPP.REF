@@ -13,7 +13,6 @@
 namespace Ayla
 {
 	class Buffer;
-	class VertexFactory;
 
 	ACLASS()
 	class ENGINE_API StaticMesh : public Mesh
@@ -23,7 +22,6 @@ namespace Ayla
 	private:
 		SharedPtr<Buffer> m_VertexBuffer;
 		SharedPtr<Buffer> m_IndexBuffer;
-		SharedPtr<VertexFactory> m_VertexFactory;
 
 	public:
 		ACONSTRUCTOR()
@@ -53,14 +51,8 @@ namespace Ayla
 		/// </summary>
 		void SetIndices(std::span<const uint32> indices);
 
-		/// <summary>
-		/// Sets the vertex factory that describes the input layout of the vertex buffer.
-		/// </summary>
-		void SetVertexFactory(SharedPtr<VertexFactory> factory);
-
-		SharedPtr<Buffer> GetVertexBuffer() const noexcept { return m_VertexBuffer; }
-		SharedPtr<Buffer> GetIndexBuffer() const noexcept { return m_IndexBuffer; }
-		SharedPtr<VertexFactory> GetVertexFactory() const noexcept { return m_VertexFactory; }
+		SharedPtr<Buffer> GetVertexBuffer() const noexcept;
+		SharedPtr<Buffer> GetIndexBuffer() const noexcept;
 		size_t GetVertexCount() const noexcept;
 		size_t GetIndexCount() const noexcept;
 

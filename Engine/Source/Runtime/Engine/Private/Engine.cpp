@@ -8,18 +8,20 @@
 #include "GameInstance.h"
 #include "CommandBuffer.h"
 #include "TimerManager.h"
-#include "Rendering/RenderThread.h"
 #include "Exceptions/ModuleNotFoundException.h"
 #include "SceneManagement/Scene.h"
 #include "SceneManagement/SceneManager.h"
+#include "Threading/MainSynchronizationContext.h"
+#include "Rendering/RenderThread.h"
 #include "Rendering/SceneRenderer.h"
 #include "Rendering/SceneView.h"
 #include "Rendering/RenderTexture.h"
-#include "Threading/MainSynchronizationContext.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Shader.h"
 #include "Rendering/ShaderType.h"
 #include "Rendering/RenderPipeline.h"
+#include "Rendering/PositionColorVertexFactory.h"
+#include "RenderPasses/GeometryRenderPass.h"
 #include "IO/File.h"
 
 namespace Ayla
@@ -45,24 +47,57 @@ namespace Ayla
 		m_GameInstance = InitializeGameInstance();
 		std::vector<Task<>> tasks;
 		tasks.emplace_back(m_GameInstance->InitializeAsync({}));
-		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultRayGeneration.cso")).ContinueWith([&](auto r)
+		tasks.emplace_back(Task<>::Create([this]() -> Task<>
 		{
-			auto& bytecode = r.GetResult();
-			m_DefaultRaygenShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::RayGeneration, TEXT("DefaultRayGeneration"));
+			ShaderCreationInfo sci = {};
+			sci.VertexFactory = std::make_shared<PositionColorVertexFactory>();
+			std::vector<Task<>> tasks;
+			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultVertex.cso")).ContinueWith([&](auto r)
+			{
+				auto& bytecode = r.GetResult();
+				sci.VertexShader.Bytecode = std::move(bytecode);
+				sci.VertexShader.EntrypointName = TEXT("main");
+			}));
+			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultPixel.cso")).ContinueWith([&](auto r)
+			{
+				auto& bytecode = r.GetResult();
+				sci.FragmentShader.Bytecode = std::move(bytecode);
+				sci.FragmentShader.EntrypointName = TEXT("main");
+			}));
+
+			co_await Task<>::WhenAll(tasks);
+			auto shader = m_Graphics->CreateShader(std::move(sci));
+			m_DefaultGeometryRenderPipeline = m_Graphics->CreateGeometryRenderPipeline(shader);
 		}));
-		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultHit.cso")).ContinueWith([&](auto r)
+		tasks.emplace_back(Task<>::Create([this]() -> Task<>
 		{
-			auto& bytecode = r.GetResult();
-			m_DefaultClosestHitShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::ClosestHit, TEXT("DefaultClosestHit"));
-		}));
-		tasks.emplace_back(File::ReadAllBytesAsync(TEXT("C:\\Workspace\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultMiss.cso")).ContinueWith([&](auto r)
-		{
-			auto& bytecode = r.GetResult();
-			m_DefaultMissShader = m_Graphics->CreateShader(std::move(bytecode), ShaderType::Miss, TEXT("DefaultMiss"));
+			ShaderCreationInfo sci = {};
+			std::vector<Task<>> tasks;
+			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultRayGeneration.cso")).ContinueWith([&](auto r)
+			{
+				auto& bytecode = r.GetResult();
+				sci.RayGenerationShader.Bytecode = std::move(bytecode);
+				sci.RayGenerationShader.EntrypointName = TEXT("DefaultRayGeneration");
+			}));
+			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultHit.cso")).ContinueWith([&](auto r)
+			{
+				auto& bytecode = r.GetResult();
+				sci.ClosestHitShader.Bytecode = std::move(bytecode);
+				sci.ClosestHitShader.EntrypointName = TEXT("DefaultClosestHit");
+			}));
+			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultMiss.cso")).ContinueWith([&](auto r)
+			{
+				auto& bytecode = r.GetResult();
+				sci.MissShader.Bytecode = std::move(bytecode);
+				sci.MissShader.EntrypointName = TEXT("DefaultMiss");
+			}));
+
+			co_await Task<>::WhenAll(tasks);
+			auto shader = m_Graphics->CreateShader(std::move(sci));
+			m_DefaultRaytracingRenderPipeline = m_Graphics->CreateRaytracingRenderPipeline(shader);
 		}));
 
 		Task<>::WhenAll(tasks).GetResult();
-		m_DefaultRenderPipeline = m_Graphics->CreateRaytracingRenderPipeline({ m_DefaultRaygenShader, m_DefaultClosestHitShader, m_DefaultMissShader });
 
 		m_MainActivity->AfterInitialize();
 	}
@@ -147,7 +182,7 @@ namespace Ayla
 			graphics = m_Graphics,
 			commandBuffer = m_CommandBuffer,
 			self = m_RenderThread.Get(),
-			renderPipeline = m_DefaultRenderPipeline.Get(),
+			renderPipeline = m_DefaultRaytracingRenderPipeline.Get(),
 			views = &m_Scratch.AllCameraViews
 		]()
 		{
@@ -167,9 +202,13 @@ namespace Ayla
 			auto rt = swapchainExtensions[0]->GetRenderTexture();
 			rt->Acquire(commandBuffer.Get());
 
+			SceneRenderer renderer;
+
+			GeometryRenderPass geometryPass(renderPipeline);
+			renderer.AddPass(&geometryPass);
+
 			for (auto& view : *views)
 			{
-				SceneRenderer renderer;
 				SceneView sceneView{ view };
 				renderer.Render(commandBuffer.Get(), sceneView);
 			}

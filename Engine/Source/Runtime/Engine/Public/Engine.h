@@ -36,10 +36,8 @@ namespace Ayla
 		double m_FrameTime = 0;
 		size_t m_FrameCount = 0;
 
-		SharedPtr<RenderPipeline> m_DefaultRenderPipeline;
-		SharedPtr<Shader> m_DefaultRaygenShader;
-		SharedPtr<Shader> m_DefaultClosestHitShader;
-		SharedPtr<Shader> m_DefaultMissShader;
+		SharedPtr<RenderPipeline> m_DefaultGeometryRenderPipeline;
+		SharedPtr<RenderPipeline> m_DefaultRaytracingRenderPipeline;
 
 		struct Scratch
 		{

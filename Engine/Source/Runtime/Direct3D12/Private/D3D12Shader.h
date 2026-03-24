@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Rendering/Shader.h"
 #include "Rendering/ShaderCreationInfo.h"
+#include "Rendering/VertexFactory.h"
 #include "D3D12Common.h"
 #include "D3D12Shader.gen.h"
 
@@ -23,5 +24,9 @@ namespace Ayla
 	public:
 		D3D12Shader(ShaderCreationInfo shaderCreationInfo);
 		virtual ~D3D12Shader() noexcept override;
+
+		virtual VertexFactory* GetVertexFactory() const override;
+		virtual bool Has(ShaderType type) const override;
+		virtual const ShaderBytecode& GetBytecode(ShaderType type) const override;
 	};
 }

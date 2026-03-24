@@ -13,6 +13,7 @@
 #pragma pop_macro("TEXT")
 #include "LogD3D12.h"
 #include "Rendering/GraphicsFormat.h"
+#include "Rendering/InputElementSemantic.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -127,5 +128,22 @@ inline DXGI_FORMAT ToDXGIFormat(Ayla::GraphicsFormat format)
 	case B4G4R4A4_UNorm:       return DXGI_FORMAT_B4G4R4A4_UNORM;
 	case A4B4G4R4_UNorm:       return DXGI_FORMAT_A4B4G4R4_UNORM;
 	default:                   return DXGI_FORMAT_UNKNOWN;
+	}
+}
+
+inline const char* ToSemanticName(Ayla::InputElementSemantic semantic)
+{
+	using enum Ayla::InputElementSemantic;
+	switch (semantic)
+	{
+	case Position:    return "POSITION";
+	case Normal:      return "NORMAL";
+	case Tangent:     return "TANGENT";
+	case Bitangent:   return "BITANGENT";
+	case Color:       return "COLOR";
+	case TexCoord:    return "TEXCOORD";
+	case BoneWeights: return "BLENDWEIGHT";
+	case BoneIndices: return "BLENDINDICES";
+	default:          return "UNKNOWN";
 	}
 }

@@ -7,7 +7,6 @@
 #include "Rendering/InputElementDescription.h"
 #include "Rendering/InputElementSemantic.h"
 #include "Rendering/GraphicsFormat.h"
-#include "PositionOnlyVertexFactory.gen.h"
 
 namespace Ayla
 {
@@ -15,13 +14,9 @@ namespace Ayla
 	/// Vertex factory for position-only vertices.
 	/// Used for shadow map rendering and depth prepass.
 	/// </summary>
-	ACLASS()
 	class RENDERCORE_API PositionOnlyVertexFactory : public VertexFactory
 	{
-		GENERATED_BODY()
-
 	public:
-		ACONSTRUCTOR()
 		PositionOnlyVertexFactory() = default;
 
 		virtual std::vector<InputElementDescription> GetInputElements() const override

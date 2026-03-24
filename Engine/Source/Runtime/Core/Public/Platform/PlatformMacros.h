@@ -41,3 +41,7 @@
 #ifndef PLATFORM_UNREACHABLE
 #error PLATFORM_UNREACHABLE is not defined.
 #endif
+
+#ifndef PLATFORM_NOVTABLE
+#error PLATFORM_NOVTABLE is not defined.
+#endif

@@ -7,7 +7,6 @@
 #include "Rendering/InputElementDescription.h"
 #include "Rendering/InputElementSemantic.h"
 #include "Rendering/GraphicsFormat.h"
-#include "PositionNormalVertexFactory.gen.h"
 
 namespace Ayla
 {
@@ -15,13 +14,9 @@ namespace Ayla
 	/// Vertex factory for position + normal vertices.
 	/// Used for simple diffuse lighting without texture mapping.
 	/// </summary>
-	ACLASS()
 	class RENDERCORE_API PositionNormalVertexFactory : public VertexFactory
 	{
-		GENERATED_BODY()
-
 	public:
-		ACONSTRUCTOR()
 		PositionNormalVertexFactory() = default;
 
 		virtual std::vector<InputElementDescription> GetInputElements() const override

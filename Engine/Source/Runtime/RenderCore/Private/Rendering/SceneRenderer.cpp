@@ -14,9 +14,9 @@ namespace Ayla
 	{
 	}
 
-	void SceneRenderer::AddPass(std::unique_ptr<RenderPass> pass)
+	void SceneRenderer::AddPass(RenderPass* pass)
 	{
-		m_Passes.emplace_back(std::move(pass));
+		m_Passes.emplace_back(pass);
 	}
 
 	void SceneRenderer::Render(CommandBuffer* commandBuffer, const SceneView& view)

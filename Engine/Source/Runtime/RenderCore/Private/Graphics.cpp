@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "GenericApplication.h"
 #include "CommandBuffer.h"
+#include "Buffer.h"
 
 namespace Ayla
 {

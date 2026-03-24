@@ -7,7 +7,6 @@
 #include "Rendering/InputElementDescription.h"
 #include "Rendering/InputElementSemantic.h"
 #include "Rendering/GraphicsFormat.h"
-#include "PositionColorVertexFactory.gen.h"
 
 namespace Ayla
 {
@@ -15,13 +14,9 @@ namespace Ayla
 	/// Vertex factory for position + color vertices.
 	/// Used for debug rendering and simple colored geometry.
 	/// </summary>
-	ACLASS()
-	class RENDERCORE_API PositionColorVertexFactory : public VertexFactory
+	class PositionColorVertexFactory : public VertexFactory
 	{
-		GENERATED_BODY()
-
 	public:
-		ACONSTRUCTOR()
 		PositionColorVertexFactory() = default;
 
 		virtual std::vector<InputElementDescription> GetInputElements() const override

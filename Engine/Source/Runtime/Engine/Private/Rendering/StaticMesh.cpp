@@ -56,9 +56,14 @@ namespace Ayla
 		);
 	}
 
-	void StaticMesh::SetVertexFactory(SharedPtr<VertexFactory> factory)
+	SharedPtr<Buffer> StaticMesh::GetVertexBuffer() const noexcept
 	{
-		m_VertexFactory = std::move(factory);
+		return m_VertexBuffer;
+	}
+
+	SharedPtr<Buffer> StaticMesh::GetIndexBuffer() const noexcept
+	{
+		return m_IndexBuffer;
 	}
 
 	size_t StaticMesh::GetVertexCount() const noexcept
@@ -204,7 +209,6 @@ namespace Ayla
 			mesh->SetVertices(std::span<const PrimitiveVertex>(vertices));
 			mesh->SetIndices(std::span<const uint16>(indices));
 		});
-		mesh->SetVertexFactory(New<PrimitiveVertexFactory>());
 		co_return;
 	}
 }

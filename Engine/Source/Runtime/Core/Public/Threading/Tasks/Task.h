@@ -243,6 +243,18 @@ namespace Ayla
 		template<class TBody>
 		static auto Run(TBody&& continuationBody, std::stop_token cancellationToken = {}) -> Task<std::invoke_result_t<TBody>>;
 
+		template<class TBody>
+		static auto Create(TBody&& continuationBody, std::stop_token cancellationToken = {}) -> std::invoke_result_t<TBody, std::stop_token>
+		{
+			return continuationBody(std::move(cancellationToken));
+		}
+
+		template<class TBody>
+		static auto Create(TBody&& continuationBody) -> std::invoke_result_t<TBody>
+		{
+			return continuationBody();
+		}
+
 		static YieldAwaitable Yield()
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::Yield instead.");

@@ -7,7 +7,6 @@
 #include "Rendering/InputElementDescription.h"
 #include "Rendering/InputElementSemantic.h"
 #include "Rendering/GraphicsFormat.h"
-#include "FullVertexFactory.gen.h"
 
 namespace Ayla
 {
@@ -15,13 +14,9 @@ namespace Ayla
 	/// Vertex factory for full vertex data (Position + Normal + Tangent + Bitangent + TexCoord).
 	/// Used for PBR rendering with normal mapping.
 	/// </summary>
-	ACLASS()
 	class RENDERCORE_API FullVertexFactory : public VertexFactory
 	{
-		GENERATED_BODY()
-
 	public:
-		ACONSTRUCTOR()
 		FullVertexFactory() = default;
 
 		virtual std::vector<InputElementDescription> GetInputElements() const override

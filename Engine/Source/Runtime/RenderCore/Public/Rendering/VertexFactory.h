@@ -4,15 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Rendering/InputElementDescription.h"
-#include "VertexFactory.gen.h"
 
 namespace Ayla
 {
-	ACLASS()
-	class RENDERCORE_API VertexFactory : public Object
+	class PLATFORM_NOVTABLE VertexFactory
 	{
-		GENERATED_BODY()
-
 	public:
 		virtual std::vector<InputElementDescription> GetInputElements() const = 0;
 	};
