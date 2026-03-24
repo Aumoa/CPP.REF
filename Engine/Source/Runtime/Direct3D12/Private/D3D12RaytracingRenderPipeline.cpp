@@ -4,10 +4,11 @@
 #include "D3D12Shader.h"
 #include "RaytracePayload.h"
 #include "RaytraceAttributes.h"
+#include "Rendering/ShaderType.h"
 
 namespace Ayla
 {
-	D3D12RaytracingRenderPipeline::D3D12RaytracingRenderPipeline(ID3D12Device5* device, std::vector<SharedPtr<Shader>> shaders)
+	D3D12RaytracingRenderPipeline::D3D12RaytracingRenderPipeline(ID3D12Device5* device, SharedPtr<Shader> shader)
 	{
 		D3D12_DESCRIPTOR_RANGE outputTextureRange =
 		{
@@ -69,24 +70,42 @@ namespace Ayla
 		HR(D3D12SerializeRootSignature(&localRootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &localRootSigBlob, &errorBlob));
 		HR(device->CreateRootSignature(0, localRootSigBlob->GetBufferPointer(), localRootSigBlob->GetBufferSize(), IID_PPV_ARGS(&m_LocalRootSignature)));
 
-		std::vector<String> entrypointNames;
-		entrypointNames.reserve(shaders.size());
-		std::vector<D3D12_SHADER_BYTECODE> shaderBytecodes;
-		shaderBytecodes.reserve(shaders.size());
-		std::vector<D3D12_DXIL_LIBRARY_DESC> dxilLibDesc;
-		dxilLibDesc.reserve(shaders.size());
-		std::vector<D3D12_EXPORT_DESC> exports;
-		exports.reserve(shaders.size());
-		std::vector<D3D12_STATE_SUBOBJECT> subobjects;
-		subobjects.reserve(shaders.size() + 5);
-		for (size_t i = 0; i < shaders.size(); ++i)
+		std::vector<const ShaderBytecode*> shaderBytecodeSources;
+		if (shader->Has(ShaderType::RayGeneration))
 		{
-			auto& shader = shaders[i];
-			auto& entrypointName = entrypointNames.emplace_back(shader->GetEntrypointName());
+			shaderBytecodeSources.emplace_back(&shader->GetBytecode(ShaderType::RayGeneration));
+		}
+		if (shader->Has(ShaderType::ClosestHit))
+		{
+			shaderBytecodeSources.emplace_back(&shader->GetBytecode(ShaderType::ClosestHit));
+		}
+		if (shader->Has(ShaderType::AnyHit))
+		{
+			shaderBytecodeSources.emplace_back(&shader->GetBytecode(ShaderType::AnyHit));
+		}
+		if (shader->Has(ShaderType::Miss))
+		{
+			shaderBytecodeSources.emplace_back(&shader->GetBytecode(ShaderType::Miss));
+		}
+
+		std::vector<String> entrypointNames;
+		entrypointNames.reserve(shaderBytecodeSources.size());
+		std::vector<D3D12_SHADER_BYTECODE> shaderBytecodes;
+		shaderBytecodes.reserve(shaderBytecodeSources.size());
+		std::vector<D3D12_DXIL_LIBRARY_DESC> dxilLibDesc;
+		dxilLibDesc.reserve(shaderBytecodeSources.size());
+		std::vector<D3D12_EXPORT_DESC> exports;
+		exports.reserve(shaderBytecodeSources.size());
+		std::vector<D3D12_STATE_SUBOBJECT> subobjects;
+		subobjects.reserve(shaderBytecodeSources.size() + 5);
+		for (size_t i = 0; i < shaderBytecodeSources.size(); ++i)
+		{
+			auto& shaderBytecodeSource = *shaderBytecodeSources[i];
+			auto& entrypointName = entrypointNames.emplace_back(shaderBytecodeSource.EntrypointName);
 			auto& shaderBytecode = shaderBytecodes.emplace_back(D3D12_SHADER_BYTECODE
 			{
-				.pShaderBytecode = shader->GetBytecode(),
-				.BytecodeLength = shader->GetBytecodeSize()
+				.pShaderBytecode = shaderBytecodeSource.Bytecode.data(),
+				.BytecodeLength = shaderBytecodeSource.Bytecode.size()
 			});
 			auto& exp = exports.emplace_back(D3D12_EXPORT_DESC
 			{

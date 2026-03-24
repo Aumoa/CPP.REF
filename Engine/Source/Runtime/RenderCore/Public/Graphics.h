@@ -43,8 +43,10 @@ namespace Ayla
 
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) = 0;
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer() = 0;
-        virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(std::vector<SharedPtr<Shader>> shaders) = 0;
+        virtual SharedPtr<RenderPipeline> CreateGeometryRenderPipeline(SharedPtr<Shader> shader) = 0;
+        virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(SharedPtr<Shader> shader) = 0;
         virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) = 0;
+        virtual SharedPtr<Buffer> CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage) = 0;
 
         SharedPtr<CommandBuffer> GetPooledCommandBuffer();
         void ReleasePooledCommandBuffer(SharedPtr<CommandBuffer> cmd);

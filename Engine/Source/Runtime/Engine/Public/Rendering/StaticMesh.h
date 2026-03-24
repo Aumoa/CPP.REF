@@ -6,6 +6,7 @@
 #include "Rendering/Mesh.h"
 #include "Numerics/VectorInterface/Vector.h"
 #include "Misc/PrimitiveVertex.h"
+#include "Misc/VertexTypes.h"
 #include "Graphics.h"
 #include "StaticMesh.gen.h"
 
@@ -27,8 +28,36 @@ namespace Ayla
 		StaticMesh(SharedPtr<Graphics> graphics);
 		virtual ~StaticMesh() noexcept override;
 
-		void SetVertices(std::span<const Vector3F> vertices);
+		/// <summary>
+		/// Sets vertices from a typed span. Any vertex struct is accepted.
+		/// The Graphics backend will create a GPU-resident vertex buffer from this data.
+		/// </summary>
+		template<typename TVertex>
+		void SetVertices(std::span<const TVertex> vertices)
+		{
+			SetVerticesRaw(
+				std::span<const byte>(reinterpret_cast<const byte*>(vertices.data()), vertices.size() * sizeof(TVertex)),
+				sizeof(TVertex)
+			);
+		}
+
+		/// <summary>
+		/// Sets 16-bit indices for this mesh.
+		/// </summary>
 		void SetIndices(std::span<const uint16> indices);
+
+		/// <summary>
+		/// Sets 32-bit indices for this mesh.
+		/// </summary>
+		void SetIndices(std::span<const uint32> indices);
+
+		SharedPtr<Buffer> GetVertexBuffer() const noexcept;
+		SharedPtr<Buffer> GetIndexBuffer() const noexcept;
+		size_t GetVertexCount() const noexcept;
+		size_t GetIndexCount() const noexcept;
+
+	private:
+		void SetVerticesRaw(std::span<const byte> data, size_t stride);
 
 	public:
 		static Task<SharedPtr<StaticMesh>> CreateBoxAsync(SharedPtr<Graphics> graphics, Vector3F size, bool rhcoords, bool invertNormal, std::stop_token cancellationToken = {});
@@ -38,7 +67,7 @@ namespace Ayla
 		static Task<SharedPtr<StaticMesh>> CreateConeAsync(SharedPtr<Graphics> graphics, float diameter, float height, size_t tessellation, bool rhcoords, std::stop_token cancellationToken = {});
 		static Task<SharedPtr<StaticMesh>> CreateTorusAsync(SharedPtr<Graphics> graphics, float diameter, float thickness, size_t tessellation, bool rhcoords, std::stop_token cancellationToken = {});
 		static Task<SharedPtr<StaticMesh>> CreateTetrahedronAsync(SharedPtr<Graphics> graphics, float size, bool rhcoords, std::stop_token cancellationToken = {});
-		static Task<SharedPtr<StaticMesh>> CreateOctahedronAsync(SharedPtr<Graphics> graphics, float size, bool rhcoords, std::stop_token cancellationToDodecahedronken = {});
+		static Task<SharedPtr<StaticMesh>> CreateOctahedronAsync(SharedPtr<Graphics> graphics, float size, bool rhcoords, std::stop_token cancellationToken = {});
 		static Task<SharedPtr<StaticMesh>> CreateDodecahedronAsync(SharedPtr<Graphics> graphics, float size, bool rhcoords, std::stop_token cancellationToken = {});
 		static Task<SharedPtr<StaticMesh>> CreateIcosahedronAsync(SharedPtr<Graphics> graphics, float size, bool rhcoords, std::stop_token cancellationToken = {});
 		static Task<SharedPtr<StaticMesh>> CreateTeapotAsync(SharedPtr<Graphics> graphics, float size, size_t tessellation, bool rhcoords, std::stop_token cancellationToken = {});
@@ -49,11 +78,8 @@ namespace Ayla
 			auto mesh = BeforeCreatePrimitiveMesh(graphics);
 			std::vector<PrimitiveVertex> vertices;
 			std::vector<uint16> indices;
-			std::vector<Vector3F> positions;
 			co_await generator(vertices, indices).ConfigureAwait(false);
 			co_await AfterCreatePrimitiveMeshAsync(mesh, vertices, indices, cancellationToken).ConfigureAwait(false);
-			mesh->SetVertices(positions);
-			mesh->SetIndices(indices);
 			co_return mesh;
 		}
 

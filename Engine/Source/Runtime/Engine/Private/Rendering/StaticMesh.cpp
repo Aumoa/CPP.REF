@@ -3,6 +3,7 @@
 #include "Rendering/StaticMesh.h"
 #include "Misc/Geometry.h"
 #include "Misc/PrimitiveVertex.h"
+#include "Rendering/PrimitiveVertexFactory.h"
 #include "Graphics.h"
 #include "Buffer.h"
 
@@ -17,16 +18,62 @@ namespace Ayla
 	{
 	}
 
-	void StaticMesh::SetVertices(std::span<const Vector3F> vertices)
+	void StaticMesh::SetVerticesRaw(std::span<const byte> data, size_t stride)
 	{
-		// TODO: Convert to proper vertex format
-		//m_VertexBuffer->UpdateData(std::span<const byte>(reinterpret_cast<const byte*>(vertices.data()), vertices.size() * sizeof(Vector3F)));
+		if (data.empty())
+		{
+			m_VertexBuffer = nullptr;
+			return;
+		}
+		m_VertexBuffer = GetGraphics()->CreateBuffer(data, stride, BufferUsage::VertexBuffer);
 	}
 
 	void StaticMesh::SetIndices(std::span<const uint16> indices)
 	{
-		// TODO: Support 32-bit indices
-		//m_IndexBuffer->UpdateData(std::span<const byte>(reinterpret_cast<const byte*>(indices.data()), indices.size() * sizeof(uint16)));
+		if (indices.empty())
+		{
+			m_IndexBuffer = nullptr;
+			return;
+		}
+		m_IndexBuffer = GetGraphics()->CreateBuffer(
+			std::span<const byte>(reinterpret_cast<const byte*>(indices.data()), indices.size() * sizeof(uint16)),
+			sizeof(uint16),
+			BufferUsage::IndexBuffer
+		);
+	}
+
+	void StaticMesh::SetIndices(std::span<const uint32> indices)
+	{
+		if (indices.empty())
+		{
+			m_IndexBuffer = nullptr;
+			return;
+		}
+		m_IndexBuffer = GetGraphics()->CreateBuffer(
+			std::span<const byte>(reinterpret_cast<const byte*>(indices.data()), indices.size() * sizeof(uint32)),
+			sizeof(uint32),
+			BufferUsage::IndexBuffer
+		);
+	}
+
+	SharedPtr<Buffer> StaticMesh::GetVertexBuffer() const noexcept
+	{
+		return m_VertexBuffer;
+	}
+
+	SharedPtr<Buffer> StaticMesh::GetIndexBuffer() const noexcept
+	{
+		return m_IndexBuffer;
+	}
+
+	size_t StaticMesh::GetVertexCount() const noexcept
+	{
+		return m_VertexBuffer ? m_VertexBuffer->GetCount() : 0;
+	}
+
+	size_t StaticMesh::GetIndexCount() const noexcept
+	{
+		return m_IndexBuffer ? m_IndexBuffer->GetCount() : 0;
 	}
 
 	Task<SharedPtr<StaticMesh>> StaticMesh::CreateBoxAsync(SharedPtr<Graphics> graphics, Vector3F size, bool rhcoords, bool invertNormal, std::stop_token cancellationToken)
@@ -157,17 +204,11 @@ namespace Ayla
 
 	Task<> StaticMesh::AfterCreatePrimitiveMeshAsync(SharedPtr<StaticMesh> mesh, std::vector<PrimitiveVertex>& vertices, std::vector<uint16>& indices, std::stop_token cancellationToken)
 	{
-		std::vector<Vector3F> positions;
 		co_await Task<>::Run([&]()
 		{
-			positions.reserve(vertices.size());
-			for (const auto& v : vertices)
-			{
-				positions.emplace_back(v.Position);
-			}
+			mesh->SetVertices(std::span<const PrimitiveVertex>(vertices));
+			mesh->SetIndices(std::span<const uint16>(indices));
 		});
-		mesh->SetVertices(positions);
-		mesh->SetIndices(indices);
 		co_return;
 	}
 }

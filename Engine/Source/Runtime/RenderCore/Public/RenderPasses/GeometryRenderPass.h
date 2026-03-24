@@ -7,10 +7,14 @@
 
 namespace Ayla
 {
+	class RenderPipeline;
+
 	class RENDERCORE_API GeometryRenderPass : public RenderPass
 	{
+		RenderPipeline* m_RenderPipeline;
+
 	public:
-		GeometryRenderPass();
+		GeometryRenderPass(RenderPipeline* renderPipeline);
 		virtual ~GeometryRenderPass() noexcept override;
 
 		virtual void Setup() override;

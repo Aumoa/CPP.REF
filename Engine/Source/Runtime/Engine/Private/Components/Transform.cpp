@@ -58,11 +58,6 @@ namespace Ayla
 		else
 		{
 			m_Parent->TryCacheMatrix();
-			for (size_t i = 0; i < 4; ++i)
-			{
-				auto& v = m_Parent->m_WorldMatrix[i];
-				PlatformProcess::OutputDebugString(String::Format(TEXT("{:.6f} {:.6f} {:.6f} {:.6f}\n"), v[0], v[1], v[2], v[3]));
-			}
 			m_WorldMatrix = m_Parent->m_WorldMatrix * localMatrix;
 			m_WorldPosition = m_Parent->m_WorldMatrix.TransformPoint(m_LocalPosition);
 			m_WorldRotation = m_Parent->m_WorldRotation.Multiply(m_LocalRotation);

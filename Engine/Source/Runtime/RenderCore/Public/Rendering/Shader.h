@@ -8,6 +8,8 @@
 namespace Ayla
 {
 	enum class ShaderType;
+	struct ShaderBytecode;
+	class VertexFactory;
 
 	ACLASS()
 	class RENDERCORE_API Shader : public Object
@@ -15,6 +17,8 @@ namespace Ayla
 		GENERATED_BODY()
 
 	public:
+		virtual VertexFactory* GetVertexFactory() const = 0;
 		virtual bool Has(ShaderType type) const = 0;
+		virtual const ShaderBytecode& GetBytecode(ShaderType type) const = 0;
 	};
 }

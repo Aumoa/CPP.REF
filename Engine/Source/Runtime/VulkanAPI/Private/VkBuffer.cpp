@@ -6,8 +6,8 @@
 
 namespace Ayla
 {
-	VkBuffer::VkBuffer(VkGraphics* graphics, BufferUsage usage)
-		: m_Usage(usage), m_Graphics(graphics)
+	VkBuffer::VkBuffer(VkGraphics* graphics, BufferUsage usage, size_t stride)
+		: m_Usage(usage), m_Graphics(graphics), m_Stride(stride)
 	{
 	}
 
@@ -219,8 +219,13 @@ namespace Ayla
 		return vkGetBufferDeviceAddress(m_Graphics->GetDevice(), &addrInfo);
 	}
 
-	SharedPtr<Buffer> VkGraphics::CreateBuffer_Implementation(BufferUsage usage)
+	SharedPtr<Buffer> VkGraphics::CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage)
 	{
-		return New<VkBuffer>(this, usage);
+		auto buffer = New<VkBuffer>(this, usage, stride);
+		if (!data.empty())
+		{
+			buffer->UpdateData(data);
+		}
+		return buffer;
 	}
 }

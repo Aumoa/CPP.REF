@@ -18,6 +18,7 @@ namespace Ayla
 		Compute,
 		RayGeneration,
 		ClosestHit,
+		AnyHit,
 		Miss
 	};
 }

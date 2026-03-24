@@ -4,6 +4,7 @@
 #include "D3D12Graphics.h"
 #include "CommandQueue.h"
 #include "D3D12RaytracingRenderPipeline.h"
+#include "D3D12GeometryRenderPipeline.h"
 
 namespace Ayla
 {
@@ -49,8 +50,17 @@ namespace Ayla
 
 	void D3D12CommandBuffer::SetRenderPipeline(RenderPipeline* renderPipeline)
 	{
-		auto d3d12RenderPipeline = static_cast<D3D12RaytracingRenderPipeline*>(renderPipeline);
-		m_CommandBuffer->SetPipelineState1(d3d12RenderPipeline->GetPipelineStateObject());
+		if (auto* pso1 = dynamic_cast<D3D12RaytracingRenderPipeline*>(renderPipeline))
+		{
+			m_CommandBuffer->SetPipelineState1(pso1->GetPipelineStateObject());
+			return;
+		}
+		else if (auto* ps = dynamic_cast<D3D12GeometryRenderPipeline*>(renderPipeline))
+		{
+			m_CommandBuffer->SetGraphicsRootSignature(ps->GetRootSignature());
+			m_CommandBuffer->SetPipelineState(ps->GetPipelineState());
+			return;
+		}
 	}
 
 	void D3D12CommandBuffer::WaitForCompletion(const TimeSpan& timeout)

@@ -14,14 +14,14 @@ namespace Ayla
 	class RENDERCORE_API SceneRenderer : public NonCopyable
 	{
 	private:
-		std::vector<std::unique_ptr<RenderPass>> m_Passes;
+		std::vector<RenderPass*> m_Passes;
 
 	public:
 		SceneRenderer();
 		SceneRenderer(SceneRenderer&&) = delete;
 		virtual ~SceneRenderer() noexcept;
 
-		void AddPass(std::unique_ptr<RenderPass> pass);
+		void AddPass(RenderPass* pass);
 
 		virtual void Render(CommandBuffer* commandBuffer, const SceneView& view);
 	};
