@@ -5,7 +5,8 @@
 
 namespace Ayla
 {
-	SceneManager::SceneManager()
+	SceneManager::SceneManager(GameInstance* gameInstance)
+		: m_GameInstance(gameInstance)
 	{
 	}
 
@@ -24,7 +25,7 @@ namespace Ayla
 
 		if (m_ActiveScene)
 		{
-			m_ActiveScene->Activate();
+			m_ActiveScene->Activate(this);
 		}
 	}
 
@@ -56,10 +57,5 @@ namespace Ayla
 			auto cameras = scene->GetCameraComponents();
 			output->insert(output->end(), cameras.begin(), cameras.end());
 		}
-	}
-
-	void SceneManager::DispatchTick(TickTiming timing)
-	{
-		m_ActiveScene->DispatchTick(timing);
 	}
 }

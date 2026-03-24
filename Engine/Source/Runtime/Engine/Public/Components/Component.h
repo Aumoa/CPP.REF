@@ -9,6 +9,8 @@
 namespace Ayla
 {
 	class Actor;
+	class GameObject;
+	class Transform;
 
 	ACLASS()
 	class ENGINE_API Component : public SerializableObject
@@ -29,5 +31,8 @@ namespace Ayla
 			ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
 			return m_ActorPtr;
 		}
+
+		GameObject* GetGameObject() const;
+		Transform* GetTransform() const;
 	};
 }

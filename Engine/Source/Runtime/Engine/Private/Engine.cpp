@@ -22,6 +22,7 @@
 #include "Rendering/RenderPipeline.h"
 #include "Rendering/PositionColorVertexFactory.h"
 #include "RenderPasses/GeometryRenderPass.h"
+#include "Ticking/TickTiming.h"
 #include "IO/File.h"
 
 namespace Ayla

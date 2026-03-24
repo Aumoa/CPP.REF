@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TickTiming.h"
 #include "Rendering/MinimalViewInfo.h"
 #include "Engine.gen.h"
 
 namespace Ayla
 {
+	enum class TickTiming;
 	class Graphics;
 	class GenericWindowSwapchainExtension;
 	class RenderThread;

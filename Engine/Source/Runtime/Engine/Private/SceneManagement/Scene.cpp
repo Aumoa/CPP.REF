@@ -13,10 +13,11 @@ namespace Ayla
 	{
 	}
 
-	void Scene::Activate()
+	void Scene::Activate(SceneManager* sceneManager)
 	{
 		ObjectDisposedException::ThrowIfDisposed(m_Disposed, TEXT("Scene"));
 		m_Active = true;
+		m_SceneManager = sceneManager;
 		for (auto& gameObject : m_InactiveGameObjects)
 		{
 			m_GameObjects.emplace_back(gameObject);
@@ -33,6 +34,7 @@ namespace Ayla
 			gameObject->Destroy();
 		}
 		m_GameObjects.clear();
+		m_SceneManager = nullptr;
 		m_Active = false;
 		m_Disposed = true;
 	}
@@ -63,13 +65,5 @@ namespace Ayla
 		auto it = std::find(m_CameraComponents.begin(), m_CameraComponents.end(), camera);
 		check(it != m_CameraComponents.end());
 		m_CameraComponents.erase(it);
-	}
-
-	void Scene::DispatchTick(TickTiming timing)
-	{
-		for (auto& gameObject : m_GameObjects)
-		{
-			gameObject->Tick(timing);
-		}
 	}
 }

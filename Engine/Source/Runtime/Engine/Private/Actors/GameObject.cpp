@@ -6,16 +6,12 @@
 namespace Ayla
 {
 	GameObject::GameObject(Scene* scene)
-		: m_Scene(scene)
+		: Super(scene)
 	{
 		m_Transform = AddComponent<Transform>().Get();
 	}
 
 	GameObject::~GameObject() noexcept
-	{
-	}
-
-	void GameObject::Tick(TickTiming timing)
 	{
 	}
 }

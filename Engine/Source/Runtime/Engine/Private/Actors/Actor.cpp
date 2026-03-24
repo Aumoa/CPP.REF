@@ -4,12 +4,14 @@
 #include "Components/Component.h"
 #include "Components/Behavior.h"
 #include "Components/Transform.h"
+#include "Components/ScriptableBehavior.h"
 #include "Activator.h"
 #include "LogEngine.h"
 
 namespace Ayla
 {
-	Actor::Actor()
+	Actor::Actor(Scene* scene)
+		: m_Scene(scene)
 	{
 	}
 
@@ -29,22 +31,24 @@ namespace Ayla
 
 		if (active)
 		{
-			for (auto& component : m_Components)
+			for (auto& scriptableBehavior : m_ScriptableBehaviors)
 			{
-				if (Behavior* behavior; component.Is(&behavior))
+				if (scriptableBehavior->DidAwake() == false)
 				{
-					behavior->OnEnable();
+					scriptableBehavior->Awake();
 				}
+			}
+
+			for (auto& behavior : m_Behaviors)
+			{
+				behavior->OnEnable();
 			}
 		}
 		else
 		{
-			for (auto& component : m_Components)
+			for (auto& behavior : m_Behaviors)
 			{
-				if (Behavior* behavior; component.Is(&behavior))
-				{
-					behavior->OnDisable();
-				}
+				behavior->OnDisable();
 			}
 		}
 	}
@@ -61,16 +65,29 @@ namespace Ayla
 			return nullptr;
 		}
 
-		if (m_IsActive)
+		comp->m_ActorPtr = this;
+		m_Components.emplace_back(comp);
+		if (auto* scriptableBehavior = dynamic_cast<ScriptableBehavior*>(comp.Get()))
 		{
-			if (auto* behavior = (Behavior*)obj.Get(); behavior)
+			m_ScriptableBehaviors.emplace(scriptableBehavior);
+			m_Behaviors.emplace(scriptableBehavior);
+
+			if (m_IsActive)
+			{
+				scriptableBehavior->Awake();
+				scriptableBehavior->OnEnable();
+			}
+		}
+		else if (auto* behavior = dynamic_cast<Behavior*>(comp.Get()))
+		{
+			m_Behaviors.emplace(behavior);
+
+			if (m_IsActive)
 			{
 				behavior->OnEnable();
 			}
 		}
 
-		comp->m_ActorPtr = this;
-		m_Components.emplace_back(comp);
 		return comp;
 	}
 
@@ -78,7 +95,15 @@ namespace Ayla
 	{
 		ObjectDisposedException::ThrowIfDisposed(m_Disposed, ToString());
 		SetActive(false);
+
+		for (auto& scriptableBehavior : m_ScriptableBehaviors)
+		{
+			scriptableBehavior->OnDestroy();
+		}
+
 		m_Components.clear();
+		m_Behaviors.clear();
+		m_ScriptableBehaviors.clear();
 		m_Disposed = true;
 	}
 }

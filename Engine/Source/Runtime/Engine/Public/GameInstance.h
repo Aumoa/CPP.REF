@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SerializableObject.h"
-#include "TickTiming.h"
+#include "Ticking/TickTiming.h"
 #include "InitializeTiming.h"
 #include "GameInstance.gen.h"
 
@@ -14,6 +14,7 @@ namespace Ayla
 	class SceneManager;
 	class Engine;
 	class MainSynchronizationContext;
+	class TickManager;
 
 	ACLASS()
 	class ENGINE_API GameInstance : public SerializableObject
@@ -25,6 +26,7 @@ namespace Ayla
 		std::shared_ptr<SceneManager> m_SceneManager;
 		SharedPtr<Scene> m_EntryScene;
 		std::shared_ptr<MainSynchronizationContext> m_SyncContext;
+		std::unique_ptr<TickManager> m_TickManager;
 
 	public:
 		GameInstance();
@@ -40,6 +42,7 @@ namespace Ayla
 		virtual SharedPtr<Scene> GetEntryScene();
 
 		SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
+		TickManager* GetTickManager() const noexcept { return m_TickManager.get(); }
 
 	protected:
 		AFUNCTION()

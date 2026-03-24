@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TickTiming.h"
 #include "Actors/Actor.h"
 #include "GameObject.gen.h"
 
@@ -18,7 +17,6 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		Scene* m_Scene;
 		Transform* m_Transform;
 
 	public:
@@ -26,8 +24,5 @@ namespace Ayla
 		virtual ~GameObject() noexcept override;
 
 		Transform* GetTransform() const noexcept { return m_Transform; }
-		Scene* GetScene() const noexcept { return m_Scene; }
-
-		void Tick(TickTiming timing);
 	};
 }

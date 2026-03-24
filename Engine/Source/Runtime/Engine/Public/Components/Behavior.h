@@ -26,7 +26,7 @@ namespace Ayla
 		AFUNCTION()
 		void SetEnabled(bool value);
 		AFUNCTION()
-		bool IsEnabled() const;
+		bool IsEnabled() const { return m_Enabled; }
 
 	protected:
 		AFUNCTION()

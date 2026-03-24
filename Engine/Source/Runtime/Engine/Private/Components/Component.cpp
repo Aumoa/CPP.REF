@@ -12,4 +12,16 @@ namespace Ayla
 	Component::~Component() noexcept
 	{
 	}
+
+	GameObject* Component::GetGameObject() const
+	{
+		auto actor = GetActor();
+		return actor ? dynamic_cast<GameObject*>(actor) : nullptr;
+	}
+
+	Transform* Component::GetTransform() const
+	{
+		auto gameObject = GetGameObject();
+		return gameObject ? gameObject->GetTransform() : nullptr;
+	}
 }

@@ -21,6 +21,7 @@ namespace Ayla
 		PostLateUpdate,
 		PreRender,
 		PostRender,
-		EndOfFrame
+		EndOfFrame,
+		Count
 	};
 }

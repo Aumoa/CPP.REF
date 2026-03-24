@@ -6,11 +6,13 @@
 #include "SceneManagement/Scene.h"
 #include "SceneManagement/SceneManager.h"
 #include "Threading/MainSynchronizationContext.h"
+#include "Ticking/TickManager.h"
 
 namespace Ayla
 {
 	GameInstance::GameInstance()
 	{
+		m_TickManager = std::make_unique<TickManager>();
 	}
 
 	GameInstance::~GameInstance() noexcept
@@ -23,7 +25,7 @@ namespace Ayla
 		SynchronizationContext::SetSynchronizationContext(m_SyncContext);
 		try__
 		{
-			m_SceneManager = std::make_shared<SceneManager>();
+			m_SceneManager = std::make_shared<SceneManager>(this);
 
 			GameContext::BeginContext(m_Engine, this, m_SceneManager.get());
 			ScriptingInitialize(InitializeTiming::BeforeSceneLoad);
@@ -47,7 +49,7 @@ namespace Ayla
 		{
 			GameContext::BeginContext(m_Engine, this, m_SceneManager.get());
 			m_SyncContext->Tick();
-			m_SceneManager->DispatchTick(timing);
+			m_TickManager->Tick(timing, deltaTime);
 		}
 		finally__
 		{

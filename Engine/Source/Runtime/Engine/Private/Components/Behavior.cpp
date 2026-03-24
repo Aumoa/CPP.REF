@@ -16,11 +16,6 @@ namespace Ayla
 	{
 		m_Enabled = value;
 	}
-	
-	bool Behavior::IsEnabled() const
-	{
-		return m_Enabled;
-	}
 
 	void Behavior::OnEnable_Implementation()
 	{
