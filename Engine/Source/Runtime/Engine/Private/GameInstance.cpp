@@ -7,27 +7,31 @@
 #include "SceneManagement/SceneManager.h"
 #include "Threading/MainSynchronizationContext.h"
 #include "Ticking/TickManager.h"
+#include "InputSystem/InputManager.h"
+#include "GenericWindow.h"
 
 namespace Ayla
 {
 	GameInstance::GameInstance()
 	{
 		m_TickManager = std::make_unique<TickManager>();
+		m_InputManager = New<InputManager>();
 	}
 
 	GameInstance::~GameInstance() noexcept
 	{
 	}
 
-	Task<> GameInstance::InitializeAsync(std::stop_token cancellationToken)
+	void GameInstance::Initialize(GenericWindow* window)
 	{
 		m_SyncContext = std::make_shared<MainSynchronizationContext>();
 		SynchronizationContext::SetSynchronizationContext(m_SyncContext);
 		try__
 		{
+			window->AddExtension(m_InputManager);
 			m_SceneManager = std::make_shared<SceneManager>(this);
 
-			GameContext::BeginContext(m_Engine, this, m_SceneManager.get());
+			GameContext::BeginContext(m_Engine, this);
 			ScriptingInitialize(InitializeTiming::BeforeSceneLoad);
 			m_SceneManager->LoadScene(GetEntryScene());
 			ScriptingInitialize(InitializeTiming::AfterSceneLoad);
@@ -38,8 +42,6 @@ namespace Ayla
 			SynchronizationContext::SetSynchronizationContext(nullptr);
 		}
 		end_try__;
-
-		co_return;
 	}
 
 	void GameInstance::Tick(TickTiming timing, const TimeSpan& deltaTime)
@@ -47,7 +49,7 @@ namespace Ayla
 		SynchronizationContext::SetSynchronizationContext(m_SyncContext);
 		try__
 		{
-			GameContext::BeginContext(m_Engine, this, m_SceneManager.get());
+			GameContext::BeginContext(m_Engine, this);
 			m_SyncContext->Tick();
 			m_TickManager->Tick(timing, deltaTime);
 		}

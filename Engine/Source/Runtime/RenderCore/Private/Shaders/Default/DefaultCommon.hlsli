@@ -28,16 +28,11 @@ struct Pixel
     float4 Color : SV_TARGET;
 };
 
-struct Camera
-{
-    matrix WVP;
-};
-
 #ifdef __VERTEX_SHADER__
 
 cbuffer CameraBuffer : register(b0)
 {
-    matrix ViewProjection;
+    row_major matrix ViewProjection;
 };
 
 #endif

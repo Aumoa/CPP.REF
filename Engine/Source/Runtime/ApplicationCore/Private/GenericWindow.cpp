@@ -3,6 +3,7 @@
 #include "GenericWindow.h"
 #include "IGenericWindowResizeEventHandler.h"
 #include "IGenericWindowDestroyEventHandler.h"
+#include "IGenericWindowKeyEventHandler.h"
 #include "GenericWindowExtension.h"
 
 namespace Ayla
@@ -47,6 +48,34 @@ namespace Ayla
 			if (auto* handler = dynamic_cast<IGenericWindowDestroyEventHandler*>(extension.Get()); handler)
 			{
 				handler->OnDestroy();
+			}
+		}
+	}
+
+	void GenericWindow::NotifyKeyDown(KeyCode keyCode)
+	{
+		auto lock = std::unique_lock(m_Lock);
+		std::vector extensions = m_Extensions;
+		lock.unlock();
+		for (auto& extension : extensions)
+		{
+			if (auto* handler = dynamic_cast<IGenericWindowKeyEventHandler*>(extension.Get()); handler)
+			{
+				handler->OnKeyDown(keyCode);
+			}
+		}
+	}
+
+	void GenericWindow::NotifyKeyUp(KeyCode keyCode)
+	{
+		auto lock = std::unique_lock(m_Lock);
+		std::vector extensions = m_Extensions;
+		lock.unlock();
+		for (auto& extension : extensions)
+		{
+			if (auto* handler = dynamic_cast<IGenericWindowKeyEventHandler*>(extension.Get()); handler)
+			{
+				handler->OnKeyUp(keyCode);
 			}
 		}
 	}

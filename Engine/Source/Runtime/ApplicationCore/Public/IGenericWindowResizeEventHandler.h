@@ -7,18 +7,8 @@
 
 namespace Ayla
 {
-    class IGenericWindowResizeEventHandler
+    interface IGenericWindowResizeEventHandler
     {
-    protected:
-        IGenericWindowResizeEventHandler()
-        {
-        }
-
-        virtual ~IGenericWindowResizeEventHandler() noexcept
-        {
-        }
-
-    public:
         virtual void OnResize(const Vector2N& newSize) = 0;
     };
 }

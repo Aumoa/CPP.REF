@@ -59,6 +59,24 @@ namespace Ayla
 		}
 	}
 
+	void Transform::SetPositionAndRotation(const Vector3F& position, const QuaternionF& rotation)
+	{
+		if (position != m_WorldPosition || rotation != m_WorldRotation)
+		{
+			if (m_Parent == nullptr)
+			{
+				SetLocalPositionAndRotation(position, rotation);
+			}
+			else
+			{
+				m_Parent->TryCacheMatrix();
+				auto localPosition = Matrix4x4<>::Inverse(m_Parent->m_WorldMatrix).TransformPoint(position);
+				auto localRotation = m_Parent->m_WorldRotation.Inverse().Multiply(rotation);
+				SetLocalPositionAndRotation(localPosition, localRotation);
+			}
+		}
+	}
+
 	void Transform::TryCacheMatrix() const noexcept
 	{
 		if (m_MatrixCached)

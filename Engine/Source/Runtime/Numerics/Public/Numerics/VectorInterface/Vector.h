@@ -191,12 +191,59 @@ namespace Ayla
 		template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>
 		static inline constexpr IVectorResult Normalize(const IVector& V) requires TIsCompatibleVector<IVector, IVectorResult>
 		{
-			float InvSqrt = Math::ReciprocalSqrtEstimate(LengthSq(V));
+			auto InvSqrt = Math::ReciprocalSqrtEstimate(LengthSq(V));
 			IVectorResult R;
 			for (size_t i = 0; i < V.Size(); ++i)
 			{
 				R[i] = V[i] * InvSqrt;
 			}
+			return R;
+		}
+
+		template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>
+		static inline constexpr IVectorResult SafeNormalize(const IVector& V) requires TIsCompatibleVector<IVector, IVectorResult>
+		{
+			using T = typename IVector::Type;
+			auto SquareSum = LengthSq(V);
+			if (SquareSum == (T)1.0)
+			{
+				return static_cast<IVectorResult>(V);
+			}
+			else if (SquareSum < Math::SmallNumber)
+			{
+				return IVectorResult::Zero();
+			}
+
+			auto InvSqrt = Math::ReciprocalSqrtEstimate(SquareSum);
+			IVectorResult R;
+			for (size_t i = 0; i < V.Size(); ++i)
+			{
+				R[i] = V[i] * InvSqrt;
+			}
+			return R;
+		}
+
+		template<TIsVectorBase IVector, TIsVectorBase IVectorResult = IVector>
+		static inline constexpr IVectorResult ClampToMaxSize(const IVector& V, typename IVector::Type MaxSize) requires TIsCompatibleVector<IVector, IVectorResult>
+		{
+			if (MaxSize < Math::SmallNumber)
+			{
+				return IVectorResult::Zero();
+			}
+
+			auto SquareSum = LengthSq(V);
+			if (SquareSum <= MaxSize * MaxSize)
+			{
+				return static_cast<IVectorResult>(V);
+			}
+
+			auto Scale = MaxSize * Math::ReciprocalSqrtEstimate(SquareSum);
+			IVectorResult R;
+			for (size_t i = 0; i < V.Size(); ++i)
+			{
+				R[i] = V[i] * Scale;
+			}
+
 			return R;
 		}
 

@@ -15,6 +15,8 @@ namespace Ayla
 	class Engine;
 	class MainSynchronizationContext;
 	class TickManager;
+	class InputManager;
+	class GenericWindow;
 
 	ACLASS()
 	class ENGINE_API GameInstance : public SerializableObject
@@ -27,12 +29,13 @@ namespace Ayla
 		SharedPtr<Scene> m_EntryScene;
 		std::shared_ptr<MainSynchronizationContext> m_SyncContext;
 		std::unique_ptr<TickManager> m_TickManager;
+		SharedPtr<InputManager> m_InputManager;
 
 	public:
 		GameInstance();
 		virtual ~GameInstance() noexcept override;
 
-		virtual Task<> InitializeAsync(std::stop_token cancellationToken);
+		virtual void Initialize(GenericWindow* window);
 		void Tick(TickTiming timing, const TimeSpan& deltaTime);
 		void Shutdown();
 
@@ -43,6 +46,7 @@ namespace Ayla
 
 		SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
 		TickManager* GetTickManager() const noexcept { return m_TickManager.get(); }
+		InputManager* GetInputManager() const noexcept { return m_InputManager.Get(); }
 
 	protected:
 		AFUNCTION()

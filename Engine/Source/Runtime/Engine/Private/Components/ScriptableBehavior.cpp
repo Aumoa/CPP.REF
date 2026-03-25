@@ -1,7 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Components/ScriptableBehavior.h"
-#include "Actors/Actor.h"
+#include "Actors/GameObject.h"
 #include "SceneManagement/Scene.h"
 #include "SceneManagement/SceneManager.h"
 #include "Ticking/TickManager.h"
@@ -11,7 +11,7 @@ namespace Ayla
 {
 	ScriptableBehavior::ScriptableBehavior()
 		: Super()
-		, m_PrimaryTick{ .Timing = TickTiming::Update }
+		, m_PrimaryTick{ .Owner = this, .Timing = TickTiming::Update }
 	{
 	}
 
@@ -25,7 +25,7 @@ namespace Ayla
 		m_bDidAwake = true;
 		if (m_PrimaryTick.bCanEverTick)
 		{
-			auto* tm = GetActor()->GetScene()->GetSceneManager()->GetGameInstance()->GetTickManager();
+			auto* tm = GetGameObject()->GetScene()->GetSceneManager()->GetGameInstance()->GetTickManager();
 			tm->AddScriptableBehavior(&m_PrimaryTick);
 		}
 	}
@@ -39,7 +39,7 @@ namespace Ayla
 
 		if (m_PrimaryTick.bCanEverTick)
 		{
-			auto* tm = GetActor()->GetScene()->GetSceneManager()->GetGameInstance()->GetTickManager();
+			auto* tm = GetGameObject()->GetScene()->GetSceneManager()->GetGameInstance()->GetTickManager();
 			tm->RemoveScriptableBehavior(&m_PrimaryTick);
 		}
 	}

@@ -25,7 +25,7 @@ namespace Ayla
 
 		D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc =
 		{
-			.NumParameters = AE_ARRAYSIZE(rootParameters),
+			.NumParameters = static_cast<UINT>(AE_ARRAYSIZE(rootParameters)),
 			.pParameters = rootParameters,
 			.NumStaticSamplers = 0,
 			.pStaticSamplers = nullptr,

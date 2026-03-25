@@ -30,6 +30,29 @@ namespace Ayla
 				case WM_SIZE:
 					window->NotifyResize(Vector2N(LOWORD(lParam), HIWORD(lParam)));
 					break;
+				case WM_KEYDOWN:
+				case WM_KEYUP:
+				{
+					int32 virtualKey = static_cast<int32>(wParam);
+					if (virtualKey >= 'A' && virtualKey <= 'Z')
+					{
+						constexpr int32 kCaseDiff = 'a' - 'A';
+						virtualKey += kCaseDiff;
+					}
+
+					KeyCode keyCode = static_cast<KeyCode>(virtualKey);
+					bool bKeyDown = (msg == WM_KEYDOWN);
+
+					if (bKeyDown)
+					{
+						window->NotifyKeyDown(keyCode);
+					}
+					else
+					{
+						window->NotifyKeyUp(keyCode);
+					}
+					break;
+				}
 				}
 			}
 		}

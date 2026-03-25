@@ -8,13 +8,13 @@
 
 namespace Ayla
 {
-	class Actor;
+	class GameObject;
 
 	ACLASS()
 	class ENGINE_API Behavior : public Component
 	{
 		GENERATED_BODY()
-		friend Actor;
+		friend GameObject;
 
 	private:
 		bool m_Enabled = true;

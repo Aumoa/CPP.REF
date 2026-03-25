@@ -49,8 +49,9 @@ namespace Ayla
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
 
 		m_GameInstance = InitializeGameInstance();
+		m_GameInstance->Initialize(m_MainActivity->GetMainWindow().Get());
+
 		std::vector<Task<>> tasks;
-		tasks.emplace_back(m_GameInstance->InitializeAsync({}));
 		tasks.emplace_back(Task<>::Create([this]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};

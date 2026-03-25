@@ -10,19 +10,20 @@ namespace Ayla
 	thread_local Engine* m_Engine;
 	thread_local GameInstance* m_GameInstance;
 	thread_local SceneManager* m_SceneManager;
+	thread_local InputManager* m_InputManager;
 
-	void GameContext::BeginContext(Engine* engine, GameInstance* gameInstance, SceneManager* sceneManager)
+	void GameContext::BeginContext(Engine* engine, GameInstance* gameInstance)
 	{
 		m_Engine = engine;
 		m_GameInstance = gameInstance;
-		m_SceneManager = sceneManager;
+		m_SceneManager = gameInstance->GetSceneManager();
+		m_InputManager = gameInstance->GetInputManager();
 	}
 
 	void GameContext::EndContext()
 	{
 		m_Engine = nullptr;
 		m_GameInstance = nullptr;
-		m_SceneManager = nullptr;
 	}
 
 	Engine* GameContext::GetEngine()
@@ -38,5 +39,10 @@ namespace Ayla
 	SceneManager* GameContext::GetSceneManager()
 	{
 		return m_SceneManager;
+	}
+
+	InputManager* GameContext::GetInputManager()
+	{
+		return m_InputManager;
 	}
 }

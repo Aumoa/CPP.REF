@@ -335,17 +335,18 @@ namespace Ayla
 		static constexpr float Determinant(const IMatrix& M)
 		{
 			static_assert(IsSquared<IMatrix>(), "Matrix is not squared.");
+			using T = typename IMatrix::Type;
 
 			if constexpr (IMatrix::Row() == 1)
 			{
-				return (float)M[0][0];
+				return (T)M[0][0];
 			}
 			else
 			{
-				float Result = 0;
+				T Result = 0;
 				for (size_t i = 0; i < IMatrix::Column(); ++i)
 				{
-					float Mul = (i % 2) == 0 ? +1.0 : -1.0;
+					T Mul = (i % 2) == 0 ? (T)+1.0 : (T)-1.0;
 					Result += Mul * M[0][i] * Determinant(Minor(M, 0, i));
 				}
 				return Result;
@@ -355,12 +356,13 @@ namespace Ayla
 		template<TIsMatrixBase IMatrix>
 		static constexpr auto Cofactor(const IMatrix& M)
 		{
-			Matrix<float, IMatrix::Row(), IMatrix::Column()> R(0.0);
+			using T = typename IMatrix::Type;
+			Matrix<T, IMatrix::Row(), IMatrix::Column()> R(0.0);
 			for (size_t i = 0; i < IMatrix::Row(); ++i)
 			{
 				for (size_t j = 0; j < IMatrix::Column(); ++j)
 				{
-					float Mul = ((i + j) % 2) == 0 ? +1.0 : -1.0;
+					T Mul = ((i + j) % 2) == 0 ? (T)+1.0 : (T)-1.0;
 					R[i][j] = Mul * Determinant(Minor(M, i, j));
 				}
 			}

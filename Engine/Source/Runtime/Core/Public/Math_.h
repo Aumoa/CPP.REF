@@ -109,9 +109,9 @@ namespace Ayla
 		{
 			if consteval
 			{
-				return (guess * guess - value) < 1e-10 && (value - guess * guess) < 1e-10
+				return (guess * guess - value) < (T)1e-10 && (value - guess * guess) < (T)1e-10
 					? guess
-					: Sqrt(value, (guess + value / guess) / 2.0);
+					: Sqrt(value, (guess + value / guess) / (T)2.0);
 
 			}
 			else
@@ -191,13 +191,13 @@ namespace Ayla
 		template<class TL, class TR>
 		static FORCEINLINE constexpr auto Min(const TL& Lhs, const TR& Rhs) noexcept
 		{
-			return std::min(Lhs, Rhs);
+			return Lhs < Rhs ? Lhs : Rhs;
 		}
 
 		template<class TL, class TR>
 		static FORCEINLINE constexpr auto Max(const TL& Lhs, const TR& Rhs) noexcept
 		{
-			return std::max(Lhs, Rhs);
+			return Lhs > Rhs ? Lhs : Rhs;
 		}
 
 		template<class TL, class TR, class... T>
@@ -224,6 +224,17 @@ namespace Ayla
 			{
 				return (Lhs > Rhs ? Lhs : Rhs);
 			}
+		}
+
+		/// <summary>
+		/// Get square value.
+		/// </summary>
+		/// <param name="value"> The value to be squared. </param>
+		/// <returns> The squared value. </returns>
+		template<class T>
+		inline static constexpr T Square(const T& value)
+		{
+			return value * value;
 		}
 
 		/// <summary>
@@ -291,6 +302,19 @@ namespace Ayla
 		/// Represents small number.
 		/// </summary>
 		inline static constexpr float SmallNumber = 0.0001f;
+
+		/// <summary>
+		/// Determines whether two values are approximately equal, within a specified tolerance (epsilon).
+		/// </summary>
+		/// <param name="A"> The first value to compare. </param>
+		/// <param name="B"> The second value to compare. </param>
+		/// <param name="Epsilon"> The tolerance within which the two values are considered approximately equal. </param>
+		/// <returns> Returns <c>true</c> if the values are approximately equal, otherwise <c>false</c>. </returns>
+		template<class T>
+		static constexpr bool Approximately(const T& A, const T& B, const T& Epsilon = (T)SmallNumber)
+		{
+			return Math::Abs(A - B) <= Epsilon;
+		}
 
 		template<EaseFunction Function>
 		static double EaseFunction(double t) requires (Function == EaseFunction::InSine)
