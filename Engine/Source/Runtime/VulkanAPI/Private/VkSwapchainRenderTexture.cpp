@@ -42,6 +42,8 @@ namespace Ayla
 			};
 			VKR(graphics->GetSetDebugUtilsObjectNameEXTFunction()(graphics->GetDevice(), &info));
 		}
+
+		CreateRenderPass();
 	}
 
 	Vector2N VkSwapchainRenderTexture::GetSize() const
@@ -105,6 +107,14 @@ namespace Ayla
 
 	void VkSwapchainRenderTexture::Dispose()
 	{
+		DestroyFramebufferResources();
+
+		if (m_RenderPass != VK_NULL_HANDLE)
+		{
+			vkDestroyRenderPass(m_Graphics->GetDevice(), m_RenderPass, nullptr);
+			m_RenderPass = VK_NULL_HANDLE;
+		}
+
 		for (auto& semaphore : m_PresentCompletedSemaphores)
 		{
 			vkDestroySemaphore(m_Graphics->GetDevice(), semaphore, nullptr);
@@ -120,6 +130,7 @@ namespace Ayla
 
 	void VkSwapchainRenderTexture::Invalidate()
 	{
+		DestroyFramebufferResources();
 		m_SwapchainImages.clear();
 	}
 
@@ -142,8 +153,19 @@ namespace Ayla
 		m_CurrentImageIndex = 0xFFFFFFFF;
 	}
 
+	VkFramebuffer VkSwapchainRenderTexture::GetCurrentFramebuffer() const noexcept
+	{
+		if (m_CurrentImageIndex < m_Framebuffers.size())
+		{
+			return m_Framebuffers[m_CurrentImageIndex];
+		}
+		return VK_NULL_HANDLE;
+	}
+
 	void VkSwapchainRenderTexture::ReallocateSwapchainImages()
 	{
+		DestroyFramebufferResources();
+
 		auto owner = m_Swapchain->GetOwner();
 		auto device = owner->GetDevice();
 		uint32_t imageCount = 0;
@@ -151,5 +173,240 @@ namespace Ayla
 		VKR(vkGetSwapchainImagesKHR(device, swapchain, &imageCount, nullptr));
 		m_SwapchainImages.resize(imageCount);
 		VKR(vkGetSwapchainImagesKHR(device, swapchain, &imageCount, m_SwapchainImages.data()));
+
+		m_SwapchainImageViews.resize(imageCount);
+		for (uint32_t i = 0; i < imageCount; ++i)
+		{
+			VkImageViewCreateInfo viewInfo
+			{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+				.image = m_SwapchainImages[i],
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.format = kColorFormat,
+				.components =
+				{
+					.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+					.a = VK_COMPONENT_SWIZZLE_IDENTITY,
+				},
+				.subresourceRange =
+				{
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1,
+				}
+			};
+			VKR(vkCreateImageView(device, &viewInfo, nullptr, &m_SwapchainImageViews[i]));
+		}
+
+		CreateDepthResources();
+		CreateFramebuffers();
+	}
+
+	void VkSwapchainRenderTexture::CreateRenderPass()
+	{
+		VkAttachmentDescription attachments[2] =
+		{
+			// Color attachment
+			{
+				.format = kColorFormat,
+				.samples = VK_SAMPLE_COUNT_1_BIT,
+				.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+				.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			},
+			// Depth attachment
+			{
+				.format = kDepthFormat,
+				.samples = VK_SAMPLE_COUNT_1_BIT,
+				.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+				.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+				.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+				.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+				.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+			}
+		};
+
+		VkAttachmentReference colorRef
+		{
+			.attachment = 0,
+			.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		};
+
+		VkAttachmentReference depthRef
+		{
+			.attachment = 1,
+			.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+		};
+
+		VkSubpassDescription subpass
+		{
+			.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+			.colorAttachmentCount = 1,
+			.pColorAttachments = &colorRef,
+			.pDepthStencilAttachment = &depthRef,
+		};
+
+		VkSubpassDependency dependency
+		{
+			.srcSubpass = VK_SUBPASS_EXTERNAL,
+			.dstSubpass = 0,
+			.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+			.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+			.srcAccessMask = 0,
+			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+		};
+
+		VkRenderPassCreateInfo renderPassInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+			.attachmentCount = 2,
+			.pAttachments = attachments,
+			.subpassCount = 1,
+			.pSubpasses = &subpass,
+			.dependencyCount = 1,
+			.pDependencies = &dependency,
+		};
+
+		VKR(vkCreateRenderPass(m_Graphics->GetDevice(), &renderPassInfo, nullptr, &m_RenderPass));
+	}
+
+	void VkSwapchainRenderTexture::CreateDepthResources()
+	{
+		auto device = m_Graphics->GetDevice();
+		auto size = GetSize();
+
+		VkImageCreateInfo imageInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+			.imageType = VK_IMAGE_TYPE_2D,
+			.format = kDepthFormat,
+			.extent = { (uint32_t)size.X, (uint32_t)size.Y, 1 },
+			.mipLevels = 1,
+			.arrayLayers = 1,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.tiling = VK_IMAGE_TILING_OPTIMAL,
+			.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		};
+
+		VKR(vkCreateImage(device, &imageInfo, nullptr, &m_DepthImage));
+
+		VkMemoryRequirements memReq;
+		vkGetImageMemoryRequirements(device, m_DepthImage, &memReq);
+
+		VkPhysicalDeviceMemoryProperties memProps;
+		vkGetPhysicalDeviceMemoryProperties(m_Graphics->GetPhysicalDevice(), &memProps);
+
+		uint32_t memoryTypeIndex = UINT32_MAX;
+		for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
+		{
+			if ((memReq.memoryTypeBits & (1u << i)) == 0)
+			{
+				continue;
+			}
+
+			if (memProps.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
+			{
+				memoryTypeIndex = i;
+				break;
+			}
+		}
+
+		VkMemoryAllocateInfo allocInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.allocationSize = memReq.size,
+			.memoryTypeIndex = memoryTypeIndex,
+		};
+
+		VKR(vkAllocateMemory(device, &allocInfo, nullptr, &m_DepthMemory));
+		VKR(vkBindImageMemory(device, m_DepthImage, m_DepthMemory, 0));
+
+		VkImageViewCreateInfo viewInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.image = m_DepthImage,
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = kDepthFormat,
+			.subresourceRange =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			}
+		};
+
+		VKR(vkCreateImageView(device, &viewInfo, nullptr, &m_DepthImageView));
+	}
+
+	void VkSwapchainRenderTexture::CreateFramebuffers()
+	{
+		auto device = m_Graphics->GetDevice();
+		auto size = GetSize();
+
+		m_Framebuffers.resize(m_SwapchainImages.size());
+		for (size_t i = 0; i < m_SwapchainImages.size(); ++i)
+		{
+			VkImageView attachments[2] = { m_SwapchainImageViews[i], m_DepthImageView };
+
+			VkFramebufferCreateInfo framebufferInfo
+			{
+				.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+				.renderPass = m_RenderPass,
+				.attachmentCount = 2,
+				.pAttachments = attachments,
+				.width = (uint32_t)size.X,
+				.height = (uint32_t)size.Y,
+				.layers = 1,
+			};
+
+			VKR(vkCreateFramebuffer(device, &framebufferInfo, nullptr, &m_Framebuffers[i]));
+		}
+	}
+
+	void VkSwapchainRenderTexture::DestroyFramebufferResources()
+	{
+		auto device = m_Graphics->GetDevice();
+
+		for (auto& fb : m_Framebuffers)
+		{
+			vkDestroyFramebuffer(device, fb, nullptr);
+		}
+		m_Framebuffers.clear();
+
+		if (m_DepthImageView != VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(device, m_DepthImageView, nullptr);
+			m_DepthImageView = VK_NULL_HANDLE;
+		}
+
+		if (m_DepthImage != VK_NULL_HANDLE)
+		{
+			vkDestroyImage(device, m_DepthImage, nullptr);
+			m_DepthImage = VK_NULL_HANDLE;
+		}
+
+		if (m_DepthMemory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(device, m_DepthMemory, nullptr);
+			m_DepthMemory = VK_NULL_HANDLE;
+		}
+
+		for (auto& view : m_SwapchainImageViews)
+		{
+			vkDestroyImageView(device, view, nullptr);
+		}
+		m_SwapchainImageViews.clear();
 	}
 }

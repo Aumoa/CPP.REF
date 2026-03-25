@@ -32,11 +32,17 @@ namespace Ayla
 
 		virtual size_t GetByteSize() const noexcept override { return m_Size; }
 		virtual size_t GetStride() const noexcept override { return m_Stride; }
+		virtual BufferUsage GetUsage() const noexcept override { return m_Usage; }
+		virtual void* Map() const override;
 
 	public:
 		VkBuffer(VkGraphics* graphics, BufferUsage usage, size_t stride);
 		virtual ~VkBuffer() noexcept override;
 
 		void UpdateData(std::span<const byte> buffer);
+		void AllocateUploadBuffer(size_t sizeInBytes);
+
+	private:
+		void* m_MappedPtr = nullptr;
 	};
 }

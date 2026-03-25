@@ -13,6 +13,11 @@ namespace Ayla
 
 	VkBuffer::~VkBuffer() noexcept
 	{
+		if (m_MappedPtr != nullptr && m_Memory != VK_NULL_HANDLE)
+		{
+			vkUnmapMemory(m_Graphics->GetDevice(), m_Memory);
+			m_MappedPtr = nullptr;
+		}
 		if (m_Buffer != VK_NULL_HANDLE)
 		{
 			vkDestroyBuffer(m_Graphics->GetDevice(), m_Buffer, nullptr);
@@ -219,6 +224,92 @@ namespace Ayla
 		return vkGetBufferDeviceAddress(m_Graphics->GetDevice(), &addrInfo);
 	}
 
+	void* VkBuffer::Map() const
+	{
+		if (m_MappedPtr != nullptr)
+		{
+			return m_MappedPtr;
+		}
+
+		throw InvalidOperationException(TEXT("Buffer is not mappable. Only upload buffers can be mapped."));
+	}
+
+	void VkBuffer::AllocateUploadBuffer(size_t sizeInBytes)
+	{
+		if (m_Buffer != VK_NULL_HANDLE)
+		{
+			if (m_MappedPtr != nullptr)
+			{
+				vkUnmapMemory(m_Graphics->GetDevice(), m_Memory);
+				m_MappedPtr = nullptr;
+			}
+			vkDestroyBuffer(m_Graphics->GetDevice(), m_Buffer, nullptr);
+			m_Buffer = VK_NULL_HANDLE;
+		}
+		if (m_Memory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(m_Graphics->GetDevice(), m_Memory, nullptr);
+			m_Memory = VK_NULL_HANDLE;
+		}
+
+		m_Size = sizeInBytes;
+
+		VkBufferCreateInfo bufferInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+			.size = sizeInBytes,
+			.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE
+		};
+
+		auto device = m_Graphics->GetDevice();
+		VKR(vkCreateBuffer(device, &bufferInfo, nullptr, &m_Buffer));
+
+		VkMemoryRequirements memReq;
+		vkGetBufferMemoryRequirements(device, m_Buffer, &memReq);
+
+		VkPhysicalDeviceMemoryProperties memProps;
+		vkGetPhysicalDeviceMemoryProperties(m_Graphics->GetPhysicalDevice(), &memProps);
+
+		uint32_t memoryTypeIndex = UINT32_MAX;
+		for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
+		{
+			if ((memReq.memoryTypeBits & (1u << i)) == 0)
+			{
+				continue;
+			}
+
+			if ((memProps.memoryTypes[i].propertyFlags & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) == (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
+			{
+				memoryTypeIndex = i;
+				break;
+			}
+		}
+
+		if (memoryTypeIndex == UINT32_MAX)
+		{
+			for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
+			{
+				if (memReq.memoryTypeBits & (1u << i))
+				{
+					memoryTypeIndex = i;
+					break;
+				}
+			}
+		}
+
+		VkMemoryAllocateInfo allocInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.allocationSize = memReq.size,
+			.memoryTypeIndex = memoryTypeIndex
+		};
+
+		VKR(vkAllocateMemory(device, &allocInfo, nullptr, &m_Memory));
+		VKR(vkBindBufferMemory(device, m_Buffer, m_Memory, 0));
+		VKR(vkMapMemory(device, m_Memory, 0, sizeInBytes, 0, &m_MappedPtr));
+	}
+
 	SharedPtr<Buffer> VkGraphics::CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage)
 	{
 		auto buffer = New<VkBuffer>(this, usage, stride);
@@ -226,6 +317,13 @@ namespace Ayla
 		{
 			buffer->UpdateData(data);
 		}
+		return buffer;
+	}
+
+	SharedPtr<Buffer> VkGraphics::CreateUploadBuffer(size_t sizeInBytes)
+	{
+		auto buffer = New<VkBuffer>(this, BufferUsage::Upload, 0);
+		buffer->AllocateUploadBuffer(sizeInBytes);
 		return buffer;
 	}
 }

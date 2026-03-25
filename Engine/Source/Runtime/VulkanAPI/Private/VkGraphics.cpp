@@ -5,6 +5,8 @@
 #include "GenericWindowSwapchainExtension.h"
 #include "VkSwapchainExt.h"
 #include "VkCommandQueue.h"
+#include "VkShader.h"
+#include "VkGeometryRenderPipeline.h"
 #include "Linq/Concat.h"
 #include <ranges>
 #include <array>
@@ -443,6 +445,21 @@ namespace Ayla
         auto extension = New<VkSwapchainExt>(this, surface, swapchain, swapchainCreateInfo, suitableQueue);
         targetWindow->AddExtension(extension);
         return extension;
+    }
+
+    SharedPtr<RenderPipeline> VkGraphics::CreateGeometryRenderPipeline(SharedPtr<Shader> shader)
+    {
+        return New<VkGeometryRenderPipeline>(this, std::move(shader));
+    }
+
+    SharedPtr<RenderPipeline> VkGraphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
+    {
+        throw InvalidOperationException(TEXT("Raytracing render pipeline is not yet implemented for Vulkan."));
+    }
+
+    SharedPtr<Shader> VkGraphics::CreateShader(ShaderCreationInfo shaderCreationInfo)
+    {
+        return New<VkShader>(std::move(shaderCreationInfo));
     }
 
     void VkGraphics::BeginRenderFrame()
