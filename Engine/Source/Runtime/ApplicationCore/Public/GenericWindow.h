@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericWindowDefinition.h"
+#include "KeyCode.h"
 #include "Threading/Spinlock.h"
 #include "Threading/SpinlockConditionVariable.h"
 #include "Numerics/VectorInterface/Vector.h"
@@ -53,5 +54,7 @@ namespace Ayla
         
         void NotifyResize(const Vector2N& newSize);
         void NotifyDestroy();
+        void NotifyKeyDown(KeyCode keyCode);
+        void NotifyKeyUp(KeyCode keyCode);
     };
 }

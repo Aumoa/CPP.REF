@@ -6,18 +6,8 @@
 
 namespace Ayla
 {
-	class IGenericWindowDestroyEventHandler
+	interface IGenericWindowDestroyEventHandler
 	{
-	protected:
-		IGenericWindowDestroyEventHandler()
-		{
-		}
-
-		virtual ~IGenericWindowDestroyEventHandler() noexcept
-		{
-		}
-
-	public:
 		virtual void OnDestroy() = 0;
 	};
 }

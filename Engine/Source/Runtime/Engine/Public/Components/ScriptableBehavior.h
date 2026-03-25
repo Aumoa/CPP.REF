@@ -32,7 +32,7 @@ namespace Ayla
 		virtual void OnDestroy();
 		virtual void OnEnable() override;
 		virtual void OnDisable() override;
-		virtual void Tick(TickTiming timing, const TimeSpan& deltaTime) = 0;
+		virtual void Tick(TickTiming timing, const TimeSpan& deltaTime) {}
 
 		bool DidAwake() const noexcept { return m_bDidAwake; }
 	};

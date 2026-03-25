@@ -18,8 +18,7 @@ namespace Ayla
 
 	void Camera::GetMinimalViewInfo(MinimalViewInfo* output) const
 	{
-		auto gameObject = (GameObject*)GetActor();
-		auto transform = gameObject->GetTransform();
+		auto transform = GetTransform();
 		transform->GetPositionAndRotation(&output->Position, &output->Rotation);
 		output->FieldOfView = 60.0f;
 		output->AspectRatio = std::nullopt;
@@ -27,13 +26,13 @@ namespace Ayla
 
 	void Camera::OnEnable()
 	{
-		auto gameObject = (GameObject*)GetActor();
+		auto gameObject = GetGameObject();
 		gameObject->GetScene()->AddCameraComponent(this);
 	}
 
 	void Camera::OnDisable()
 	{
-		auto gameObject = (GameObject*)GetActor();
+		auto gameObject = GetGameObject();
 		gameObject->GetScene()->RemoveCameraComponent(this);
 	}
 }

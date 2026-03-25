@@ -15,6 +15,7 @@ namespace Ayla
 
 	void TickManager::AddScriptableBehavior(TickFunction* tickFunction)
 	{
+		check(tickFunction->Owner);
 		check(tickFunction->TickIndex == (size_t)-1);
 		auto& list = m_TickFunctions[(size_t)tickFunction->Timing];
 		size_t tickIndex = list.size();

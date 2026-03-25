@@ -406,9 +406,9 @@ namespace Ayla
 	struct Quaternion<void>
 	{
 		template<class T, TIsVector<T, 4> IQuaternion>
-		static constexpr Quaternion Inverse(const IQuaternion& Q)
+		static constexpr Quaternion<T> Inverse(const IQuaternion& Q)
 		{
-			return Quaternion<T>(-Image(Q), Real(Q));
+			return Quaternion<T>(-Q.Image(), Q.Real());
 		}
 
 		template<class T, TIsVector<T, 4> IQuaternionL, TIsVector<T, 4> IQuaternionR>

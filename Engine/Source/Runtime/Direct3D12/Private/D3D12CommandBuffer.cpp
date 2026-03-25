@@ -42,9 +42,9 @@ namespace Ayla
 		DXSetName(m_VertexBuffer);
 		PositionColorVertex* vertexPtr;
 		HR(m_VertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vertexPtr)));
-		vertexPtr[0] = { Vector3F(0, 1.0f, 0), NamedColors::Red };
-		vertexPtr[1] = { Vector3F(1.0f, -1.0f, 0), NamedColors::Green };
-		vertexPtr[2] = { Vector3F(-1.0f, -1.0f, 0), NamedColors::Blue };
+		vertexPtr[0] = { Vector3F(0, 5.0f, 0), NamedColors::Red };
+		vertexPtr[1] = { Vector3F(5.0f, -5.0f, 0), NamedColors::Green };
+		vertexPtr[2] = { Vector3F(-5.0f, -5.0f, 0), NamedColors::Blue };
 
 		resourceDesc.Width = sizeof(uint32) * 3;
 		m_Graphics->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_IndexBuffer));
@@ -227,7 +227,7 @@ namespace Ayla
 		m_CommandBuffer->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandBuffer->IASetVertexBuffers(0, 1, &vertexBufferView);
 		m_CommandBuffer->IASetIndexBuffer(&indexBufferView);
-		m_CommandBuffer->DrawInstanced(3, 1, 0, 0);
+		m_CommandBuffer->DrawIndexedInstanced(3, 1, 0, 0, 0);
 	}
 
 	void D3D12CommandBuffer::WaitForCompletion(const TimeSpan& timeout)
