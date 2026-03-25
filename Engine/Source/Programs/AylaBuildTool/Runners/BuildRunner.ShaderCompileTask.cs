@@ -67,7 +67,7 @@ internal static partial class BuildRunner
                 var options = new Terminal.Options
                 {
                     Executable = workerPath,
-                    WorkingDirectory = resolver.Group.RootDirectory,
+                    WorkingDirectory = Path.GetDirectoryName(workerPath)!,
                     Logging = Terminal.Logging.All
                 };
 
@@ -130,8 +130,8 @@ internal static partial class BuildRunner
                     lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main -o \"{outputBasePath}\" {includeArgs}");
 
                     // Add Vulkan compilation (SPIR-V)
-                    //lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" {includeArgs}");
-                    //lines.Add("");
+                    lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" {includeArgs}");
+                    lines.Add("");
                 }
             }
 

@@ -44,8 +44,8 @@ namespace Ayla
         virtual void Dispose() noexcept override;
         virtual RenderFeatures GetCurrentRenderFeature() noexcept override { return RenderFeatures::Vulkan; }
 
-        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
-        virtual SharedPtr<CommandBuffer> CreateCommandBuffer_Implementation() override;  // VkCommandBuffer.cpp
+        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) override;
+        virtual SharedPtr<CommandBuffer> CreateCommandBuffer() override;  // VkCommandBuffer.cpp
         virtual SharedPtr<RenderPipeline> CreateGeometryRenderPipeline(SharedPtr<Shader> shader) override;
         virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(SharedPtr<Shader> shader) override;
         virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) override;

@@ -345,7 +345,7 @@ namespace Ayla
         m_PhysicalDevice = nullptr;
     }
 
-    SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow)
+    SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain(SharedPtr<GenericWindow> targetWindow)
     {
 #if PLATFORM_LINUX
         auto* display = reinterpret_cast<Display*>(GenericApplication::Get().GetApplicationPointer());

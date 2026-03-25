@@ -332,7 +332,7 @@ namespace Ayla
 		return m_Graphics->FindMemoryType(typeFilter, properties);
 	}
 
-	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()
+	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer()
 	{
 		return New<VkCommandBuffer>(this, true);
 	}
