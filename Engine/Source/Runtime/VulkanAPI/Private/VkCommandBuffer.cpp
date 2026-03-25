@@ -329,18 +329,7 @@ namespace Ayla
 
 	uint32_t VkCommandBuffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 	{
-		VkPhysicalDeviceMemoryProperties memProps;
-		vkGetPhysicalDeviceMemoryProperties(m_Graphics->GetPhysicalDevice(), &memProps);
-
-		for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-		{
-			if ((typeFilter & (1u << i)) && (memProps.memoryTypes[i].propertyFlags & properties) == properties)
-			{
-				return i;
-			}
-		}
-
-		throw InvalidOperationException(TEXT("Failed to find suitable memory type."));
+		return m_Graphics->FindMemoryType(typeFilter, properties);
 	}
 
 	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()

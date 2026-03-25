@@ -66,5 +66,6 @@ namespace Ayla
 
         PFN_vkSetDebugUtilsObjectNameEXT GetSetDebugUtilsObjectNameEXTFunction() const noexcept;
         void AddFenceCompletionCallback(VkFence fence, function_t<void()> continuation);
+        uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
     };
 }

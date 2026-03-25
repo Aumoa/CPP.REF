@@ -65,34 +65,7 @@ namespace Ayla
 			VkMemoryRequirements memReq;
 			vkGetBufferMemoryRequirements(device, m_Buffer, &memReq);
 
-			VkPhysicalDeviceMemoryProperties memProps;
-			vkGetPhysicalDeviceMemoryProperties(m_Graphics->GetPhysicalDevice(), &memProps);
-
-			uint32_t memoryTypeIndex = UINT32_MAX;
-			for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-			{
-				if ((memReq.memoryTypeBits & (1u << i)) == 0)
-				{
-					continue;
-				}
-
-				if (memProps.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
-				{
-					memoryTypeIndex = i;
-					break;
-				}
-			}
-			if (memoryTypeIndex == UINT32_MAX)
-			{
-				for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-				{
-					if (memReq.memoryTypeBits & (1u << i))
-					{
-						memoryTypeIndex = i;
-						break;
-					}
-				}
-			}
+			uint32_t memoryTypeIndex = m_Graphics->FindMemoryType(memReq.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 			VkMemoryAllocateInfo allocInfo
 			{
@@ -130,35 +103,7 @@ namespace Ayla
 			VkMemoryRequirements stagingReq;
 			vkGetBufferMemoryRequirements(device, stagingBuffer, &stagingReq);
 
-			VkPhysicalDeviceMemoryProperties memProps;
-			vkGetPhysicalDeviceMemoryProperties(m_Graphics->GetPhysicalDevice(), &memProps);
-
-			uint32_t stagingType = UINT32_MAX;
-			for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-			{
-				if ((stagingReq.memoryTypeBits & (1u << i)) == 0)
-				{
-					continue;
-				}
-
-				if ((memProps.memoryTypes[i].propertyFlags & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) == (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
-				{
-					stagingType = i;
-					break;
-				}
-			}
-
-			if (stagingType == UINT32_MAX)
-			{
-				for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-				{
-					if (stagingReq.memoryTypeBits & (1u << i))
-					{
-						stagingType = i;
-						break;
-					}
-				}
-			}
+			uint32_t stagingType = m_Graphics->FindMemoryType(stagingReq.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 			VkMemoryAllocateInfo stagingAlloc
 			{
@@ -268,35 +213,7 @@ namespace Ayla
 		VkMemoryRequirements memReq;
 		vkGetBufferMemoryRequirements(device, m_Buffer, &memReq);
 
-		VkPhysicalDeviceMemoryProperties memProps;
-		vkGetPhysicalDeviceMemoryProperties(m_Graphics->GetPhysicalDevice(), &memProps);
-
-		uint32_t memoryTypeIndex = UINT32_MAX;
-		for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-		{
-			if ((memReq.memoryTypeBits & (1u << i)) == 0)
-			{
-				continue;
-			}
-
-			if ((memProps.memoryTypes[i].propertyFlags & (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT)) == (VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT))
-			{
-				memoryTypeIndex = i;
-				break;
-			}
-		}
-
-		if (memoryTypeIndex == UINT32_MAX)
-		{
-			for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-			{
-				if (memReq.memoryTypeBits & (1u << i))
-				{
-					memoryTypeIndex = i;
-					break;
-				}
-			}
-		}
+		uint32_t memoryTypeIndex = m_Graphics->FindMemoryType(memReq.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 		VkMemoryAllocateInfo allocInfo
 		{

@@ -303,29 +303,11 @@ namespace Ayla
 		VkMemoryRequirements memReq;
 		vkGetImageMemoryRequirements(device, m_DepthImage, &memReq);
 
-		VkPhysicalDeviceMemoryProperties memProps;
-		vkGetPhysicalDeviceMemoryProperties(m_Graphics->GetPhysicalDevice(), &memProps);
-
-		uint32_t memoryTypeIndex = UINT32_MAX;
-		for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
-		{
-			if ((memReq.memoryTypeBits & (1u << i)) == 0)
-			{
-				continue;
-			}
-
-			if (memProps.memoryTypes[i].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
-			{
-				memoryTypeIndex = i;
-				break;
-			}
-		}
-
 		VkMemoryAllocateInfo allocInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 			.allocationSize = memReq.size,
-			.memoryTypeIndex = memoryTypeIndex,
+			.memoryTypeIndex = m_Graphics->FindMemoryType(memReq.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT),
 		};
 
 		VKR(vkAllocateMemory(device, &allocInfo, nullptr, &m_DepthMemory));

@@ -513,4 +513,29 @@ namespace Ayla
         std::unique_lock lock(m_FenceCompletionMutex);
         m_FenceCompletionCallbacks.emplace(fence, std::move(continuation));
     }
+
+    uint32_t VkGraphics::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const
+    {
+        VkPhysicalDeviceMemoryProperties memProps;
+        vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &memProps);
+
+        for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
+        {
+            if ((typeFilter & (1u << i)) && (memProps.memoryTypes[i].propertyFlags & properties) == properties)
+            {
+                return i;
+            }
+        }
+
+        // Fallback: find any matching memory type
+        for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
+        {
+            if (typeFilter & (1u << i))
+            {
+                return i;
+            }
+        }
+
+        return UINT32_MAX;
+    }
 }
