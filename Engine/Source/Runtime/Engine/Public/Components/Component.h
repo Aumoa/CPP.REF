@@ -10,6 +10,7 @@ namespace Ayla
 {
 	class GameObject;
 	class Transform;
+	class Scene;
 
 	ACLASS()
 	class ENGINE_API Component : public SerializableObject
@@ -32,5 +33,6 @@ namespace Ayla
 		}
 
 		Transform* GetTransform() const;
+		Scene* GetScene() const;
 	};
 }

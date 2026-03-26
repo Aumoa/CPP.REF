@@ -10,12 +10,15 @@ namespace Ayla
 	class GameInstance;
 	class Scene;
 	class Camera;
+	class RenderScene;
 
 	class ENGINE_API SceneManager : public NonCopyable
 	{
 		GameInstance* m_GameInstance;
 		SharedPtr<Scene> m_ActiveScene;
 		std::vector<SharedPtr<Scene>> m_AdditiveScenes;
+		std::shared_ptr<RenderScene> m_RenderScene;
+		std::set<Renderer*> m_
 
 	public:
 		SceneManager(GameInstance* gameInstance);
@@ -26,5 +29,9 @@ namespace Ayla
 		
 		void GetAllCameraComponents(std::vector<Camera*>* output) const;
 		GameInstance* GetGameInstance() const noexcept { return m_GameInstance; }
+		RenderScene* GetRenderScene() const noexcept { return m_RenderScene.get(); }
+		
+		void MarkRendererDirty(Renderer* renderer);
+		void UnmarkRendererDirty(Renderer* renderer);
 	};
 }

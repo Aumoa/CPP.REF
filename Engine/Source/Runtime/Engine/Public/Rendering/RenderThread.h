@@ -31,6 +31,7 @@ namespace Ayla
 		std::condition_variable m_Notify;
 		std::queue<function_t<void()>> m_Jobs;
 		std::queue<function_t<void()>> m_CompletionActions;
+		std::queue<function_t<void()>> m_AfterCompletedActions;
 		std::atomic<bool> m_StopRequested = false;
 
 	public:
@@ -39,6 +40,7 @@ namespace Ayla
 
 		void Add(function_t<void()> job);
 		void Dispatch(function_t<void()> completionAction);
+		void AddAfterCompleted(function_t<void()> completionAction);
 
 		void RequestStop();
 		void ExecuteJobs();
@@ -52,3 +54,4 @@ namespace Ayla
 }
 
 #define ENQUEUE_RENDER_THREAD_JOB(job) ::Ayla::RenderThread::GetCurrent()->Add((job));
+#define ENQUEUE_RENDER_THREAD_FINISHED_JOB(action) ::Ayla::RenderThread::GetCurrent()->AddAfterCompleted((action));

@@ -178,12 +178,20 @@ namespace Ayla
 		DispatchTick(TickTiming::EndOfFrame);
 
 		m_Scratch.AllCameras.clear();
-		m_GameInstance->GetSceneManager()->GetAllCameraComponents(&m_Scratch.AllCameras);
+		auto sm = m_GameInstance->GetSceneManager();
+		sm->GetAllCameraComponents(&m_Scratch.AllCameras);
 		m_Scratch.AllCameraViews.resize(m_Scratch.AllCameras.size());
 
 		size_t requiredBufferSize = sizeof(CameraBuffer) * m_Scratch.AllCameras.size();
 		if (!m_Scratch.CameraBuffers || m_Scratch.CameraBuffers->GetByteSize() != requiredBufferSize)
 		{
+			if (m_Scratch.CameraBuffers)
+			{
+				m_RenderThread->AddAfterCompleted([capture = m_Scratch.CameraBuffers]()
+				{
+				});
+			}
+
 			m_Scratch.CameraBuffers = m_Graphics->CreateUploadBuffer(requiredBufferSize);
 		}
 

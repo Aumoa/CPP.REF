@@ -2,11 +2,13 @@
 
 #include "SceneManagement/SceneManager.h"
 #include "SceneManagement/Scene.h"
+#include "Rendering/RenderScene.h"
 
 namespace Ayla
 {
 	SceneManager::SceneManager(GameInstance* gameInstance)
 		: m_GameInstance(gameInstance)
+		, m_RenderScene(std::make_shared<RenderScene>())
 	{
 	}
 

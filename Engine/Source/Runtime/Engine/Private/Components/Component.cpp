@@ -17,4 +17,9 @@ namespace Ayla
 	{
 		return GetGameObject()->GetTransform();
 	}
+
+	Scene* Component::GetScene() const
+	{
+		return GetGameObject()->GetScene();
+	}
 }

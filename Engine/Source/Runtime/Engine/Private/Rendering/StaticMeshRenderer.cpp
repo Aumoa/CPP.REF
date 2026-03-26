@@ -2,6 +2,7 @@
 
 #include "Rendering/StaticMeshRenderer.h"
 #include "Rendering/StaticMesh.h"
+#include "Rendering/StaticMeshRendererProxy.h"
 
 namespace Ayla
 {
@@ -9,8 +10,22 @@ namespace Ayla
 	{
 	}
 
+	StaticMeshRenderer::~StaticMeshRenderer() noexcept
+	{
+	}
+
 	void StaticMeshRenderer::SetMesh(SharedPtr<StaticMesh> mesh)
 	{
-		m_Mesh = mesh;
+		if (m_Mesh != mesh)
+		{
+			m_Mesh = mesh;
+			MarkRenderStateDirty();
+		}
+	}
+
+	std::shared_ptr<RendererProxy> StaticMeshRenderer::CreateProxy()
+	{
+		auto proxy = std::make_shared<StaticMeshRendererProxy>();
+		return proxy;
 	}
 }

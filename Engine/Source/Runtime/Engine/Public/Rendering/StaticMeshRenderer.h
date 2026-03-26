@@ -21,8 +21,12 @@ namespace Ayla
 	public:
 		ACONSTRUCTOR()
 		StaticMeshRenderer();
+		virtual ~StaticMeshRenderer() noexcept override;
 
 		AFUNCTION()
 		void SetMesh(SharedPtr<StaticMesh> mesh);
+
+	protected:
+		virtual std::shared_ptr<RendererProxy> CreateProxy() override;
 	};
 }
