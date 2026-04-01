@@ -60,4 +60,14 @@ namespace Ayla
 			output->insert(output->end(), cameras.begin(), cameras.end());
 		}
 	}
+
+	void SceneManager::MarkRendererDirty(Renderer* renderer)
+	{
+		m_DirtyRenderers.insert(renderer);
+	}
+
+	void SceneManager::UnmarkRendererDirty(Renderer* renderer)
+	{
+		m_DirtyRenderers.erase(renderer);
+	}
 }

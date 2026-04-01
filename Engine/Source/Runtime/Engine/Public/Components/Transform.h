@@ -57,6 +57,18 @@ namespace Ayla
 			*outRotation = m_WorldRotation;
 		}
 
+		Vector3F GetPosition() const noexcept
+		{
+			TryCacheMatrix();
+			return m_WorldPosition;
+		}
+
+		QuaternionF GetRotation() const noexcept
+		{
+			TryCacheMatrix();
+			return m_WorldRotation;
+		}
+
 		void SetPositionAndRotation(const Vector3F& position, const QuaternionF& rotation);
 
 	private:

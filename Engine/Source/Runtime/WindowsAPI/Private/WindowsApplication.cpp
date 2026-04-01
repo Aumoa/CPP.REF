@@ -65,6 +65,17 @@ namespace Ayla
 		return DirectoryReference();
 	}
 
+	DirectoryReference WindowsApplication::GetApplicationDirectory() const
+	{
+		wchar_t exePath[MAX_PATH];
+		if (GetModuleFileNameW(nullptr, exePath, MAX_PATH))
+		{
+			FileReference exeFile(String::FromLiteral(exePath));
+			return exeFile.GetDirectory().GetAbsolute();
+		}
+		return DirectoryReference();
+	}
+
 	void* WindowsApplication::GetApplicationPointer() const
 	{
 		return GetModuleHandleW(nullptr);

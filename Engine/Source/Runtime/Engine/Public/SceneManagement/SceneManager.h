@@ -11,6 +11,7 @@ namespace Ayla
 	class Scene;
 	class Camera;
 	class RenderScene;
+	class Renderer;
 
 	class ENGINE_API SceneManager : public NonCopyable
 	{
@@ -18,7 +19,7 @@ namespace Ayla
 		SharedPtr<Scene> m_ActiveScene;
 		std::vector<SharedPtr<Scene>> m_AdditiveScenes;
 		std::shared_ptr<RenderScene> m_RenderScene;
-		std::set<Renderer*> m_
+		std::set<Renderer*> m_DirtyRenderers;
 
 	public:
 		SceneManager(GameInstance* gameInstance);

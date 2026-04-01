@@ -27,6 +27,7 @@
 #include "Misc/DefaultVectors.h"
 #include "Ticking/TickTiming.h"
 #include "IO/File.h"
+#include "IO/FileReference.h"
 
 namespace Ayla
 {
@@ -51,19 +52,21 @@ namespace Ayla
 		m_GameInstance = InitializeGameInstance();
 		m_GameInstance->Initialize(m_MainActivity->GetMainWindow().Get());
 
+		auto applicationDirectory = GenericApplication::Get().GetApplicationDirectory();
+
 		std::vector<Task<>> tasks;
-		tasks.emplace_back(Task<>::Create([this]() -> Task<>
+		tasks.emplace_back(Task<>::Create([this, &applicationDirectory]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};
 			sci.VertexFactory = std::make_shared<PositionColorVertexFactory>();
 			std::vector<Task<>> tasks;
-			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultVertex.cso")).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultVertex.cso"))).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.VertexShader.Bytecode = std::move(bytecode);
 				sci.VertexShader.EntrypointName = TEXT("main");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultPixel.cso")).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultPixel.cso"))).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.FragmentShader.Bytecode = std::move(bytecode);
@@ -74,23 +77,23 @@ namespace Ayla
 			auto shader = m_Graphics->CreateShader(std::move(sci));
 			m_DefaultGeometryRenderPipeline = m_Graphics->CreateGeometryRenderPipeline(shader);
 		}));
-		tasks.emplace_back(Task<>::Create([this]() -> Task<>
+		tasks.emplace_back(Task<>::Create([this, &applicationDirectory]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};
 			std::vector<Task<>> tasks;
-			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultRayGeneration.cso")).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultRayGeneration.cso"))).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.RayGenerationShader.Bytecode = std::move(bytecode);
 				sci.RayGenerationShader.EntrypointName = TEXT("DefaultRayGeneration");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultHit.cso")).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultHit.cso"))).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.ClosestHitShader.Bytecode = std::move(bytecode);
 				sci.ClosestHitShader.EntrypointName = TEXT("DefaultClosestHit");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(TEXT("E:\\CPP.REF\\Engine\\Binaries\\Win64\\Debug\\Shaders\\DefaultMiss.cso")).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultMiss.cso"))).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.MissShader.Bytecode = std::move(bytecode);
@@ -246,8 +249,8 @@ namespace Ayla
 					.CameraBufferOffset = sizeof(CameraBuffer) * viewIndex
 				};
 
-				auto forward = view.Rotation.TransformVector(Ayla::DefaultVectors<3>::Forward);
-				auto up = view.Rotation.TransformVector(Ayla::DefaultVectors<3>::Up);
+				auto forward = view.Rotation.TransformVector(DefaultVectors<3>::Forward);
+				auto up = view.Rotation.TransformVector(DefaultVectors<3>::Up);
 				auto viewMatrix = Matrix4x4<>::LookToLH(view.Position, forward, up);
 				auto projMatrix = Matrix4x4<>::PerspectiveFovLH<float>(Degrees<float>(view.FieldOfView).ToRadians(), view.AspectRatio.value_or(defaultAspectRatio), 0.01f, 1000.0f);
 				cameraBufferPtr[viewIndex].ViewProjection = Matrix<>::Multiply(viewMatrix, projMatrix);
