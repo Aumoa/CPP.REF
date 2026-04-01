@@ -212,13 +212,15 @@ namespace Ayla
 	void D3D12Graphics::BeginRenderFrame()
 	{
 		static constexpr TimeSpan _1s = TimeSpan::FromSeconds(1);
-		m_CommandQueue[0]->WaitForCompletion(m_LastFrameFenceValue, _1s);
+		size_t previousFrameIndex = GetPreviousFramePageIndex();
+		auto previousFrameFenceValue = m_LastFrameFenceValue[previousFrameIndex];
+		m_CommandQueue[0]->WaitForCompletion(previousFrameFenceValue, _1s);
 	}
 
 	void D3D12Graphics::EndRenderFrame()
 	{
-		++m_FrameCount;
-		m_LastFrameFenceValue = m_CommandQueue[0]->Signal();
+		m_LastFrameFenceValue[GetFramePageIndex()] = m_CommandQueue[0]->Signal();
+		Super::EndRenderFrame();
 	}
 
 	void D3D12Graphics::WaitForCompletion()

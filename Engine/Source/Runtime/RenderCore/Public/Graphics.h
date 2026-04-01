@@ -31,6 +31,7 @@ namespace Ayla
     private:
         std::mutex m_PooledCommandBufferMutex;
         std::vector<SharedPtr<CommandBuffer>> m_PooledCommandBuffers;
+        std::atomic<size_t> m_FrameNumber;
 
     protected:
         Graphics();
@@ -52,8 +53,12 @@ namespace Ayla
         SharedPtr<CommandBuffer> GetPooledCommandBuffer();
         void ReleasePooledCommandBuffer(SharedPtr<CommandBuffer> cmd);
 
-        virtual void BeginRenderFrame() = 0;
-        virtual void EndRenderFrame() = 0;
+        virtual void BeginRenderFrame();
+        virtual void EndRenderFrame();
         virtual void WaitForCompletion() = 0;
+
+        inline size_t GetFrameIndex() const noexcept { return m_FrameNumber; }
+        inline size_t GetPreviousFramePageIndex() const noexcept { return (m_FrameNumber - 1) % kMaxFramesInFlight; }
+        inline size_t GetFramePageIndex() const noexcept { return m_FrameNumber % kMaxFramesInFlight; }
     };
 }

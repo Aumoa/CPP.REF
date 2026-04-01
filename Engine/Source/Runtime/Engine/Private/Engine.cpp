@@ -185,7 +185,7 @@ namespace Ayla
 		sm->GetAllCameraComponents(&m_Scratch.AllCameras);
 		m_Scratch.AllCameraViews.resize(m_Scratch.AllCameras.size());
 
-		size_t requiredBufferSize = sizeof(CameraBuffer) * m_Scratch.AllCameras.size();
+		size_t requiredBufferSize = sizeof(CameraBuffer) * m_Scratch.AllCameras.size() * Graphics::kMaxFramesInFlight;
 		if (!m_Scratch.CameraBuffers || m_Scratch.CameraBuffers->GetByteSize() != requiredBufferSize)
 		{
 			if (m_Scratch.CameraBuffers)
@@ -216,8 +216,8 @@ namespace Ayla
 			cameraBufferPtr
 		]()
 		{
-			commandBuffer->WaitForCompletion(TimeSpan::FromSeconds(1));
 			graphics->BeginRenderFrame();
+			auto framePageIndex = graphics->GetFramePageIndex();
 
 			for (auto& swapchainExt : swapchainExtensions)
 			{
@@ -242,18 +242,20 @@ namespace Ayla
 			size_t viewIndex = 0;
 			for (auto& view : *views)
 			{
+				size_t viewPageIndex = viewIndex * Graphics::kMaxFramesInFlight + framePageIndex;
+
 				SceneView sceneView
 				{
 					.View = view,
 					.CameraBuffer = cameraBuffer.Get(),
-					.CameraBufferOffset = sizeof(CameraBuffer) * viewIndex
+					.CameraBufferOffset = sizeof(CameraBuffer) * viewPageIndex
 				};
 
 				auto forward = view.Rotation.TransformVector(DefaultVectors<3>::Forward);
 				auto up = view.Rotation.TransformVector(DefaultVectors<3>::Up);
 				auto viewMatrix = Matrix4x4<>::LookToLH(view.Position, forward, up);
 				auto projMatrix = Matrix4x4<>::PerspectiveFovLH<float>(Degrees<float>(view.FieldOfView).ToRadians(), view.AspectRatio.value_or(defaultAspectRatio), 0.01f, 1000.0f);
-				cameraBufferPtr[viewIndex].ViewProjection = Matrix<>::Multiply(viewMatrix, projMatrix);
+				cameraBufferPtr[viewPageIndex].ViewProjection = Matrix<>::Multiply(viewMatrix, projMatrix);
 
 				renderer.Render(commandBuffer.Get(), sceneView);
 				++viewIndex;

@@ -36,7 +36,7 @@ namespace Ayla
 
 	void DXGISwapchainExt::DoResize()
 	{
-		if (m_PendingFrameNumber == -1 || m_PendingFrameNumber > (int64)m_Owner->GetFrameNumber() || !m_PendingResize.has_value())
+		if (m_PendingFrameNumber == -1 || m_PendingFrameNumber > (int64)m_Owner->GetFrameIndex() || !m_PendingResize.has_value())
 		{
 			return;
 		}
@@ -57,6 +57,6 @@ namespace Ayla
 	void DXGISwapchainExt::OnResize(const Vector2N& newSize)
 	{
 		m_PendingResize = newSize;
-		m_PendingFrameNumber = m_Owner->GetFrameNumber() + 1;
+		m_PendingFrameNumber = m_Owner->GetFrameIndex() + 1;
 	}
 }

@@ -37,4 +37,13 @@ namespace Ayla
         std::unique_lock lock(m_PooledCommandBufferMutex);
         m_PooledCommandBuffers.emplace_back(std::move(cmd));
     }
+
+    void Graphics::BeginRenderFrame()
+    {
+    }
+
+    void Graphics::EndRenderFrame()
+    {
+        ++m_FrameNumber;
+    }
 }

@@ -20,8 +20,7 @@ namespace Ayla
 		ComPtr<IDXGIFactory5> m_DXGI;
 		ComPtr<ID3D12Device5> m_Device;
 		std::array<std::unique_ptr<CommandQueue>, 3> m_CommandQueue;
-		std::atomic<std::size_t> m_FrameCount = 0;
-		uint64 m_LastFrameFenceValue = 0;
+		std::array<uint64, 2> m_LastFrameFenceValue;
 
 	public:
 		ACONSTRUCTOR()
@@ -43,7 +42,6 @@ namespace Ayla
 		virtual void EndRenderFrame() override;
 		virtual void WaitForCompletion() override;
 
-		inline size_t GetFrameNumber() const noexcept { return m_FrameCount; }
 		inline ID3D12Device1* GetDevice() const noexcept { return m_Device.Get(); }
 		inline CommandQueue& GetCommandQueue() const noexcept { return *m_CommandQueue[0]; }
 	};

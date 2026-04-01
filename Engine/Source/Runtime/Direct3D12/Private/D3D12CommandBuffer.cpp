@@ -15,9 +15,13 @@ namespace Ayla
 	{
 		HR(graphics->GetDevice()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandPool)));
 		DXSetName(m_CommandPool);
-		HR(graphics->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandPool.Get(), nullptr, IID_PPV_ARGS(&m_CommandBuffer)));
-		DXSetName(m_CommandBuffer);
-		HR(m_CommandBuffer->Close());
+
+		for (size_t i = 0; i < Graphics::kMaxFramesInFlight; ++i)
+		{
+			HR(graphics->GetDevice()->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_CommandPool.Get(), nullptr, IID_PPV_ARGS(&m_CommandBuffers[i])));
+			DXSetName(m_CommandBuffers[i]);
+			HR(m_CommandBuffers[i]->Close());
+		}
 
 		D3D12_HEAP_PROPERTIES heapProp = { D3D12_HEAP_TYPE_UPLOAD };
 		D3D12_RESOURCE_DESC resourceDesc =
@@ -65,20 +69,24 @@ namespace Ayla
 		m_VertexBuffer.Reset();
 		m_IndexBuffer.Reset();
 		m_CommandPool.Reset();
-		m_CommandBuffer.Reset();
+		for (auto& commandBuffer : m_CommandBuffers)
+		{
+			commandBuffer.Reset();
+		}
 	}
 
 	void D3D12CommandBuffer::BeginCommands_Implementation()
 	{
+		auto pi = m_Graphics->GetFramePageIndex();
 		HR(m_CommandPool->Reset());
-		HR(m_CommandBuffer->Reset(m_CommandPool.Get(), nullptr));
+		HR(m_CommandBuffers[pi]->Reset(m_CommandPool.Get(), nullptr));
 	}
 
 	void D3D12CommandBuffer::EndCommands_Implementation()
 	{
-		HR(m_CommandBuffer->Close());
-
-		ID3D12CommandList* targetCommandBuffer = m_CommandBuffer.Get();
+		auto pi = m_Graphics->GetFramePageIndex();
+		HR(m_CommandBuffers[pi]->Close());
+		ID3D12CommandList* targetCommandBuffer = m_CommandBuffers[pi].Get();
 		auto& queue = m_Graphics->GetCommandQueue();
 		queue.GetQueue()->ExecuteCommandLists(1, &targetCommandBuffer);
 		m_FenceValue = queue.Signal();
@@ -86,6 +94,7 @@ namespace Ayla
 
 	void D3D12CommandBuffer::BeginRenderPass(RenderTexture* renderTexture)
 	{
+		auto pi = m_Graphics->GetFramePageIndex();
 		if (auto* rt = dynamic_cast<DXGISwapchainRenderTexture*>(renderTexture))
 		{
 			D3D12_RESOURCE_BARRIER barrier =
@@ -99,7 +108,7 @@ namespace Ayla
 					.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
 				}
 			};
-			m_CommandBuffer->ResourceBarrier(1, &barrier);
+			m_CommandBuffers[pi]->ResourceBarrier(1, &barrier);
 
 			D3D12_RENDER_PASS_RENDER_TARGET_DESC renderTargetDesc =
 			{
@@ -138,7 +147,7 @@ namespace Ayla
 				}
 			};
 
-			m_CommandBuffer->BeginRenderPass(1, &renderTargetDesc, &depthStencilDesc, D3D12_RENDER_PASS_FLAG_NONE);
+			m_CommandBuffers[pi]->BeginRenderPass(1, &renderTargetDesc, &depthStencilDesc, D3D12_RENDER_PASS_FLAG_NONE);
 
 			auto size = rt->GetSize();
 			D3D12_VIEWPORT viewport =
@@ -150,7 +159,7 @@ namespace Ayla
 				.MinDepth = 0,
 				.MaxDepth = 1
 			};
-			m_CommandBuffer->RSSetViewports(1, &viewport);
+			m_CommandBuffers[pi]->RSSetViewports(1, &viewport);
 
 			D3D12_RECT scissorRect =
 			{
@@ -159,7 +168,7 @@ namespace Ayla
 				.right = static_cast<LONG>(size.X),
 				.bottom = static_cast<LONG>(size.Y)
 			};
-			m_CommandBuffer->RSSetScissorRects(1, &scissorRect);
+			m_CommandBuffers[pi]->RSSetScissorRects(1, &scissorRect);
 			return;
 		}
 		else
@@ -184,8 +193,9 @@ namespace Ayla
 				}
 			};
 
-			m_CommandBuffer->EndRenderPass();
-			m_CommandBuffer->ResourceBarrier(1, &barrier);
+			auto pi = m_Graphics->GetFramePageIndex();
+			m_CommandBuffers[pi]->EndRenderPass();
+			m_CommandBuffers[pi]->ResourceBarrier(1, &barrier);
 		}
 	}
 
@@ -193,13 +203,15 @@ namespace Ayla
 	{
 		if (auto* pso1 = dynamic_cast<D3D12RaytracingRenderPipeline*>(renderPipeline))
 		{
-			m_CommandBuffer->SetPipelineState1(pso1->GetPipelineStateObject());
+			auto pi = m_Graphics->GetFramePageIndex();
+			m_CommandBuffers[pi]->SetPipelineState1(pso1->GetPipelineStateObject());
 			return;
 		}
 		else if (auto* ps = dynamic_cast<D3D12GeometryRenderPipeline*>(renderPipeline))
 		{
-			m_CommandBuffer->SetGraphicsRootSignature(ps->GetRootSignature());
-			m_CommandBuffer->SetPipelineState(ps->GetPipelineState());
+			auto pi = m_Graphics->GetFramePageIndex();
+			m_CommandBuffers[pi]->SetGraphicsRootSignature(ps->GetRootSignature());
+			m_CommandBuffers[pi]->SetPipelineState(ps->GetPipelineState());
 			return;
 		}
 		else
@@ -223,16 +235,23 @@ namespace Ayla
 			.SizeInBytes = sizeof(uint32) * 3,
 			.Format = DXGI_FORMAT_R32_UINT
 		};
-
-		m_CommandBuffer->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_CommandBuffer->IASetVertexBuffers(0, 1, &vertexBufferView);
-		m_CommandBuffer->IASetIndexBuffer(&indexBufferView);
-		m_CommandBuffer->DrawIndexedInstanced(3, 1, 0, 0, 0);
+		
+		auto pi = m_Graphics->GetFramePageIndex();
+		m_CommandBuffers[pi]->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_CommandBuffers[pi]->IASetVertexBuffers(0, 1, &vertexBufferView);
+		m_CommandBuffers[pi]->IASetIndexBuffer(&indexBufferView);
+		m_CommandBuffers[pi]->DrawIndexedInstanced(3, 1, 0, 0, 0);
 	}
 
 	void D3D12CommandBuffer::WaitForCompletion(const TimeSpan& timeout)
 	{
 		auto& queue = m_Graphics->GetCommandQueue();
 		queue.WaitForCompletion(m_FenceValue, timeout);
+	}
+
+	ID3D12GraphicsCommandList* D3D12CommandBuffer::GetCommandBuffer() const noexcept
+	{
+		auto pi = m_Graphics->GetFramePageIndex();
+		return m_CommandBuffers[pi].Get();
 	}
 }

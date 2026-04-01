@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CommandBuffer.h"
 #include "D3D12Common.h"
+#include "Graphics.h"
 #include "D3D12CommandBuffer.gen.h"
 
 namespace Ayla
@@ -19,7 +20,7 @@ namespace Ayla
 	private:
 		D3D12Graphics* m_Graphics;
 		ComPtr<ID3D12CommandAllocator> m_CommandPool;
-		ComPtr<ID3D12GraphicsCommandList4> m_CommandBuffer;
+		std::array<ComPtr<ID3D12GraphicsCommandList4>, Graphics::kMaxFramesInFlight> m_CommandBuffers;
 		uint64 m_FenceValue;
 
 		ComPtr<ID3D12Resource> m_VertexBuffer;
@@ -39,6 +40,6 @@ namespace Ayla
 		virtual void Draw() override;
 		virtual void WaitForCompletion(const TimeSpan& timeout) override;
 
-		inline ID3D12GraphicsCommandList* GetCommandBuffer() const noexcept { return m_CommandBuffer.Get(); }
+		ID3D12GraphicsCommandList* GetCommandBuffer() const noexcept;
 	};
 }
