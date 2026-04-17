@@ -94,10 +94,19 @@ internal class Solution
         if (string.IsNullOrEmpty(gameFolder) == false)
         {
             primaryGroup = GroupDescriptor.FromRoot(gameFolder, false);
+            EnsureGameDirectories(primaryGroup);
             tasks.Add(ScanDirectoryRecursive(gameProjects, primaryGroup, Path.Combine(gameFolder, "Source")));
         }
 
         await Task.WhenAll(tasks);
+
+        static void EnsureGameDirectories(GroupDescriptor group)
+        {
+            Directory.CreateDirectory(group.SourceDirectory);
+            Directory.CreateDirectory(group.IntermediateDirectory);
+            Directory.CreateDirectory(group.BinariesDirectory);
+            Directory.CreateDirectory(group.ContentDirectory);
+        }
         engineProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
         gameProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
 
