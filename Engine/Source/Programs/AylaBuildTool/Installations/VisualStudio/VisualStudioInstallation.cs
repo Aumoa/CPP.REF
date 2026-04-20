@@ -20,7 +20,8 @@ internal class VisualStudioInstallation : Installation
 
     public enum VSVersion
     {
-        _2022
+        _2022,
+        _2026
     }
 
     public readonly struct Product
@@ -97,6 +98,10 @@ internal class VisualStudioInstallation : Installation
                 case "2022":
                     visualStudioVersion = VSVersion._2022;
                     break;
+                case "2026":
+                case "18":
+                    visualStudioVersion = VSVersion._2026;
+                    break;
                 default:
                     continue;
             }
@@ -148,6 +153,8 @@ internal class VisualStudioInstallation : Installation
             s_WindowsKitVersion = null;
         }
     }
+
+    public static VSVersion? DetectedVersion => s_Products.Length > 0 ? s_Products[0].VisualStudioVersion : null;
 
     public override ValueTask<string> GetCompilerPath(TargetInfo targetInfo, CancellationToken cancellationToken)
     {

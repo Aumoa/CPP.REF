@@ -8,8 +8,13 @@ namespace AylaEngine;
 internal class VSSolutionGenerator : Generator
 {
     private static readonly Version SolutionVersion = new Version(12, 0);
-    private static readonly Version VisualStudioVersion = new Version(17, 2, 32602, 215);
     private static readonly Version MinimumVisualStudioVersion = new Version(10, 0, 40219, 1);
+
+    private static Version VisualStudioVersion => VisualStudioInstallation.DetectedVersion switch
+    {
+        VisualStudioInstallation.VSVersion._2026 => new Version(18, 0, 0, 0),
+        _ => new Version(17, 2, 32602, 215),
+    };
 
     private static readonly Guid CSharpProjectGuid = Guid.Parse("9A19103F-16F7-4668-BE54-9A1E7A4F7556");
     private static readonly Guid FilterGuid = Guid.Parse("2150E333-8FDC-42A3-9474-1A3956D46DE8");
