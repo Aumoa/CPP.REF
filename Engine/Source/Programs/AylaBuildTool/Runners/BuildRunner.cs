@@ -187,7 +187,7 @@ internal static partial class BuildRunner
 
                 if (shaderFiles.Any())
                 {
-                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles));
+                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup));
                 }
             }
 
@@ -213,6 +213,8 @@ internal static partial class BuildRunner
             _ => 6
         };
 
+        await EnsureShaderCompileWorkerAsync();
+
         // Execute CMake builds for third-party modules
         await ExecuteCMakeBuilds();
 
@@ -227,6 +229,31 @@ internal static partial class BuildRunner
         string MakeOutputPrefix(double elapsedSeconds)
         {
             return string.Format($"[{{0,{log}}}/{{1,{log}}} {{2,5:F1}}s]", Interlocked.Increment(ref compiled), totalActions, elapsedSeconds);
+        }
+
+        async Task EnsureShaderCompileWorkerAsync()
+        {
+            if (!shaderTasks.Any())
+            {
+                return;
+            }
+
+            var workerTargetInfo = new TargetInfo { Platform = buildTarget.Platform, Config = Configuration.Development, Editor = false };
+            var workerPath = Path.Combine(solution.EngineGroup.Output(workerTargetInfo, FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
+            if (File.Exists(workerPath))
+            {
+                return;
+            }
+
+            Console.WriteLine("Building ShaderCompileWorker (Development)...");
+            await RunAsync(new BuildOptions
+            {
+                ProjectFile = options.ProjectFile,
+                Target = "ShaderCompileWorker",
+                Config = Configuration.Development,
+                Editor = false,
+                GeneratorType = options.GeneratorType,
+            }, cancellationToken);
         }
 
         async Task ExecuteCMakeBuilds()

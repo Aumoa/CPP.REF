@@ -5,17 +5,19 @@ internal static partial class BuildRunner
     private class ShaderCompileTask : ITask
     {
         private const int MaxShaderTypeDetectionLines = 20; // Maximum lines to scan for shader type annotation
-        
+
         private readonly ModuleProject m_Project;
         private readonly TargetInfo m_TargetInfo;
         private readonly SourceCodeDescriptor[] m_ShaderFiles;
+        private readonly GroupDescriptor m_EngineGroup;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public ShaderCompileTask(ModuleProject project, TargetInfo targetInfo, SourceCodeDescriptor[] shaderFiles)
+        public ShaderCompileTask(ModuleProject project, TargetInfo targetInfo, SourceCodeDescriptor[] shaderFiles, GroupDescriptor engineGroup)
         {
             m_Project = project;
             m_TargetInfo = targetInfo;
             m_ShaderFiles = shaderFiles;
+            m_EngineGroup = engineGroup;
         }
 
         public async Task<Terminal.Output> CompileAsync(IList<ModuleTask> moduleTasks, Installation installation, CancellationToken cancellationToken)
@@ -26,13 +28,6 @@ internal static partial class BuildRunner
                 {
                     m_CompletionSource.SetResult();
                     return Terminal.Output.Success("Shader Compiler", "No shaders to compile");
-                }
-
-                var shaderCompileWorkerTask = moduleTasks.FirstOrDefault(m => m.Resolver.Name == "ShaderCompileWorker");
-                if (shaderCompileWorkerTask != null)
-                {
-                    // Wait for the shader compile worker to be built before proceeding, since we need its executable
-                    await shaderCompileWorkerTask.Task;
                 }
 
                 var resolver = m_Project.GetResolver(m_TargetInfo);
@@ -54,9 +49,8 @@ internal static partial class BuildRunner
                     return Terminal.Output.Success("Shader Compiler", "All shaders up to date");
                 }
 
-                // Invoke DXC compiler
-                var targetInfo = TargetInfo.Environment;
-                var workerPath = Path.Combine(resolver.Group.BinariesDirectory, targetInfo.Platform.Name, targetInfo.Config.ToString(), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
+                var workerTargetInfo = new TargetInfo { Platform = m_TargetInfo.Platform, Config = Configuration.Development, Editor = false };
+                var workerPath = Path.Combine(m_EngineGroup.Output(workerTargetInfo, FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
                 if (!File.Exists(workerPath))
                 {
                     Console.Error.WriteLine("Error: Shader compile worker executable not found at {0}", workerPath);
