@@ -38,9 +38,13 @@ internal static partial class BuildRunner
                 Directory.CreateDirectory(intDir);
                 Directory.CreateDirectory(outDir);
 
+                // Support vullkan
+                var vulkanSdk = Environment.GetEnvironmentVariable("VULKAN_SDK");
+                bool supportVulkan = !string.IsNullOrEmpty(vulkanSdk);
+
                 // Generate shader makefile
                 var makefilePath = Path.Combine(intDir, "ShaderCompilation.txt");
-                var needsCompilation = await GenerateMakefileAsync(makefilePath, intDir, outDir, cancellationToken);
+                var needsCompilation = await GenerateMakefileAsync(makefilePath, intDir, outDir, supportVulkan, cancellationToken);
 
                 if (!needsCompilation.Any())
                 {
@@ -58,11 +62,18 @@ internal static partial class BuildRunner
                 }
 
                 // Run DXC
+                string path = Environment.GetEnvironmentVariable("PATH") ?? "";
+                if (supportVulkan)
+                {
+                    path = $"{Path.Combine(vulkanSdk!, "Bin")};{path}";
+                }
+
                 var options = new Terminal.Options
                 {
                     Executable = workerPath,
-                    WorkingDirectory = resolver.Group.RootDirectory,
-                    Logging = Terminal.Logging.All
+                    WorkingDirectory = Path.GetDirectoryName(workerPath)!,
+                    Logging = Terminal.Logging.All,
+                    Environments = [new KeyValuePair<string, string>("PATH", path)]
                 };
 
                 var dxcOutput = await Terminal.ExecuteCommandAsync($"\"{makefilePath}\"", options, cancellationToken);
@@ -86,7 +97,7 @@ internal static partial class BuildRunner
             }
         }
 
-        private async Task<List<SourceCodeDescriptor>> GenerateMakefileAsync(string makefilePath, string intDir, string outDir, CancellationToken cancellationToken)
+        private async Task<List<SourceCodeDescriptor>> GenerateMakefileAsync(string makefilePath, string intDir, string outDir, bool supportVulkan, CancellationToken cancellationToken)
         {
             var needsCompilation = new List<SourceCodeDescriptor>();
             var lines = new List<string>();
@@ -123,9 +134,12 @@ internal static partial class BuildRunner
                     var includeArgs = string.Join(" ", includePaths.Select(p => $"-I \"{p}\""));
                     lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main -o \"{outputBasePath}\" {includeArgs}");
 
-                    // Add Vulkan compilation (SPIR-V)
-                    //lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" {includeArgs}");
-                    //lines.Add("");
+                    if (supportVulkan)
+                    {
+                        // Add Vulkan compilation (SPIR-V)
+                        lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" {includeArgs}");
+                        lines.Add("");
+                    }
                 }
             }
 

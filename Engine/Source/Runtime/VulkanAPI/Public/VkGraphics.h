@@ -44,8 +44,12 @@ namespace Ayla
         virtual void Dispose() noexcept override;
         virtual RenderFeatures GetCurrentRenderFeature() noexcept override { return RenderFeatures::Vulkan; }
 
-        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow) override;
-        virtual SharedPtr<CommandBuffer> CreateCommandBuffer_Implementation() override;  // VkCommandBuffer.cpp
+        virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) override;
+        virtual SharedPtr<CommandBuffer> CreateCommandBuffer() override;  // VkCommandBuffer.cpp
+        virtual SharedPtr<RenderPipeline> CreateGeometryRenderPipeline(SharedPtr<Shader> shader) override;
+        virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(SharedPtr<Shader> shader) override;
+        virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) override;
+        virtual SharedPtr<Buffer> CreateUploadBuffer(size_t sizeInBytes) override; // VkBuffer.cpp
         virtual SharedPtr<Buffer> CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage) override; // VkBuffer.cpp
 
         virtual void BeginRenderFrame() override;
@@ -62,5 +66,6 @@ namespace Ayla
 
         PFN_vkSetDebugUtilsObjectNameEXT GetSetDebugUtilsObjectNameEXTFunction() const noexcept;
         void AddFenceCompletionCallback(VkFence fence, function_t<void()> continuation);
+        uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
     };
 }

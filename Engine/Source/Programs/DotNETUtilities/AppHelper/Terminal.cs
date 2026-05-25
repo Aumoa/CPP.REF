@@ -21,6 +21,8 @@ public static class Terminal
         public string WorkingDirectory { get; init; } = string.Empty;
 
         public Logging Logging { get; init; } = Logging.StdOut;
+
+        public IEnumerable<KeyValuePair<string, string>> Environments { get; init; } = [];
     }
 
     public record Log
@@ -125,7 +127,7 @@ public static class Terminal
     public static async ValueTask<Output> ExecuteCommandAsync(string command, Options options, CancellationToken cancellationToken = default)
     {
         var sw = Stopwatch.StartNew();
-        var process = StartProcess(options.Executable, command, options.WorkingDirectory);
+        var process = StartProcess(options.Executable, command, options.WorkingDirectory, options.Environments);
 
         List<Log> logs = [];
         List<Log> stdout = [];
@@ -196,7 +198,7 @@ public static class Terminal
         };
     }
 
-    private static Process StartProcess(string? executable, string command, string workingDirectory = ".")
+    private static Process StartProcess(string? executable, string command, string workingDirectory, IEnumerable<KeyValuePair<string, string>> environments)
     {
         var processInfo = new ProcessStartInfo
         {
@@ -216,6 +218,11 @@ public static class Terminal
         {
             processInfo.FileName = executable;
             processInfo.Arguments = command;
+        }
+
+        foreach (var env in environments)
+        {
+            processInfo.Environment[env.Key] = env.Value;
         }
 
         var process = Process.Start(processInfo);

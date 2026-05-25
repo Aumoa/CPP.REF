@@ -5,6 +5,8 @@
 #include "GenericWindowSwapchainExtension.h"
 #include "VkSwapchainExt.h"
 #include "VkCommandQueue.h"
+#include "VkShader.h"
+#include "VkGeometryRenderPipeline.h"
 #include "Linq/Concat.h"
 #include <ranges>
 #include <array>
@@ -343,7 +345,7 @@ namespace Ayla
         m_PhysicalDevice = nullptr;
     }
 
-    SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain_Implementation(SharedPtr<GenericWindow> targetWindow)
+    SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain(SharedPtr<GenericWindow> targetWindow)
     {
 #if PLATFORM_LINUX
         auto* display = reinterpret_cast<Display*>(GenericApplication::Get().GetApplicationPointer());
@@ -445,6 +447,21 @@ namespace Ayla
         return extension;
     }
 
+    SharedPtr<RenderPipeline> VkGraphics::CreateGeometryRenderPipeline(SharedPtr<Shader> shader)
+    {
+        return New<VkGeometryRenderPipeline>(this, std::move(shader));
+    }
+
+    SharedPtr<RenderPipeline> VkGraphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
+    {
+        throw InvalidOperationException(TEXT("Raytracing render pipeline is not yet implemented for Vulkan."));
+    }
+
+    SharedPtr<Shader> VkGraphics::CreateShader(ShaderCreationInfo shaderCreationInfo)
+    {
+        return New<VkShader>(std::move(shaderCreationInfo));
+    }
+
     void VkGraphics::BeginRenderFrame()
     {
         static thread_local std::vector<function_t<void()>> s_Continuations;
@@ -495,5 +512,30 @@ namespace Ayla
     {
         std::unique_lock lock(m_FenceCompletionMutex);
         m_FenceCompletionCallbacks.emplace(fence, std::move(continuation));
+    }
+
+    uint32_t VkGraphics::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const
+    {
+        VkPhysicalDeviceMemoryProperties memProps;
+        vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &memProps);
+
+        for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
+        {
+            if ((typeFilter & (1u << i)) && (memProps.memoryTypes[i].propertyFlags & properties) == properties)
+            {
+                return i;
+            }
+        }
+
+        // Fallback: find any matching memory type
+        for (uint32_t i = 0; i < memProps.memoryTypeCount; ++i)
+        {
+            if (typeFilter & (1u << i))
+            {
+                return i;
+            }
+        }
+
+        return UINT32_MAX;
     }
 }

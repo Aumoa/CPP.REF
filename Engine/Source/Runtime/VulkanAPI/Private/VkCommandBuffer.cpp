@@ -3,6 +3,9 @@
 #include "VkCommandBuffer.h"
 #include "VkGraphics.h"
 #include "VkCommandQueue.h"
+#include "VkSwapchainRenderTexture.h"
+#include "VkGeometryRenderPipeline.h"
+#include "Misc/PositionColorVertex.h"
 
 namespace Ayla
 {
@@ -26,11 +29,6 @@ namespace Ayla
 			.commandBufferCount = (uint32_t)VkGraphics::kMaxFramesInFlight
 		};
 
-		VkSemaphoreCreateInfo semaphoreCreateInfo
-		{
-			.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-		};
-
 		m_CommandBuffers.resize(VkGraphics::kMaxFramesInFlight);
 		VKR(vkAllocateCommandBuffers(graphics->GetDevice(), &commandBufferAllocInfo, m_CommandBuffers.data()));
 
@@ -48,6 +46,8 @@ namespace Ayla
 				VKR(vkCreateFence(graphics->GetDevice(), &fenceCreateInfo, nullptr, &m_Fences[i]));
 			}
 		}
+
+		CreateTriangleBuffers();
 	}
 
 	VkCommandBuffer::~VkCommandBuffer() noexcept
@@ -57,21 +57,44 @@ namespace Ayla
 
 	void VkCommandBuffer::Dispose() noexcept
 	{
+		auto device = m_Graphics->GetDevice();
+
+		if (m_VertexBuffer != VK_NULL_HANDLE)
+		{
+			vkDestroyBuffer(device, m_VertexBuffer, nullptr);
+			m_VertexBuffer = VK_NULL_HANDLE;
+		}
+		if (m_VertexMemory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(device, m_VertexMemory, nullptr);
+			m_VertexMemory = VK_NULL_HANDLE;
+		}
+		if (m_IndexBuffer != VK_NULL_HANDLE)
+		{
+			vkDestroyBuffer(device, m_IndexBuffer, nullptr);
+			m_IndexBuffer = VK_NULL_HANDLE;
+		}
+		if (m_IndexMemory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(device, m_IndexMemory, nullptr);
+			m_IndexMemory = VK_NULL_HANDLE;
+		}
+
 		for (auto& fence : m_Fences)
 		{
-			vkDestroyFence(m_Graphics->GetDevice(), fence, nullptr);
+			vkDestroyFence(device, fence, nullptr);
 		}
 		m_Fences.clear();
 
 		if (m_CommandBuffers.size() > 0)
 		{
-			vkFreeCommandBuffers(m_Graphics->GetDevice(), m_CommandPool, (uint32_t)m_CommandBuffers.size(), m_CommandBuffers.data());
+			vkFreeCommandBuffers(device, m_CommandPool, (uint32_t)m_CommandBuffers.size(), m_CommandBuffers.data());
 			m_CommandBuffers.clear();
 		}
 
 		if (m_CommandPool)
 		{
-			vkDestroyCommandPool(m_Graphics->GetDevice(), m_CommandPool, nullptr);
+			vkDestroyCommandPool(device, m_CommandPool, nullptr);
 			m_CommandPool = nullptr;
 		}
 	}
@@ -124,6 +147,83 @@ namespace Ayla
 		VKR(vkQueueSubmit(m_Graphics->GetGraphicsQueue()->GetVkQueue(), 1, &submitInfo, fence));
 	}
 
+	void VkCommandBuffer::BeginRenderPass(RenderTexture* renderTexture)
+	{
+		if (auto* rt = dynamic_cast<VkSwapchainRenderTexture*>(renderTexture))
+		{
+			auto size = rt->GetSize();
+			auto framebuffer = rt->GetCurrentFramebuffer();
+			auto renderPass = rt->GetRenderPass();
+
+			VkClearValue clearValues[2] = {};
+			clearValues[0].color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
+			clearValues[1].depthStencil = { 1.0f, 0 };
+
+			VkRenderPassBeginInfo renderPassBeginInfo
+			{
+				.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+				.renderPass = renderPass,
+				.framebuffer = framebuffer,
+				.renderArea =
+				{
+					.offset = { 0, 0 },
+					.extent = { (uint32_t)size.X, (uint32_t)size.Y },
+				},
+				.clearValueCount = 2,
+				.pClearValues = clearValues,
+			};
+
+			vkCmdBeginRenderPass(GetVkCommandBuffer(), &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			VkViewport viewport
+			{
+				.x = 0.0f,
+				.y = 0.0f,
+				.width = static_cast<float>(size.X),
+				.height = static_cast<float>(size.Y),
+				.minDepth = 0.0f,
+				.maxDepth = 1.0f,
+			};
+			vkCmdSetViewport(GetVkCommandBuffer(), 0, 1, &viewport);
+
+			VkRect2D scissor
+			{
+				.offset = { 0, 0 },
+				.extent = { (uint32_t)size.X, (uint32_t)size.Y },
+			};
+			vkCmdSetScissor(GetVkCommandBuffer(), 0, 1, &scissor);
+		}
+		else
+		{
+			throw InvalidOperationException(TEXT("Unsupported render texture type."));
+		}
+	}
+
+	void VkCommandBuffer::EndRenderPass(RenderTexture* renderTexture)
+	{
+		vkCmdEndRenderPass(GetVkCommandBuffer());
+	}
+
+	void VkCommandBuffer::SetRenderPipeline(RenderPipeline* renderPipeline)
+	{
+		if (auto* ps = dynamic_cast<VkGeometryRenderPipeline*>(renderPipeline))
+		{
+			vkCmdBindPipeline(GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, ps->GetPipeline());
+		}
+		else
+		{
+			throw InvalidOperationException(TEXT("Unsupported render pipeline type."));
+		}
+	}
+
+	void VkCommandBuffer::Draw()
+	{
+		VkDeviceSize offset = 0;
+		vkCmdBindVertexBuffers(GetVkCommandBuffer(), 0, 1, &m_VertexBuffer, &offset);
+		vkCmdBindIndexBuffer(GetVkCommandBuffer(), m_IndexBuffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdDrawIndexed(GetVkCommandBuffer(), 3, 1, 0, 0, 0);
+	}
+
 	void VkCommandBuffer::WaitForCompletion(const TimeSpan& timeout)
 	{
 		if (m_Fences.empty())
@@ -155,7 +255,84 @@ namespace Ayla
 		return m_Fences[m_Graphics->GetFrameIndex()];
 	}
 
-	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer_Implementation()
+	void VkCommandBuffer::CreateTriangleBuffers()
+	{
+		auto device = m_Graphics->GetDevice();
+
+		// Create vertex buffer (host visible, like D3D12's upload heap)
+		PositionColorVertex vertices[3] =
+		{
+			{ Vector3F(0, 1.0f, 0), NamedColors::Red },
+			{ Vector3F(1.0f, -1.0f, 0), NamedColors::Green },
+			{ Vector3F(-1.0f, -1.0f, 0), NamedColors::Blue },
+		};
+
+		VkBufferCreateInfo vertexBufferInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+			.size = sizeof(vertices),
+			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		};
+
+		VKR(vkCreateBuffer(device, &vertexBufferInfo, nullptr, &m_VertexBuffer));
+
+		VkMemoryRequirements vertexMemReq;
+		vkGetBufferMemoryRequirements(device, m_VertexBuffer, &vertexMemReq);
+
+		VkMemoryAllocateInfo vertexAllocInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.allocationSize = vertexMemReq.size,
+			.memoryTypeIndex = FindMemoryType(vertexMemReq.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
+		};
+
+		VKR(vkAllocateMemory(device, &vertexAllocInfo, nullptr, &m_VertexMemory));
+		VKR(vkBindBufferMemory(device, m_VertexBuffer, m_VertexMemory, 0));
+
+		void* vertexData;
+		VKR(vkMapMemory(device, m_VertexMemory, 0, sizeof(vertices), 0, &vertexData));
+		std::memcpy(vertexData, vertices, sizeof(vertices));
+		vkUnmapMemory(device, m_VertexMemory);
+
+		// Create index buffer (host visible, like D3D12's upload heap)
+		uint32 indices[3] = { 0, 1, 2 };
+
+		VkBufferCreateInfo indexBufferInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+			.size = sizeof(indices),
+			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		};
+
+		VKR(vkCreateBuffer(device, &indexBufferInfo, nullptr, &m_IndexBuffer));
+
+		VkMemoryRequirements indexMemReq;
+		vkGetBufferMemoryRequirements(device, m_IndexBuffer, &indexMemReq);
+
+		VkMemoryAllocateInfo indexAllocInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.allocationSize = indexMemReq.size,
+			.memoryTypeIndex = FindMemoryType(indexMemReq.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
+		};
+
+		VKR(vkAllocateMemory(device, &indexAllocInfo, nullptr, &m_IndexMemory));
+		VKR(vkBindBufferMemory(device, m_IndexBuffer, m_IndexMemory, 0));
+
+		void* indexData;
+		VKR(vkMapMemory(device, m_IndexMemory, 0, sizeof(indices), 0, &indexData));
+		std::memcpy(indexData, indices, sizeof(indices));
+		vkUnmapMemory(device, m_IndexMemory);
+	}
+
+	uint32_t VkCommandBuffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+	{
+		return m_Graphics->FindMemoryType(typeFilter, properties);
+	}
+
+	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer()
 	{
 		return New<VkCommandBuffer>(this, true);
 	}

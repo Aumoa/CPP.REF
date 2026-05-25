@@ -13,35 +13,28 @@ public class ShaderCompileWorker : ModuleRules
         AddPublicDependencyModuleNames("Core");
         Type = ModuleType.Console;
 
-        if (OperatingSystem.IsWindows())
+        string? vulkanSdk = Environment.GetEnvironmentVariable("VULKAN_SDK");
+        if (string.IsNullOrEmpty(vulkanSdk))
         {
-            AddPrivateAdditionalLibraries("dxcompiler.lib");
+            AddError("VULKAN_SDK environment variable is not set. Please install the Vulkan SDK and ensure the environment variable is configured.");
+            return;
         }
-        else
+
+        var includePath = Path.Combine(vulkanSdk, "Include", "dxc");
+        if (!Directory.Exists(includePath))
         {
-            string? vulkanSdk = Environment.GetEnvironmentVariable("VULKAN_SDK");
-            if (string.IsNullOrEmpty(vulkanSdk))
-            {
-                AddError("VULKAN_SDK environment variable is not set. Please install the Vulkan SDK and ensure the environment variable is configured.");
-                return;
-            }
-
-            var includePath = Path.Combine(vulkanSdk, "Include", "dxc");
-            if (!Directory.Exists(includePath))
-            {
-                AddError($"Could not find the Include directory in the Vulkan SDK directory: {vulkanSdk}. Please ensure the Vulkan SDK is installed correctly.");
-                return;
-            }
-
-            var libPath = Path.Combine(vulkanSdk, "Lib", "dxcompiler.lib");
-            if (!File.Exists(libPath))
-            {
-                AddError($"Could not find dxcompiler.lib in the Vulkan SDK directory: {vulkanSdk}. Please ensure the Vulkan SDK is installed correctly.");
-                return;
-            }
-
-            AddPrivateIncludePaths(includePath);
-            AddPrivateAdditionalLibraries(libPath);
+            AddError($"Could not find the Include directory in the Vulkan SDK directory: {vulkanSdk}. Please ensure the Vulkan SDK is installed correctly.");
+            return;
         }
+
+        var libPath = Path.Combine(vulkanSdk, "Lib", "dxcompiler.lib");
+        if (!File.Exists(libPath))
+        {
+            AddError($"Could not find dxcompiler.lib in the Vulkan SDK directory: {vulkanSdk}. Please ensure the Vulkan SDK is installed correctly.");
+            return;
+        }
+
+        AddPrivateIncludePaths(includePath);
+        AddPrivateAdditionalLibraries(libPath);
     }
 }
