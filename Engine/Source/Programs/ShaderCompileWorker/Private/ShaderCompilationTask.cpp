@@ -109,6 +109,11 @@ namespace Ayla
 			{
 				task.m_OutputBasePath = ReadToken(context);
 			}
+			// Parse dependency file path (-d)
+			else if (token == TEXT("-d"))
+			{
+				task.m_DependencyFile = ReadToken(context);
+			}
 			// Parse include path (-I)
 			else if (token == TEXT("-I"))
 			{

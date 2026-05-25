@@ -53,6 +53,7 @@ namespace Ayla
 		String m_SourceFile;
 		std::optional<ShaderType> m_Type;
 		String m_OutputBasePath;
+		String m_DependencyFile;
 		std::vector<String> m_IncludePaths;
 		String m_EntryPoint;
 		bool m_Vulkan = false;
@@ -65,6 +66,7 @@ namespace Ayla
 		ShaderType GetType() const { return m_Type.value(); }
 		bool HasType() const noexcept { return m_Type.has_value(); }
 		const String& GetOutputBasePath() const noexcept { return m_OutputBasePath; }
+		const String& GetDependencyFile() const noexcept { return m_DependencyFile; }
 		const std::vector<String>& GetIncludePaths() const noexcept { return m_IncludePaths; }
 		const String& GetEntryPoint() const noexcept { return m_EntryPoint; }
 		bool IsVulkan() const noexcept { return m_Vulkan; }

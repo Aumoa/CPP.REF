@@ -57,6 +57,7 @@ internal static partial class BuildRunner
         int compiled = 0;
         int totalActions = 0;
         int log = 1;
+        HashSet<string> loggedTerminalFailures = [];
 
         Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
 
@@ -222,13 +223,65 @@ internal static partial class BuildRunner
         DispatchShaderCompileWorkers();
         DispatchLinkWorkers();
         DispatchScriptCompileWorkers();
-        await Task.WhenAll(moduleTasks.Select(p => p.Task).Concat(scriptTasks.Select(p => p.Task)).Concat(shaderTasks.Select(p => p.Task)));
+        var buildTasks = moduleTasks.Select(p => p.Task).Concat(scriptTasks.Select(p => p.Task)).Concat(shaderTasks.Select(p => p.Task)).ToArray();
+        try
+        {
+            await Task.WhenAll(buildTasks);
+        }
+        catch
+        {
+            foreach (var task in buildTasks.Where(p => p.IsFaulted))
+            {
+                LogTaskFailure(task.Exception);
+            }
+
+            throw TerminateException.User();
+        }
 
         return;
 
         string MakeOutputPrefix(double elapsedSeconds)
         {
             return string.Format($"[{{0,{log}}}/{{1,{log}}} {{2,5:F1}}s]", Interlocked.Increment(ref compiled), totalActions, elapsedSeconds);
+        }
+
+        void LogTaskFailure(Exception? exception)
+        {
+            if (exception == null)
+            {
+                return;
+            }
+
+            IEnumerable<Exception> exceptions = exception is AggregateException ae
+                ? ae.Flatten().InnerExceptions
+                : [exception];
+
+            foreach (var ex in exceptions)
+            {
+                if (ex is TerminalExecutionException terminalException)
+                {
+                    var output = terminalException.Output;
+                    var key = $"{output.Executable}\n{output.Command}\n{output.ExitCode}";
+                    lock (loggedTerminalFailures)
+                    {
+                        if (!loggedTerminalFailures.Add(key))
+                        {
+                            continue;
+                        }
+                    }
+
+                    var logText = string.Join('\n', output.Logs.Select(l => l.Value));
+                    Console.Error.WriteLine("{0} Terminal execution failed with code {1}\n{2}{3}",
+                        MakeOutputPrefix(output.ElapsedSeconds),
+                        output.ExitCode,
+                        output.Command,
+                        string.IsNullOrWhiteSpace(logText) ? string.Empty : "\n" + logText);
+                }
+                else if (ex is not OperationCanceledException)
+                {
+                    Console.Error.WriteLine(ex.Message);
+                }
+            }
         }
 
         async Task EnsureShaderCompileWorkerAsync()
@@ -240,10 +293,6 @@ internal static partial class BuildRunner
 
             var workerTargetInfo = new TargetInfo { Platform = buildTarget.Platform, Config = Configuration.Development, Editor = false };
             var workerPath = Path.Combine(solution.EngineGroup.Output(workerTargetInfo, FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
-            if (File.Exists(workerPath))
-            {
-                return;
-            }
 
             Console.WriteLine("Building ShaderCompileWorker (Development)...");
             await RunAsync(new BuildOptions
@@ -254,6 +303,12 @@ internal static partial class BuildRunner
                 Editor = false,
                 GeneratorType = options.GeneratorType,
             }, cancellationToken);
+
+            if (!File.Exists(workerPath))
+            {
+                Console.Error.WriteLine("Error: Shader compile worker executable not found at {0}", workerPath);
+                throw TerminateException.Abort();
+            }
         }
 
         async Task ExecuteCMakeBuilds()
@@ -369,6 +424,11 @@ internal static partial class BuildRunner
             {
                 scriptTask.BuildAsync(scriptTasks, virtualProjects, buildTarget, cancellationToken).ContinueWith(r =>
                 {
+                    if (r.IsFaulted)
+                    {
+                        return;
+                    }
+
                     var output = r.Result;
                     Console.WriteLine("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
                 });
@@ -383,21 +443,7 @@ internal static partial class BuildRunner
                 {
                     if (r.IsFaulted)
                     {
-                        LogException(r.Exception);
-                        foreach (var ex in r.Exception.InnerExceptions)
-                        {
-                            LogException(ex);
-                        }
-
-                        throw r.Exception;
-
-                        void LogException(Exception ex)
-                        {
-                            if (ex is TerminalExecutionException e)
-                            {
-                                Console.Error.WriteLine("{0} Terminal execution failed with code {1}\n{2}\n{3}", MakeOutputPrefix(e.Output.ElapsedSeconds), e.Output.ExitCode, e.Output.Command, string.Join('\n', e.Output.Logs.Select(l => l.Value)));
-                            }
-                        }
+                        return;
                     }
 
                     var output = r.Result;
@@ -417,16 +463,13 @@ internal static partial class BuildRunner
                 {
                     moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
                     {
-                        try
+                        if (r.IsFaulted)
                         {
-                            var output = r.Result;
-                            Console.WriteLine("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
+                            return;
                         }
-                        catch (TerminalExecutionException e)
-                        {
-                            Console.Error.WriteLine(string.Join('\n', e.Output.Logs.Select(l => l.Value)));
-                            throw;
-                        }
+
+                        var output = r.Result;
+                        Console.WriteLine("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
                     });
                 }
                 else
@@ -443,6 +486,11 @@ internal static partial class BuildRunner
             {
                 compileTask.CompileAsync(installation, buildTarget, cancellationToken).ContinueWith(r =>
                 {
+                    if (r.IsFaulted)
+                    {
+                        return;
+                    }
+
                     var output = r.Result;
                     string fileText = string.Format("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), compileTask.Item.SourceCode.FilePath);
                     string[] outputs = [fileText, .. output.Logs.Select(l => l.Value)];

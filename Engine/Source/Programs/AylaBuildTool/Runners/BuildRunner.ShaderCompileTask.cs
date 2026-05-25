@@ -103,7 +103,7 @@ internal static partial class BuildRunner
             var lines = new List<string>();
             
             lines.Add("# Auto-generated shader compilation makefile");
-            lines.Add("# Format: <source> -t <type> -e <entrypoint> [--vulkan] -o <output> [-I <include_path>]...");
+            lines.Add("# Format: <source> -t <type> -e <entrypoint> [--vulkan] -o <output> -d <deps> [-I <include_path>]...");
             lines.Add("");
 
             foreach (var shaderFile in m_ShaderFiles)
@@ -122,24 +122,37 @@ internal static partial class BuildRunner
 
                 var fileName = Path.GetFileNameWithoutExtension(shaderFile.FilePath);
                 var outputBasePath = Path.Combine(outDir, "Shaders", fileName);
-                var depsFile = Path.Combine(intDir, fileName + ".deps");
+                var includePaths = GetIncludePaths(shaderFile);
+                var includeArgs = string.Join(" ", includePaths.Select(p => $"-I \"{p}\""));
 
-                // Check if compilation is needed
-                if (await NeedsCompilationAsync(shaderFile.FilePath, outputBasePath, depsFile, cancellationToken))
+                var shaderNeedsCompilation = false;
+                var csoFile = outputBasePath + ".cso";
+                var csoDepsFile = Path.Combine(intDir, fileName + ".cso.deps");
+
+                if (await NeedsCompilationAsync(csoFile, csoDepsFile, cancellationToken))
+                {
+                    shaderNeedsCompilation = true;
+
+                    lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main -o \"{outputBasePath}\" -d \"{csoDepsFile}\" {includeArgs}");
+                }
+
+                if (supportVulkan)
+                {
+                    var spvFile = outputBasePath + ".spv";
+                    var spvDepsFile = Path.Combine(intDir, fileName + ".spv.deps");
+
+                    if (await NeedsCompilationAsync(spvFile, spvDepsFile, cancellationToken))
+                    {
+                        shaderNeedsCompilation = true;
+
+                        lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" -d \"{spvDepsFile}\" {includeArgs}");
+                    }
+                }
+
+                if (shaderNeedsCompilation)
                 {
                     needsCompilation.Add(shaderFile);
-
-                    // Add DirectX compilation
-                    var includePaths = GetIncludePaths(shaderFile);
-                    var includeArgs = string.Join(" ", includePaths.Select(p => $"-I \"{p}\""));
-                    lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main -o \"{outputBasePath}\" {includeArgs}");
-
-                    if (supportVulkan)
-                    {
-                        // Add Vulkan compilation (SPIR-V)
-                        lines.Add($"\"{shaderFile.FilePath}\" -t {shaderType} -e main --vulkan -o \"{outputBasePath}\" {includeArgs}");
-                        lines.Add("");
-                    }
+                    lines.Add("");
                 }
             }
 
@@ -202,13 +215,9 @@ internal static partial class BuildRunner
             return null;
         }
 
-        private async Task<bool> NeedsCompilationAsync(string sourceFile, string outputBasePath, string depsFile, CancellationToken cancellationToken)
+        private async Task<bool> NeedsCompilationAsync(string outputFile, string depsFile, CancellationToken cancellationToken)
         {
-            var csoFile = outputBasePath + ".cso";
-            var spvFile = outputBasePath + ".spv";
-
-            // If output files don't exist, need compilation
-            if (!File.Exists(csoFile) || !File.Exists(spvFile))
+            if (!File.Exists(outputFile))
             {
                 return true;
             }
@@ -223,7 +232,7 @@ internal static partial class BuildRunner
             {
                 // Read dependency file
                 var depsContent = await File.ReadAllTextAsync(depsFile, cancellationToken);
-                var outputTime = File.GetLastWriteTimeUtc(csoFile);
+                var outputTime = File.GetLastWriteTimeUtc(outputFile);
                 
                 // Parse dependencies (format: "output: \ dep1 \ dep2 ...")
                 var lines = depsContent.Split('\n');

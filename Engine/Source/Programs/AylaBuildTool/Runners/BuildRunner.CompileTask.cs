@@ -20,6 +20,7 @@ internal static partial class BuildRunner
             {
                 var compiler = await installation.SpawnCompilerAsync(targetInfo, cancellationToken);
                 var output = await compiler.CompileAsync(Item, cancellationToken);
+                TerminalExecutionException.ThrowIfFailure(output);
                 m_CompletionSource.SetResult();
                 return output;
             }

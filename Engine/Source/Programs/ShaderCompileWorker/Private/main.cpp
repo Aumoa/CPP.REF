@@ -20,7 +20,7 @@ Task<int> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 			Console::WriteLine(TEXT("Usage: ShaderCompileWorker <compilation-list-file>"));
 			Console::WriteLine(TEXT(""));
 			Console::WriteLine(TEXT("The compilation list file should contain lines in the format:"));
-			Console::WriteLine(TEXT("  Source/Shader.hlsl -t library -o Intermediate/Shader -I Include/Path -e main"));
+			Console::WriteLine(TEXT("  Source/Shader.hlsl -t library -o Intermediate/Shader -d Intermediate/Shader.cso.deps -I Include/Path -e main"));
 			co_return 1;
 		}
 

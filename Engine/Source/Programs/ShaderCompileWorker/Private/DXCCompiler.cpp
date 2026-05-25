@@ -94,7 +94,11 @@ namespace Ayla
 		}
 
 		// Ensure dependency directory exists
-		String dependencyFileName = sct.GetOutputBasePath() + TEXT(".deps");
+		String dependencyFileName = sct.GetDependencyFile();
+		if (dependencyFileName.IsEmpty())
+		{
+			dependencyFileName = sct.GetOutputBasePath() + (sct.IsVulkan() ? TEXT(".spv.deps") : TEXT(".cso.deps"));
+		}
 		auto depDir = Path::GetDirectoryName(dependencyFileName);
 		if (!Directory::Exists(depDir))
 		{

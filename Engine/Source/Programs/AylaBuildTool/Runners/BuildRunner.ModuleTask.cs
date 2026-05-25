@@ -101,6 +101,7 @@ internal static partial class BuildRunner
 
                     var linker = await installation.SpawnLinkerAsync(targetInfo, cancellationToken);
                     var output = await linker.LinkAsync(Resolver, m_AllCompiles, cancellationToken);
+                    TerminalExecutionException.ThrowIfFailure(output);
                     m_CompletionSource.SetResult();
                     return output;
                 }
