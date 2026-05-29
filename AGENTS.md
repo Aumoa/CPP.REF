@@ -7,6 +7,7 @@
 
 ## Code Style
 
+- Repository files and generated documentation should be written in English.
 - C++ and C# member fields should use the `m_` prefix.
 - Class names do not use engine-style prefixes, so member prefixes help reduce naming collisions.
 
