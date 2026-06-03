@@ -83,6 +83,7 @@ internal class Solution
     {
         var solution = new Solution(projectFile == null ? null : Path.GetFullPath(projectFile));
         string? gameFolder = solution.ProjectFile == null ? null : Path.GetDirectoryName(solution.ProjectFile);
+        var metadataStore = new ProjectMetadataStore();
 
         List<Task> tasks = new();
         GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
@@ -119,7 +120,7 @@ internal class Solution
             var csprojFileName = Path.Combine(currentDir, directoryName + ".csproj");
             if (File.Exists(csprojFileName))
             {
-                Project.Declaration declaration = await ConfigureDeclarationAsync(csprojFileName);
+                Project.Declaration declaration = await metadataStore.GetOrCreateProjectDeclarationAsync(csprojFileName, cancellationToken);
 
                 lock (results)
                 {
@@ -161,7 +162,7 @@ internal class Solution
 
                 var className = directoryName.Replace('.', '_');
                 var ruleType = assembly.GetTypes().First(p => p.Name == className);
-                ModuleProject.ModuleDeclaration declaration = await ConfigureModuleDeclarationAsync(ruleFileName);
+                ModuleProject.ModuleDeclaration declaration = await metadataStore.GetOrCreateModuleDeclarationAsync(ruleFileName, cancellationToken);
 
                 lock (results)
                 {
@@ -225,42 +226,5 @@ internal class Solution
             ]);
         }
 
-        async Task<Project.Declaration> ConfigureDeclarationAsync(string fileName)
-        {
-            fileName += ".meta";
-
-            Project.Declaration? declaration = null;
-            if (File.Exists(fileName))
-            {
-                declaration = await MetadataHelper.DeserializeFromFileAsync<Project.Declaration>(fileName, cancellationToken);
-            }
-
-            if (declaration is not { IsValid: true })
-            {
-                declaration = Project.Declaration.New();
-                await MetadataHelper.SerializeToFileAsync(declaration, fileName, cancellationToken);
-            }
-
-            return declaration;
-        }
-
-        async Task<ModuleProject.ModuleDeclaration> ConfigureModuleDeclarationAsync(string fileName)
-        {
-            fileName += ".meta";
-
-            ModuleProject.ModuleDeclaration? declaration = null;
-            if (File.Exists(fileName))
-            {
-                declaration = await MetadataHelper.DeserializeFromFileAsync<ModuleProject.ModuleDeclaration>(fileName, cancellationToken);
-            }
-
-            if (declaration is not { IsValid: true })
-            {
-                declaration = ModuleProject.ModuleDeclaration.New();
-                await MetadataHelper.SerializeToFileAsync(declaration, fileName, cancellationToken);
-            }
-
-            return declaration;
-        }
     }
 }
