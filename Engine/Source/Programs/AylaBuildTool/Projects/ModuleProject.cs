@@ -42,7 +42,9 @@ internal class ModuleProject(Solution Solution, string name, GroupDescriptor des
             }
         }
 
-        rules = ModuleRules.New(RuleType, targetInfo);
+        rules = BuildRulesExceptionHandler.Evaluate(
+            $"Failed to evaluate module rule '{Name}'.",
+            () => ModuleRules.New(RuleType, targetInfo));
         lock (m_CachedRules)
         {
             if (m_CachedRules.TryGetValue(targetInfo, out var @int))

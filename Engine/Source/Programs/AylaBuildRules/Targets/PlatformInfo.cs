@@ -42,8 +42,8 @@ public record PlatformInfo
                 }
             }
 
-            Console.Error.WriteLine("PlatformInfo: Not supported platform. {0} ({1})", RuntimeInformation.OSDescription, RuntimeInformation.ProcessArchitecture);
-            throw TerminateException.NotSupport();
+            throw new PlatformNotSupportedException(
+                $"PlatformInfo: Not supported platform. {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}).");
         }
     }
 

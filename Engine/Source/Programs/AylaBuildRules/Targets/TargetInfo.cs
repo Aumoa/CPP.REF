@@ -1,9 +1,8 @@
-﻿using System.Runtime.InteropServices;
-using static AylaEngine.Terminal;
+using System.Runtime.InteropServices;
 
 namespace AylaEngine;
 
-internal record TargetInfo : ITargetInfo
+public record TargetInfo : ITargetInfo
 {
     public PlatformInfo Platform { get; init; } = PlatformInfo.Win64;
 
@@ -44,8 +43,7 @@ internal record TargetInfo : ITargetInfo
         }
         else
         {
-            Console.Error.WriteLine("TargetInfo: Not supported platform. {0}", RuntimeInformation.OSDescription);
-            throw TerminateException.Internal();
+            throw new PlatformNotSupportedException($"TargetInfo: Not supported platform. {RuntimeInformation.OSDescription}.");
         }
     }
 
@@ -72,15 +70,15 @@ internal record TargetInfo : ITargetInfo
         }
     }
 
-    public static TargetInfo CreateDefaultTargetInfo(BuildOptions options)
+    public static TargetInfo CreateDefaultTargetInfo(Configuration config, bool editor)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return new TargetInfo
             {
                 Platform = PlatformInfo.Win64,
-                Editor = options.Editor,
-                Config = options.Config
+                Editor = editor,
+                Config = config
             };
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -88,8 +86,8 @@ internal record TargetInfo : ITargetInfo
             return new TargetInfo
             {
                 Platform = PlatformInfo.Linux64,
-                Editor = options.Editor,
-                Config = options.Config
+                Editor = editor,
+                Config = config
             };
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -97,14 +95,13 @@ internal record TargetInfo : ITargetInfo
             return new TargetInfo
             {
                 Platform = PlatformInfo.OSXArm64,
-                Editor = options.Editor,
-                Config = options.Config
+                Editor = editor,
+                Config = config
             };
         }
         else
         {
-            Console.Error.WriteLine("TargetInfo: Not supported platform. {0}", RuntimeInformation.OSDescription);
-            throw TerminateException.Internal();
+            throw new PlatformNotSupportedException($"TargetInfo: Not supported platform. {RuntimeInformation.OSDescription}.");
         }
     }
 }

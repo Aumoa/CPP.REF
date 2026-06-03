@@ -6,7 +6,9 @@ internal static partial class BuildRunner
 {
     public static async ValueTask RunAsync(BuildOptions options, CancellationToken cancellationToken)
     {
-        var buildTarget = TargetInfo.CreateDefaultTargetInfo(options);
+        var buildTarget = BuildRulesExceptionHandler.Evaluate(
+            "Failed to create build target information.",
+            () => TargetInfo.CreateDefaultTargetInfo(options.Config, options.Editor));
         var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, options.ProjectFile, cancellationToken);
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
         IEnumerable<ModuleProject> targetProjects;

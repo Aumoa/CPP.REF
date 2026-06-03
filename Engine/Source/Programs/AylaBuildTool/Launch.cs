@@ -17,6 +17,16 @@ try
 }
 catch (TerminateException e)
 {
+    if (string.IsNullOrWhiteSpace(e.DisplayMessage) == false)
+    {
+        Console.Error.WriteLine(e.DisplayMessage);
+    }
+
+    if (e.InnerException != null)
+    {
+        Console.Error.WriteLine(e.InnerException.Message);
+    }
+
     return e.ReturnCode;
 }
 

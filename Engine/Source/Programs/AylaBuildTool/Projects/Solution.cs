@@ -29,7 +29,7 @@ internal class Solution
             )],
         [new CSItemGroup(
             null,
-            [new CSFileReference("AylaBuildTool", typeof(Solution).Assembly.Location)],
+            [new CSFileReference("AylaBuildRules", typeof(ModuleRules).Assembly.Location)],
             [],
             []
             )],
@@ -149,7 +149,7 @@ internal class Solution
                     try
                     {
                         await CSCompiler.CompileAsAsync(sourceCodes, csproj, [], currentDir, projectName, cancellationToken);
-                        File.Copy(ruleFileName, cacheFileName, true);
+                        await File.WriteAllTextAsync(cacheFileName, CreateRuleCacheText(ruleFileName), cancellationToken);
                         assembly = await Task.Run(() => Assembly.LoadFile(dllFileName), cancellationToken);
                     }
                     catch (CSCompilerError e)
@@ -199,7 +199,7 @@ internal class Solution
                     return null;
                 }
 
-                var ruleText = File.ReadAllText(ruleFileName);
+                var ruleText = CreateRuleCacheText(ruleFileName);
                 var cacheText = File.ReadAllText(cacheFileName);
                 if (ruleText != cacheText)
                 {
@@ -208,6 +208,21 @@ internal class Solution
 
                 return Assembly.LoadFile(dllFileName);
             }
+        }
+
+        static string CreateRuleCacheText(string ruleFileName)
+        {
+            var rulesAssemblyFileName = typeof(ModuleRules).Assembly.Location;
+            var rulesAssemblyWriteTime = File.GetLastWriteTimeUtc(rulesAssemblyFileName).ToBinary();
+            var ruleText = File.ReadAllText(ruleFileName);
+
+            return string.Join('\n',
+            [
+                "AylaBuildRulesCacheVersion=1",
+                $"RulesAssembly={rulesAssemblyFileName}",
+                $"RulesAssemblyWriteTimeUtc={rulesAssemblyWriteTime}",
+                ruleText
+            ]);
         }
 
         async Task<Project.Declaration> ConfigureDeclarationAsync(string fileName)

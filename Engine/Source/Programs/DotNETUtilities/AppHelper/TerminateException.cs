@@ -12,16 +12,20 @@ public class TerminateException : Exception
 
     public readonly int ReturnCode;
 
-    public TerminateException(int returnCode)
+    public string? DisplayMessage { get; }
+
+    public TerminateException(int returnCode, string? message = null, Exception? innerException = null)
+        : base(message, innerException)
     {
         ReturnCode = returnCode;
+        DisplayMessage = message;
     }
 
-    public static TerminateException Successfully() => new(EC_Successfully);
-    public static TerminateException User() => new(EC_User);
-    public static TerminateException Arguments() => new(EC_Arguments);
-    public static TerminateException Internal() => new(EC_Internal);
-    public static TerminateException Thirdparty() => new(EC_Thirdparty);
-    public static TerminateException Abort() => new(EC_Abort);
-    public static TerminateException NotSupport() => new(EC_NotSupport);
+    public static TerminateException Successfully(string? message = null, Exception? innerException = null) => new(EC_Successfully, message, innerException);
+    public static TerminateException User(string? message = null, Exception? innerException = null) => new(EC_User, message, innerException);
+    public static TerminateException Arguments(string? message = null, Exception? innerException = null) => new(EC_Arguments, message, innerException);
+    public static TerminateException Internal(string? message = null, Exception? innerException = null) => new(EC_Internal, message, innerException);
+    public static TerminateException Thirdparty(string? message = null, Exception? innerException = null) => new(EC_Thirdparty, message, innerException);
+    public static TerminateException Abort(string? message = null, Exception? innerException = null) => new(EC_Abort, message, innerException);
+    public static TerminateException NotSupport(string? message = null, Exception? innerException = null) => new(EC_NotSupport, message, innerException);
 }
