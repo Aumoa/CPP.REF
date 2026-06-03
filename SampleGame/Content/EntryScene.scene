@@ -1,0 +1,9 @@
+--- &1
+SceneAsset:
+  m_RootGameObjects:
+  - m_FileID: 2
+    m_GUID: 2b94c9fe98707191991556deb4c75e32
+--- $2
+GameObject:
+  m_Name: Main Camera
+  m_IsActive: 1
