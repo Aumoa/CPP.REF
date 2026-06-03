@@ -1,40 +1,7 @@
-using System.Diagnostics;
-using System.Reflection;
-using Microsoft.CodeAnalysis;
-
 namespace AylaEngine;
 
 internal class Solution
 {
-    private static readonly CSProject ProjectTemplate = new("Microsoft.NET.Sdk",
-        [new CSPropertyGroup(
-            null,
-            OutputKind.DynamicallyLinkedLibrary,
-            CSTargetFramework.Net0900,
-            true,
-            NullableContextOptions.Enable,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            [],
-            [],
-            null,
-            null,
-            [],
-            null
-            )],
-        [new CSItemGroup(
-            null,
-            [new CSFileReference("AylaBuildRules", typeof(ModuleRules).Assembly.Location)],
-            [],
-            []
-            )],
-        null);
-
     public readonly string? ProjectFile;
 
     public IReadOnlyList<Project> Projects { get; private set; } = null!;
@@ -84,6 +51,7 @@ internal class Solution
         var solution = new Solution(projectFile == null ? null : Path.GetFullPath(projectFile));
         string? gameFolder = solution.ProjectFile == null ? null : Path.GetDirectoryName(solution.ProjectFile);
         var metadataStore = new ProjectMetadataStore();
+        var moduleRuleCompiler = new ModuleRuleCompiler(new ModuleRuleCache());
 
         List<Task> tasks = new();
         GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
@@ -132,36 +100,7 @@ internal class Solution
             var ruleFileName = Path.Combine(currentDir, directoryName + ".Module.cs");
             if (File.Exists(ruleFileName))
             {
-                var assembly = FindCachedAssembly(ruleFileName, out var dllFileName, out var cacheFileName);
-                if (assembly == null)
-                {
-                    var projectName = Path.GetFileNameWithoutExtension(dllFileName);
-                    var csproj = ProjectTemplate with
-                    {
-                        PropertyGroups = [ProjectTemplate.PropertyGroup with
-                        {
-                            OutputPath = Path.GetDirectoryName(dllFileName),
-                            AssemblyName = projectName
-                        }]
-                    };
-
-                    CSSourceCode[] sourceCodes = [CSSourceCode.FromFile(ruleFileName)];
-
-                    try
-                    {
-                        await CSCompiler.CompileAsAsync(sourceCodes, csproj, [], currentDir, projectName, cancellationToken);
-                        await File.WriteAllTextAsync(cacheFileName, CreateRuleCacheText(ruleFileName), cancellationToken);
-                        assembly = await Task.Run(() => Assembly.LoadFile(dllFileName), cancellationToken);
-                    }
-                    catch (CSCompilerError e)
-                    {
-                        Console.Error.WriteLine(e.Message);
-                        throw TerminateException.User();
-                    }
-                }
-
-                var className = directoryName.Replace('.', '_');
-                var ruleType = assembly.GetTypes().First(p => p.Name == className);
+                var ruleType = await moduleRuleCompiler.GetRuleTypeAsync(directoryName, currentDir, descriptor, ruleFileName, cancellationToken);
                 ModuleProject.ModuleDeclaration declaration = await metadataStore.GetOrCreateModuleDeclarationAsync(ruleFileName, cancellationToken);
 
                 lock (results)
@@ -178,52 +117,6 @@ internal class Solution
             }
 
             await Task.WhenAll(innerTasks);
-
-            return;
-
-            Assembly? FindCachedAssembly(string ruleFileName, out string dllFileName, out string cacheFileName)
-            {
-                var fileName = Path.GetFileName(ruleFileName).Replace('.', '_');
-                var dirName = Path.Combine(descriptor.IntermediateDirectory, "Rules");
-                Directory.CreateDirectory(dirName);
-
-                dllFileName = Path.GetFullPath(Path.Combine(dirName, fileName + ".dll"));
-                cacheFileName = Path.GetFullPath(Path.Combine(dirName, fileName + ".cache"));
-
-                if (File.Exists(cacheFileName) == false)
-                {
-                    return null;
-                }
-
-                if (File.Exists(dllFileName) == false)
-                {
-                    return null;
-                }
-
-                var ruleText = CreateRuleCacheText(ruleFileName);
-                var cacheText = File.ReadAllText(cacheFileName);
-                if (ruleText != cacheText)
-                {
-                    return null;
-                }
-
-                return Assembly.LoadFile(dllFileName);
-            }
-        }
-
-        static string CreateRuleCacheText(string ruleFileName)
-        {
-            var rulesAssemblyFileName = typeof(ModuleRules).Assembly.Location;
-            var rulesAssemblyWriteTime = File.GetLastWriteTimeUtc(rulesAssemblyFileName).ToBinary();
-            var ruleText = File.ReadAllText(ruleFileName);
-
-            return string.Join('\n',
-            [
-                "AylaBuildRulesCacheVersion=1",
-                $"RulesAssembly={rulesAssemblyFileName}",
-                $"RulesAssemblyWriteTimeUtc={rulesAssemblyWriteTime}",
-                ruleText
-            ]);
         }
 
     }
