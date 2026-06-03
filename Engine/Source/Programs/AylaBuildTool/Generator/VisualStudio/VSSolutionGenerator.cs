@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -53,13 +53,15 @@ internal class VSSolutionGenerator : Generator
 
         Dictionary<ModuleProject, string> vcxprojPaths = new();
         Dictionary<ModuleProject, string> scriptProjectPaths = new();
+        var resolverFactory = new ModuleRulesResolverFactory(solution);
+        var scriptProjectFactory = new ScriptProjectFactory(solution, resolverFactory);
         List<Task> tasks = [];
         foreach (var project in solution.Projects.OfType<ModuleProject>())
         {
-            tasks.Add(VSCppProjectGenerator.GenerateAsync(solution, vcxprojPaths, project, cancellationToken));
+            tasks.Add(VSCppProjectGenerator.GenerateAsync(solution, resolverFactory, vcxprojPaths, project, cancellationToken));
             if (project.IsScriptable())
             {
-                tasks.Add(VSScriptProjectGenerator.GenerateAsync(solution, project, cancellationToken).AsTask());
+                tasks.Add(VSScriptProjectGenerator.GenerateAsync(project, scriptProjectFactory.GetScriptProject(project), cancellationToken).AsTask());
             }
         }
 

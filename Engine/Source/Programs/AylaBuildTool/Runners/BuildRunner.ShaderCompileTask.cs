@@ -10,14 +10,16 @@ internal static partial class BuildRunner
         private readonly TargetInfo m_TargetInfo;
         private readonly SourceCodeDescriptor[] m_ShaderFiles;
         private readonly GroupDescriptor m_EngineGroup;
+        private readonly ModuleRulesResolverFactory m_ResolverFactory;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public ShaderCompileTask(ModuleProject project, TargetInfo targetInfo, SourceCodeDescriptor[] shaderFiles, GroupDescriptor engineGroup)
+        public ShaderCompileTask(ModuleProject project, TargetInfo targetInfo, SourceCodeDescriptor[] shaderFiles, GroupDescriptor engineGroup, ModuleRulesResolverFactory resolverFactory)
         {
             m_Project = project;
             m_TargetInfo = targetInfo;
             m_ShaderFiles = shaderFiles;
             m_EngineGroup = engineGroup;
+            m_ResolverFactory = resolverFactory;
         }
 
         public async Task<Terminal.Output> CompileAsync(IList<ModuleTask> moduleTasks, Installation installation, CancellationToken cancellationToken)
@@ -30,7 +32,7 @@ internal static partial class BuildRunner
                     return Terminal.Output.Success("Shader Compiler", "No shaders to compile");
                 }
 
-                var resolver = m_Project.GetResolver(m_TargetInfo);
+                var resolver = m_ResolverFactory.GetResolver(m_Project, m_TargetInfo);
                 var intDir = resolver.Group.Intermediate(resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
                 var outDir = resolver.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
 
@@ -278,7 +280,7 @@ internal static partial class BuildRunner
             includePaths.Add(shaderFile.Directory);
             
             // Add common include paths
-            var resolver = m_Project.GetResolver(m_TargetInfo);
+            var resolver = m_ResolverFactory.GetResolver(m_Project, m_TargetInfo);
             foreach (var includePath in resolver.IncludePaths)
             {
                 var fullPath = Path.Combine(m_Project.SourceDirectory, includePath);

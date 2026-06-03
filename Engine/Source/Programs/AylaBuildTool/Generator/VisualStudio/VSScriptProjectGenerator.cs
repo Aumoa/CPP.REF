@@ -1,15 +1,15 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 internal static class VSScriptProjectGenerator
 {
-    public static async ValueTask GenerateAsync(Solution solution, ModuleProject project, CancellationToken cancellationToken)
+    public static async ValueTask GenerateAsync(ModuleProject project, CSProject scriptProject, CancellationToken cancellationToken)
     {
         await Task.Yield();
 
         Directory.CreateDirectory(Path.GetDirectoryName(project.ScriptProjectFileName)!);
 
         var csprojPath = Path.GetDirectoryName(project.ScriptProjectFileName);
-        string xml = project.ScriptProject.GenerateXml(csprojPath);
+        string xml = scriptProject.GenerateXml(csprojPath);
         await File.WriteAllTextAsync(project.ScriptProjectFileName, xml, cancellationToken);
     }
 }

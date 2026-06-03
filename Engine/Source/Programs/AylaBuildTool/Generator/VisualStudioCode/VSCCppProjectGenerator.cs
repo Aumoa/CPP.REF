@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -140,7 +140,7 @@ internal static class VSCCppProjectGenerator
         WriteIndented = true
     };
 
-    public static async ValueTask GenerateAsync(Solution solution, ModuleProject project, List<string> outputFolders, CancellationToken cancellationToken)
+    public static async ValueTask GenerateAsync(Solution solution, ModuleRulesResolverFactory resolverFactory, ModuleProject project, List<string> outputFolders, CancellationToken cancellationToken)
     {
         string vscode_FullName = Path.Combine(project.SourceDirectory, ".vscode");
         string c_cpp_properties_FileName = "c_cpp_properties.json";
@@ -164,7 +164,7 @@ internal static class VSCCppProjectGenerator
         {
             if (targetInfo.Platform == PlatformInfo.Current)
             {
-                var resolver = project.GetResolver(targetInfo);
+                var resolver = resolverFactory.GetResolver(project, targetInfo);
                 string compilerPath = await installation.GetCompilerPath(targetInfo, cancellationToken);
                 string intelliSenseMode = await installation.GetIntelliSenseMode(targetInfo, cancellationToken);
                 var rule = resolver.Rules;
@@ -174,7 +174,7 @@ internal static class VSCCppProjectGenerator
                 {
                     fileName = fileName[3..^3];
                 }
-                
+
                 outputFileName = Path.Combine(Path.GetDirectoryName(outputFileName)!, fileName);
 
                 configurations.Add(new Configuration
@@ -303,7 +303,7 @@ internal static class VSCCppProjectGenerator
                         set = set.Append("PLATFORM_OSX=1");
                         break;
                 }
-                
+
                 if (targetInfo.Config != AylaEngine.Configuration.Shipping)
                 {
                     set = set.Append("DO_CHECK=1");

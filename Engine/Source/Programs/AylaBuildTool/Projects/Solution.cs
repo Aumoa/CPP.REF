@@ -4,19 +4,19 @@ internal class Solution
 {
     public readonly string? ProjectFile;
 
-    public IReadOnlyList<Project> Projects { get; private set; } = null!;
+    public IReadOnlyList<Project> Projects { get; }
 
-    public GroupDescriptor EngineGroup { get; private set; } = null!;
+    public GroupDescriptor EngineGroup { get; }
 
-    public GroupDescriptor PrimaryGroup { get; private set; } = null!;
+    public GroupDescriptor PrimaryGroup { get; }
 
-    internal Solution(string? projectFile)
+    internal Solution(
+        string? projectFile,
+        IEnumerable<Project> projects,
+        GroupDescriptor engineGroup,
+        GroupDescriptor primaryGroup)
     {
         ProjectFile = projectFile;
-    }
-
-    internal void Assign(IEnumerable<Project> projects, GroupDescriptor engineGroup, GroupDescriptor primaryGroup)
-    {
         Projects = projects.ToArray();
         EngineGroup = engineGroup;
         PrimaryGroup = primaryGroup;
@@ -44,15 +44,5 @@ internal class Solution
         }
 
         return results;
-    }
-
-    public static async Task<Solution> ScanProjectsAsync(string engineFolder, string? projectFile, CancellationToken cancellationToken = default)
-    {
-        var metadataStore = new ProjectMetadataStore();
-        var moduleRuleCompiler = new ModuleRuleCompiler(new ModuleRuleCache());
-        var materializer = new ProjectMaterializer(metadataStore, moduleRuleCompiler);
-        var loader = new SolutionLoader(new ProjectScanner(), materializer);
-
-        return await loader.LoadAsync(engineFolder, projectFile, cancellationToken);
     }
 }

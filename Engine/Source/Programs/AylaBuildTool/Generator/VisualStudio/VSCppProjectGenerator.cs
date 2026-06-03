@@ -1,4 +1,4 @@
-﻿// Copyright 2020-2025 AylaEngine. All Rights Reserved.
+// Copyright 2020-2025 AylaEngine. All Rights Reserved.
 
 using System.Text;
 
@@ -20,7 +20,7 @@ internal static class VSCppProjectGenerator
         _ => "v143",
     };
 
-    public static async Task GenerateAsync(Solution solution, Dictionary<ModuleProject, string> vcxprojPaths, ModuleProject project, CancellationToken cancellationToken)
+    public static async Task GenerateAsync(Solution solution, ModuleRulesResolverFactory resolverFactory, Dictionary<ModuleProject, string> vcxprojPaths, ModuleProject project, CancellationToken cancellationToken)
     {
         var engineGroup = solution.EngineGroup;
         var primaryGroup = solution.PrimaryGroup;
@@ -307,7 +307,7 @@ internal static class VSCppProjectGenerator
                     var outDir = group.Output(buildTarget, FolderPolicy.PathType.Windows);
                     var intDir = group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Windows);
                     var rules = project.GetRule(buildTarget);
-                    var resolver = project.GetResolver(buildTarget);
+                    var resolver = resolverFactory.GetResolver(project, buildTarget);
                     var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                     var includes = GenerateIncludePaths(resolver);
                     var outputFileName = installation.OutputFileName(project.Name, rules.Type);

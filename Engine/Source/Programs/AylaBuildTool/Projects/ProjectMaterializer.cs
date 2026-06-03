@@ -12,23 +12,21 @@ internal sealed class ProjectMaterializer
     }
 
     public async Task<IReadOnlyList<Project>> MaterializeAsync(
-        Solution solution,
         IEnumerable<ProjectCandidate> candidates,
         CancellationToken cancellationToken)
     {
-        var tasks = candidates.Select(candidate => MaterializeAsync(solution, candidate, cancellationToken));
+        var tasks = candidates.Select(candidate => MaterializeAsync(candidate, cancellationToken));
         return await Task.WhenAll(tasks);
     }
 
     private async Task<Project> MaterializeAsync(
-        Solution solution,
         ProjectCandidate candidate,
         CancellationToken cancellationToken)
     {
         return candidate.Kind switch
         {
             ProjectCandidateKind.Program => await MaterializeProgramProjectAsync(candidate, cancellationToken),
-            ProjectCandidateKind.Module => await MaterializeModuleProjectAsync(solution, candidate, cancellationToken),
+            ProjectCandidateKind.Module => await MaterializeModuleProjectAsync(candidate, cancellationToken),
             _ => throw new InvalidOperationException($"Unsupported project candidate kind: {candidate.Kind}")
         };
     }
@@ -49,7 +47,6 @@ internal sealed class ProjectMaterializer
     }
 
     private async Task<Project> MaterializeModuleProjectAsync(
-        Solution solution,
         ProjectCandidate candidate,
         CancellationToken cancellationToken)
     {
@@ -64,7 +61,6 @@ internal sealed class ProjectMaterializer
             cancellationToken);
 
         return new ModuleProject(
-            solution,
             candidate.Name,
             candidate.Group,
             candidate.SourceDirectory,

@@ -1,18 +1,11 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 internal class ModuleRulesResolver
 {
     private readonly ITargetInfo m_TargetInfo;
 
-    public ModuleRulesResolver(ITargetInfo targetInfo, Solution solution, ModuleRules rules, GroupDescriptor group)
+    public ModuleRulesResolver(ITargetInfo targetInfo, Solution solution, ModuleProject targetProject, ModuleRules rules)
     {
-        var targetProject = (ModuleProject)solution.FindProject(rules.Name)!;
-        if (targetProject == null)
-        {
-            Console.Error.WriteLine("BuildTool Error: The specified project could not be found. Please check the project name and search method.");
-            throw TerminateException.Internal();
-        }
-
         m_TargetInfo = targetInfo;
         Project = targetProject;
         Rules = rules;

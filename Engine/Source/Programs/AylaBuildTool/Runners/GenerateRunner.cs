@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace AylaEngine;
 
@@ -6,7 +6,7 @@ internal class GenerateRunner
 {
     public static async ValueTask RunAsync(GenerateOptions options, CancellationToken cancellationToken)
     {
-        var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, options.ProjectFile, cancellationToken);
+        var solution = await SolutionLoader.CreateDefault().LoadAsync(Global.EngineDirectory, options.ProjectFile, cancellationToken);
 
         Generator generator;
         switch (options.GeneratorType)

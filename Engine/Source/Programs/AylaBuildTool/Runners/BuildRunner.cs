@@ -1,4 +1,4 @@
-﻿using static AylaEngine.CppCompiler;
+using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
 
@@ -9,7 +9,9 @@ internal static partial class BuildRunner
         var buildTarget = BuildRulesExceptionHandler.Evaluate(
             "Failed to create build target information.",
             () => TargetInfo.CreateDefaultTargetInfo(options.Config, options.Editor));
-        var solution = await Solution.ScanProjectsAsync(Global.EngineDirectory, options.ProjectFile, cancellationToken);
+        var solution = await SolutionLoader.CreateDefault().LoadAsync(Global.EngineDirectory, options.ProjectFile, cancellationToken);
+        var resolverFactory = new ModuleRulesResolverFactory(solution);
+        var scriptProjectFactory = new ScriptProjectFactory(solution, resolverFactory);
         Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
         IEnumerable<ModuleProject> targetProjects;
         if (string.IsNullOrEmpty(options.Target))
@@ -32,7 +34,7 @@ internal static partial class BuildRunner
             }
 
             List<string> requiredProjects = [];
-            var resolver = mp.GetResolver(buildTarget);
+            var resolver = resolverFactory.GetResolver(mp, buildTarget);
             if (mp.GetRule(buildTarget).Type == ModuleType.Game)
             {
                 requiredProjects.Add("Engine");
@@ -143,7 +145,7 @@ internal static partial class BuildRunner
 
         foreach (var project in targetProjects)
         {
-            var resolver = project.GetResolver(buildTarget);
+            var resolver = resolverFactory.GetResolver(project, buildTarget);
             List<CompileItem> allCompiles = [];
             List<CompileTask> needCompiles = [];
 
@@ -190,17 +192,17 @@ internal static partial class BuildRunner
 
                 if (shaderFiles.Any())
                 {
-                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup));
+                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup, resolverFactory));
                 }
             }
 
             moduleTasks.Add(new ModuleTask(installation, resolver, allCompiles.ToArray(), needCompiles.ToArray()));
             if (resolver.Rules.Script.Enabled)
             {
-                var scriptTask = new ScriptTask(resolver);
+                var scriptTask = new ScriptTask(resolver, scriptProjectFactory.GetScriptProject(project));
                 if (scriptTask.NeedBuild(buildTarget))
                 {
-                    scriptTasks.Add(new ScriptTask(resolver));
+                    scriptTasks.Add(scriptTask);
                 }
             }
         }
@@ -420,7 +422,7 @@ internal static partial class BuildRunner
         {
             Dictionary<string, CSProject> virtualProjects = solution.Projects
                 .OfType<ModuleProject>()
-                .ToDictionary(p => p.ScriptProjectFileName, p => p.ScriptProject);
+                .ToDictionary(p => p.ScriptProjectFileName, p => scriptProjectFactory.GetScriptProject(p));
 
             foreach (var scriptTask in scriptTasks)
             {

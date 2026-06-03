@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 using System.Xml;
 
@@ -6,7 +6,7 @@ namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class ScriptTask(ModuleRulesResolver resolver) : ITask
+    private class ScriptTask(ModuleRulesResolver resolver, CSProject scriptProject) : ITask
     {
         private readonly TaskCompletionSource m_CompletionSource = new();
 
@@ -75,7 +75,7 @@ internal static partial class BuildRunner
                 var assemblyName = resolver.Name + ".Script";
                 var condition = CSCondition.Parse($"$(Configuration)|$(Platform)=='{config}|{platform}'");
 
-                var csproj = resolver.Project.ScriptProject.Freeze(condition);
+                var csproj = scriptProject.Freeze(condition);
                 var sourceCodes = GatherSourceCodes(resolver.Project.ScriptSourceDirectory)
                     .Select(CSSourceCode.FromFile)
                     .Append(csproj.GenerateAssemblyAttribute(null, config, null, assemblyName, Version.Parse("1.0.0.0")))

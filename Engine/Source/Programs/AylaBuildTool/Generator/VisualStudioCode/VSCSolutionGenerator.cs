@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace AylaEngine;
@@ -19,13 +19,14 @@ internal class VSCSolutionGenerator : Generator
     /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
     public override async ValueTask GenerateAsync(Solution solution, CancellationToken cancellationToken = default)
     {
+        var resolverFactory = new ModuleRulesResolverFactory(solution);
         List<Task> tasks = [];
         List<string> outputFolders = [];
         foreach (var project in solution.Projects)
         {
             if (project is ModuleProject mp)
             {
-                tasks.Add(VSCCppProjectGenerator.GenerateAsync(solution, mp, outputFolders, cancellationToken).AsTask());
+                tasks.Add(VSCCppProjectGenerator.GenerateAsync(solution, resolverFactory, mp, outputFolders, cancellationToken).AsTask());
             }
             else if (project is ProgramProject pp)
             {

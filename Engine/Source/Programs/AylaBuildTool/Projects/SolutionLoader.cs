@@ -11,13 +11,21 @@ internal sealed class SolutionLoader
         m_ProjectMaterializer = projectMaterializer;
     }
 
+    public static SolutionLoader CreateDefault()
+    {
+        var metadataStore = new ProjectMetadataStore();
+        var moduleRuleCompiler = new ModuleRuleCompiler(new ModuleRuleCache());
+        var materializer = new ProjectMaterializer(metadataStore, moduleRuleCompiler);
+
+        return new SolutionLoader(new ProjectScanner(), materializer);
+    }
+
     public async Task<Solution> LoadAsync(
         string engineFolder,
         string? projectFile,
         CancellationToken cancellationToken)
     {
         var normalizedProjectFile = projectFile == null ? null : Path.GetFullPath(projectFile);
-        var solution = new Solution(normalizedProjectFile);
         string? gameFolder = normalizedProjectFile == null ? null : Path.GetDirectoryName(normalizedProjectFile);
 
         GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
@@ -40,15 +48,18 @@ internal sealed class SolutionLoader
 
         await Task.WhenAll(engineCandidatesTask, gameCandidatesTask);
 
-        var engineProjectsTask = m_ProjectMaterializer.MaterializeAsync(solution, await engineCandidatesTask, cancellationToken);
-        var gameProjectsTask = m_ProjectMaterializer.MaterializeAsync(solution, await gameCandidatesTask, cancellationToken);
+        var engineProjectsTask = m_ProjectMaterializer.MaterializeAsync(await engineCandidatesTask, cancellationToken);
+        var gameProjectsTask = m_ProjectMaterializer.MaterializeAsync(await gameCandidatesTask, cancellationToken);
         await Task.WhenAll(engineProjectsTask, gameProjectsTask);
 
         var engineProjects = SortProjectsByGuid(await engineProjectsTask);
         var gameProjects = SortProjectsByGuid(await gameProjectsTask);
 
-        solution.Assign(engineProjects.Concat(gameProjects), engineGroup, primaryGroup);
-        return solution;
+        return new Solution(
+            normalizedProjectFile,
+            engineProjects.Concat(gameProjects),
+            engineGroup,
+            primaryGroup);
     }
 
     private static void EnsureGameDirectories(GroupDescriptor group)
