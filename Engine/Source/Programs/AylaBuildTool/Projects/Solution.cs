@@ -52,22 +52,27 @@ internal class Solution
         string? gameFolder = solution.ProjectFile == null ? null : Path.GetDirectoryName(solution.ProjectFile);
         var metadataStore = new ProjectMetadataStore();
         var moduleRuleCompiler = new ModuleRuleCompiler(new ModuleRuleCache());
+        var materializer = new ProjectMaterializer(metadataStore, moduleRuleCompiler);
 
-        List<Task> tasks = new();
         GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
         GroupDescriptor primaryGroup = engineGroup;
 
-        List<Project> engineProjects = new();;
-        tasks.Add(ScanDirectoryRecursive(engineProjects, primaryGroup, Path.Combine(engineFolder, "Source")));
-        List<Project> gameProjects = new();
+        var engineCandidatesTask = ProjectScanner.ScanAsync(
+            engineGroup,
+            Path.Combine(engineFolder, "Source"),
+            cancellationToken);
+        Task<IReadOnlyList<ProjectCandidate>> gameCandidatesTask = Task.FromResult<IReadOnlyList<ProjectCandidate>>([]);
         if (string.IsNullOrEmpty(gameFolder) == false)
         {
             primaryGroup = GroupDescriptor.FromRoot(gameFolder, false);
             EnsureGameDirectories(primaryGroup);
-            tasks.Add(ScanDirectoryRecursive(gameProjects, primaryGroup, Path.Combine(gameFolder, "Source")));
+            gameCandidatesTask = ProjectScanner.ScanAsync(
+                primaryGroup,
+                Path.Combine(gameFolder, "Source"),
+                cancellationToken);
         }
 
-        await Task.WhenAll(tasks);
+        await Task.WhenAll(engineCandidatesTask, gameCandidatesTask);
 
         static void EnsureGameDirectories(GroupDescriptor group)
         {
@@ -76,48 +81,17 @@ internal class Solution
             Directory.CreateDirectory(group.BinariesDirectory);
             Directory.CreateDirectory(group.ContentDirectory);
         }
+
+        var engineProjectsTask = materializer.MaterializeAsync(solution, await engineCandidatesTask, cancellationToken);
+        var gameProjectsTask = materializer.MaterializeAsync(solution, await gameCandidatesTask, cancellationToken);
+        await Task.WhenAll(engineProjectsTask, gameProjectsTask);
+
+        var engineProjects = (await engineProjectsTask).ToList();
+        var gameProjects = (await gameProjectsTask).ToList();
         engineProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
         gameProjects.Sort((l, r) => l.Decl.Guid.CompareTo(r.Decl.Guid));
 
         solution.Assign(engineProjects.Concat(gameProjects), engineGroup, primaryGroup);
         return solution;
-
-        async Task ScanDirectoryRecursive(IList<Project> results, GroupDescriptor descriptor, string currentDir)
-        {
-            var directoryName = Path.GetFileName(currentDir);
-            var csprojFileName = Path.Combine(currentDir, directoryName + ".csproj");
-            if (File.Exists(csprojFileName))
-            {
-                Project.Declaration declaration = await metadataStore.GetOrCreateProjectDeclarationAsync(csprojFileName, cancellationToken);
-
-                lock (results)
-                {
-                    results.Add(new ProgramProject(directoryName, descriptor, declaration, csprojFileName));
-                }
-                return;
-            }
-
-            var ruleFileName = Path.Combine(currentDir, directoryName + ".Module.cs");
-            if (File.Exists(ruleFileName))
-            {
-                var ruleType = await moduleRuleCompiler.GetRuleTypeAsync(directoryName, currentDir, descriptor, ruleFileName, cancellationToken);
-                ModuleProject.ModuleDeclaration declaration = await metadataStore.GetOrCreateModuleDeclarationAsync(ruleFileName, cancellationToken);
-
-                lock (results)
-                {
-                    results.Add(new ModuleProject(solution, directoryName, descriptor, currentDir, ruleType, ruleFileName, declaration));
-                }
-                return;
-            }
-
-            List<Task> innerTasks = new();
-            foreach (var subDir in Directory.GetDirectories(currentDir, "*", SearchOption.TopDirectoryOnly))
-            {
-                innerTasks.Add(ScanDirectoryRecursive(results, descriptor, subDir));
-            }
-
-            await Task.WhenAll(innerTasks);
-        }
-
     }
 }
