@@ -12,7 +12,7 @@ internal record SBracket(CapturedContext Context, char? EscapeBracket) : Syntax(
             '}' => "{}",
             ']' => "[]",
             ')' => "()",
-            _ => throw TerminateException.Internal()
+            _ => throw new InvalidOperationException($"Unsupported bracket escape character '{EscapeBracket}'.")
         };
     }
 

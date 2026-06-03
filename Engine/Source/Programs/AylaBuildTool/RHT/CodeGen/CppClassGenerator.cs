@@ -41,7 +41,7 @@ internal class CppClassGenerator
         });
         m_Parent.WriteIndentedLine("}");
         m_Parent.WriteIndentedLine("");
-        
+
         GenerateExternCBlock(@namespace, className, classType);
     }
 
@@ -51,7 +51,7 @@ internal class CppClassGenerator
         {
             var constructor = m_Class.Constructors[i];
             var parameterDeclare = string.Join(", ", constructor.Parameters.Select(p => p.Variable.TypeName.FullName + " " + p.Variable.Name));
-            
+
             m_Parent.WriteIndentedLine($"::Ayla::SharedPtr<::Ayla::Object> {className}::reflexpr_class::members::constructor__{i}__{constructor.Name}({parameterDeclare})");
             m_Parent.WriteIndentedLine("{");
             m_Parent.Indented(() =>
@@ -89,7 +89,7 @@ internal class CppClassGenerator
             m_Parent.Indented(() =>
             {
                 m_Parent.WriteIndentedLine($".NativeType = ::Ayla::TypeCollector::FindType(typeid({className})),");
-                m_Parent.WriteIndentedLine($".ScriptTypeGetter = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"GetScriptType__Invoke\"))()");
+                m_Parent.WriteIndentedLine($".ScriptTypeGetter = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Context.ScriptAssemblyName}\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"GetScriptType__Invoke\"))()");
             });
             m_Parent.WriteIndentedLine("};");
             m_Parent.WriteIndentedLine("");
@@ -122,17 +122,16 @@ internal class CppClassGenerator
             {
                 var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
                 m_Parent.WriteIndentedLine($"using signature_t = {returnType.CppBindingName}(*)({invokeParametersDeclare});");
-                m_Parent.WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Project.Name}.Script\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"{function.Name}__Invoke\"));");
+                m_Parent.WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Context.ScriptAssemblyName}\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"{function.Name}__Invoke\"));");
                 m_Parent.WriteIndentedLine($"auto self = AsShared();");
-                
+
                 string callable = "callable";
                 var codeGen = new FunctionBodyGenerator(parameters.AddFirstTemp(SharedPtrTypeName.SharedObject, "self"), callable, returnType);
                 codeGen.GenerateCppNativeToCSharp(m_Parent.WriteIndentedLine);
             });
             m_Parent.WriteIndentedLine("}");
 
-            var rule = m_Parent.Project.GetRule(m_Parent.BuildTarget);
-            if (rule.Type == ModuleType.Application || rule.Type == ModuleType.Console)
+            if (m_Parent.Context.AllowsNativeFunctionInvocation == false)
             {
                 m_Parent.WriteIndentedLine($"{function.ReturnType.FullName} {className}::{function.Name}_Implementation({parametersDeclare})");
                 m_Parent.WriteIndentedLine("{");
@@ -206,7 +205,7 @@ internal class CppClassGenerator
             var caller = isStatic ? $"{classType.CppName}::" : $"(({classType.CppName}*)(::Ayla::Object*)self)->";
             string suffix = isVirtual ? "_Implementation" : string.Empty;
             string callable = $"{caller}{function.Name}{suffix}";
-            
+
             FunctionBodyGenerator codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
             string parametersDeclare = isStatic
                 ? ParametersGenerator.GenerateCppBindings(parameters)

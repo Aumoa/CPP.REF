@@ -8,17 +8,15 @@ namespace AylaEngine.RHT.CodeGen;
 internal class CppSourceGenerator
 {
     private readonly RHTGenerator m_Generator;
-    private readonly ModuleProject m_Project;
-    private readonly TargetInfo m_BuildTarget;
+    private readonly RHTGenerationContext m_Context;
     private readonly TypeNames m_TypeNames;
     private int m_Indent;
     private string m_SourceCode = string.Empty;
 
-    public CppSourceGenerator(RHTGenerator generator, ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
+    public CppSourceGenerator(RHTGenerator generator, RHTGenerationContext context, TypeNames typeNames)
     {
         m_Generator = generator;
-        m_Project = project;
-        m_BuildTarget = buildTarget;
+        m_Context = context;
         m_TypeNames = typeNames;
         m_Indent = 0;
     }
@@ -85,7 +83,7 @@ internal class CppSourceGenerator
     private List<string> CollectRequiredHeaders()
     {
         List<string> headers = [];
-        
+
         foreach (var aclass in m_Generator.Classes)
         {
             foreach (var type in aclass
@@ -148,7 +146,6 @@ internal class CppSourceGenerator
         }
     }
 
-    internal ModuleProject Project => m_Project;
+    internal RHTGenerationContext Context => m_Context;
     internal TypeNames TypeNames => m_TypeNames;
-    internal TargetInfo BuildTarget => m_BuildTarget;
 }

@@ -48,7 +48,7 @@ internal class Context : ICapturedContext
     {
         if (m_Freezed)
         {
-            throw TerminateException.Internal();
+            throw new InvalidOperationException("Cannot advance a frozen parser context.");
         }
 
         for (int i = m_Index; i < m_FullText.Length && advance > 0;)

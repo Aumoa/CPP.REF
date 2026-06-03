@@ -4,9 +4,9 @@ namespace AylaEngine.RHT;
 
 internal partial class RHTGenerator
 {
-    public string GenerateCSharp(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
+    public string GenerateCSharp(RHTGenerationContext context, TypeNames typeNames)
     {
-        var generator = new CSharpCodeGenerator(this, project, buildTarget, typeNames);
+        var generator = new CSharpCodeGenerator(this, context, typeNames);
         return generator.Generate();
     }
 }

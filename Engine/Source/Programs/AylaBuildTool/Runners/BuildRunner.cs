@@ -342,7 +342,7 @@ internal static partial class BuildRunner
         {
             Console.Write("Generating reflection header files...");
 
-            List<Task<GenerateReflectionHeaderTask>> tasks = [];
+            List<GenerateReflectionHeaderTask> tasks = [];
 
             foreach (var project in targetProjects)
             {
@@ -351,69 +351,49 @@ internal static partial class BuildRunner
                     if (sourceCode.Type == SourceCodeType.Header)
                     {
                         var ght = new GenerateReflectionHeaderTask(project, buildTarget, sourceCode);
-                        tasks.Add(ght.ParseAsync(cancellationToken));
+                        tasks.Add(ght);
                     }
                 }
             }
 
-            var results = await Task.WhenAll(tasks);
-
-            if (results.Any(p => p.ErrorText != null))
+            RHTGenerationResult result;
+            try
             {
-                var errorMessages = results.Where(p => p.ErrorText != null).Select(p => p.ErrorText);
-                Console.Error.WriteLine(string.Join('\n', errorMessages));
+                result = await ReflectionHeaderGenerator.GenerateAsync(tasks.Select(task => task.Input), cancellationToken);
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
                 throw TerminateException.User();
             }
 
-            TypeNames collection;
+            if (result.HasErrors)
             {
-                Dictionary<string, List<RHTGenerator>> dict = [];
-                List<TypeName> typeNames = new();
-                foreach (var result in results)
-                {
-                    if (result.Generator != null)
-                    {
-                        foreach (var @class in result.Generator.Classes)
-                        {
-                            typeNames.Add(new ClassName(
-                                new NamespaceName(@class.Class.Namespaces.Select(p => p.Name).ToArray()),
-                                @class.Class.Name,
-                                result.Generator
-                            ));
-                        }
-
-                        foreach (var @enum in result.Generator.Enums)
-                        {
-                            typeNames.Add(new EnumName(
-                                new NamespaceName(@enum.Namespaces.Select(p => p.Name).ToArray()),
-                                @enum.Name,
-                                result.Generator
-                            ));
-                        }
-                    }
-                }
-
-                collection = new TypeNames(typeNames.ToArray());
+                Console.Error.WriteLine(string.Join('\n', result.ErrorTexts));
+                throw TerminateException.User();
             }
 
-            foreach (var result in results)
+            Dictionary<string, GenerateReflectionHeaderTask> taskBySourceFile = new(StringComparer.OrdinalIgnoreCase);
+            foreach (var task in tasks)
             {
-                if (await result.TryGenerateAsync(collection, buildTarget, cancellationToken) == false)
+                taskBySourceFile.Add(task.Input.SourceFile.FilePath, task);
+            }
+
+            foreach (var generatedSource in result.GeneratedSources)
+            {
+                if (taskBySourceFile.TryGetValue(generatedSource.Input.SourceFile.FilePath, out var task) == false)
                 {
                     continue;
                 }
 
-                var gsc = result.GeneratedSourceCode;
-                if (gsc.HasValue)
+                var generatedSourceCode = await task.WriteAsync(generatedSource, cancellationToken);
+                if (generatedSourceCodes.TryGetValue(task.Project, out var list) == false)
                 {
-                    if (generatedSourceCodes.TryGetValue(result.Project, out var list) == false)
-                    {
-                        list = [];
-                        generatedSourceCodes.Add(result.Project, list);
-                    }
-
-                    list.Add(gsc.Value);
+                    list = [];
+                    generatedSourceCodes.Add(task.Project, list);
                 }
+
+                list.Add(generatedSourceCode);
             }
 
             Console.WriteLine(" Done.");

@@ -41,7 +41,7 @@ internal class BuiltinTypeName : TypeName
         Kinds.Single => "float",
         Kinds.Double => "double",
         Kinds.Object => "::Ayla::Object",
-        _ => throw TerminateException.Arguments()
+        _ => throw UnsupportedKind()
     };
 
     public override string CppBindingName => Kind switch
@@ -66,7 +66,7 @@ internal class BuiltinTypeName : TypeName
         Kinds.Single => "float",
         Kinds.Double => "double",
         Kinds.Object => "global::Ayla.Object",
-        _ => throw TerminateException.Arguments()
+        _ => throw UnsupportedKind()
     };
 
     public override string CSharpBindingName => Kind switch
@@ -83,7 +83,7 @@ internal class BuiltinTypeName : TypeName
         Kinds.Single => "float",
         Kinds.Double => "double",
         Kinds.Object => "global::Ayla.ObjectReferenceWrapper",
-        _ => throw TerminateException.Arguments()
+        _ => throw UnsupportedKind()
     };
 
     public override string Id => Kind switch
@@ -100,14 +100,10 @@ internal class BuiltinTypeName : TypeName
         Kinds.Single => "global::float",
         Kinds.Double => "global::double",
         Kinds.Object => "global::Ayla.Object",
-        _ => throw TerminateException.Arguments()
+        _ => throw UnsupportedKind()
     };
 
     public override bool IsGenericTypeDefinition => false;
 
-    private static TerminateException User(string message)
-    {
-        Console.Error.WriteLine(message);
-        throw TerminateException.User();
-    }
+    private InvalidOperationException UnsupportedKind() => new InvalidOperationException($"Unsupported builtin type kind '{Kind}'.");
 }

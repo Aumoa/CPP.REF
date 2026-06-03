@@ -6,9 +6,9 @@ namespace AylaEngine.RHT;
 
 internal partial class RHTGenerator
 {
-    public string GenerateSourceCode(ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
+    public string GenerateSourceCode(RHTGenerationContext context, TypeNames typeNames)
     {
-        var generator = new CppSourceGenerator(this, project, buildTarget, typeNames);
+        var generator = new CppSourceGenerator(this, context, typeNames);
         return generator.Generate();
     }
 }

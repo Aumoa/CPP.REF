@@ -8,16 +8,14 @@ namespace AylaEngine.RHT.CodeGen;
 internal class CSharpCodeGenerator
 {
     private readonly RHTGenerator m_Generator;
-    private readonly ModuleProject m_Project;
-    private readonly TargetInfo m_BuildTarget;
+    private readonly RHTGenerationContext m_Context;
     private readonly TypeNames m_TypeNames;
     private int m_Indent;
 
-    public CSharpCodeGenerator(RHTGenerator generator, ModuleProject project, TargetInfo buildTarget, TypeNames typeNames)
+    public CSharpCodeGenerator(RHTGenerator generator, RHTGenerationContext context, TypeNames typeNames)
     {
         m_Generator = generator;
-        m_Project = project;
-        m_BuildTarget = buildTarget;
+        m_Context = context;
         m_TypeNames = typeNames;
         m_Indent = 0;
     }
@@ -25,7 +23,7 @@ internal class CSharpCodeGenerator
     public string Generate()
     {
         string sourceCode = GenerateFileHeader();
-        
+
         foreach (var syntax in m_Generator.Syntaxes)
         {
             if (syntax is SAEnum aenum)
@@ -133,8 +131,7 @@ internal class CSharpCodeGenerator
     }
 
     internal TypeNames TypeNames => m_TypeNames;
-    internal ModuleProject Project => m_Project;
-    internal TargetInfo BuildTarget => m_BuildTarget;
+    internal RHTGenerationContext Context => m_Context;
     internal string ModuleName => m_Generator.SourceFile.ModuleName;
     internal ref int IndentRef => ref m_Indent;
 }

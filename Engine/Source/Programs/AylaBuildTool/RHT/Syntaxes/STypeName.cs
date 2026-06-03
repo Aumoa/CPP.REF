@@ -28,7 +28,7 @@ internal record STypeName(CapturedContext Context, STypeName.Part[] NameParts) :
                 PartType.TemplateEnd => ">",
                 PartType.TemplateSeparator => ", ",
                 PartType.Number => p.Name,
-                _ => throw TerminateException.Internal()
+                _ => throw new InvalidOperationException($"Unsupported type name part '{p.Type}'.")
             }));
         }
     }

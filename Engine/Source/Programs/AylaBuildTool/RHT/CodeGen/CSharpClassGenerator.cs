@@ -8,7 +8,7 @@ namespace AylaEngine.RHT.CodeGen;
 internal class CSharpClassGenerator
 {
     private const string kDllImport = "global::System.Runtime.InteropServices.DllImport";
-    
+
     private readonly CSharpCodeGenerator m_Parent;
     private readonly SAClass m_Class;
     private string m_SourceCode = string.Empty;
@@ -65,7 +65,7 @@ internal class CSharpClassGenerator
     private void GenerateInjectedMethods()
     {
         var @class = m_Parent.TypeNames.FindClass(m_Class.Class);
-        
+
         // GetManagedType method
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
         m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.ManagedTypeWrapper GetManagedType();");
@@ -89,7 +89,7 @@ internal class CSharpClassGenerator
         var parameters = CollectParameters(constructor.Parameters);
         var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{index}__Injected";
-        
+
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
         m_SourceCode += m_Parent.IndentedLine($"public static extern nint ctor_{constructor.Name}({injectParamsDeclare});");
     }
@@ -137,7 +137,7 @@ internal class CSharpClassGenerator
         m_SourceCode += m_Parent.IndentedLine("{");
         m_SourceCode += m_Parent.IndentedLine("}");
         m_SourceCode += m_Parent.IndentedLine("");
-        
+
         // Static type getter
         m_SourceCode += m_Parent.IndentedLine($"private static readonly global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({classFullName});");
         m_SourceCode += m_Parent.IndentedLine($"private static nint GetScriptType__Invoke() => global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
@@ -161,7 +161,7 @@ internal class CSharpClassGenerator
         var parameters = CollectParameters(constructor.Parameters);
         var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
         var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
-        
+
         m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable({csharpParamsDeclare}) : this(@this =>");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
@@ -261,7 +261,7 @@ internal class CSharpClassGenerator
 
             var internalParamsDeclare = string.Join(", ", parameterTypes.Select((t, j) => $"{t.CSharpName} {function.Parameters[j].Variable.Name}"));
             var returnStmt = returnType is SharedPtrTypeName ? $"{returnType.CSharpName}" : returnType.CSharpName;
-            
+
             m_SourceCode += m_Parent.IndentedLine($"{access} unsafe{(isVirtual ? " virtual" : string.Empty)}{(isStatic ? " static" : string.Empty)} {returnStmt} {function.Name}({internalParamsDeclare})");
             m_SourceCode += m_Parent.IndentedLine("{");
             m_Parent.Indented(() =>
@@ -281,8 +281,7 @@ internal class CSharpClassGenerator
 
     private void GenerateFunctionBody(SFunction function, TypeName returnType, ParameterCollection parameters, bool isStatic, string injectFullName)
     {
-        var rule = m_Parent.Project.GetRule(m_Parent.BuildTarget);
-        if (rule.Type == ModuleType.Application || rule.Type == ModuleType.Console)
+        if (m_Parent.Context.AllowsNativeFunctionInvocation == false)
         {
             m_SourceCode += m_Parent.IndentedLine($"throw new global::System.AccessViolationException(\"Assemblies of the Application or Console type cannot directly invoke native functions.\");");
             return;
