@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AylaEngine;
+namespace AylaEngine.RHT;
 
 internal record SConstructor(CapturedContext Context, string Name, SParameter[] Parameters, SAccessSpecifier.Types Access)
     : SMember(Context, null, Name, Access)

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace AylaEngine;
+namespace AylaEngine.RHT;
 
 internal record SAEnum(CapturedContext Context, string Name, SNamespace[] Namespaces, SEnumDefine[] Defines) : Syntax(Context, '}')
 {

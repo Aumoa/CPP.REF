@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using static AylaEngine.RHTGenerator;
+using static AylaEngine.RHT.RHTGenerator;
 
-namespace AylaEngine;
+namespace AylaEngine.RHT;
 
 internal record SFunction(CapturedContext Context, string Name, SFunction.FFlags Flags, STypeName ReturnType, SParameter[] Parameters, SAccessSpecifier.Types Access)
     : SMember(Context, null, Name, Access)

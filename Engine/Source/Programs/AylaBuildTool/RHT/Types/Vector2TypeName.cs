@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+﻿namespace AylaEngine.RHT;
 
 internal class Vector2TypeName : TypeName
 {

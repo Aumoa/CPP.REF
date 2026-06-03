@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+﻿namespace AylaEngine.RHT;
 
 internal abstract class TypeName
 {

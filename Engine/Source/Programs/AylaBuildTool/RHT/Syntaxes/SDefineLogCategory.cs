@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace AylaEngine;
+namespace AylaEngine.RHT;
 
 internal record SDefineLogCategory(CapturedContext Context, SNamespace[] Namespaces, string Name) : Syntax(Context, null)
 {

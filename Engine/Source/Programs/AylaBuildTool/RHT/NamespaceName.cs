@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+﻿namespace AylaEngine.RHT;
 
 internal record struct NamespaceName(params string[] Names) : IScopeName
 {
@@ -13,7 +13,7 @@ internal record struct NamespaceName(params string[] Names) : IScopeName
             return "::" + string.Join("::", Names) + "::" + name;
         }
     }
-    
+
     public string CSharp(string name)
     {
         if (Names.Length == 0)

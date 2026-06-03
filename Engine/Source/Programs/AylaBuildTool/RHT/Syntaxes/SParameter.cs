@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+﻿namespace AylaEngine.RHT;
 
 internal record SParameter(SVariable Variable) : Syntax(Variable.Context, null)
 {

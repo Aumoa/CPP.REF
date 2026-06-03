@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using static AylaEngine.RHTGenerator;
+using static AylaEngine.RHT.RHTGenerator;
 
-namespace AylaEngine;
+namespace AylaEngine.RHT;
 
 internal record SAClass(CapturedContext Context, SClass Class) : Syntax(Context, Class.EscapeBracket)
 {

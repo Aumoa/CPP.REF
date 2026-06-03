@@ -2,7 +2,7 @@
 
 using AylaEngine.RHT.CodeGen;
 
-namespace AylaEngine;
+namespace AylaEngine.RHT;
 
 internal partial class RHTGenerator
 {

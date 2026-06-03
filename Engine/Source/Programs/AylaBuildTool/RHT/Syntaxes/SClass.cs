@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using static AylaEngine.RHTGenerator;
+using static AylaEngine.RHT.RHTGenerator;
 
-namespace AylaEngine;
+namespace AylaEngine.RHT;
 
 internal record SClass(
     CapturedContext Context,

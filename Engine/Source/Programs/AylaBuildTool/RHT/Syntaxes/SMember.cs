@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+﻿namespace AylaEngine.RHT;
 
 internal abstract record SMember(CapturedContext Context, char? EscapeBracket, string Name, SAccessSpecifier.Types Access)
     : Syntax(Context, EscapeBracket)
