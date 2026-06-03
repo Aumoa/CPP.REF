@@ -1,8 +1,8 @@
 namespace AylaEngine;
 
-internal static class ProjectScanner
+internal sealed class ProjectScanner
 {
-    public static async Task<IReadOnlyList<ProjectCandidate>> ScanAsync(
+    public async Task<IReadOnlyList<ProjectCandidate>> ScanAsync(
         GroupDescriptor group,
         string sourceDirectory,
         CancellationToken cancellationToken)
@@ -10,7 +10,7 @@ internal static class ProjectScanner
         return await ScanDirectoryRecursiveAsync(group, sourceDirectory, cancellationToken);
     }
 
-    private static async Task<ProjectCandidate[]> ScanDirectoryRecursiveAsync(
+    private async Task<ProjectCandidate[]> ScanDirectoryRecursiveAsync(
         GroupDescriptor group,
         string currentDirectory,
         CancellationToken cancellationToken)
