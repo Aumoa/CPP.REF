@@ -1,22 +1,65 @@
-# Visual Studio Files
+# Ayla build outputs
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+
+# Visual Studio generated files
 .vs/
 *.sln
-Engine/.vs
-**/obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
 **/x64/
 
-# Visual Studio Code
-.vscode
+# Visual Studio Code generated files
+.vscode/
 *.code-workspace
 
-# Script Projects
+# .NET generated output
+bin/
+obj/
+*.deps.json
+
+# Script project generated files
 *.Script.csproj
-**/Script/bin
-**/Script/obj
+**/Script/bin/
+**/Script/obj/
+**/Script/Bindings/
+**/Script/Properties/launchSettings.json
+
+# Native and reflection build intermediates
+*.cache
+*.deps
+*.ilk
+*.obj
+*.o
+*.pdb
+*.gen.h
+*.gen.cpp
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Logs and local temporary files
+*.log
+*.tmp
+*.temp
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# CodeQL local detection output
 _codeql_detected_source_root
 
-# Claude AI
+# Claude AI local settings
 .claude/*.local.json

@@ -1,5 +1,38 @@
-# Local
-Intermediate/
+# Ayla sample build outputs
+/Binaries/
+/Intermediate/
+/Saved/
+/DerivedDataCache/
 
-# Outputs
-Binaries/
+# Generated script project files
+*.Script.csproj
+/Source/**/Script/bin/
+/Source/**/Script/obj/
+/Source/**/Script/Bindings/
+/Source/**/Script/Properties/launchSettings.json
+
+# Generated native and reflection intermediates
+*.cache
+*.deps
+*.deps.json
+*.ilk
+*.obj
+*.o
+*.pdb
+*.gen.h
+*.gen.cpp
+
+# Local IDE files generated for this sample
+/.vs/
+*.sln
+*.suo
+*.user
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.code-workspace
+
+# Logs and local temporary files
+*.log
+*.tmp
+*.temp
