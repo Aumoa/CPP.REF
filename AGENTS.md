@@ -8,6 +8,7 @@
 ## Code Style
 
 - Repository files and generated documentation should be written in English.
+- When creating or editing files, use the line ending appropriate for the current platform: CRLF on Windows and LF on Linux or macOS.
 - C++ and C# member fields should use the `m_` prefix.
 - Class names do not use engine-style prefixes, so member prefixes help reduce naming collisions.
 
