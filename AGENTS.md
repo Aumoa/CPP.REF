@@ -11,6 +11,16 @@
 - C++ and C# member fields should use the `m_` prefix.
 - Class names do not use engine-style prefixes, so member prefixes help reduce naming collisions.
 
+## Build Rules
+
+- Native C++ builds must be driven by AylaBuildTool.
+- If AylaBuildTool is missing or may be stale, refresh it first with `dotnet build Engine/Source/Programs/AylaBuildTool/AylaBuildTool.csproj`.
+- Run AylaBuildTool through `dotnet Engine/Binaries/DotNET/AylaBuildTool.dll build ...` for native C++ build checks.
+- Do not use generated C++ IDE projects as normal build entry points. They may be used for IDE navigation or compile diagnostics, but AylaBuildTool owns the actual C++ build orchestration.
+- C# projects should be built with `dotnet build <project>.csproj`.
+- For native C++ build checks, use `SampleGame/SampleGame.aproject` when it exists and target the sample game's game module, currently `GameAssembly`.
+- If `SampleGame/SampleGame.aproject` does not exist, build the engine target instead, currently `Engine`.
+
 ## Commit Rules
 
 - Codex AI must create a commit for each completed functional unit to keep history reviewable.
