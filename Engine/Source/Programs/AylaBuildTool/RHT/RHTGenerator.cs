@@ -5,7 +5,7 @@ internal partial class RHTGenerator
     private readonly Syntax[] m_Syntaxes;
     private readonly string m_FileId;
 
-    public SourceCodeDescriptor SourceCode { get; }
+    public RHTSourceFile SourceFile { get; }
 
     public SAClass[] Classes { get; }
 
@@ -13,13 +13,13 @@ internal partial class RHTGenerator
 
     internal Syntax[] Syntaxes => m_Syntaxes;
 
-    private RHTGenerator(SourceCodeDescriptor sourceCode, Syntax[] syntaxes)
+    private RHTGenerator(RHTSourceFile sourceFile, Syntax[] syntaxes)
     {
-        SourceCode = sourceCode;
+        SourceFile = sourceFile;
         m_Syntaxes = syntaxes;
         Classes = syntaxes.OfType<SAClass>().ToArray();
         Enums = syntaxes.OfType<SAEnum>().ToArray();
-        var sourceRelativePath = Path.GetRelativePath(SourceCode.Group.SourceDirectory, SourceCode.FilePath);
+        var sourceRelativePath = Path.GetRelativePath(SourceFile.SourceRootDirectory, SourceFile.FilePath);
         m_FileId = sourceRelativePath
             .Replace('/', '_')
             .Replace('\\', '_')
@@ -27,10 +27,10 @@ internal partial class RHTGenerator
             .ToUpper();
     }
 
-    public static async Task<RHTGenerator?> ParseAsync(SourceCodeDescriptor sourceCode, CancellationToken cancellationToken = default)
+    public static async Task<RHTGenerator?> ParseAsync(RHTSourceFile sourceFile, CancellationToken cancellationToken = default)
     {
-        var headerFileName = Path.GetFileNameWithoutExtension(sourceCode.FilePath);
-        var headerText = await File.ReadAllTextAsync(sourceCode.FilePath, cancellationToken);
+        var headerFileName = Path.GetFileNameWithoutExtension(sourceFile.FilePath);
+        var headerText = await File.ReadAllTextAsync(sourceFile.FilePath, cancellationToken);
         var includeText = $"#include \"{headerFileName}.gen.h\"";
         int includeIndex = headerText.IndexOf(includeText);
         if (includeIndex == -1)
@@ -47,7 +47,7 @@ internal partial class RHTGenerator
         List<Syntax> syntaxes = [];
         List<Syntax> bracketStack = [];
 
-        var context = new Context(sourceCode.FilePath, headerText);
+        var context = new Context(sourceFile.FilePath, headerText);
         for (; context.IsEOF == false;)
         {
             if (bracketStack.LastOrDefault()?.EscapeBracket == context.CurrentChar)
@@ -160,6 +160,6 @@ internal partial class RHTGenerator
             context.ParsingError("The mandatory header file must be included at the very end of the inclusion list.");
         }
 
-        return new RHTGenerator(sourceCode, syntaxes.ToArray());
+        return new RHTGenerator(sourceFile, syntaxes.ToArray());
     }
 }

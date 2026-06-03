@@ -25,7 +25,11 @@ internal static partial class BuildRunner
         {
             try
             {
-                Generator = await RHTGenerator.ParseAsync(m_SourceCode, cancellationToken);
+                var sourceFile = new RHTSourceFile(
+                    m_SourceCode.FilePath,
+                    m_SourceCode.Group.SourceDirectory,
+                    m_SourceCode.ModuleName);
+                Generator = await RHTGenerator.ParseAsync(sourceFile, cancellationToken);
             }
             catch (Exception e)
             {

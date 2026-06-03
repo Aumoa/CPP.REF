@@ -76,7 +76,7 @@ internal class CppSourceGenerator
 
 #include "CoreMinimal.h"
 #include "Reflection/TypeCollector.h"{headersInclude}
-#include "{m_Generator.SourceCode.FilePath.Replace('\\', '/')}"
+#include "{m_Generator.SourceFile.FilePath.Replace('\\', '/')}"
 
 
 """;
@@ -106,11 +106,11 @@ internal class CppSourceGenerator
     {
         if (typeName is ClassName className)
         {
-            headers.Add(className.Source.SourceCode.FilePath);
+            headers.Add(className.Source.SourceFile.FilePath);
         }
         else if (typeName is SharedPtrTypeName rptr)
         {
-            headers.Add(((ClassName)rptr.ElementType).Source.SourceCode.FilePath);
+            headers.Add(((ClassName)rptr.ElementType).Source.SourceFile.FilePath);
         }
         else if (typeName is ArrayTypeName array)
         {

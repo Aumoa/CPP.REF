@@ -135,6 +135,6 @@ internal class CSharpCodeGenerator
     internal TypeNames TypeNames => m_TypeNames;
     internal ModuleProject Project => m_Project;
     internal TargetInfo BuildTarget => m_BuildTarget;
-    internal string ModuleName => m_Generator.SourceCode.ModuleName;
+    internal string ModuleName => m_Generator.SourceFile.ModuleName;
     internal ref int IndentRef => ref m_Indent;
 }
