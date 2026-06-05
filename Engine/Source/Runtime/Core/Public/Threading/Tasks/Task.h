@@ -160,20 +160,8 @@ namespace Ayla
 		}
 
 	private:
-		template<class T>
-		struct add_reference_unless_void
-		{
-			using type = T&;
-		};
-
-		template<>
-		struct add_reference_unless_void<void>
-		{
-			using type = void;
-		};
-
-		template<class T>
-		using add_reference_unless_void_t = typename add_reference_unless_void<T>::type;
+		template<class TValue>
+		using add_reference_unless_void_t = std::add_lvalue_reference_t<TValue>;
 
 	public:
 		inline add_reference_unless_void_t<T> GetResult() const
