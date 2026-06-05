@@ -10,8 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        #os: [ubuntu-latest, windows-latest, macos-latest]
-        os: [windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout repository
@@ -22,14 +21,18 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Run Setup Script (Linux/Mac)
-        if: runner.os != 'Windows'
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
         run: |
-          chmod +x ./Setup.sh
-          ./Setup.sh
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-dev \
+            xorg-dev \
+            libxext-dev \
+            libxrandr-dev \
+            libxi-dev
 
-      - name: Build AylaBuildTool (Windows)
-        if: runner.os == 'Windows'
+      - name: Build AylaBuildTool
         run: dotnet publish ./Engine/Source/Programs/AylaBuildTool/AylaBuildTool.csproj -c Shipping -o ./Engine/Binaries/DotNET
 
       - name: Build
