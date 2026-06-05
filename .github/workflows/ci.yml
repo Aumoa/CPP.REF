@@ -30,7 +30,10 @@ jobs:
             xorg-dev \
             libxext-dev \
             libxrandr-dev \
-            libxi-dev
+            libxi-dev \
+            libicu-dev \
+            liburing-dev \
+            libunwind-dev
 
       - name: Build AylaBuildTool
         run: dotnet publish ./Engine/Source/Programs/AylaBuildTool/AylaBuildTool.csproj -c Shipping -o ./Engine/Binaries/DotNET
