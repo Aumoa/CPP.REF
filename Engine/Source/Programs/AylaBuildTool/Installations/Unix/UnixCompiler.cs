@@ -18,12 +18,35 @@ internal abstract class UnixCompiler : CppCompiler
         return ValueTask.FromResult<string[]>([]);
     }
 
+    protected abstract string GetPchOutputFilePath(CppPchSettings pchSettings);
+
+    protected abstract string[] GetCreatePchArguments(CppPchSettings pchSettings);
+
+    protected abstract string[] GetUsePchArguments(CppPchSettings pchSettings);
+
+    public override string[] GetCompileOutputFilePaths(CppCompileCommand command)
+    {
+        if (command.CreatesPch == false)
+        {
+            return base.GetCompileOutputFilePaths(command);
+        }
+
+        var pchSettings = command.PchSettings
+            ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+        return [GetPchOutputFilePath(pchSettings)];
+    }
+
+    public override string[] GetPchCleanupFilePaths(CppPchSettings pchSettings)
+    {
+        return [.. base.GetPchCleanupFilePaths(pchSettings), GetPchOutputFilePath(pchSettings)];
+    }
+
     public override async ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken = default)
     {
-        if (command.PchCommandKind != CppPchCommandKind.None)
-        {
-            throw new NotSupportedException("PCH compile commands are currently supported only by the MSVC compiler.");
-        }
+        var pchSettings = command.PchCommandKind == CppPchCommandKind.None
+            ? null
+            : command.PchSettings ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
 
         var options = new Terminal.Options
         {
@@ -84,9 +107,22 @@ internal abstract class UnixCompiler : CppCompiler
 
         AddCompilerCommands("-c");
 
-        AddCompilerCommands($"{command.SourceCode.FilePath}");
+        if (command.CreatesPch)
+        {
+            AddCompilerCommands(GetCreatePchArguments(pchSettings!));
+        }
+        else if (command.UsesPch)
+        {
+            AddCompilerCommands(GetUsePchArguments(pchSettings!));
+        }
 
-        AddCompilerCommands($"-o\"{command.ObjectFilePath}\"");
+        AddCompilerCommands($"\"{command.SourceCode.FilePath}\"");
+
+        var outputFilePath = command.CreatesPch && pchSettings != null
+            ? GetPchOutputFilePath(pchSettings)
+            : command.ObjectFilePath;
+
+        AddCompilerCommands($"-o\"{outputFilePath}\"");
         AddCompilerCommands($"-MMD -MF\"{command.DependenciesFilePath}\"");
 
         Terminal.Output output;

@@ -16,6 +16,24 @@ internal class ClCompiler : CppCompiler
         m_Product = product;
     }
 
+    public override string[] GetCompileOutputFilePaths(CppCompileCommand command)
+    {
+        if (command.CreatesPch == false)
+        {
+            return base.GetCompileOutputFilePaths(command);
+        }
+
+        var pchSettings = command.PchSettings
+            ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+        return
+        [
+            command.ObjectFilePath,
+            pchSettings.PchFilePath,
+            pchSettings.PdbFilePath
+        ];
+    }
+
     public override async ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options

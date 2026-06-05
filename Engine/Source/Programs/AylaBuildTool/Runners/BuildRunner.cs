@@ -58,6 +58,7 @@ internal static partial class BuildRunner
         }
 
         var installation = Installation.CreateDefaultInstallation();
+        CppCompiler? compiler = null;
         int compiled = 0;
         int totalActions = 0;
         int log = 1;
@@ -103,7 +104,7 @@ internal static partial class BuildRunner
 
                     var resolver = resolverFactory.GetResolver(project, buildTarget);
                     var compileEnvironment = new CppCompileEnvironment(resolver, buildTarget, project.Group);
-                    DeletePchFiles(compileEnvironment.PchSettings);
+                    DeletePchFiles(await GetCompilerAsync(), compileEnvironment.PchSettings);
                 }
 
                 var bindingsDir = Path.Combine(intDir, "Bindings");
@@ -162,7 +163,10 @@ internal static partial class BuildRunner
                     await compileEnvironment.PchSettings.WriteSourceFileAsync(cancellationToken);
 
                     var pchCommand = CppCompileCommand.CreatePch(compileEnvironment);
-                    allCompiles.Add(pchCommand);
+                    if ((await GetCompilerAsync()).GetCompileOutputFilePaths(pchCommand).Contains(pchCommand.ObjectFilePath))
+                    {
+                        allCompiles.Add(pchCommand);
+                    }
 
                     if (await NeedCompileAsync(pchCommand))
                     {
@@ -261,12 +265,7 @@ internal static partial class BuildRunner
 
             if (command.CreatesPch)
             {
-                var pchSettings = command.PchSettings
-                    ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
-
-                if (File.Exists(command.ObjectFilePath) == false ||
-                    File.Exists(pchSettings.PchFilePath) == false ||
-                    File.Exists(pchSettings.PdbFilePath) == false)
+                if ((await GetCompilerAsync()).GetCompileOutputFilePaths(command).Any(filePath => File.Exists(filePath) == false))
                 {
                     return true;
                 }
@@ -277,25 +276,22 @@ internal static partial class BuildRunner
                 SourceCodeCache.LoadCached(command.CacheFilePath).IsModified(cached);
         }
 
-        void DeletePchFiles(CppPchSettings? pchSettings)
+        async ValueTask<CppCompiler> GetCompilerAsync()
+        {
+            return compiler ??= await installation.SpawnCompilerAsync(buildTarget, cancellationToken);
+        }
+
+        void DeletePchFiles(CppCompiler activeCompiler, CppPchSettings? pchSettings)
         {
             if (pchSettings == null)
             {
                 return;
             }
 
-            var intermediateDirectory = Path.GetDirectoryName(pchSettings.SourceFilePath);
-            if (intermediateDirectory == null)
+            foreach (var filePath in activeCompiler.GetPchCleanupFilePaths(pchSettings).Distinct())
             {
-                return;
+                File.Delete(filePath);
             }
-
-            File.Delete(pchSettings.SourceFilePath);
-            File.Delete(pchSettings.PchFilePath);
-            File.Delete(pchSettings.PdbFilePath);
-            File.Delete(Path.Combine(intermediateDirectory, pchSettings.OutputName + ".o"));
-            File.Delete(Path.Combine(intermediateDirectory, pchSettings.OutputName + ".deps"));
-            File.Delete(Path.Combine(intermediateDirectory, pchSettings.OutputName + ".cache"));
         }
 
         void LogTaskFailure(Exception? exception)

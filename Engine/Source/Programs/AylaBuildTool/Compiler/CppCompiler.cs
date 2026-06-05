@@ -36,6 +36,35 @@ internal abstract class CppCompiler
 
     public abstract ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken = default);
 
+    public virtual string[] GetCompileOutputFilePaths(CppCompileCommand command)
+    {
+        if (command.CreatesPch)
+        {
+            var pchSettings = command.PchSettings
+                ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+            return [pchSettings.PchFilePath];
+        }
+
+        return [command.ObjectFilePath];
+    }
+
+    public virtual string[] GetPchCleanupFilePaths(CppPchSettings pchSettings)
+    {
+        var intermediateDirectory = Path.GetDirectoryName(pchSettings.SourceFilePath)
+            ?? throw new InvalidOperationException("PCH source file path does not have a directory.");
+
+        return
+        [
+            pchSettings.SourceFilePath,
+            pchSettings.PchFilePath,
+            pchSettings.PdbFilePath,
+            Path.Combine(intermediateDirectory, pchSettings.OutputName + ".o"),
+            Path.Combine(intermediateDirectory, pchSettings.OutputName + ".deps"),
+            Path.Combine(intermediateDirectory, pchSettings.OutputName + ".cache")
+        ];
+    }
+
     protected static ValueTask<ScopedAccess> GetAccess(CancellationToken cancellationToken = default)
     {
         return ScopedAccess.GetAccess(s_Access, cancellationToken);
