@@ -15,12 +15,15 @@
 ## Build Rules
 
 - Native C++ builds must be driven by AylaBuildTool.
-- If AylaBuildTool is missing or may be stale, refresh it first with `dotnet build Engine/Source/Programs/AylaBuildTool/AylaBuildTool.csproj`.
-- Run AylaBuildTool through `dotnet Engine/Binaries/DotNET/AylaBuildTool.dll build ...` for native C++ build checks.
 - Do not use generated C++ IDE projects as normal build entry points. They may be used for IDE navigation or compile diagnostics, but AylaBuildTool owns the actual C++ build orchestration.
-- C# projects should be built with `dotnet build <project>.csproj`.
-- For native C++ build checks, use `SampleGame/SampleGame.aproject` when it exists and target the sample game's game module, currently `GameAssembly`.
-- If `SampleGame/SampleGame.aproject` does not exist, build the engine target instead, currently `Engine`.
+- Use the repository-local `ayla-build` skill at `.codex/skills/ayla-build/SKILL.md` for detailed build, generation, and verification workflows.
+
+## Instruction Storage
+
+- Keep short, always-on repository policies in `AGENTS.md`.
+- When a requested persistent instruction is mainly useful for a recurring workflow, verification procedure, tool usage pattern, or detailed domain guide, create or update a repository-local skill under `.codex/skills/<skill-name>/SKILL.md` and link it from `AGENTS.md`.
+- Prefer scripts only for deterministic, repeatedly executed operations where a command or code snippet would otherwise be rewritten often.
+- Do not split instructions just to split them. Keep compact universal rules in `AGENTS.md` when a skill or script would not reduce future context or execution risk.
 
 ## Commit Rules
 
