@@ -12,7 +12,7 @@ public partial class Object : IDisposable, IStaticObject
 
     protected Object(Func<object, nint> locker)
     {
-        NativePointer = locker(this);
+        m_NativePointer = locker(this);
     }
 
     ~Object()
@@ -28,24 +28,37 @@ public partial class Object : IDisposable, IStaticObject
 
     protected virtual void Dispose(bool disposing)
     {
-        var iid = NativePointer;
-        NativePointer = 0;
-        var gcHandlePtr = BeginWriteGCHandle__Injected(iid);
-        EndWriteGCHandle__Injected(iid, 0, false);
-        if (gcHandlePtr == 0)
+        var nativePointer = Interlocked.Exchange(ref m_NativePointer, 0);
+        if (nativePointer == 0)
         {
-            throw new InvalidOperationException();
+            return;
         }
 
-        GCHandle.FromIntPtr(gcHandlePtr).Free();
+        var gcHandlePtr = BeginWriteGCHandle__Injected(nativePointer);
+        EndWriteGCHandle__Injected(nativePointer, 0, false);
+        if (gcHandlePtr != 0)
+        {
+            GCHandle.FromIntPtr(gcHandlePtr).Free();
+        }
     }
 
-    public nint NativePointer { get; private set; }
+    private nint m_NativePointer;
 
-    internal ObjectReferenceWrapper AsWrapper() => AsWrapper__Injected(NativePointer) with
+    public nint NativePointer => m_NativePointer;
+
+    internal ObjectReferenceWrapper AsWrapper()
     {
-        IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal)
-    };
+        var nativePointer = NativePointer;
+        if (nativePointer == 0)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+
+        return AsWrapper__Injected(nativePointer) with
+        {
+            IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal)
+        };
+    }
 
     public virtual ManagedTypeWrapper GetClass() => StaticClass();
 
