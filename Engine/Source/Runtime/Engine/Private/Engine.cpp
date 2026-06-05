@@ -19,6 +19,7 @@
 #include "Rendering/RenderTexture.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Shader.h"
+#include "Rendering/ShaderBinaryPathResolver.h"
 #include "Rendering/ShaderType.h"
 #include "Rendering/RenderPipeline.h"
 #include "Rendering/PositionColorVertexFactory.h"
@@ -52,21 +53,22 @@ namespace Ayla
 		m_GameInstance = InitializeGameInstance();
 		m_GameInstance->Initialize(m_MainActivity->GetMainWindow().Get());
 
-		auto applicationDirectory = GenericApplication::Get().GetApplicationDirectory();
+		auto shaderDirectory = GenericApplication::Get().GetApplicationDirectory().GetChild(TEXT("Shaders"));
+		auto shaderBinaryFeature = m_Graphics->GetCurrentRenderFeature();
 
 		std::vector<Task<>> tasks;
-		tasks.emplace_back(Task<>::Create([this, &applicationDirectory]() -> Task<>
+		tasks.emplace_back(Task<>::Create([this, shaderDirectory, shaderBinaryFeature]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};
 			sci.VertexFactory = std::make_shared<PositionColorVertexFactory>();
 			std::vector<Task<>> tasks;
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultVertex.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultVertex"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.VertexShader.Bytecode = std::move(bytecode);
 				sci.VertexShader.EntrypointName = TEXT("main");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultPixel.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultPixel"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.FragmentShader.Bytecode = std::move(bytecode);
@@ -77,23 +79,23 @@ namespace Ayla
 			auto shader = m_Graphics->CreateShader(std::move(sci));
 			m_DefaultGeometryRenderPipeline = m_Graphics->CreateGeometryRenderPipeline(shader);
 		}));
-		tasks.emplace_back(Task<>::Create([this, &applicationDirectory]() -> Task<>
+		tasks.emplace_back(Task<>::Create([this, shaderDirectory, shaderBinaryFeature]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};
 			std::vector<Task<>> tasks;
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultRayGeneration.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultRayGeneration"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.RayGenerationShader.Bytecode = std::move(bytecode);
 				sci.RayGenerationShader.EntrypointName = TEXT("DefaultRayGeneration");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultHit.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultHit"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.ClosestHitShader.Bytecode = std::move(bytecode);
 				sci.ClosestHitShader.EntrypointName = TEXT("DefaultClosestHit");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultMiss.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultMiss"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.MissShader.Bytecode = std::move(bytecode);
