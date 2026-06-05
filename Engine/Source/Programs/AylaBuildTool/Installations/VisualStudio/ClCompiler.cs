@@ -137,14 +137,46 @@ internal class ClCompiler : CppCompiler
 
         Directory.CreateDirectory(command.IntermediateDirectory);
 
+        var pdbFilePath = command.UsesPch && command.PchSettings != null
+            ? command.PchSettings.PdbFilePath
+            : command.PdbFilePath;
+
         m_CommandBuilder.AppendFormat(
             "/Fo\"{0}\" " +
             "/Fd\"{1}\" " +
             "/sourceDependencies \"{2}\" ",
             command.ObjectFilePath,
-            command.PdbFilePath,
+            pdbFilePath,
             command.DependenciesFilePath
         );
+
+        if (command.CreatesPch)
+        {
+            var pchSettings = command.PchSettings
+                ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+            m_CommandBuilder.AppendFormat(
+                "/Yc\"{0}\" " +
+                "/Fp\"{1}\" " +
+                "/FS ",
+                pchSettings.HeaderIncludeName,
+                pchSettings.PchFilePath
+            );
+        }
+        else if (command.UsesPch)
+        {
+            var pchSettings = command.PchSettings
+                ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+            m_CommandBuilder.AppendFormat(
+                "/Yu\"{0}\" " +
+                "/Fp\"{1}\" " +
+                "/FI\"{0}\" " +
+                "/FS ",
+                pchSettings.HeaderIncludeName,
+                pchSettings.PchFilePath
+            );
+        }
 
         if (command.IsModuleInterface)
         {

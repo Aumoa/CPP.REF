@@ -5,17 +5,20 @@ internal static partial class BuildRunner
     private class CompileTask : ITask
     {
         public readonly CppCompileCommand Command;
+        private readonly Task[] m_PrerequisiteTasks;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public CompileTask(CppCompileCommand command)
+        public CompileTask(CppCompileCommand command, params Task[] prerequisiteTasks)
         {
             Command = command;
+            m_PrerequisiteTasks = prerequisiteTasks;
         }
 
         public async Task<Terminal.Output> CompileAsync(Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             try
             {
+                await Task.WhenAll(m_PrerequisiteTasks);
                 var compiler = await installation.SpawnCompilerAsync(targetInfo, cancellationToken);
                 var output = await compiler.CompileAsync(Command, cancellationToken);
                 TerminalExecutionException.ThrowIfFailure(output);

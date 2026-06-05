@@ -8,6 +8,8 @@ public class Core : ModuleRules
     public Core()
     {
         Script.Enabled = true;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
 
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");

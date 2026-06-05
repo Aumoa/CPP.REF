@@ -20,6 +20,11 @@ internal abstract class UnixCompiler : CppCompiler
 
     public override async ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken = default)
     {
+        if (command.PchCommandKind != CppPchCommandKind.None)
+        {
+            throw new NotSupportedException("PCH compile commands are currently supported only by the MSVC compiler.");
+        }
+
         var options = new Terminal.Options
         {
             Executable = await m_Installation.GetCompilerPath(m_TargetInfo, cancellationToken),
