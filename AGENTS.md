@@ -4,6 +4,8 @@
 
 - The project aims to combine suitable strengths from Unity and Unreal Engine.
 - The project is primarily for learning and experimentation.
+- The renderer is designed around raytracing as a core requirement. Do not treat raytracing as an optional backend feature or add non-raytracing fallbacks unless explicitly requested.
+- Rendering backends, including Vulkan, are expected to implement required raytracing support or fail clearly when the platform cannot provide it.
 
 ## Code Style
 
