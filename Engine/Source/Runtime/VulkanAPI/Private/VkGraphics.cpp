@@ -137,6 +137,21 @@ namespace Ayla
                 ThrowRequiredFeatureMissing(deviceName, TEXT("accelerationStructure"));
             }
         }
+
+        template<class TFunction>
+        TFunction LoadRequiredDeviceFunction(VkDevice device, const char* functionName)
+        {
+            auto function = reinterpret_cast<TFunction>(vkGetDeviceProcAddr(device, functionName));
+            if (function == nullptr)
+            {
+                throw InvalidOperationException(String::Format(
+                    TEXT("Required Vulkan device function '{}' is not available."),
+                    String::FromLiteral(functionName)
+                ));
+            }
+
+            return function;
+        }
     }
 
     VkGraphics::VkGraphics()
@@ -256,6 +271,24 @@ namespace Ayla
         const VkPhysicalDeviceProperties& selectedPhysicalDeviceProps = physicalDeviceProps[0];
         ValidateRequiredDeviceExtensions(selectedPhysicalDevice, selectedPhysicalDeviceProps.deviceName);
         ValidateRequiredRaytracingFeatures(selectedPhysicalDevice, selectedPhysicalDeviceProps.deviceName);
+
+        m_RaytracingPipelineProperties =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR,
+            .pNext = &m_AccelerationStructureProperties
+        };
+        m_AccelerationStructureProperties =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR
+        };
+
+        VkPhysicalDeviceProperties2 selectedDeviceProperties =
+        {
+            .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
+            .pNext = &m_RaytracingPipelineProperties
+        };
+        vkGetPhysicalDeviceProperties2(selectedPhysicalDevice, &selectedDeviceProperties);
+        m_RaytracingPipelineProperties.pNext = nullptr;
 
         // Find a queue family that supports VK_QUEUE_GRAPHICS_BIT
         uint32_t queueCount;
@@ -435,6 +468,17 @@ namespace Ayla
         LogVulkan::Verbose(TEXT("Logical device created using {} physical device."), String::FromCodepage(selectedPhysicalDeviceProps.deviceName));
         VKR(vkCreateDevice(selectedPhysicalDevice, &vkDeviceInfo, nullptr, &m_Device));
 
+        m_vkCreateRayTracingPipelinesKHR = LoadRequiredDeviceFunction<PFN_vkCreateRayTracingPipelinesKHR>(m_Device, "vkCreateRayTracingPipelinesKHR");
+        m_vkGetRayTracingShaderGroupHandlesKHR = LoadRequiredDeviceFunction<PFN_vkGetRayTracingShaderGroupHandlesKHR>(m_Device, "vkGetRayTracingShaderGroupHandlesKHR");
+        m_vkCmdTraceRaysKHR = LoadRequiredDeviceFunction<PFN_vkCmdTraceRaysKHR>(m_Device, "vkCmdTraceRaysKHR");
+        m_vkGetBufferDeviceAddress = LoadRequiredDeviceFunction<PFN_vkGetBufferDeviceAddress>(m_Device, "vkGetBufferDeviceAddress");
+        m_vkCreateAccelerationStructureKHR = LoadRequiredDeviceFunction<PFN_vkCreateAccelerationStructureKHR>(m_Device, "vkCreateAccelerationStructureKHR");
+        m_vkDestroyAccelerationStructureKHR = LoadRequiredDeviceFunction<PFN_vkDestroyAccelerationStructureKHR>(m_Device, "vkDestroyAccelerationStructureKHR");
+        m_vkGetAccelerationStructureBuildSizesKHR = LoadRequiredDeviceFunction<PFN_vkGetAccelerationStructureBuildSizesKHR>(m_Device, "vkGetAccelerationStructureBuildSizesKHR");
+        m_vkBuildAccelerationStructuresKHR = LoadRequiredDeviceFunction<PFN_vkBuildAccelerationStructuresKHR>(m_Device, "vkBuildAccelerationStructuresKHR");
+        m_vkCmdBuildAccelerationStructuresKHR = LoadRequiredDeviceFunction<PFN_vkCmdBuildAccelerationStructuresKHR>(m_Device, "vkCmdBuildAccelerationStructuresKHR");
+        m_vkGetAccelerationStructureDeviceAddressKHR = LoadRequiredDeviceFunction<PFN_vkGetAccelerationStructureDeviceAddressKHR>(m_Device, "vkGetAccelerationStructureDeviceAddressKHR");
+
         for (auto& createInfo : queueCreateInfos)
         {
             for (size_t i = 0; i < createInfo.Types.size(); ++i)
@@ -460,6 +504,18 @@ namespace Ayla
     {
         m_Queues = {};
         m_PhysicalDevice = nullptr;
+        m_RaytracingPipelineProperties = {};
+        m_AccelerationStructureProperties = {};
+        m_vkCreateRayTracingPipelinesKHR = nullptr;
+        m_vkGetRayTracingShaderGroupHandlesKHR = nullptr;
+        m_vkCmdTraceRaysKHR = nullptr;
+        m_vkGetBufferDeviceAddress = nullptr;
+        m_vkCreateAccelerationStructureKHR = nullptr;
+        m_vkDestroyAccelerationStructureKHR = nullptr;
+        m_vkGetAccelerationStructureBuildSizesKHR = nullptr;
+        m_vkBuildAccelerationStructuresKHR = nullptr;
+        m_vkCmdBuildAccelerationStructuresKHR = nullptr;
+        m_vkGetAccelerationStructureDeviceAddressKHR = nullptr;
     }
 
     SharedPtr<GenericWindowSwapchainExtension> VkGraphics::InstallSwapChain(SharedPtr<GenericWindow> targetWindow)

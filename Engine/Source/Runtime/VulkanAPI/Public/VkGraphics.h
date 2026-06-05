@@ -31,6 +31,20 @@ namespace Ayla
         VkDeviceRef m_Device;
         std::array<std::unique_ptr<VkCommandQueue>, 3> m_Queues;
 
+        VkPhysicalDeviceRayTracingPipelinePropertiesKHR m_RaytracingPipelineProperties = {};
+        VkPhysicalDeviceAccelerationStructurePropertiesKHR m_AccelerationStructureProperties = {};
+
+        PFN_vkCreateRayTracingPipelinesKHR m_vkCreateRayTracingPipelinesKHR = nullptr;
+        PFN_vkGetRayTracingShaderGroupHandlesKHR m_vkGetRayTracingShaderGroupHandlesKHR = nullptr;
+        PFN_vkCmdTraceRaysKHR m_vkCmdTraceRaysKHR = nullptr;
+        PFN_vkGetBufferDeviceAddress m_vkGetBufferDeviceAddress = nullptr;
+        PFN_vkCreateAccelerationStructureKHR m_vkCreateAccelerationStructureKHR = nullptr;
+        PFN_vkDestroyAccelerationStructureKHR m_vkDestroyAccelerationStructureKHR = nullptr;
+        PFN_vkGetAccelerationStructureBuildSizesKHR m_vkGetAccelerationStructureBuildSizesKHR = nullptr;
+        PFN_vkBuildAccelerationStructuresKHR m_vkBuildAccelerationStructuresKHR = nullptr;
+        PFN_vkCmdBuildAccelerationStructuresKHR m_vkCmdBuildAccelerationStructuresKHR = nullptr;
+        PFN_vkGetAccelerationStructureDeviceAddressKHR m_vkGetAccelerationStructureDeviceAddressKHR = nullptr;
+
         std::atomic<std::size_t> m_FrameCount = 0;
 
         std::mutex m_FenceCompletionMutex;
@@ -60,6 +74,19 @@ namespace Ayla
         VkDevice GetDevice() const noexcept { return m_Device; }
         VkPhysicalDevice GetPhysicalDevice() const noexcept { return m_PhysicalDevice; }
         VkCommandQueue* GetGraphicsQueue() const noexcept { return m_Queues[0].get(); }
+        const VkPhysicalDeviceRayTracingPipelinePropertiesKHR& GetRaytracingPipelineProperties() const noexcept { return m_RaytracingPipelineProperties; }
+        const VkPhysicalDeviceAccelerationStructurePropertiesKHR& GetAccelerationStructureProperties() const noexcept { return m_AccelerationStructureProperties; }
+
+        PFN_vkCreateRayTracingPipelinesKHR GetCreateRayTracingPipelinesKHRFunction() const noexcept { return m_vkCreateRayTracingPipelinesKHR; }
+        PFN_vkGetRayTracingShaderGroupHandlesKHR GetRayTracingShaderGroupHandlesKHRFunction() const noexcept { return m_vkGetRayTracingShaderGroupHandlesKHR; }
+        PFN_vkCmdTraceRaysKHR GetCmdTraceRaysKHRFunction() const noexcept { return m_vkCmdTraceRaysKHR; }
+        PFN_vkGetBufferDeviceAddress GetBufferDeviceAddressFunction() const noexcept { return m_vkGetBufferDeviceAddress; }
+        PFN_vkCreateAccelerationStructureKHR GetCreateAccelerationStructureKHRFunction() const noexcept { return m_vkCreateAccelerationStructureKHR; }
+        PFN_vkDestroyAccelerationStructureKHR GetDestroyAccelerationStructureKHRFunction() const noexcept { return m_vkDestroyAccelerationStructureKHR; }
+        PFN_vkGetAccelerationStructureBuildSizesKHR GetAccelerationStructureBuildSizesKHRFunction() const noexcept { return m_vkGetAccelerationStructureBuildSizesKHR; }
+        PFN_vkBuildAccelerationStructuresKHR GetBuildAccelerationStructuresKHRFunction() const noexcept { return m_vkBuildAccelerationStructuresKHR; }
+        PFN_vkCmdBuildAccelerationStructuresKHR GetCmdBuildAccelerationStructuresKHRFunction() const noexcept { return m_vkCmdBuildAccelerationStructuresKHR; }
+        PFN_vkGetAccelerationStructureDeviceAddressKHR GetAccelerationStructureDeviceAddressKHRFunction() const noexcept { return m_vkGetAccelerationStructureDeviceAddressKHR; }
 
         inline size_t GetFrameNumber() const noexcept { return m_FrameCount; }
         inline size_t GetFrameIndex() const noexcept { return m_FrameCount % kMaxFramesInFlight; }
