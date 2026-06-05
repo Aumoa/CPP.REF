@@ -18,7 +18,7 @@ internal abstract class UnixCompiler : CppCompiler
         return ValueTask.FromResult<string[]>([]);
     }
 
-    public override async ValueTask<Terminal.Output> CompileAsync(CompileItem item, CancellationToken cancellationToken = default)
+    public override async ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken = default)
     {
         var options = new Terminal.Options
         {
@@ -53,7 +53,7 @@ internal abstract class UnixCompiler : CppCompiler
         }
 
         List<string> includes = [];
-        foreach (var includeDirectory in item.Resolver.IncludePaths)
+        foreach (var includeDirectory in command.Environment.IncludePaths)
         {
             includes.Add($"-I\"{includeDirectory}\"");
         }
@@ -61,7 +61,7 @@ internal abstract class UnixCompiler : CppCompiler
         AddCompilerCommands(includes.ToArray());
 
         List<string> macros = [];
-        foreach (var macro in item.Resolver.AdditionalMacros)
+        foreach (var macro in command.Environment.AdditionalMacros)
         {
             if (macro.Value == null)
             {
@@ -75,20 +75,14 @@ internal abstract class UnixCompiler : CppCompiler
 
         AddCompilerCommands(macros.ToArray());
 
-        var fileName = Path.GetFileName(item.SourceCode.FilePath);
-        var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
-        var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-        var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps");
-        var cacheFileName = Path.Combine(intermediateDirectory, fileName + ".cache");
-
-        Directory.CreateDirectory(intermediateDirectory);
+        Directory.CreateDirectory(command.IntermediateDirectory);
 
         AddCompilerCommands("-c");
 
-        AddCompilerCommands($"{item.SourceCode.FilePath}");
+        AddCompilerCommands($"{command.SourceCode.FilePath}");
 
-        AddCompilerCommands($"-o\"{objectFileName}\"");
-        AddCompilerCommands($"-MMD -MF\"{depsFileName}\"");
+        AddCompilerCommands($"-o\"{command.ObjectFilePath}\"");
+        AddCompilerCommands($"-MMD -MF\"{command.DependenciesFilePath}\"");
 
         Terminal.Output output;
         using (await GetAccess(cancellationToken))
@@ -98,8 +92,8 @@ internal abstract class UnixCompiler : CppCompiler
 
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
-            cached.SaveCached(cacheFileName);
+            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, cancellationToken);
+            cached.SaveCached(command.CacheFilePath);
         }
 
         return output;

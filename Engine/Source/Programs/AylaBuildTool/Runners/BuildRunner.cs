@@ -1,5 +1,4 @@
 using AylaEngine.RHT;
-using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
 
@@ -147,54 +146,44 @@ internal static partial class BuildRunner
         foreach (var project in targetProjects)
         {
             var resolver = resolverFactory.GetResolver(project, buildTarget);
-            List<CompileItem> allCompiles = [];
+            var compileEnvironment = new CppCompileEnvironment(resolver, buildTarget, project.Group);
+            List<CppCompileCommand> allCompiles = [];
             List<CompileTask> needCompiles = [];
 
             if (project.GetRule(buildTarget).Type != ModuleType.ThirdParty)
             {
-                var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
-
                 foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
                 {
                     if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
                     {
-                        var item = new CppCompiler.CompileItem
-                        {
-                            Resolver = resolver,
-                            SourceCode = sourceCode,
-                            Descriptor = project.Group
-                        };
-
-                        var fileName = Path.GetFileName(item.SourceCode.FilePath);
-                        var cacheFileName = Path.Combine(intDir, fileName + ".cache");
-                        var depsFileName = Path.Combine(intDir, fileName + ".deps");
-                        allCompiles.Add(item);
+                        var command = new CppCompileCommand(compileEnvironment, sourceCode);
+                        allCompiles.Add(command);
 
                         if (options.Clean != CleanOptions.Rebuild)
                         {
-                            var cached = await SourceCodeCache.MakeCachedAsync(installation, item.SourceCode.FilePath, project.RuleFilePath, depsFileName, resolver.DependRuleFilePaths, cancellationToken);
-                            if (File.Exists(cacheFileName) == false ||
-                                SourceCodeCache.LoadCached(cacheFileName).IsModified(cached))
+                            var cached = await SourceCodeCache.MakeCachedAsync(installation, command.SourceCode.FilePath, project.RuleFilePath, command.DependenciesFilePath, resolver.DependRuleFilePaths, cancellationToken);
+                            if (File.Exists(command.CacheFilePath) == false ||
+                                SourceCodeCache.LoadCached(command.CacheFilePath).IsModified(cached))
                             {
-                                needCompiles.Add(new CompileTask(item));
+                                needCompiles.Add(new CompileTask(command));
                             }
                         }
                         else
                         {
-                            needCompiles.Add(new CompileTask(item));
+                            needCompiles.Add(new CompileTask(command));
                         }
                     }
                 }
+            }
 
-                // Collect HLSL shader files for compilation
-                var shaderFiles = project.GetSourceCodes()
-                    .Where(sc => sc.Type == SourceCodeType.HLSLShader)
-                    .ToArray();
+            // Collect HLSL shader files for compilation
+            var shaderFiles = project.GetSourceCodes()
+                .Where(sc => sc.Type == SourceCodeType.HLSLShader)
+                .ToArray();
 
-                if (shaderFiles.Any())
-                {
-                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup, resolverFactory));
-                }
+            if (shaderFiles.Any())
+            {
+                shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup, resolverFactory));
             }
 
             moduleTasks.Add(new ModuleTask(installation, resolver, allCompiles.ToArray(), needCompiles.ToArray()));
@@ -477,7 +466,7 @@ internal static partial class BuildRunner
                     }
 
                     var output = r.Result;
-                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), compileTask.Item.SourceCode.FilePath);
+                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), compileTask.Command.SourceCode.FilePath);
                     string[] outputs = [fileText, .. output.Logs.Select(l => l.Value)];
                     Console.WriteLine(string.Join('\n', outputs));
                 });

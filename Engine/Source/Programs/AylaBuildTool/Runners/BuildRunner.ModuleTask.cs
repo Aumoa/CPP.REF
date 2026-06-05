@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using static AylaEngine.CppCompiler;
-
 namespace AylaEngine;
 
 internal static partial class BuildRunner
@@ -11,10 +9,10 @@ internal static partial class BuildRunner
         public readonly CompileTask[] NeedCompileTasks;
 
         private readonly Installation m_Installation;
-        private readonly CompileItem[] m_AllCompiles;
+        private readonly CppCompileCommand[] m_AllCompiles;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public ModuleTask(Installation installation, ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles)
+        public ModuleTask(Installation installation, ModuleRulesResolver resolver, CppCompileCommand[] allCompiles, CompileTask[] needCompiles)
         {
             Resolver = resolver;
             NeedCompileTasks = needCompiles;

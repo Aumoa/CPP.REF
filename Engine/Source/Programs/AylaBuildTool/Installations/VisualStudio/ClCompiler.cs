@@ -16,7 +16,7 @@ internal class ClCompiler : CppCompiler
         m_Product = product;
     }
 
-    public override async ValueTask<Terminal.Output> CompileAsync(CompileItem item, CancellationToken cancellationToken)
+    public override async ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {
@@ -61,7 +61,7 @@ internal class ClCompiler : CppCompiler
             "/Zi "
         );
 
-        if (item.SourceCode.Type == SourceCodeType.ModuleInterface)
+        if (command.IsModuleInterface)
         {
             m_CommandBuilder.Append(
                 // Enables C++ modules.
@@ -100,7 +100,7 @@ internal class ClCompiler : CppCompiler
         }
 
         List<string> includes = [];
-        foreach (var includeDirectory in item.Resolver.IncludePaths
+        foreach (var includeDirectory in command.Environment.IncludePaths
             .Append(Path.Combine(m_Product.Directory, "include"))
             .Concat(VisualStudioInstallation.GatherWindowsKitInclude()))
         {
@@ -110,7 +110,7 @@ internal class ClCompiler : CppCompiler
         m_CommandBuilder.Append(string.Join(' ', includes) + ' ');
 
         List<string> macros = [];
-        foreach (var macro in item.Resolver.AdditionalMacros)
+        foreach (var macro in command.Environment.AdditionalMacros)
         {
             if (macro.Value == null)
             {
@@ -125,7 +125,7 @@ internal class ClCompiler : CppCompiler
         m_CommandBuilder.Append(string.Join(' ', macros) + ' ');
 
         List<string> disableWarnings = [];
-        foreach (var disableWarning in item.Resolver.DisableWarnings)
+        foreach (var disableWarning in command.Environment.DisableWarnings)
         {
             disableWarnings.Add($"/wd{disableWarning}");
         }
@@ -135,38 +135,31 @@ internal class ClCompiler : CppCompiler
             m_CommandBuilder.Append(string.Join(' ', disableWarnings) + ' ');
         }
 
-        var fileName = Path.GetFileName(item.SourceCode.FilePath);
-        var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
-        var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-        var pdbFileName = Path.Combine(intermediateDirectory, fileName + ".pdb");
-        var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps");
-        var cacheFileName = Path.Combine(intermediateDirectory, fileName + ".cache");
-
-        Directory.CreateDirectory(intermediateDirectory);
+        Directory.CreateDirectory(command.IntermediateDirectory);
 
         m_CommandBuilder.AppendFormat(
             "/Fo\"{0}\" " +
             "/Fd\"{1}\" " +
             "/sourceDependencies \"{2}\" ",
-            objectFileName,
-            pdbFileName,
-            depsFileName
+            command.ObjectFilePath,
+            command.PdbFilePath,
+            command.DependenciesFilePath
         );
 
-        if (item.SourceCode.Type == SourceCodeType.ModuleInterface)
+        if (command.IsModuleInterface)
         {
             m_CommandBuilder.AppendFormat(
                 "/ifcOutput \"{0}\" ",
-                intermediateDirectory
+                command.IntermediateDirectory
             );
 
             m_CommandBuilder.AppendFormat(
                 "/ifcSearchDir \"{0}\" ",
-                intermediateDirectory
+                command.IntermediateDirectory
             );
         }
 
-        m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
+        m_CommandBuilder.AppendFormat("\"{0}\"", command.SourceCode.FilePath);
         Terminal.Output output;
         using (await GetAccess(cancellationToken))
         {
@@ -175,8 +168,8 @@ internal class ClCompiler : CppCompiler
         
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
-            cached.SaveCached(cacheFileName);
+            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, cancellationToken);
+            cached.SaveCached(command.CacheFilePath);
 
             output = output with
             {
@@ -186,7 +179,7 @@ internal class ClCompiler : CppCompiler
         }
         else
         {
-            var command = new Terminal.Log
+            var commandLog = new Terminal.Log
             {
                 Value = $"cl.exe {m_CommandBuilder}",
                 Verbosity = Terminal.Verbose.Info
@@ -194,7 +187,7 @@ internal class ClCompiler : CppCompiler
 
             output = output with
             {
-                Logs = [command, .. output.Logs],
+                Logs = [commandLog, .. output.Logs],
                 StdOut = [.. output.StdOut],
                 StdErr = [.. output.StdErr]
             };
