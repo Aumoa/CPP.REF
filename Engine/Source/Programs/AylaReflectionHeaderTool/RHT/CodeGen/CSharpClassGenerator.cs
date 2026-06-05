@@ -167,12 +167,32 @@ internal class CSharpClassGenerator
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
+            m_SourceCode += m_Parent.IndentedLine("var __gchandle = global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak);");
+            m_SourceCode += m_Parent.IndentedLine("try");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indent();
             var codegen = new FunctionBodyGenerator(
-                parameters.AddFirstTemp(PlaceholderName.Value, "(nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak)"),
+                parameters.AddFirstTemp(PlaceholderName.Value, "(nint)__gchandle"),
                 $"{injectFullName}.ctor_{constructor.Name}",
                 TypeName.IntPtr
             );
             codegen.GenerateCSharpCSharpToNative(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            m_Parent.Dedent();
+            m_SourceCode += m_Parent.IndentedLine("}");
+            m_SourceCode += m_Parent.IndentedLine("catch");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine("if (__gchandle.IsAllocated)");
+                m_SourceCode += m_Parent.IndentedLine("{");
+                m_Parent.Indented(() =>
+                {
+                    m_SourceCode += m_Parent.IndentedLine("__gchandle.Free();");
+                });
+                m_SourceCode += m_Parent.IndentedLine("}");
+                m_SourceCode += m_Parent.IndentedLine("throw;");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
         });
         m_SourceCode += m_Parent.IndentedLine("})");
         m_SourceCode += m_Parent.IndentedLine("{");
