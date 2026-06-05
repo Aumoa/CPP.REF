@@ -22,7 +22,8 @@
 extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self);
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr);
+	PLATFORM_SHARED_EXPORT ::Ayla::uint64 Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr);
+	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__ClearGCHandle__Injected(void* self, ::Ayla::uint64 gcHandleSerial);
 	PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedType__Injected();
 }
 
@@ -39,7 +40,8 @@ namespace Ayla
 		friend Type;
 		friend RuntimeType;
 		friend ::Ayla::ssize_t (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self);
-		friend void ::Ayla__Object__EndWriteGCHandle__Injected(void* self, ssize_t handle, bool releaseIntPtr);
+		friend ::Ayla::uint64 (::Ayla__Object__EndWriteGCHandle__Injected)(void* self, ssize_t handle, bool releaseIntPtr);
+		friend ::Ayla::ssize_t (::Ayla__Object__ClearGCHandle__Injected)(void* self, uint64 gcHandleSerial);
 		friend ::Ayla::ManagedTypeWrapper (::Ayla__Object__GetManagedType__Injected)();
 
 	public:
@@ -62,12 +64,14 @@ namespace Ayla
 
 	private:
 		static size_t s_LiveObjects;
+		static volatile uint64 s_NextGCHandleSerial;
 
 		Spinlock m_Spinlock;
 		Type* m_Type;
 		CreationFlags m_Flags;
 		int32 m_Refs = 0;
 		ssize_t m_GCHandle = 0;
+		uint64 m_GCHandleSerial = 0;
 
 	protected:
 		static void GatherProperties(PropertyCollector& collection)
@@ -86,7 +90,7 @@ namespace Ayla
 
 		void AddRef();
 		void ReleaseRef();
-		void* BindGCHandle__Unsafe(ssize_t gcHandlePtr);
+		ObjectReferenceWrapper BindGCHandle__Unsafe(ssize_t gcHandlePtr);
 		ObjectReferenceWrapper AsWrapper();
 		
 		template<class T>
@@ -146,6 +150,8 @@ namespace Ayla
 
 	private:
 		static void ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<void()> action);
+		uint64 SetGCHandle__Unsafe(ssize_t gcHandlePtr);
+		ObjectReferenceWrapper AsWrapper__Unsafe();
 	};
 
 	template<class T>

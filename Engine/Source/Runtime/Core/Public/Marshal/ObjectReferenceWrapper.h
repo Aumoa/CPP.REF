@@ -14,6 +14,7 @@ namespace Ayla
 	{
 		ssize_t Ptr;
 		ssize_t IntGCHandlePtr;
+		uint64 GCHandleSerial;
 
 		template<class T>
 		inline SharedPtr<T> AsNative() const

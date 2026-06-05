@@ -91,7 +91,7 @@ internal class CSharpClassGenerator
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{index}__Injected";
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-        m_SourceCode += m_Parent.IndentedLine($"public static extern nint ctor_{constructor.Name}({injectParamsDeclare});");
+        m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.ObjectReferenceWrapper ctor_{constructor.Name}({injectParamsDeclare});");
     }
 
     private void GenerateInjectedFunction(int index, ClassName @class)
@@ -133,7 +133,7 @@ internal class CSharpClassGenerator
     private void GenerateInvocableMembers(ClassName @class, string injectFullName, string classFullName)
     {
         // Base constructor
-        m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable(global::System.Func<object, nint> locker) : base(locker)");
+        m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable(global::System.Func<object, global::Ayla.ObjectReferenceWrapper> locker) : base(locker)");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_SourceCode += m_Parent.IndentedLine("}");
         m_SourceCode += m_Parent.IndentedLine("");
@@ -207,7 +207,7 @@ internal class CSharpClassGenerator
         m_SourceCode += "#pragma warning disable CS8618\n";
 
         // Protected constructor
-        m_SourceCode += m_Parent.IndentedLine($"protected {@class.Name}(global::System.Func<object, nint> locker) : base(locker)");
+        m_SourceCode += m_Parent.IndentedLine($"protected {@class.Name}(global::System.Func<object, global::Ayla.ObjectReferenceWrapper> locker) : base(locker)");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
@@ -215,7 +215,7 @@ internal class CSharpClassGenerator
         });
         m_SourceCode += m_Parent.IndentedLine("}");
         m_SourceCode += "#pragma warning restore CS8618\n";
-        m_SourceCode += m_Parent.IndentedLine($"partial void OnConstructed(global::System.Func<object, nint> locker);");
+        m_SourceCode += m_Parent.IndentedLine($"partial void OnConstructed(global::System.Func<object, global::Ayla.ObjectReferenceWrapper> locker);");
         m_SourceCode += m_Parent.IndentedLine("");
 
         // Public constructors

@@ -8,6 +8,7 @@ public struct ObjectReferenceWrapper
 {
     public nint Ptr;
     public nint IntGCHandlePtr;
+    public ulong GCHandleSerial;
 
     public T? AsManaged<T>() where T : Object
     {
@@ -34,10 +35,14 @@ public struct ObjectReferenceWrapper
             }
 
             var ptr = Ptr;
-            Func<object, nint> locker = @this =>
+            Func<object, ObjectReferenceWrapper> locker = @this =>
             {
-                Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal), true);
-                return ptr;
+                var gcHandleSerial = Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal), true);
+                return new ObjectReferenceWrapper
+                {
+                    Ptr = ptr,
+                    GCHandleSerial = gcHandleSerial
+                };
             };
 
             return (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);

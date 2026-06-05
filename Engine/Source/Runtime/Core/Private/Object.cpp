@@ -41,6 +41,7 @@ namespace Ayla
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
 	size_t Object::s_LiveObjects;
+	volatile uint64 Object::s_NextGCHandleSerial;
 	CoreCLRFunctions g_CoreCLRFunctions;
 
 	ManagedTypeWrapper Object::GetManagedType()
@@ -113,18 +114,40 @@ namespace Ayla
 		}
 	}
 
-	void* Object::BindGCHandle__Unsafe(ssize_t gcHandlePtr)
+	ObjectReferenceWrapper Object::BindGCHandle__Unsafe(ssize_t gcHandlePtr)
 	{
-		m_GCHandle = gcHandlePtr;
-		return this;
+		auto lock = std::unique_lock{ m_Spinlock };
+		SetGCHandle__Unsafe(gcHandlePtr);
+		return AsWrapper__Unsafe();
 	}
 
 	ObjectReferenceWrapper Object::AsWrapper()
 	{
+		auto lock = std::unique_lock{ m_Spinlock };
+		return AsWrapper__Unsafe();
+	}
+
+	uint64 Object::SetGCHandle__Unsafe(ssize_t gcHandlePtr)
+	{
+		if (m_GCHandle == gcHandlePtr && (gcHandlePtr == 0 || m_GCHandleSerial != 0))
+		{
+			return m_GCHandleSerial;
+		}
+
+		m_GCHandle = gcHandlePtr;
+		m_GCHandleSerial = gcHandlePtr != 0
+			? PlatformAtomics::InterlockedIncrement(&s_NextGCHandleSerial)
+			: 0;
+		return m_GCHandleSerial;
+	}
+
+	ObjectReferenceWrapper Object::AsWrapper__Unsafe()
+	{
 		return ObjectReferenceWrapper
 		{
 			.Ptr = reinterpret_cast<ssize_t>(this),
-			.IntGCHandlePtr = 0
+			.IntGCHandlePtr = 0,
+			.GCHandleSerial = m_GCHandleSerial
 		};
 	}
 
@@ -151,22 +174,46 @@ extern "C"
 		return self_->m_GCHandle;
 	}
 
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr)
+	PLATFORM_SHARED_EXPORT ::Ayla::uint64 Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr)
 	{
 		auto self_ = (::Ayla::Object*)self;
-		self_->m_GCHandle = handle;
+		auto gcHandleSerial = self_->SetGCHandle__Unsafe(handle);
 		if (releaseIntPtr)
 		{
 			--self_->m_Refs;
-			check(self_->m_Refs != 0 || self_->m_GCHandle);
+			check(self_->m_Refs >= 0);
 		}
 		if (self_->m_Refs == 0 && handle == 0)
 		{
 			self_->m_Spinlock.unlock();
 			delete self_;
-			return;
+			return 0;
 		}
 		self_->m_Spinlock.unlock();
+		return gcHandleSerial;
+	}
+
+	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__ClearGCHandle__Injected(void* self, ::Ayla::uint64 gcHandleSerial)
+	{
+		auto self_ = (::Ayla::Object*)self;
+		self_->m_Spinlock.lock();
+		if (gcHandleSerial == 0 || self_->m_GCHandleSerial != gcHandleSerial)
+		{
+			self_->m_Spinlock.unlock();
+			return 0;
+		}
+
+		auto gcHandle = self_->m_GCHandle;
+		self_->SetGCHandle__Unsafe(0);
+		if (self_->m_Refs == 0)
+		{
+			self_->m_Spinlock.unlock();
+			delete self_;
+			return gcHandle;
+		}
+
+		self_->m_Spinlock.unlock();
+		return gcHandle;
 	}
 
 	PLATFORM_SHARED_EXPORT::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedType__Injected()

@@ -10,9 +10,11 @@ public partial class Object : IDisposable, IStaticObject
         public static ThreadLocal<InternalCreation> ThreadLocal = new(() => new InternalCreation());
     }
 
-    protected Object(Func<object, nint> locker)
+    protected Object(Func<object, ObjectReferenceWrapper> locker)
     {
-        m_NativePointer = locker(this);
+        var wrapper = locker(this);
+        m_NativePointer = wrapper.Ptr;
+        m_GCHandleSerial = wrapper.GCHandleSerial;
     }
 
     ~Object()
@@ -34,8 +36,8 @@ public partial class Object : IDisposable, IStaticObject
             return;
         }
 
-        var gcHandlePtr = BeginWriteGCHandle__Injected(nativePointer);
-        EndWriteGCHandle__Injected(nativePointer, 0, false);
+        var gcHandlePtr = ClearGCHandle__Injected(nativePointer, m_GCHandleSerial);
+        m_GCHandleSerial = 0;
         if (gcHandlePtr != 0)
         {
             GCHandle.FromIntPtr(gcHandlePtr).Free();
@@ -43,6 +45,7 @@ public partial class Object : IDisposable, IStaticObject
     }
 
     private nint m_NativePointer;
+    private ulong m_GCHandleSerial;
 
     public nint NativePointer => m_NativePointer;
 
@@ -77,7 +80,10 @@ public partial class Object : IDisposable, IStaticObject
     internal static extern nint BeginWriteGCHandle__Injected(nint instancePtr);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__EndWriteGCHandle__Injected")]
-    internal static extern void EndWriteGCHandle__Injected(nint instancePtr, nint handle, bool releaseIntPtr);
+    internal static extern ulong EndWriteGCHandle__Injected(nint instancePtr, nint handle, bool releaseIntPtr);
+
+    [DllImport("Core", EntryPoint = "Ayla__Object__ClearGCHandle__Injected")]
+    internal static extern nint ClearGCHandle__Injected(nint instancePtr, ulong gcHandleSerial);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedType__Injected")]
     internal static extern ManagedTypeWrapper GetManagedType__Injected();

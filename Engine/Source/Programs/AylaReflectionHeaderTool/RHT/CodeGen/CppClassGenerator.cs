@@ -181,7 +181,7 @@ internal class CppClassGenerator
             string callable = $"::Ayla::Object::ScriptNew<{classType.CppName}>";
             var codeGen = new FunctionBodyGenerator(parameters, callable, PlaceholderName.Value);
 
-            m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT void* {constructorFullName}({parametersDeclare})");
+            m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper {constructorFullName}({parametersDeclare})");
             m_Parent.WriteIndentedLine("{");
             m_Parent.Indented(() =>
             {
