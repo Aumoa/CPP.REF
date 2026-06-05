@@ -1,0 +1,37 @@
+---
+name: ayla-pr-review
+description: Repository-local pull request review guidance for Ayla engine changes. Use when Codex reviews PRs, branch diffs, CI failures, architecture changes, class responsibilities, duplication, or merge readiness in this repository.
+---
+
+# Ayla PR Review
+
+## Overview
+
+Ayla PR reviews should protect correctness, build health, and the repository's intended architecture without turning style preference into noise.
+
+## Review Priorities
+
+- Lead with actionable findings ordered by severity.
+- Ground findings in concrete source locations, logs, commands, or diffs.
+- Separate blockers from residual risks and optional follow-up ideas.
+- When reviewing CI or build changes, connect workflow edits back to the actual AylaBuildTool, module rules, generated files, and platform-specific code paths they exercise.
+
+## Class Responsibility
+
+- Check whether each meaningful feature is owned by a clear class or collaborator.
+- Flag classes that combine unrelated responsibilities when that coupling makes behavior harder to extend, test, or review.
+- Prefer changes that move behavior into cohesive feature units rather than scattered special cases.
+- Do not request extra splitting when the existing responsibility boundary is already understandable and further separation would mostly add indirection.
+- Do not ask authors to undo harmless fine-grained separation solely because it is more detailed than necessary.
+
+## Duplication
+
+- Flag duplicated code when it represents the same feature, policy, decision, or platform behavior and merging it would reduce bug risk or future maintenance.
+- Prefer one cohesive implementation for repeated behavior that must evolve together.
+- Avoid demanding abstractions for small incidental duplication when the abstraction would be noisier than the repeated code.
+
+## Review Comments
+
+- Write external PR review comments in English unless the user asks otherwise.
+- Explain the interpretation and recommendation to the user in Korean when the surrounding conversation is Korean.
+- Clearly state whether the reviewed change is safe to merge, needs fixes first, or needs CI/runtime validation before judgment.
