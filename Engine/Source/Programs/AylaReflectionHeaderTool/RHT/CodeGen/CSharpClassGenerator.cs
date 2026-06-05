@@ -87,11 +87,11 @@ internal class CSharpClassGenerator
     {
         var constructor = m_Class.Constructors[index];
         var parameters = CollectParameters(constructor.Parameters);
-        var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
+        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), "nint");
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{index}__Injected";
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-        m_SourceCode += m_Parent.IndentedLine($"public static extern nint ctor_{constructor.Name}({injectParamsDeclare});");
+        m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.NativeCallStatus ctor_{constructor.Name}({injectParamsDeclare});");
     }
 
     private void GenerateInjectedFunction(int index, ClassName @class)
@@ -105,9 +105,10 @@ internal class CSharpClassGenerator
         string injectParamsDeclare = isStatic
             ? ParametersGenerator.GenerateCSharpBindings(parameters)
             : ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+        injectParamsDeclare = AppendCSharpOutParameter(injectParamsDeclare, returnType);
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-        m_SourceCode += m_Parent.IndentedLine($"public static extern {returnType.CSharpBindingName} {function.Name}({injectParamsDeclare});");
+        m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.NativeCallStatus {function.Name}({injectParamsDeclare});");
     }
 
     private void GenerateInvocableClass(ClassName @class, string injectFullName, string invocableClassName, string classFullName)
@@ -169,7 +170,7 @@ internal class CSharpClassGenerator
             var codegen = new FunctionBodyGenerator(
                 parameters.AddFirstTemp(PlaceholderName.Value, "(nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak)"),
                 $"{injectFullName}.ctor_{constructor.Name}",
-                TypeName.Object
+                TypeName.IntPtr
             );
             codegen.GenerateCSharpCSharpToNative(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
         });
@@ -325,5 +326,16 @@ internal class CSharpClassGenerator
             collection.Add(paramType, param.Variable.Name);
         }
         return collection;
+    }
+
+    private static string AppendCSharpOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpBindingName);
+    }
+
+    private static string AppendCSharpOutParameter(string parametersDeclare, string returnBindingName)
+    {
+        string outParameter = $"out {returnBindingName} __return_value";
+        return string.IsNullOrEmpty(parametersDeclare) ? outParameter : $"{parametersDeclare}, {outParameter}";
     }
 }

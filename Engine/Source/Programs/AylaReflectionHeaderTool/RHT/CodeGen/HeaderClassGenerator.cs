@@ -47,9 +47,10 @@ internal class HeaderClassGenerator
                 string paramsDeclare = function.Flags.HasFlag(SFunction.FFlags.Static)
                     ? ParametersGenerator.GenerateCppBindings(parameters)
                     : ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+                paramsDeclare = AppendCppOutParameter(paramsDeclare, returnType);
 
-                m_Parent.HeaderText += m_Parent.IndentedLine($"PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({paramsDeclare});");
-                friends.Add($"friend {returnType.CppBindingName} (::{functionFullName})({paramsDeclare});");
+                m_Parent.HeaderText += m_Parent.IndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {functionFullName}({paramsDeclare}) noexcept;");
+                friends.Add($"friend ::Ayla::NativeCallStatus (::{functionFullName})({paramsDeclare}) noexcept;");
             }
         });
         m_Parent.HeaderText += m_Parent.IndentedLine("}");
@@ -288,8 +289,9 @@ internal class HeaderClassGenerator
                 string paramsDeclare = function.Flags.HasFlag(SFunction.FFlags.Static)
                     ? ParametersGenerator.GenerateCppBindings(parameters)
                     : ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+                paramsDeclare = AppendCppOutParameter(paramsDeclare, returnType);
                 
-                m_Parent.HeaderText += m_Parent.IndentedMacroLine($"friend {returnType.CppBindingName} (::{functionFullName})({paramsDeclare});");
+                m_Parent.HeaderText += m_Parent.IndentedMacroLine($"friend ::Ayla::NativeCallStatus (::{functionFullName})({paramsDeclare}) noexcept;");
             }
             
             m_Parent.HeaderText += m_Parent.IndentedMacroLine($"GENERATED_BODY__DECLARE_GATHER_PROPERTIES()");
@@ -308,5 +310,16 @@ internal class HeaderClassGenerator
             collection.Add(paramType, param.Variable.Name);
         }
         return collection;
+    }
+
+    private static string AppendCppOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCppOutParameter(parametersDeclare, returnType.CppBindingName);
+    }
+
+    private static string AppendCppOutParameter(string parametersDeclare, string returnBindingName)
+    {
+        string outParameter = $"{returnBindingName}* __return_value";
+        return string.IsNullOrEmpty(parametersDeclare) ? outParameter : $"{parametersDeclare}, {outParameter}";
     }
 }

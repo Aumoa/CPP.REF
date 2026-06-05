@@ -49,21 +49,15 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         {
             if (returnType_ == TypeName.Void)
             {
-                return formatLine(bodyStmt + ";");
+                return formatLine($"global::Ayla.NativeException.ThrowIfFailed({bodyStmt});");
             }
-            else if (returnType_ == TypeName.String)
-            {
-                return formatLine($"return {bodyStmt}.AsManaged();");
-            }
-            else if (returnType_ is SharedPtrTypeName)
-            {
-                return formatLine($"return {bodyStmt}.AsManaged<{returnType_.CSharpName}>();");
-            }
-            else
-            {
-                return formatLine($"return {bodyStmt};");
-            }
-        });
+
+            string source = string.Empty;
+            source += formatLine($"{returnType_.CSharpBindingName} __return_value;");
+            source += formatLine($"global::Ayla.NativeException.ThrowIfFailed({bodyStmt});");
+            source += formatLine($"return {FormatCSharpReturnValue(returnType_, "__return_value")};");
+            return source;
+        }, true);
     }
 
     public void GenerateCSharpNativeToCSharp(ref string sourceCode, ref int indent, Func<string, string> formatLine)
@@ -244,6 +238,71 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         });
     }
 
+    public void GenerateCppCSharpToNativeStatus(Action<string> formatLine)
+    {
+        List<string> scoped = [];
+        List<string> arguments = [];
+
+        foreach (var (typeName, name) in collection.Parameters)
+        {
+            if (typeName == TypeName.String)
+            {
+                arguments.Add($"{name}.AsString()");
+            }
+            else if (typeName is ArrayTypeName arrayType)
+            {
+                var elementType = arrayType.ElementType;
+                if (elementType == TypeName.String)
+                {
+                    arguments.Add($"{name}.AsStringArray()");
+                }
+                else if (elementType is SharedPtrTypeName ptype)
+                {
+                    arguments.Add($"{name}.AsObjectArray<{ptype.ElementType.CppName}>()");
+                }
+                else
+                {
+                    arguments.Add($"{name}.AsArray<{elementType.CppName}>()");
+                }
+            }
+            else if (typeName is SharedPtrTypeName ptype)
+            {
+                arguments.Add($"{name}.AsNative<{ptype.ElementType.CppName}>()");
+            }
+            else
+            {
+                arguments.Add(name);
+            }
+        }
+
+        var returnType_ = returnType;
+        GenerateCppBodyDefault(formatLine, scoped, arguments, bodyStmt =>
+        {
+            if (returnType_ == TypeName.Void)
+            {
+                formatLine(bodyStmt + ";");
+            }
+            else if (returnType_ == TypeName.String)
+            {
+                formatLine($"*__return_value = ::Ayla::ManagedStringWrapper::FromIntString({bodyStmt});");
+            }
+            else if (returnType_ is SharedPtrTypeName)
+            {
+                formatLine($"*__return_value = ::Ayla::ObjectReferenceWrapper::FromObject({bodyStmt});");
+            }
+            else if (returnType_ is PlaceholderName)
+            {
+                formatLine($"*__return_value = ({bodyStmt})->BindGCHandle__Unsafe(__gchandle_ptr);");
+            }
+            else
+            {
+                formatLine($"*__return_value = {bodyStmt};");
+            }
+
+            formatLine("return ::Ayla::NativeCallStatus::Success;");
+        });
+    }
+
     private void GenerateCppBodyDefault(Action<string> formatLine, List<string> scoped, List<string> arguments, Action<string> formatBodyStatement)
     {
         if (scoped.Count > 0)
@@ -258,7 +317,22 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         formatBodyStatement(bodyStmt);
     }
 
-    private void GenerateCSharpBodyDefault(ref string sourceCode, ref int indent, Func<string, string> formatLine, List<string> scoped, List<string> arguments, Func<string, string> formatBodyStatement)
+    private static string FormatCSharpReturnValue(TypeName typeName, string value)
+    {
+        if (typeName == TypeName.String)
+        {
+            return $"{value}.AsManaged()";
+        }
+
+        if (typeName is SharedPtrTypeName)
+        {
+            return $"{value}.AsManaged<{typeName.CSharpName}>()";
+        }
+
+        return value;
+    }
+
+    private void GenerateCSharpBodyDefault(ref string sourceCode, ref int indent, Func<string, string> formatLine, List<string> scoped, List<string> arguments, Func<string, string> formatBodyStatement, bool appendOutReturn = false)
     {
         int localIndent = 0;
 
@@ -275,7 +349,9 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
                 Indent(ref indent);
             }
 
-            string bodyStmt = $"{callable}({string.Join(", ", arguments)})";
+            string bodyStmt = appendOutReturn && returnType != TypeName.Void
+                ? $"{callable}({string.Join(", ", arguments.Append("out __return_value"))})"
+                : $"{callable}({string.Join(", ", arguments)})";
             sourceCode += formatBodyStatement(bodyStmt);
 
             if (scoped.Count > 0)
