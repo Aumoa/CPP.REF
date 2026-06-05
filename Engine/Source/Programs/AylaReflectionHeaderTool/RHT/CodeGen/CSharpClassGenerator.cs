@@ -145,7 +145,7 @@ internal class CSharpClassGenerator
         // Constructors
         for (int i = 0; i < m_Class.Constructors.Count; ++i)
         {
-            GenerateInvocableConstructor(i, @class, injectFullName);
+            GenerateInvocableConstructor(i, injectFullName);
         }
 
         m_SourceCode += m_Parent.IndentedLine("");
@@ -154,24 +154,37 @@ internal class CSharpClassGenerator
         GenerateFunctionBodies(true);
     }
 
-    private void GenerateInvocableConstructor(int index, ClassName @class, string injectFullName)
+    private void GenerateInvocableConstructor(int index, string injectFullName)
     {
         var constructor = m_Class.Constructors[index];
-        var returnType = (SharedPtrTypeName)Activator.CreateInstance(typeof(SharedPtrTypeName), @class)!;
         var parameters = CollectParameters(constructor.Parameters);
         var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
-        var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
 
         m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable({csharpParamsDeclare}) : this(@this =>");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
-            var codegen = new FunctionBodyGenerator(
-                parameters.AddFirstTemp(PlaceholderName.Value, "(nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak)"),
-                $"{injectFullName}.ctor_{constructor.Name}",
-                TypeName.Object
-            );
-            codegen.GenerateCSharpCSharpToNative(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            m_SourceCode += m_Parent.IndentedLine("var __gchandle_ptr = (nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak);");
+            m_SourceCode += m_Parent.IndentedLine("try");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                var codegen = new FunctionBodyGenerator(
+                    parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"),
+                    $"{injectFullName}.ctor_{constructor.Name}",
+                    TypeName.Object
+                );
+                codegen.GenerateCSharpCSharpToNative(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
+            m_SourceCode += m_Parent.IndentedLine("catch");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine("global::System.Runtime.InteropServices.GCHandle.FromIntPtr(__gchandle_ptr).Free();");
+                m_SourceCode += m_Parent.IndentedLine("throw;");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
         });
         m_SourceCode += m_Parent.IndentedLine("})");
         m_SourceCode += m_Parent.IndentedLine("{");
