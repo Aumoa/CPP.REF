@@ -133,7 +133,7 @@ internal abstract class UnixCompiler : CppCompiler
 
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, cancellationToken);
+            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, command.CacheDependencyFilePaths, cancellationToken);
             cached.SaveCached(command.CacheFilePath);
         }
 

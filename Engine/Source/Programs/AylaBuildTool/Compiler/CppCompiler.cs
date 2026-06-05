@@ -61,7 +61,7 @@ internal abstract class CppCompiler
             pchSettings.PdbFilePath,
             Path.Combine(intermediateDirectory, pchSettings.OutputName + ".o"),
             Path.Combine(intermediateDirectory, pchSettings.OutputName + ".deps"),
-            Path.Combine(intermediateDirectory, pchSettings.OutputName + ".cache")
+            pchSettings.CacheFilePath
         ];
     }
 

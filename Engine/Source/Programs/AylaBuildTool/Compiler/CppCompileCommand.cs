@@ -12,6 +12,7 @@ internal sealed class CppCompileCommand
     private readonly string m_PdbFilePath;
     private readonly string m_DependenciesFilePath;
     private readonly string m_CacheFilePath;
+    private readonly string[] m_CacheDependencyFilePaths;
 
     public CppCompileCommand(CppCompileEnvironment environment, SourceCodeDescriptor sourceCode)
         : this(environment, sourceCode, Path.GetFileName(sourceCode.FilePath), GetDefaultPchCommandKind(environment, sourceCode))
@@ -30,6 +31,7 @@ internal sealed class CppCompileCommand
         m_PdbFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".pdb");
         m_DependenciesFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".deps");
         m_CacheFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".cache");
+        m_CacheDependencyFilePaths = GetCacheDependencyFilePaths(environment, pchCommandKind);
     }
 
     public CppCompileEnvironment Environment => m_Environment;
@@ -57,6 +59,8 @@ internal sealed class CppCompileCommand
     public string DependenciesFilePath => m_DependenciesFilePath;
 
     public string CacheFilePath => m_CacheFilePath;
+
+    public string[] CacheDependencyFilePaths => m_CacheDependencyFilePaths;
 
     public bool IsModuleInterface => m_SourceCode.Type == SourceCodeType.ModuleInterface;
 
@@ -92,5 +96,15 @@ internal sealed class CppCompileCommand
         }
 
         return CppPchCommandKind.Use;
+    }
+
+    private static string[] GetCacheDependencyFilePaths(CppCompileEnvironment environment, CppPchCommandKind pchCommandKind)
+    {
+        if (pchCommandKind != CppPchCommandKind.Use || environment.PchSettings == null)
+        {
+            return [];
+        }
+
+        return [environment.PchSettings.CacheFilePath];
     }
 }

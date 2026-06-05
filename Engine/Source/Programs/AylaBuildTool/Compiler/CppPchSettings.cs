@@ -7,6 +7,7 @@ internal sealed class CppPchSettings
     private readonly string m_SourceFilePath;
     private readonly string m_PchFilePath;
     private readonly string m_PdbFilePath;
+    private readonly string m_CacheFilePath;
 
     private CppPchSettings(CppCompileEnvironment environment, string headerIncludeName)
     {
@@ -15,6 +16,7 @@ internal sealed class CppPchSettings
         m_SourceFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".cpp");
         m_PchFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".pch");
         m_PdbFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".pdb");
+        m_CacheFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".cache");
     }
 
     public string HeaderIncludeName => m_HeaderIncludeName;
@@ -26,6 +28,8 @@ internal sealed class CppPchSettings
     public string PchFilePath => m_PchFilePath;
 
     public string PdbFilePath => m_PdbFilePath;
+
+    public string CacheFilePath => m_CacheFilePath;
 
     public Task WriteSourceFileAsync(CancellationToken cancellationToken)
     {

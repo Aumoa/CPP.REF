@@ -272,7 +272,7 @@ internal static partial class BuildRunner
                 }
             }
 
-            var cached = await SourceCodeCache.MakeCachedAsync(installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, cancellationToken);
+            var cached = await SourceCodeCache.MakeCachedAsync(installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, command.CacheDependencyFilePaths, cancellationToken);
             return File.Exists(command.CacheFilePath) == false ||
                 SourceCodeCache.LoadCached(command.CacheFilePath).IsModified(cached);
         }
