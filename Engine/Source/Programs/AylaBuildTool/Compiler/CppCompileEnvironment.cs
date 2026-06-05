@@ -6,6 +6,8 @@ internal sealed class CppCompileEnvironment
     private readonly TargetInfo m_TargetInfo;
     private readonly GroupDescriptor m_Descriptor;
     private readonly string m_IntermediateDirectory;
+    private readonly PchUsageMode m_PchUsage;
+    private readonly string? m_PrivatePchHeaderFile;
     private readonly string[] m_IncludePaths;
     private readonly MacroSet[] m_AdditionalMacros;
     private readonly int[] m_DisableWarnings;
@@ -16,6 +18,8 @@ internal sealed class CppCompileEnvironment
         m_TargetInfo = targetInfo;
         m_Descriptor = descriptor;
         m_IntermediateDirectory = descriptor.Intermediate(resolver.Name, targetInfo, FolderPolicy.PathType.Current);
+        m_PchUsage = resolver.PchUsage;
+        m_PrivatePchHeaderFile = resolver.PrivatePchHeaderFile;
         m_IncludePaths = resolver.IncludePaths.ToArray();
         m_AdditionalMacros = resolver.AdditionalMacros.ToArray();
         m_DisableWarnings = resolver.DisableWarnings.ToArray();
@@ -28,6 +32,10 @@ internal sealed class CppCompileEnvironment
     public GroupDescriptor Descriptor => m_Descriptor;
 
     public string IntermediateDirectory => m_IntermediateDirectory;
+
+    public PchUsageMode PchUsage => m_PchUsage;
+
+    public string? PrivatePchHeaderFile => m_PrivatePchHeaderFile;
 
     public IReadOnlyList<string> IncludePaths => m_IncludePaths;
 

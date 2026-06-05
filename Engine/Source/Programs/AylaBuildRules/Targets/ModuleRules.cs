@@ -51,6 +51,10 @@ public class ModuleRules
 
     public ModuleType Type { get; protected init; } = ModuleType.Library;
 
+    public PchUsageMode PchUsage { get; protected set; } = PchUsageMode.Default;
+
+    public string? PrivatePchHeaderFile { get; protected set; }
+
     public string Name => GetType().Name.Replace('_', '.');
 
     public string SafeName => Name.Replace('.', '_');
