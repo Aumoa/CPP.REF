@@ -20,36 +20,63 @@ public struct ObjectReferenceWrapper
         var managedType = Object.GetManagedTypeFromPtr__Injected(Ptr);
         var scriptType = managedType.GetScriptType();
 
-        nint handlePtr = Object.BeginWriteGCHandle__Injected(Ptr);
-        GCHandle handle = default;
+        var handlePtr = Object.BeginWriteGCHandle__Injected(Ptr);
+        var writeCompleted = false;
         try
         {
+            if (!typeof(T).IsAssignableFrom(scriptType))
+            {
+                Object.EndWriteGCHandle__Injected(Ptr, handlePtr, true);
+                writeCompleted = true;
+                throw new InvalidCastException($"Cannot convert managed wrapper type '{scriptType.FullName}' to '{typeof(T).FullName}'.");
+            }
+
             if (handlePtr != 0)
             {
-                handle = GCHandle.FromIntPtr(handlePtr);
-                if (handle.Target is T t)
+                var target = GCHandle.FromIntPtr(handlePtr).Target;
+                if (target != null)
                 {
                     Object.EndWriteGCHandle__Injected(Ptr, handlePtr, true);
-                    return t;
+                    writeCompleted = true;
+                    if (target is T t)
+                    {
+                        return t;
+                    }
+
+                    throw new InvalidCastException($"Cannot convert existing managed wrapper type '{target.GetType().FullName}' to '{typeof(T).FullName}'.");
                 }
             }
 
             var ptr = Ptr;
             Func<object, ObjectReferenceWrapper> locker = @this =>
             {
-                var gcHandleSerial = Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal), true);
-                return new ObjectReferenceWrapper
+                var newHandlePtr = (nint)GCHandle.Alloc(@this, GCHandleType.Normal);
+                try
                 {
-                    Ptr = ptr,
-                    GCHandleSerial = gcHandleSerial
-                };
+                    var gcHandleSerial = Object.EndWriteGCHandle__Injected(ptr, newHandlePtr, true);
+                    writeCompleted = true;
+                    return new ObjectReferenceWrapper
+                    {
+                        Ptr = ptr,
+                        GCHandleSerial = gcHandleSerial
+                    };
+                }
+                catch
+                {
+                    GCHandle.FromIntPtr(newHandlePtr).Free();
+                    throw;
+                }
             };
 
             return (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
         }
         catch
         {
-            Object.EndWriteGCHandle__Injected(Ptr, 0, true);
+            if (!writeCompleted)
+            {
+                Object.EndWriteGCHandle__Injected(Ptr, 0, true);
+            }
+
             throw;
         }
     }
