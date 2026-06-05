@@ -8,11 +8,137 @@
 #include "VkShader.h"
 #include "VkGeometryRenderPipeline.h"
 #include "Linq/Concat.h"
+#include <algorithm>
 #include <ranges>
 #include <array>
+#include <cstring>
 
 namespace Ayla
 {
+    namespace
+    {
+        static constexpr std::array<const char*, 8> kRequiredDeviceExtensions
+        {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+            VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
+            VK_KHR_SPIRV_1_4_EXTENSION_NAME,
+            VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+            VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+            VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
+            VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME
+        };
+
+        bool HasDeviceExtension(const std::vector<VkExtensionProperties>& extensions, const char* requiredExtensionName)
+        {
+            return std::ranges::any_of(extensions, [requiredExtensionName](const VkExtensionProperties& extension)
+            {
+                return std::strcmp(extension.extensionName, requiredExtensionName) == 0;
+            });
+        }
+
+        void ThrowRequiredExtensionMissing(const char* deviceName, const char* requiredExtensionName)
+        {
+            throw InvalidOperationException(String::Format(
+                TEXT("Vulkan physical device '{}' does not support required device extension '{}'."),
+                String::FromCodepage(deviceName),
+                String::FromLiteral(requiredExtensionName)
+            ));
+        }
+
+        void ThrowRequiredFeatureMissing(const char* deviceName, String featureName)
+        {
+            throw InvalidOperationException(String::Format(
+                TEXT("Vulkan physical device '{}' does not support required raytracing feature '{}'."),
+                String::FromCodepage(deviceName),
+                featureName
+            ));
+        }
+
+        void ValidateRequiredDeviceExtensions(VkPhysicalDevice physicalDevice, const char* deviceName)
+        {
+            uint32_t extensionsCount = 0;
+            VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionsCount, nullptr));
+
+            std::vector<VkExtensionProperties> extensions{ (size_t)extensionsCount };
+            VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionsCount, extensions.data()));
+
+            for (const char* requiredExtensionName : kRequiredDeviceExtensions)
+            {
+                if (HasDeviceExtension(extensions, requiredExtensionName) == false)
+                {
+                    ThrowRequiredExtensionMissing(deviceName, requiredExtensionName);
+                }
+            }
+        }
+
+        void ValidateRequiredRaytracingFeatures(VkPhysicalDevice physicalDevice, const char* deviceName)
+        {
+            VkPhysicalDeviceTimelineSemaphoreFeatures timelineFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES
+            };
+
+            VkPhysicalDeviceBufferDeviceAddressFeatures bufferAddressFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES
+            };
+
+            VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES
+            };
+
+            VkPhysicalDeviceRayTracingPipelineFeaturesKHR raytracingPipelineFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR
+            };
+
+            VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR
+            };
+
+            timelineFeatures.pNext = &bufferAddressFeatures;
+            bufferAddressFeatures.pNext = &descriptorIndexingFeatures;
+            descriptorIndexingFeatures.pNext = &raytracingPipelineFeatures;
+            raytracingPipelineFeatures.pNext = &accelerationStructureFeatures;
+
+            VkPhysicalDeviceFeatures2 features =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+                .pNext = &timelineFeatures
+            };
+
+            vkGetPhysicalDeviceFeatures2(physicalDevice, &features);
+
+            if (timelineFeatures.timelineSemaphore == VK_FALSE)
+            {
+                ThrowRequiredFeatureMissing(deviceName, TEXT("timelineSemaphore"));
+            }
+
+            if (bufferAddressFeatures.bufferDeviceAddress == VK_FALSE)
+            {
+                ThrowRequiredFeatureMissing(deviceName, TEXT("bufferDeviceAddress"));
+            }
+
+            if (descriptorIndexingFeatures.runtimeDescriptorArray == VK_FALSE)
+            {
+                ThrowRequiredFeatureMissing(deviceName, TEXT("runtimeDescriptorArray"));
+            }
+
+            if (raytracingPipelineFeatures.rayTracingPipeline == VK_FALSE)
+            {
+                ThrowRequiredFeatureMissing(deviceName, TEXT("rayTracingPipeline"));
+            }
+
+            if (accelerationStructureFeatures.accelerationStructure == VK_FALSE)
+            {
+                ThrowRequiredFeatureMissing(deviceName, TEXT("accelerationStructure"));
+            }
+        }
+    }
+
     VkGraphics::VkGraphics()
     {
         auto& app = GenericApplication::Get();
@@ -111,7 +237,7 @@ namespace Ayla
             VkPhysicalDeviceProperties props;
             vkGetPhysicalDeviceProperties(pd, &props);
             physicalDeviceProps.emplace_back(props);
-            LogVulkan::Verbose(TEXT("Physical Device #{}: {} ({})"), i, String::FromLiteral(props.deviceName), formatDeviceType(props.deviceType));
+            LogVulkan::Verbose(TEXT("Physical Device #{}: {} ({})"), i, String::FromCodepage(props.deviceName), formatDeviceType(props.deviceType));
 
             uint32_t extensionsCount = 0;
             VKR(vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, nullptr));
@@ -126,11 +252,16 @@ namespace Ayla
             }
         }
 
+        VkPhysicalDevice selectedPhysicalDevice = physicalDevices[0];
+        const VkPhysicalDeviceProperties& selectedPhysicalDeviceProps = physicalDeviceProps[0];
+        ValidateRequiredDeviceExtensions(selectedPhysicalDevice, selectedPhysicalDeviceProps.deviceName);
+        ValidateRequiredRaytracingFeatures(selectedPhysicalDevice, selectedPhysicalDeviceProps.deviceName);
+
         // Find a queue family that supports VK_QUEUE_GRAPHICS_BIT
         uint32_t queueCount;
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueCount, nullptr);
+        vkGetPhysicalDeviceQueueFamilyProperties(selectedPhysicalDevice, &queueCount, nullptr);
         std::vector<VkQueueFamilyProperties> queueFamilies((size_t)queueCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueCount, queueFamilies.data());
+        vkGetPhysicalDeviceQueueFamilyProperties(selectedPhysicalDevice, &queueCount, queueFamilies.data());
 
         struct QueueFamilyInfo
         {
@@ -291,32 +422,18 @@ namespace Ayla
         descriptorIndexingFeatures.pNext = &raytracingPipelineFeatures;
         raytracingPipelineFeatures.pNext = &accelerationStructureFeatures;
 
-        auto deviceExtensions = std::array
-        {
-            "VK_KHR_swapchain",
-            // Core extensions for Vulkan 1.2 features when using extension names
-            "VK_KHR_buffer_device_address",
-            "VK_EXT_descriptor_indexing",
-            "VK_KHR_spirv_1_4",
-            "VK_KHR_shader_float_controls",
-            // Raytracing extensions
-            "VK_KHR_acceleration_structure",
-            "VK_KHR_ray_tracing_pipeline",
-            "VK_KHR_deferred_host_operations"
-        };
-
         VkDeviceCreateInfo vkDeviceInfo =
         {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .pNext = &timelineFeatures,
              .queueCreateInfoCount = (uint32_t)vkQueueInfos.size(),
              .pQueueCreateInfos = vkQueueInfos.data(),
-             .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
-             .ppEnabledExtensionNames = deviceExtensions.data()
+             .enabledExtensionCount = (uint32_t)kRequiredDeviceExtensions.size(),
+             .ppEnabledExtensionNames = kRequiredDeviceExtensions.data()
          };
 
-        LogVulkan::Verbose(TEXT("Logical device created using {} physical device."), String::FromLiteral(physicalDeviceProps[0].deviceName));
-        VKR(vkCreateDevice(physicalDevices[0], &vkDeviceInfo, nullptr, &m_Device));
+        LogVulkan::Verbose(TEXT("Logical device created using {} physical device."), String::FromCodepage(selectedPhysicalDeviceProps.deviceName));
+        VKR(vkCreateDevice(selectedPhysicalDevice, &vkDeviceInfo, nullptr, &m_Device));
 
         for (auto& createInfo : queueCreateInfos)
         {
@@ -331,7 +448,7 @@ namespace Ayla
 			}
 		}
 
-        m_PhysicalDevice = physicalDevices[0];
+        m_PhysicalDevice = selectedPhysicalDevice;
     }
 
     VkGraphics::~VkGraphics() noexcept
