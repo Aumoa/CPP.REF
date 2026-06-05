@@ -20,6 +20,9 @@ internal record BuildOptions
     [Option("clean", HelpText = "Specifies the policy for retaining existing output files during the build.", Default = CleanOptions.None)]
     public CleanOptions Clean { get; init; }
 
+    [Option("skip-shaders", HelpText = "Skips shader compilation and ShaderCompileWorker build.", Default = false)]
+    public bool SkipShaders { get; init; } = false;
+
     [Option('g', "generator")]
     public GeneratorType GeneratorType { get; init; } = GeneratorType.VisualStudio;
 }
