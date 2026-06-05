@@ -28,9 +28,9 @@ jobs:
           chmod +x ./Setup.sh
           ./Setup.sh
 
-      - name: Run Setup Script (Windows)
+      - name: Build AylaBuildTool (Windows)
         if: runner.os == 'Windows'
-        run: ./Setup.bat
+        run: dotnet publish ./Engine/Source/Programs/AylaBuildTool/AylaBuildTool.csproj -c Shipping -o ./Engine/Binaries/DotNET
 
       - name: Build
-        run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll build --target "Engine" --config Shipping
+        run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll build --target "Engine" --config Shipping --skip-shaders
