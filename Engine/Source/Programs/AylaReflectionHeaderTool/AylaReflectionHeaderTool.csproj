@@ -1,11 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputPath>..\..\..\Binaries\DotNET\</OutputPath>
-    <OutputType>Exe</OutputType>
     <EnableDefaultNamespace>false</EnableDefaultNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <RootNamespace>AylaEngine</RootNamespace>
@@ -13,17 +12,6 @@
 
   <ItemGroup>
     <None Include="..\..\..\..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="YamlDotNet" Version="16.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AylaReflectionHeaderTool\AylaReflectionHeaderTool.csproj" />
-    <ProjectReference Include="..\AylaBuildRules\AylaBuildRules.csproj" />
-    <ProjectReference Include="..\DotNETUtilities\DotNETUtilities.csproj" />
   </ItemGroup>
 
 </Project>
