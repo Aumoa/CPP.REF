@@ -33,4 +33,4 @@ jobs:
         run: ./Setup.bat
 
       - name: Build
-        run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll build --target "Engine" --config Shipping
+        run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll build --target "Engine" --config Shipping --skip-shaders
