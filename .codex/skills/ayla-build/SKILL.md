@@ -30,6 +30,8 @@ If `SampleGame/SampleGame.aproject` does not exist, build the engine target inst
 dotnet Engine/Binaries/DotNET/AylaBuildTool.dll build --target Engine
 ```
 
+When the current changes do not touch shader code, shader assets, ShaderCompileWorker, shader build rules, shader binary loading, or shader dependency handling, append `--skip-shaders` to native build checks so shaders are not compiled separately.
+
 Preserve user-requested configuration, editor, platform, or target options when they are provided.
 
 ## Generation Checks
