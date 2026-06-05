@@ -72,6 +72,7 @@
 #include "Marshal/ManagedArrayWrapper.h"
 #include "Marshal/ManagedTypeWrapper.h"
 #include "Marshal/ManagedTaskWrapper.h"
+#include "Marshal/NativeExceptionInterop.h"
 
 #include "Diagnostics/Debug.h"
 #include "Diagnostics/LogMacros.h"
