@@ -115,6 +115,65 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         });
     }
 
+    public void GenerateCSharpNativeToCSharpStatus(ref string sourceCode, ref int indent, Func<string, string> formatLine)
+    {
+        List<string> scoped = [];
+        List<string> arguments = [];
+
+        foreach (var (typeName, name) in collection.Parameters)
+        {
+            if (typeName == TypeName.String)
+            {
+                arguments.Add($"{name}.AsManaged()");
+            }
+            else if (typeName is ArrayTypeName arrayType)
+            {
+                var elementType = arrayType.ElementType;
+                if (elementType == TypeName.String)
+                {
+                    arguments.Add($"{name}.AsStringArray()");
+                }
+                else if (elementType is SharedPtrTypeName)
+                {
+                    arguments.Add($"{name}.AsObjectArray<{elementType.CSharpName}>()");
+                }
+                else
+                {
+                    arguments.Add($"{name}.AsArray<{elementType.CSharpName}>()");
+                }
+            }
+            else if (typeName is SharedPtrTypeName)
+            {
+                arguments.Add($"{name}.AsManaged<{typeName.CSharpName}>()");
+            }
+            else
+            {
+                arguments.Add(name);
+            }
+        }
+
+        var returnType_ = returnType;
+        GenerateCSharpBodyDefault(ref sourceCode, ref indent, formatLine, scoped, arguments, bodyStmt =>
+        {
+            string source = string.Empty;
+            if (returnType_ == TypeName.Void)
+            {
+                source += formatLine(bodyStmt + ";");
+            }
+            else if (returnType_ is SharedPtrTypeName)
+            {
+                source += formatLine($"__return_value = (global::Ayla.ObjectReferenceWrapper){bodyStmt};");
+            }
+            else
+            {
+                source += formatLine($"__return_value = {bodyStmt};");
+            }
+
+            source += formatLine("return global::Ayla.NativeCallStatus.Success;");
+            return source;
+        });
+    }
+
     public void GenerateCppNativeToCSharp(Action<string> formatLine)
     {
         List<string> scoped = [];
@@ -171,6 +230,85 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             else
             {
                 formatLine($"return {bodyStmt};");
+            }
+        });
+    }
+
+    public void GenerateCppNativeToCSharpStatus(Action<string> formatLine, Action<Action> indented)
+    {
+        List<string> scoped = [];
+        List<string> arguments = [];
+
+        foreach (var (typeName, name) in collection.Parameters)
+        {
+            if (typeName == TypeName.String)
+            {
+                scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedStringWrapper::FromString({name});");
+                arguments.Add($"{name}__wrapper");
+            }
+            else if (typeName is ArrayTypeName arrayType)
+            {
+                var elementType = arrayType.ElementType;
+                if (elementType == TypeName.String)
+                {
+                    scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedArrayWrapper::FromStringArray({name});");
+                    arguments.Add($"{name}__wrapper");
+                }
+                else if (elementType is SharedPtrTypeName)
+                {
+                    scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedArrayWrapper::FromObjectArray({name});");
+                    arguments.Add($"{name}__wrapper");
+                }
+                else
+                {
+                    scoped.Add($"auto {name}__wrapper = ::Ayla::ManagedArrayWrapper::FromArray({name});");
+                    arguments.Add($"{name}__wrapper");
+                }
+            }
+            else if (typeName is SharedPtrTypeName)
+            {
+                scoped.Add($"auto {name}__wrapper = ::Ayla::ObjectReferenceWrapper::FromObject({name});");
+                arguments.Add($"{name}__wrapper");
+            }
+            else
+            {
+                arguments.Add(name);
+            }
+        }
+
+        var returnType_ = returnType;
+        if (returnType_ != TypeName.Void)
+        {
+            formatLine($"{returnType_.CppBindingName} __return_value{{}};");
+            arguments.Add("&__return_value");
+        }
+
+        GenerateCppBodyDefault(formatLine, scoped, arguments, bodyStmt =>
+        {
+            formatLine($"auto __status = {bodyStmt};");
+            formatLine("if (__status != ::Ayla::NativeCallStatus::Success)");
+            formatLine("{");
+            indented(() =>
+            {
+                formatLine("::Ayla::ManagedExceptionInterop::ThrowLastException();");
+            });
+            formatLine("}");
+
+            if (returnType_ == TypeName.Void)
+            {
+                return;
+            }
+            else if (returnType_ == TypeName.String)
+            {
+                formatLine("return __return_value.AsString();");
+            }
+            else if (returnType_ is SharedPtrTypeName ptype)
+            {
+                formatLine($"return __return_value.AsNative<{ptype.ElementType.CppName}>();");
+            }
+            else
+            {
+                formatLine("return __return_value;");
             }
         });
     }

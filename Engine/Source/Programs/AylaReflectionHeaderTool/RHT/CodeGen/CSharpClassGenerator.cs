@@ -325,14 +325,34 @@ internal class CSharpClassGenerator
     private void GenerateVirtualInvokeMethod(SFunction function, TypeName returnType, ParameterCollection parameters)
     {
         var invokeParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
-        m_SourceCode += m_Parent.IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Invoke({invokeParamsDeclare})");
+        invokeParamsDeclare = AppendCSharpOutParameter(invokeParamsDeclare, returnType);
+
+        m_SourceCode += m_Parent.IndentedLine($"private static unsafe global::Ayla.NativeCallStatus {function.Name}__Invoke({invokeParamsDeclare})");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
-            m_SourceCode += m_Parent.IndentedLine($"var self = self_.AsManaged<{m_Class.Class.Name}>()!;");
-            string callable = $"self.{function.Name}";
-            var codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
-            codeGen.GenerateCSharpNativeToCSharp(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            m_SourceCode += m_Parent.IndentedLine("try");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine($"var self = self_.AsManaged<{m_Class.Class.Name}>()!;");
+                string callable = $"self.{function.Name}";
+                var codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
+                codeGen.GenerateCSharpNativeToCSharpStatus(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
+            m_SourceCode += m_Parent.IndentedLine("catch (global::System.Exception exception)");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                if (returnType != TypeName.Void)
+                {
+                    m_SourceCode += m_Parent.IndentedLine("__return_value = default;");
+                }
+
+                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedExceptionInterop.Capture(exception);");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
         });
         m_SourceCode += m_Parent.IndentedLine("}");
     }

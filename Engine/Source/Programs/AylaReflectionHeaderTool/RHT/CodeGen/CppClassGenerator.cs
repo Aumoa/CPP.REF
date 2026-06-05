@@ -121,13 +121,14 @@ internal class CppClassGenerator
             m_Parent.Indented(() =>
             {
                 var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
-                m_Parent.WriteIndentedLine($"using signature_t = {returnType.CppBindingName}(*)({invokeParametersDeclare});");
+                invokeParametersDeclare = AppendCppOutParameter(invokeParametersDeclare, returnType);
+                m_Parent.WriteIndentedLine($"using signature_t = ::Ayla::NativeCallStatus(*)({invokeParametersDeclare});");
                 m_Parent.WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Context.ScriptAssemblyName}\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"{function.Name}__Invoke\"));");
                 m_Parent.WriteIndentedLine($"auto self = AsShared();");
 
                 string callable = "callable";
                 var codeGen = new FunctionBodyGenerator(parameters.AddFirstTemp(SharedPtrTypeName.SharedObject, "self"), callable, returnType);
-                codeGen.GenerateCppNativeToCSharp(m_Parent.WriteIndentedLine);
+                codeGen.GenerateCppNativeToCSharpStatus(m_Parent.WriteIndentedLine, m_Parent.Indented);
             });
             m_Parent.WriteIndentedLine("}");
 
