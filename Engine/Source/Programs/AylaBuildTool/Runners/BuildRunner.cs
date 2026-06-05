@@ -185,7 +185,8 @@ internal static partial class BuildRunner
                             ? [pchCompileTask.Task]
                             : [];
 
-                        if (await NeedCompileAsync(command))
+                        var pchWillRebuild = command.UsesPch && pchCompileTask != null;
+                        if (pchWillRebuild || await NeedCompileAsync(command))
                         {
                             needCompiles.Add(new CompileTask(command, prerequisiteTasks));
                         }
