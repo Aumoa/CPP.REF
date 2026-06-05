@@ -414,8 +414,9 @@ internal static partial class BuildRunner
 
         void DispatchScriptCompileWorkers()
         {
-            Dictionary<string, CSProject> virtualProjects = solution.Projects
+            Dictionary<string, CSProject> virtualProjects = targetProjects
                 .OfType<ModuleProject>()
+                .Where(p => p.GetRule(buildTarget).Script.Enabled)
                 .ToDictionary(p => p.ScriptProjectFileName, p => scriptProjectFactory.GetScriptProject(p));
 
             foreach (var scriptTask in scriptTasks)
