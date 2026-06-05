@@ -18,6 +18,10 @@
 - Do not use generated C++ IDE projects as normal build entry points. They may be used for IDE navigation or compile diagnostics, but AylaBuildTool owns the actual C++ build orchestration.
 - Use the repository-local `ayla-build` skill at `.codex/skills/ayla-build/SKILL.md` for detailed build, generation, and verification workflows.
 
+## Review Rules
+
+- Use the repository-local `ayla-pr-review` skill at `.codex/skills/ayla-pr-review/SKILL.md` for pull request reviews, branch diff reviews, CI failure reviews, and merge-readiness checks.
+
 ## Instruction Storage
 
 - Keep short, always-on repository policies in `AGENTS.md`.

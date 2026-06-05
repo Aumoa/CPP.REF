@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ayla PR Review"
+  short_description: "Review Ayla PRs with architecture checks."
+  default_prompt: "Use the Ayla PR review workflow to review this change."
