@@ -7,7 +7,7 @@
 #include "IntegralTypes.h"
 #include "AssertionMacros.h"
 #include "Platform/PlatformIO.h"
-#include <functional>
+#include "MoveOnlyFunction.h"
 
 namespace Ayla
 {
@@ -16,7 +16,7 @@ namespace Ayla
 		static size_t s_Refs;
 
 		uint8 OverlappedBuffer[PlatformIO::OVERLAPPED_SIZE + sizeof(void*)];
-		std::move_only_function<void(size_t, int32)> m_CompletionWork;
+		MoveOnlyFunction<void(size_t, int32)> m_CompletionWork;
 
 	private:
 		static IOCompletionOverlapped*& SelfPtr(uint8* Memory)
@@ -28,7 +28,7 @@ namespace Ayla
 		IOCompletionOverlapped();
 		~IOCompletionOverlapped() noexcept;
 
-		inline void SetOnCompletion(std::move_only_function<void(size_t, int32)> callback)
+		inline void SetOnCompletion(MoveOnlyFunction<void(size_t, int32)> callback)
 		{
 			m_CompletionWork = std::move(callback);
 		}
