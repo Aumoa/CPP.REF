@@ -28,8 +28,10 @@
 - When `gh` is available, Codex should use it to verify GitHub Actions compile results for each supported platform: Windows, macOS, and Linux.
 - If `gh` or Actions access is unavailable, Codex may skip Actions validation, but must compensate with a stricter source and workflow review for Windows, macOS, and Linux support and report that limitation.
 - Codex may perform local-only actions at its own discretion, including read-only checks, local commits, and local merges.
-- Codex must request explicit user approval before any action that can affect other users, remote branches, hosted services, or shared state. This includes pushing, force-pushing, creating or updating pull requests, publishing or deploying, deleting remote resources, and triggering GitHub Actions through a push.
-- If validation requires a push or another shared-state action, Codex must report the intended action and wait for the user's approval before proceeding. This approval cannot be assumed or automated.
+- On shared working branches such as `dev`, `master`, `main`, release branches, or any branch that appears to be used directly by other people, Codex must request explicit user approval before any action that can affect other users, remote branches, hosted services, or shared state.
+- On clearly isolated task branches, especially branches whose names start with `codex/`, Codex may perform non-destructive shared-state actions at its own discretion when they support the requested work. This includes pushing that branch, updating a pull request for that branch, or triggering GitHub Actions through that branch.
+- Destructive or broad shared-state actions still require explicit user approval. This includes force-pushing, deleting remote branches or resources, publishing or deploying to shared environments, or changing shared working branches.
+- If Codex is unsure whether a branch is isolated, it must treat the branch as shared and request approval before shared-state actions.
 
 ## Instruction Storage
 

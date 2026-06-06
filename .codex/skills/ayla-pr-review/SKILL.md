@@ -22,8 +22,9 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - When `gh` is available, verify compile results for each supported platform in GitHub Actions: Windows, macOS, and Linux. Prefer job-level conclusions over only checking the overall workflow conclusion.
 - If `gh` or Actions access is unavailable, state that Actions validation was skipped and perform a stricter source and workflow review for Windows, macOS, and Linux support.
 - Local-only review actions, including read-only checks, local commits, and local merges, may be performed at Codex's discretion.
-- Do not perform actions that can affect other users, remote branches, hosted services, or shared state unless the user explicitly approves that specific action first.
-- If Actions validation requires a push or another shared-state action, report what will be done and wait for the user's decision before proceeding.
+- On shared working branches such as `dev`, `master`, `main`, release branches, or branches that appear to be used directly by other people, request explicit user approval before shared-state actions.
+- On clearly isolated task branches, especially branches whose names start with `codex/`, non-destructive shared-state actions may be performed at Codex's discretion when they support the review or validation work. This includes pushing that branch, updating its pull request, or triggering Actions through that branch.
+- Destructive or broad shared-state actions still require explicit user approval. If branch ownership is unclear, treat the branch as shared.
 
 ## Class Responsibility
 
