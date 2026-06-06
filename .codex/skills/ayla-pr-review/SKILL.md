@@ -16,6 +16,12 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - Separate blockers from residual risks and optional follow-up ideas.
 - When reviewing CI or build changes, connect workflow edits back to the actual AylaBuildTool, module rules, generated files, and platform-specific code paths they exercise.
 
+## GitHub Actions
+
+- Use `gh` to inspect Actions runs, jobs, and logs when the command is available.
+- Do not push only to trigger or test Actions unless the user explicitly approves that specific push first.
+- If Actions validation requires a push, report what will be pushed and wait for the user's decision before proceeding.
+
 ## Class Responsibility
 
 - Check whether each meaningful feature is owned by a clear class or collaborator.

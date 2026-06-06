@@ -22,6 +22,12 @@
 
 - Use the repository-local `ayla-pr-review` skill at `.codex/skills/ayla-pr-review/SKILL.md` for pull request reviews, branch diff reviews, CI failure reviews, and merge-readiness checks.
 
+## GitHub CLI And Push Safety
+
+- Codex may use the `gh` command to inspect GitHub Actions runs, jobs, and logs when it is available.
+- Codex must not push changes unless the user has explicitly reviewed the situation and approved that specific push.
+- If testing GitHub Actions requires a push, Codex must ask the user for approval before pushing. This approval cannot be assumed or automated.
+
 ## Instruction Storage
 
 - Keep short, always-on repository policies in `AGENTS.md`.
