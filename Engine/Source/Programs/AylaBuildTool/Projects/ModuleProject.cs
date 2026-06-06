@@ -41,7 +41,12 @@ internal class ModuleProject(string name, GroupDescriptor descriptor, string sou
 
         rules = BuildRulesExceptionHandler.Evaluate(
             $"Failed to evaluate module rule '{Name}'.",
-            () => ModuleRules.New(RuleType, targetInfo));
+            () =>
+            {
+                var createdRules = ModuleRules.New(RuleType, targetInfo);
+                createdRules.ThrowErrors();
+                return createdRules;
+            });
         lock (m_CachedRules)
         {
             if (m_CachedRules.TryGetValue(targetInfo, out var @int))

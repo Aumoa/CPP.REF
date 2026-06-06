@@ -147,6 +147,7 @@ internal static partial class BuildRunner
         List<ModuleTask> moduleTasks = [];
         List<ScriptTask> scriptTasks = [];
         List<ShaderCompileTask> shaderTasks = [];
+        int skippedShaderFileCount = 0;
 
         foreach (var project in targetProjects)
         {
@@ -194,14 +195,21 @@ internal static partial class BuildRunner
                 }
             }
 
-            // Collect HLSL shader files for compilation
-            var shaderFiles = project.GetSourceCodes()
-                .Where(sc => sc.Type == SourceCodeType.HLSLShader)
-                .ToArray();
-
-            if (shaderFiles.Any())
+            if (options.SkipShaders)
             {
-                shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup, resolverFactory));
+                skippedShaderFileCount += project.GetSourceCodes().Count(sc => sc.Type == SourceCodeType.HLSLShader);
+            }
+            else
+            {
+                // Collect HLSL shader files for compilation
+                var shaderFiles = project.GetSourceCodes()
+                    .Where(sc => sc.Type == SourceCodeType.HLSLShader)
+                    .ToArray();
+
+                if (shaderFiles.Any())
+                {
+                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup, resolverFactory));
+                }
             }
 
             moduleTasks.Add(new ModuleTask(installation, resolver, allCompiles.ToArray(), needCompiles.ToArray()));
@@ -213,6 +221,11 @@ internal static partial class BuildRunner
                     scriptTasks.Add(scriptTask);
                 }
             }
+        }
+
+        if (skippedShaderFileCount > 0)
+        {
+            Console.WriteLine("Skipped shader compilation for {0} shader file(s).", skippedShaderFileCount);
         }
 
         totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length) + moduleTasks.Count(p => p.NeedLink(buildTarget)) + scriptTasks.Count() + shaderTasks.Count();
@@ -446,8 +459,9 @@ internal static partial class BuildRunner
 
         void DispatchScriptCompileWorkers()
         {
-            Dictionary<string, CSProject> virtualProjects = solution.Projects
+            Dictionary<string, CSProject> virtualProjects = targetProjects
                 .OfType<ModuleProject>()
+                .Where(p => p.GetRule(buildTarget).Script.Enabled)
                 .ToDictionary(p => p.ScriptProjectFileName, p => scriptProjectFactory.GetScriptProject(p));
 
             foreach (var scriptTask in scriptTasks)
