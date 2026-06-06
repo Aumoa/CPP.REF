@@ -19,6 +19,8 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 ## GitHub Actions
 
 - Use `gh` to inspect Actions runs, jobs, and logs when the command is available.
+- When `gh` is available, verify compile results for each supported platform in GitHub Actions: Windows, macOS, and Linux. Prefer job-level conclusions over only checking the overall workflow conclusion.
+- If `gh` or Actions access is unavailable, state that Actions validation was skipped and perform a stricter source and workflow review for Windows, macOS, and Linux support.
 - Local-only review actions, including read-only checks, local commits, and local merges, may be performed at Codex's discretion.
 - Do not perform actions that can affect other users, remote branches, hosted services, or shared state unless the user explicitly approves that specific action first.
 - If Actions validation requires a push or another shared-state action, report what will be done and wait for the user's decision before proceeding.
