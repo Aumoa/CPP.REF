@@ -19,8 +19,9 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 ## GitHub Actions
 
 - Use `gh` to inspect Actions runs, jobs, and logs when the command is available.
-- Do not push only to trigger or test Actions unless the user explicitly approves that specific push first.
-- If Actions validation requires a push, report what will be pushed and wait for the user's decision before proceeding.
+- Local-only review actions, including read-only checks, local commits, and local merges, may be performed at Codex's discretion.
+- Do not perform actions that can affect other users, remote branches, hosted services, or shared state unless the user explicitly approves that specific action first.
+- If Actions validation requires a push or another shared-state action, report what will be done and wait for the user's decision before proceeding.
 
 ## Class Responsibility
 

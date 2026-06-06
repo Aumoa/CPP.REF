@@ -22,11 +22,12 @@
 
 - Use the repository-local `ayla-pr-review` skill at `.codex/skills/ayla-pr-review/SKILL.md` for pull request reviews, branch diff reviews, CI failure reviews, and merge-readiness checks.
 
-## GitHub CLI And Push Safety
+## GitHub CLI And Shared-State Safety
 
 - Codex may use the `gh` command to inspect GitHub Actions runs, jobs, and logs when it is available.
-- Codex must not push changes unless the user has explicitly reviewed the situation and approved that specific push.
-- If testing GitHub Actions requires a push, Codex must ask the user for approval before pushing. This approval cannot be assumed or automated.
+- Codex may perform local-only actions at its own discretion, including read-only checks, local commits, and local merges.
+- Codex must request explicit user approval before any action that can affect other users, remote branches, hosted services, or shared state. This includes pushing, force-pushing, creating or updating pull requests, publishing or deploying, deleting remote resources, and triggering GitHub Actions through a push.
+- If validation requires a push or another shared-state action, Codex must report the intended action and wait for the user's approval before proceeding. This approval cannot be assumed or automated.
 
 ## Instruction Storage
 
