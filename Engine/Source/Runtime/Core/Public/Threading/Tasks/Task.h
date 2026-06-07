@@ -380,7 +380,11 @@ namespace Ayla
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::WhenAll instead.");
 
-			auto v = std::ranges::to<std::vector>(std::forward<IR>(tasks));
+			std::vector<std::ranges::range_value_t<IR>> v;
+			for (auto&& task : tasks)
+			{
+				v.emplace_back(std::forward<decltype(task)>(task));
+			}
 			return WhenAll(std::move(v));
 		}
 
@@ -458,7 +462,11 @@ namespace Ayla
 		{
 			static_assert(std::same_as<T, void>, "Use Task<>::WhenAny instead.");
 
-			auto v = std::ranges::to<std::vector>(std::forward<IR>(tasks));
+			std::vector<std::ranges::range_value_t<IR>> v;
+			for (auto&& task : tasks)
+			{
+				v.emplace_back(std::forward<decltype(task)>(task));
+			}
 			return WhenAny(std::move(v));
 		}
 
@@ -488,7 +496,7 @@ namespace Ayla
 			return WhenAny(std::move(taskVector));
 		}
 
-		// Unwrap for Task<Task<T>> ¡æ Task<T>
+		// Unwrap for Task<Task<T>> to Task<T>
 		template<class U = T>
 		auto Unwrap() const -> Task<typename U::ValueType>
 			requires std::same_as<U, Task<typename U::ValueType>>

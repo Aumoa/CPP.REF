@@ -10,16 +10,16 @@ namespace Ayla
 {
 	struct ShaderCreationInfo
 	{
-		std::shared_ptr<VertexFactory> VertexFactory;
-		ShaderBytecode VertexShader;
-		ShaderBytecode FragmentShader;
-		ShaderBytecode DomainShader;
-		ShaderBytecode HullShader;
-		ShaderBytecode GeometryShader;
-		ShaderBytecode ComputeShader;
-		ShaderBytecode RayGenerationShader;
-		ShaderBytecode ClosestHitShader;
-		ShaderBytecode AnyHitShader;
-		ShaderBytecode MissShader;
+		std::shared_ptr<VertexFactory> m_VertexFactory;
+		ShaderBytecode m_VertexShader;
+		ShaderBytecode m_FragmentShader;
+		ShaderBytecode m_DomainShader;
+		ShaderBytecode m_HullShader;
+		ShaderBytecode m_GeometryShader;
+		ShaderBytecode m_ComputeShader;
+		ShaderBytecode m_RayGenerationShader;
+		ShaderBytecode m_ClosestHitShader;
+		ShaderBytecode m_AnyHitShader;
+		ShaderBytecode m_MissShader;
 	};
 }
