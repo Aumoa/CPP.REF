@@ -147,6 +147,7 @@ namespace Ayla
 				io_uring_sqe* sqe = io_uring_get_sqe(&m_Ring);
 				if (sqe == nullptr)
 				{
+					errno = EAGAIN;
 					return false;
 				}
 
@@ -156,7 +157,6 @@ namespace Ayla
 				if (submitResult < 0)
 				{
 					errno = -submitResult;
-					operation.release();
 					return false;
 				}
 
