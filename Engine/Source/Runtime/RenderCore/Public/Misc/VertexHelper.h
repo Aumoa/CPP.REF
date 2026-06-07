@@ -9,6 +9,14 @@ namespace Ayla
 {
 	namespace GeometryHelper
 	{
+#if defined(_MSC_VER)
+		template<class T>
+		concept IsDirectXVector = std::convertible_to<T, DirectX::XMVECTOR> || std::convertible_to<T, DirectX::XMVECTORF32>;
+#else
+		template<class T>
+		concept IsDirectXVector = std::convertible_to<T, DirectX::XMVECTORF32>;
+#endif
+
 		template<class T>
 		concept IsMutableVector2 = requires (T & v)
 		{
@@ -21,7 +29,7 @@ namespace Ayla
 		};
 
 		template<class T>
-		concept IsVector2 = IsMutableVector2<T> || std::convertible_to<T, DirectX::XMVECTOR> || std::convertible_to<T, DirectX::XMVECTORF32>;
+		concept IsVector2 = IsMutableVector2<T> || IsDirectXVector<T>;
 
 		template<class T>
 		concept IsMutableVector3 = requires (T & v)
@@ -37,7 +45,7 @@ namespace Ayla
 		};
 
 		template<class T>
-		concept IsVector3 = IsMutableVector3<T> || std::convertible_to<T, DirectX::XMVECTOR> || std::convertible_to<T, DirectX::XMVECTORF32>;
+		concept IsVector3 = IsMutableVector3<T> || IsDirectXVector<T>;
 
 		template<class T>
 		concept IsVertex = requires (T & v)

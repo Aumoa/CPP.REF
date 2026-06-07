@@ -317,14 +317,22 @@ namespace Ayla
         case FileMode::Truncate:  flags |= O_TRUNC; break;
         }
 
-        switch (InAccessMode)
+        const uint32 accessMode = (uint32)InAccessMode;
+        if (accessMode == (uint32)FileAccessMode::Read)
         {
-        case FileAccessMode::Read:    flags |= O_RDONLY; break;
-        case FileAccessMode::Write:   flags |= O_WRONLY; break;
-        case FileAccessMode::Append:  flags |= O_APPEND | O_CREAT; break;
-        case (FileAccessMode::Read | FileAccessMode::Write):
+            flags |= O_RDONLY;
+        }
+        else if (accessMode == (uint32)FileAccessMode::Write)
+        {
+            flags |= O_WRONLY;
+        }
+        else if (accessMode == (uint32)FileAccessMode::Append)
+        {
+            flags |= O_APPEND | O_CREAT;
+        }
+        else if (accessMode == ((uint32)FileAccessMode::Read | (uint32)FileAccessMode::Write) || accessMode == (uint32)FileAccessMode::All)
+        {
             flags |= O_RDWR;
-            break;
         }
 
         int fd = open(InFilename.AsCodepage().c_str(), flags, 0666);
