@@ -49,6 +49,7 @@ namespace Ayla
         std::mutex m_CancellationLock;
         std::stop_source m_DispatchCancel;
         std::thread m_DispatchThread;
+        int32 m_InitializationError = 0;
 
     public:
         struct scoped_sqe
@@ -59,6 +60,13 @@ namespace Ayla
             scoped_sqe(IOCompletionPort* completionPort)
                 : m_CompletionPort{ completionPort }
             {
+                if (completionPort->m_InitializationError != 0)
+                {
+                    m_CompletionPort = nullptr;
+                    errno = completionPort->m_InitializationError;
+                    return;
+                }
+
                 completionPort->m_RingMutex.lock();
                 m_sqe = io_uring_get_sqe(&completionPort->m_Ring);
             }
@@ -90,12 +98,23 @@ namespace Ayla
     public:
         IOCompletionPort()
         {
-            check(io_uring_queue_init(static_cast<unsigned int>(kUringQueueDepth), &m_Ring, 0) == 0);
+            int initResult = io_uring_queue_init(static_cast<unsigned int>(kUringQueueDepth), &m_Ring, 0);
+            if (initResult != 0)
+            {
+                m_InitializationError = initResult < 0 ? -initResult : initResult;
+                return;
+            }
+
             m_DispatchThread = std::thread([this]() { this->io_uring_dispatch(this->m_DispatchCancel.get_token()); });
         }
 
         ~IOCompletionPort() noexcept
         {
+            if (m_InitializationError != 0)
+            {
+                return;
+            }
+
             RequestStop();
             if (m_DispatchThread.joinable())
             {
@@ -246,7 +265,6 @@ namespace Ayla
 
     void LinuxPlatformIO::InitializeIOCPHandle(void*& Handle) noexcept
     {
-        const uint32 kUringQueueDepth = 64;
         auto* completionPort = new IOCompletionPort();
         Handle = completionPort;
     }
