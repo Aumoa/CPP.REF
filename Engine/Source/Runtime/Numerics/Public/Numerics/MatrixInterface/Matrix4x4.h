@@ -246,168 +246,185 @@ namespace Ayla
 #define MX_C(v) reinterpret_cast<const Matrix4x4<T>&>(v)
 #define MX_V(v) reinterpret_cast<Matrix4x4<T>&>(v)
 
-#define ASSIGN(x, y) x = reinterpret_cast<std::remove_reference_t<decltype(x)>&>(y)
 #define FLOAT3(x) DirectX::XMLoadFloat3(reinterpret_cast<const DirectX::XMFLOAT3*>(&x))
 #define FLOAT4(x) reinterpret_cast<const DirectX::XMVECTOR&>(x)
 
 		template<class T>
 		static constexpr T Determinant(const Matrix4x4<T>& M)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				auto v = XMMatrixDeterminant(XM_C(M));
-				return XMVectorGetX(v);
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					auto v = XMMatrixDeterminant(XM_C(M));
+					return XMVectorGetX(v);
+				}
 			}
-			else
-			{
-				return
-					M[0][0] * (M[1][1] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
-						M[1][2] * (M[2][1] * M[3][3] - M[2][3] * M[3][1]) +
-						M[1][3] * (M[2][1] * M[3][2] - M[2][2] * M[3][1])) -
-					M[0][1] * (M[1][0] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
-						M[1][2] * (M[2][0] * M[3][3] - M[2][3] * M[3][0]) +
-						M[1][3] * (M[2][0] * M[3][2] - M[2][2] * M[3][0])) +
-					M[0][2] * (M[1][0] * (M[2][1] * M[3][3] - M[2][3] * M[3][1]) -
-						M[1][1] * (M[2][0] * M[3][3] - M[2][3] * M[3][0]) +
-						M[1][3] * (M[2][0] * M[3][1] - M[2][1] * M[3][0])) -
-					M[0][3] * (M[1][0] * (M[2][1] * M[3][2] - M[2][2] * M[3][1]) -
-						M[1][1] * (M[2][0] * M[3][2] - M[2][2] * M[3][0]) +
-						M[1][2] * (M[2][0] * M[3][1] - M[2][1] * M[3][0]));
-			}
+
+			return
+				M[0][0] * (M[1][1] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
+					M[1][2] * (M[2][1] * M[3][3] - M[2][3] * M[3][1]) +
+					M[1][3] * (M[2][1] * M[3][2] - M[2][2] * M[3][1])) -
+				M[0][1] * (M[1][0] * (M[2][2] * M[3][3] - M[2][3] * M[3][2]) -
+					M[1][2] * (M[2][0] * M[3][3] - M[2][3] * M[3][0]) +
+					M[1][3] * (M[2][0] * M[3][2] - M[2][2] * M[3][0])) +
+				M[0][2] * (M[1][0] * (M[2][1] * M[3][3] - M[2][3] * M[3][1]) -
+					M[1][1] * (M[2][0] * M[3][3] - M[2][3] * M[3][0]) +
+					M[1][3] * (M[2][0] * M[3][1] - M[2][1] * M[3][0])) -
+				M[0][3] * (M[1][0] * (M[2][1] * M[3][2] - M[2][2] * M[3][1]) -
+					M[1][1] * (M[2][0] * M[3][2] - M[2][2] * M[3][0]) +
+					M[1][2] * (M[2][0] * M[3][1] - M[2][1] * M[3][0]));
 		}
 
 		template<class T>
 		static constexpr Matrix4x4<T> Inverse(const Matrix4x4<T>& M)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				return MX_V(XMMatrixInverse(nullptr, XM_V(M)));
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					Matrix4x4<T> result;
+					XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&result), XMMatrixInverse(nullptr, XM_C(M)));
+					return result;
+				}
 			}
-			else
-			{
-				return Matrix<>::Inverse(M);
-			}
+
+			return Matrix<>::Inverse(M);
 		}
 
 		template<class T>
 		static constexpr bool Decompose(const Matrix4x4<T>& M, Translate3D<T>& translate, Scale3D<T>& scale, Quaternion<T>& rotation)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				XMVECTOR xmtrans, xmscale, xmquat;
-				bool success = XMMatrixDecompose(&xmtrans, &xmscale, &xmquat, XM_C(M));
-				ASSIGN(translate, xmtrans);
-				ASSIGN(scale, xmscale);
-				ASSIGN(rotation, xmquat);
-				return success;
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					XMVECTOR xmtrans, xmscale, xmquat;
+					bool success = XMMatrixDecompose(&xmtrans, &xmscale, &xmquat, XM_C(M));
+					XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&translate), xmtrans);
+					XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&scale), xmscale);
+					XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&rotation), xmquat);
+					return success;
+				}
 			}
-			else
-			{
-				// Extract Translation
-				translate = Translate3D<T>(M[0][3], M[1][3], M[2][3]);
 
-				// Extract Scale
-				scale = Scale3D<T>(
-					Math::Sqrt(M[0][0] * M[0][0] + M[0][1] * M[0][1] + M[0][2] * M[0][2]),
-					Math::Sqrt(M[1][0] * M[1][0] + M[1][1] * M[1][1] + M[1][2] * M[1][2]),
-					Math::Sqrt(M[2][0] * M[2][0] + M[2][1] * M[2][1] + M[2][2] * M[2][2])
-				);
+			// Extract Translation
+			translate = Translate3D<T>(M[0][3], M[1][3], M[2][3]);
 
-				// Normalize rotation matrix by removing scale
-				T m00 = M[0][0] / scale.X, m01 = M[0][1] / scale.X, m02 = M[0][2] / scale.X;
-				T m10 = M[1][0] / scale.Y, m11 = M[1][1] / scale.Y, m12 = M[1][2] / scale.Y;
-				T m20 = M[2][0] / scale.Z, m21 = M[2][1] / scale.Z, m22 = M[2][2] / scale.Z;
+			// Extract Scale
+			scale = Scale3D<T>(
+				Math::Sqrt(M[0][0] * M[0][0] + M[0][1] * M[0][1] + M[0][2] * M[0][2]),
+				Math::Sqrt(M[1][0] * M[1][0] + M[1][1] * M[1][1] + M[1][2] * M[1][2]),
+				Math::Sqrt(M[2][0] * M[2][0] + M[2][1] * M[2][1] + M[2][2] * M[2][2])
+			);
 
-				// Extract Rotation as Quaternion
-				T qw = Math::Sqrt(1.0 + m00 + m11 + m22) / 2.0;
-				T qx = (m21 - m12) / (4.0 * qw);
-				T qy = (m02 - m20) / (4.0 * qw);
-				T qz = (m10 - m01) / (4.0 * qw);
+			// Normalize rotation matrix by removing scale
+			T m00 = M[0][0] / scale.X, m01 = M[0][1] / scale.X, m02 = M[0][2] / scale.X;
+			T m10 = M[1][0] / scale.Y, m11 = M[1][1] / scale.Y, m12 = M[1][2] / scale.Y;
+			T m20 = M[2][0] / scale.Z, m21 = M[2][1] / scale.Z, m22 = M[2][2] / scale.Z;
 
-				rotation = Quaternion<T>(qw, qx, qy, qz);
-			}
+			// Extract Rotation as Quaternion
+			T qw = Math::Sqrt(1.0 + m00 + m11 + m22) / 2.0;
+			T qx = (m21 - m12) / (4.0 * qw);
+			T qy = (m02 - m20) / (4.0 * qw);
+			T qz = (m10 - m01) / (4.0 * qw);
+
+			rotation = Quaternion<T>(qw, qx, qy, qz);
+			return true;
 		}
 
 		template<class T>
 		static constexpr Vector3<T> TransformPoint(const Matrix4x4<T>& M, const Vector3<T>& P)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				auto r = XMVector3Transform(FLOAT3(P), XM_C(M));
-				return reinterpret_cast<Vector3<T>&>(r);
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					auto r = XMVector3Transform(FLOAT3(P), XM_C(M));
+					Vector3<T> result;
+					XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&result), r);
+					return result;
+				}
 			}
-			else
-			{
-				return Matrix<>::TransformPoint(M, P);
-			}
+
+			return Matrix<>::TransformPoint(M, P);
 		}
 
 		template<class T>
 		static constexpr Vector3<T> TransformVector(const Matrix4x4<T>& M, const Vector3<T>& V)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				auto r = XMVector3TransformNormal(FLOAT3(V), XM_C(M));
-				return reinterpret_cast<Vector3<T>&>(r);
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					auto r = XMVector3TransformNormal(FLOAT3(V), XM_C(M));
+					Vector3<T> result;
+					XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&result), r);
+					return result;
+				}
 			}
-			else
-			{
-				return Matrix<>::TransformVector(M, V);
-			}
+
+			return Matrix<>::TransformVector(M, V);
 		}
 
 		template<class T>
 		static constexpr Matrix4x4<T> Multiply(const Matrix4x4<T>& ML, const Matrix4x4<T>& MR)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixMultiply(XM_C(ML), XM_C(MR)));
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					Matrix4x4<T> result;
+					XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&result), XMMatrixMultiply(XM_C(ML), XM_C(MR)));
+					return result;
+				}
 			}
-			else
-			{
-				return Matrix<>::Multiply(ML, MR);
-			}
+
+			return Matrix<>::Multiply(ML, MR);
 		}
 
 		template<class T>
 		static constexpr Matrix4x4<T> LookToLH(const Vector3<T>& EyePosition, const Vector3<T>& EyeDirection, const Vector3<T>& UpDirection)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated() == false)
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				auto location = FLOAT3(EyePosition);
-				auto direction = FLOAT3(EyeDirection);
-				auto up = FLOAT3(UpDirection);
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixLookToLH(location, direction, up));
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					auto location = FLOAT3(EyePosition);
+					auto direction = FLOAT3(EyeDirection);
+					auto up = FLOAT3(UpDirection);
+					Matrix4x4<T> result;
+					XMStoreFloat4x4(reinterpret_cast<XMFLOAT4X4*>(&result), XMMatrixLookToLH(location, direction, up));
+					return result;
+				}
 			}
-			else
-			{
-				auto R2 = Vector<>::Normalize(EyeDirection);
-				auto R0 = Vector<>::Cross(UpDirection, R2);
-				R0 = Vector<>::Normalize(R0);
 
-				auto R1 = Vector<>::Cross(R2, R0);
+			auto R2 = Vector<>::Normalize(EyeDirection);
+			auto R0 = Vector<>::Cross(UpDirection, R2);
+			R0 = Vector<>::Normalize(R0);
 
-				auto NegEyePosition = -EyePosition;
+			auto R1 = Vector<>::Cross(R2, R0);
 
-				auto D0 = Vector<>::Dot(R0, NegEyePosition);
-				auto D1 = Vector<>::Dot(R1, NegEyePosition);
-				auto D2 = Vector<>::Dot(R2, NegEyePosition);
+			auto NegEyePosition = -EyePosition;
 
-				Matrix4x4<T> M;
-				M[0] = Vector4<T>(R0, D0);
-				M[1] = Vector4<T>(R1, D1);
-				M[2] = Vector4<T>(R2, D2);
-				M[3] = Vector4<T>(0, 0, 0, 1.0);
+			auto D0 = Vector<>::Dot(R0, NegEyePosition);
+			auto D1 = Vector<>::Dot(R1, NegEyePosition);
+			auto D2 = Vector<>::Dot(R2, NegEyePosition);
 
-				return Matrix<>::Transpose(M);
-			}
+			Matrix4x4<T> M;
+			M[0] = Vector4<T>(R0, D0);
+			M[1] = Vector4<T>(R1, D1);
+			M[2] = Vector4<T>(R2, D2);
+			M[3] = Vector4<T>(0, 0, 0, 1.0);
+
+			return Matrix<>::Transpose(M);
 		}
 
 		template<class T>

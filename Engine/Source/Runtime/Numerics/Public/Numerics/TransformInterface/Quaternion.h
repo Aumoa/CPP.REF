@@ -118,57 +118,63 @@ namespace Ayla
 	public:
 		static Quaternion FromAxisAngle(const Vector3<T>& Axis, Degrees<T> Angle)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated())
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				auto rad = Angle.ToRadians();
-				auto xaxis = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&Axis));
-				auto xq = XMQuaternionRotationNormal(xaxis, rad.Value);
-				return reinterpret_cast<Quaternion&>(xq);
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					auto rad = Angle.ToRadians();
+					auto xaxis = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&Axis));
+					auto xq = XMQuaternionRotationNormal(xaxis, rad.Value);
+					Quaternion result;
+					XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&result), xq);
+					return result;
+				}
 			}
-			else
-			{
-				auto rad = Angle.ToRadians().Value;
-				T halfAngle = rad * T(0.5);
-				T s = Math::Sin(halfAngle);
-				T c = Math::Cos(halfAngle);
-				Vector3<T> axis = Vector<>::Normalize(Axis);
-				return Quaternion(axis * s, c);
-			}
+
+			auto rad = Angle.ToRadians().Value;
+			T halfAngle = rad * T(0.5);
+			T s = Math::Sin(halfAngle);
+			T c = Math::Cos(halfAngle);
+			Vector3<T> axis = Vector<>::Normalize(Axis);
+			return Quaternion(axis * s, c);
 		}
 
 		static Quaternion LookTo(const Vector3<T>& Forward, const Vector3<T>& Up)
 		{
-			if constexpr (std::same_as<T, float> && std::is_constant_evaluated())
+			if constexpr (std::same_as<T, float>)
 			{
-				using namespace DirectX;
-				auto xforward = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&Forward)));
-				auto xup = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&Up)));
-				auto xright = XMVector3Normalize(XMVector3Cross(xup, xforward));
-				xup = XMVector3Cross(xforward, xright);
+				if (!std::is_constant_evaluated())
+				{
+					using namespace DirectX;
+					auto xforward = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&Forward)));
+					auto xup = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&Up)));
+					auto xright = XMVector3Normalize(XMVector3Cross(xup, xforward));
+					xup = XMVector3Cross(xforward, xright);
 
-				XMMATRIX xm;
-				xm.r[0] = xright;
-				xm.r[1] = xup;
-				xm.r[2] = xforward;
-				xm.r[3] = XMVectorSet(0, 0, 0, 1);
+					XMMATRIX xm;
+					xm.r[0] = xright;
+					xm.r[1] = xup;
+					xm.r[2] = xforward;
+					xm.r[3] = XMVectorSet(0, 0, 0, 1);
 
-				auto xq = XMQuaternionRotationMatrix(xm);
-				return reinterpret_cast<Quaternion&>(xq);
+					auto xq = XMQuaternionRotationMatrix(xm);
+					Quaternion result;
+					XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(&result), xq);
+					return result;
+				}
 			}
-			else
-			{
-				Vector3<T> f = Vector<>::Normalize(Forward);
-				Vector3<T> r = Vector<>::Normalize(Vector<>::Cross(Up, f));
-				Vector3<T> u = Vector<>::Cross(f, r);
 
-				Matrix4x4<T> m;
-				m[0][0] = r[0]; m[0][1] = r[1]; m[0][2] = r[2];
-				m[1][0] = u[0]; m[1][1] = u[1]; m[1][2] = u[2];
-				m[2][0] = f[0]; m[2][1] = f[1]; m[2][2] = f[2];
+			Vector3<T> f = Vector<>::Normalize(Forward);
+			Vector3<T> r = Vector<>::Normalize(Vector<>::Cross(Up, f));
+			Vector3<T> u = Vector<>::Cross(f, r);
 
-				return FromMatrix(m);
-			}
+			Matrix4x4<T> m;
+			m[0][0] = r[0]; m[0][1] = r[1]; m[0][2] = r[2];
+			m[1][0] = u[0]; m[1][1] = u[1]; m[1][2] = u[2];
+			m[2][0] = f[0]; m[2][1] = f[1]; m[2][2] = f[2];
+
+			return FromMatrix(m);
 		}
 
 		static Quaternion FromEulerAngles(const Vector3<T>& eulerAngles)
