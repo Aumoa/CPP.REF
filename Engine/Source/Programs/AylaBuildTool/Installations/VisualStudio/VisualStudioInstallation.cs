@@ -95,13 +95,13 @@ internal class VisualStudioInstallation : Installation
 
     private static List<Product> DiscoverProducts()
     {
-        var products = DiscoverProductsWithVswhere();
+        var products = DiscoverProductsFromKnownFolders();
         if (products.Count > 0)
         {
             return products;
         }
 
-        return DiscoverProductsFromKnownFolders();
+        return DiscoverProductsWithVswhere();
     }
 
     private static List<Product> DiscoverProductsWithVswhere()
