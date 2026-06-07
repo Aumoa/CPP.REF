@@ -26,6 +26,13 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - On clearly isolated task branches, especially branches whose names start with `codex/`, non-destructive shared-state actions may be performed at Codex's discretion when they support the review or validation work. This includes pushing that branch, updating its pull request, or triggering Actions through that branch.
 - Destructive or broad shared-state actions still require explicit user approval. If branch ownership is unclear, treat the branch as shared.
 
+## Merge Readiness
+
+- Before approving or merging into protected shared branches such as `dev`, `master`, `main`, or release branches, check whether the PR includes CI, GitHub Actions, branch trigger, permission, environment, or workflow configuration changes that were only needed for task-branch validation.
+- Temporary branch-local CI settings are allowed on isolated task branches, but they must be removed before the task branch is approved for merge into a protected shared branch.
+- Require a revert commit or a separate cleanup commit when temporary CI settings would otherwise affect the protected branch after merge.
+- Treat unremoved temporary CI or Actions configuration as a merge blocker, even if the code changes themselves look correct.
+
 ## Object-Oriented Design
 
 - Prefer object-oriented designs with clear responsibilities, encapsulation, and extensibility unless the touched code is genuinely performance-critical.
