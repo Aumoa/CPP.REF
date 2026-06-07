@@ -5,6 +5,12 @@
 - The project aims to combine suitable strengths from Unity and Unreal Engine.
 - The project is primarily for learning and experimentation.
 
+## Design Principles
+
+- Prefer faithful object-oriented design by default, with clear responsibilities, encapsulation, and extension points.
+- Performance-critical code may deliberately bend object-oriented design when doing so improves performance without significantly harming readability, maintainability, or local reasoning.
+- Use Microsoft's recommended C# design guidelines and object-oriented patterns from major engines such as Unreal Engine as major references, adapting them to this project's goals rather than copying them mechanically.
+
 ## Code Style
 
 - Repository files and generated documentation should be written in English.

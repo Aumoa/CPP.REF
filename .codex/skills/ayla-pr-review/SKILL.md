@@ -26,6 +26,12 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - On clearly isolated task branches, especially branches whose names start with `codex/`, non-destructive shared-state actions may be performed at Codex's discretion when they support the review or validation work. This includes pushing that branch, updating its pull request, or triggering Actions through that branch.
 - Destructive or broad shared-state actions still require explicit user approval. If branch ownership is unclear, treat the branch as shared.
 
+## Object-Oriented Design
+
+- Prefer object-oriented designs with clear responsibilities, encapsulation, and extensibility unless the touched code is genuinely performance-critical.
+- Accept performance-oriented departures from object-oriented design only when they do not significantly harm readability, maintainability, or local reasoning.
+- Use Microsoft's recommended C# design guidelines and object-oriented patterns from major engines such as Unreal Engine as review references, adapted to Ayla's conventions.
+
 ## Class Responsibility
 
 - Check whether each meaningful feature is owned by a clear class or collaborator.
