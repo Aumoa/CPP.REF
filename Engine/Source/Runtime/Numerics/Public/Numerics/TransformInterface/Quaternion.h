@@ -451,7 +451,7 @@ namespace Ayla
 
 	template<class T>
 	template<TIsVector<T, 4> IQuaternion, TIsVector<T, 3> IVector>
-	static constexpr IVector Quaternion<T>::TransformVector(const IQuaternion& QW, const IVector& V)
+	constexpr IVector Quaternion<T>::TransformVector(const IQuaternion& QW, const IVector& V)
 	{
 		return Quaternion<>::TransformPoint<T>(QW, V);
 	}

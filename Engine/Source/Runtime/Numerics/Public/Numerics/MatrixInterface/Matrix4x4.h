@@ -655,21 +655,21 @@ namespace Ayla
 
 	template<class T>
 	template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> IPoint>
-	static IPoint Matrix4x4<T>::TransformPoint(const IMatrix& M, const IPoint& P)
+	IPoint Matrix4x4<T>::TransformPoint(const IMatrix& M, const IPoint& P)
 	{
 		return Matrix4x4<>::TransformPoint(Matrix4x4<T>(M), Vector3<T>(P));
 	}
 
 	template<class T>
 	template<TIsVector<T, 3> ILocation, TIsVector<T, 3> IDir, TIsVector<T, 3> IUp>
-	static Matrix4x4<T> Matrix4x4<T>::LookToLH(const ILocation& Location, const IDir& Dir, const IUp& Up)
+	Matrix4x4<T> Matrix4x4<T>::LookToLH(const ILocation& Location, const IDir& Dir, const IUp& Up)
 	{
 		return LookToLH(Vector3<T>(Location), Vector3<T>(Dir), Vector3<T>(Up));
 	}
 
 	template<class T>
 	template<TIsMatrix<T, 4, 3> IMatrix, TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
-	static auto Matrix4x4<T>::AffineTransformation(const ITranslation& translate, const IScale& scale, const IQuaternion& rot)
+	auto Matrix4x4<T>::AffineTransformation(const ITranslation& translate, const IScale& scale, const IQuaternion& rot)
 	{
 		Matrix4x4 M = Matrix4x4<>::AffineTransformation(Translate3D<T>(translate), Scale3D<T>(scale), Quaternion<T>(rot));
 		IMatrix R = IMatrix::Identity();

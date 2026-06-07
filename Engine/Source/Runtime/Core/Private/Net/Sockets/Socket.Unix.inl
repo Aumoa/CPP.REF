@@ -268,7 +268,7 @@ namespace Ayla
 					return;
 				}
 
-				kevent wakeEvent;
+				struct kevent wakeEvent;
 				EV_SET(&wakeEvent, kWakeIdent, EVFILT_USER, EV_ADD | EV_CLEAR, 0, 0, nullptr);
 				if (kevent(m_Kqueue, &wakeEvent, 1, nullptr, 0, nullptr) != 0)
 				{
@@ -321,7 +321,7 @@ namespace Ayla
 		private:
 			bool Register(OSXSocketOperation* operation) noexcept
 			{
-				kevent event;
+				struct kevent event;
 				EV_SET(&event, operation->GetSocket(), operation->GetFilter(), EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, operation);
 
 				auto lock = std::unique_lock{ m_KqueueMutex };
@@ -330,7 +330,7 @@ namespace Ayla
 
 			void QueueWakeup() noexcept
 			{
-				kevent event;
+				struct kevent event;
 				EV_SET(&event, kWakeIdent, EVFILT_USER, 0, NOTE_TRIGGER, 0, nullptr);
 
 				auto lock = std::unique_lock{ m_KqueueMutex };
@@ -341,7 +341,7 @@ namespace Ayla
 			{
 				while (true)
 				{
-					kevent event;
+					struct kevent event;
 					int result = kevent(m_Kqueue, nullptr, 0, &event, 1, nullptr);
 					if (result == SOCKET_ERROR)
 					{
