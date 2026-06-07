@@ -9,13 +9,13 @@ namespace Ayla
 {
 	namespace GeometryHelper
 	{
-#if defined(_MSC_VER)
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+#endif
+
 		template<class T>
 		concept IsDirectXVector = std::convertible_to<T, DirectX::XMVECTOR> || std::convertible_to<T, DirectX::XMVECTORF32>;
-#else
-		template<class T>
-		concept IsDirectXVector = std::convertible_to<T, DirectX::XMVECTORF32>;
-#endif
 
 		template<class T>
 		concept IsMutableVector2 = requires (T & v)
@@ -46,6 +46,10 @@ namespace Ayla
 
 		template<class T>
 		concept IsVector3 = IsMutableVector3<T> || IsDirectXVector<T>;
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 		template<class T>
 		concept IsVertex = requires (T & v)
