@@ -79,10 +79,14 @@ public:
         this->Reset();
     }
 
-    template<class TSelf>
-    inline auto Get(this TSelf&& self) noexcept
+    inline T Get() noexcept
     {
-        return self.m_Ptr;
+        return m_Ptr;
+    }
+
+    inline T Get() const noexcept
+    {
+        return m_Ptr;
     }
 
     inline void Reset() noexcept
@@ -100,8 +104,8 @@ public:
         return &m_Ptr;
     }
 
-    template<class TSelf>
-    inline auto operator ->(this TSelf&& self) noexcept { return self.Get(); }
+    inline T operator ->() noexcept { return Get(); }
+    inline T operator ->() const noexcept { return Get(); }
 
     inline VkRef& operator =(VkRef&& rhs) noexcept
     {
