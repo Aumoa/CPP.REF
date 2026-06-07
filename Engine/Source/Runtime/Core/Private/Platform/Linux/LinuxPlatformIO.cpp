@@ -1,4 +1,4 @@
-﻿// Copyright 2020-2025 Aumoa.lib. All right reserved.
+// Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Platform/Linux/LinuxPlatformIO.h"
 
@@ -20,6 +20,10 @@
 #include <cerrno>
 #include <limits>
 #include <span>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
 #include <liburing.h>
 
 namespace Ayla
@@ -27,15 +31,24 @@ namespace Ayla
     class IOCompletionPort
     {
     private:
+        struct Completion
+        {
+            IOCompletionOverlapped* m_Overlap = nullptr;
+            size_t m_Bytes = 0;
+            int32 m_Error = 0;
+        };
+
         static constexpr uint32 kUringQueueDepth = 64;
         io_uring m_Ring;
 
-        std::queue<std::pair<IOCompletionOverlapped*, size_t>> m_Overlaps;
+        std::queue<Completion> m_Overlaps;
         std::mutex m_Mutex;
         std::condition_variable m_Cond;
 
+        std::mutex m_RingMutex;
         std::mutex m_CancellationLock;
         std::stop_source m_DispatchCancel;
+        std::thread m_DispatchThread;
 
     public:
         struct scoped_sqe
@@ -46,7 +59,7 @@ namespace Ayla
             scoped_sqe(IOCompletionPort* completionPort)
                 : m_CompletionPort{ completionPort }
             {
-                completionPort->m_Mutex.lock();
+                completionPort->m_RingMutex.lock();
                 m_sqe = io_uring_get_sqe(&completionPort->m_Ring);
             }
 
@@ -62,23 +75,32 @@ namespace Ayla
             {
                 if (m_CompletionPort != nullptr)
                 {
-                    io_uring_submit(&m_CompletionPort->m_Ring);
-                    m_CompletionPort->m_Mutex.unlock();
+                    if (m_sqe != nullptr)
+                    {
+                        io_uring_submit(&m_CompletionPort->m_Ring);
+                    }
+                    m_CompletionPort->m_RingMutex.unlock();
                 }
             }
 
             inline operator io_uring_sqe*() const noexcept { return m_sqe; }
+            inline explicit operator bool() const noexcept { return m_sqe != nullptr; }
         };
 
     public:
         IOCompletionPort()
         {
-            io_uring_queue_init((unsigned int)kUringQueueDepth, &m_Ring, 0);
-            std::thread([this]() { this->io_uring_dispatch(this->m_DispatchCancel.get_token()); }).detach();
+            check(io_uring_queue_init(static_cast<unsigned int>(kUringQueueDepth), &m_Ring, 0) == 0);
+            m_DispatchThread = std::thread([this]() { this->io_uring_dispatch(this->m_DispatchCancel.get_token()); });
         }
 
         ~IOCompletionPort() noexcept
         {
+            RequestStop();
+            if (m_DispatchThread.joinable())
+            {
+                m_DispatchThread.join();
+            }
             io_uring_queue_exit(&m_Ring);
         }
 
@@ -113,27 +135,39 @@ namespace Ayla
                 return false;
             }
 
-            auto [overlap, res] = m_Overlaps.front();
+            auto completion = m_Overlaps.front();
             m_Overlaps.pop();
             lock.unlock();
 
-            if (res >= 0)
+            if (completion.m_Error == 0)
             {
-                overlap->Complete(res);
+                completion.m_Overlap->Complete(completion.m_Bytes);
             }
             else
             {
-                overlap->Failed(res);
+                completion.m_Overlap->Failed(completion.m_Error);
             }
 
             return true;
         }
 
-        void QueueInterruptSignal() noexcept
+        void RequestStop() noexcept
         {
-            auto lock = std::unique_lock{ m_Mutex };
             m_DispatchCancel.request_stop();
+            QueueWakeup();
             m_Cond.notify_all();
+        }
+
+        void QueueWakeup() noexcept
+        {
+            auto lock = std::unique_lock{ m_RingMutex };
+            io_uring_sqe* sqe = io_uring_get_sqe(&m_Ring);
+            if (sqe != nullptr)
+            {
+                io_uring_prep_nop(sqe);
+                io_uring_sqe_set_data(sqe, nullptr);
+                io_uring_submit(&m_Ring);
+            }
         }
         
         void io_uring_dispatch(std::stop_token cancellationToken)
@@ -157,9 +191,26 @@ namespace Ayla
                 else if (i_errno == 0)
                 {
                     auto* overlap = (IOCompletionOverlapped*)cqe->user_data;
-                    auto lock = std::unique_lock{ m_Mutex };
-                    m_Overlaps.emplace(overlap, (size_t)cqe->res);
+                    int32 error = cqe->res < 0 ? static_cast<int32>(-cqe->res) : 0;
+                    size_t bytes = cqe->res < 0 ? 0 : static_cast<size_t>(cqe->res);
                     io_uring_cqe_seen(&this->m_Ring, cqe);
+
+                    if (overlap == nullptr)
+                    {
+                        if (cancellationToken.stop_requested())
+                        {
+                            break;
+                        }
+                        continue;
+                    }
+
+                    auto lock = std::unique_lock{ m_Mutex };
+                    m_Overlaps.emplace(Completion
+                    {
+                        .m_Overlap = overlap,
+                        .m_Bytes = bytes,
+                        .m_Error = error
+                    });
                     m_Cond.notify_one();
                 }
                 else
@@ -231,8 +282,9 @@ namespace Ayla
 
     void LinuxPlatformIO::QueueInterruptSignal(void* handle, int32 size) noexcept
     {
+        (void)size;
         auto iocp = reinterpret_cast<IOCompletionPort*>(handle);
-        iocp->QueueInterruptSignal();
+        iocp->RequestStop();
     }
 
     void LinuxPlatformIO::OpenFileHandle(void*& Handle, String InFilename, FileMode InFileMode, FileAccessMode InAccessMode, FileSharedMode InSharedMode) noexcept
@@ -283,13 +335,13 @@ namespace Ayla
 
     bool LinuxPlatformIO::FlushFileBuffers(void* Handle) noexcept
     {
-        int fd = static_cast<int>(reinterpret_cast<intptr_t>(Handle));
-        return fsync(fd) == 0;
+        auto* socketHandle = reinterpret_cast<SocketHandle*>(Handle);
+        return fsync(socketHandle->m_fd) == 0;
     }
 
     bool LinuxPlatformIO::SetFileSeekPointer(void* Handle, int64 Seekpos, SeekOrigin InOrigin) noexcept
     {
-        int fd = static_cast<int>(reinterpret_cast<intptr_t>(Handle));
+        auto* socketHandle = reinterpret_cast<SocketHandle*>(Handle);
         int whence = SEEK_SET;
         switch (InOrigin)
         {
@@ -297,24 +349,26 @@ namespace Ayla
         case SeekOrigin::Current: whence = SEEK_CUR; break;
         case SeekOrigin::End:     whence = SEEK_END; break;
         }
-        return lseek(fd, Seekpos, whence) != -1;
+        return lseek(socketHandle->m_fd, Seekpos, whence) != -1;
     }
 
     int64 LinuxPlatformIO::GetFileSize(void* Handle) noexcept
     {
-        int fd = static_cast<int>(reinterpret_cast<intptr_t>(Handle));
+        auto* socketHandle = reinterpret_cast<SocketHandle*>(Handle);
         struct stat st;
-        if (fstat(fd, &st) == -1)
+        if (fstat(socketHandle->m_fd, &st) == -1)
         {
             return 0;
         }
         return static_cast<int64>(st.st_size);
     }
 
-    Action<IOCompletionOverlapped*, size_t, int32> LinuxPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
+    MoveOnlyFunction<void(IOCompletionOverlapped*, size_t, int32)> LinuxPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
     {
         return [TCS, WriteIO](IOCompletionOverlapped* self, size_t written, int32 err)
         {
+            (void)self;
+            (void)WriteIO;
             if (err)
             {
                 TCS.TrySetException<SystemException>(err);
@@ -330,15 +384,21 @@ namespace Ayla
     {
         auto* socketHandle = reinterpret_cast<SocketHandle*>(handle);
         auto sqe = socketHandle->m_CompletionPort->get_scoped_sqe();
+        if (!sqe)
+        {
+            return false;
+        }
         io_uring_prep_write(sqe, socketHandle->m_fd, inBytes.data(), inBytes.size_bytes(), (__u64)-1);
         io_uring_sqe_set_data(sqe, overlap);
         return true;
     }
 
-    Action<IOCompletionOverlapped*, size_t, int32> LinuxPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
+    MoveOnlyFunction<void(IOCompletionOverlapped*, size_t, int32)> LinuxPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
     {
         return [TCS, ReadIO](IOCompletionOverlapped* self, size_t read, int32 err)
         {
+            (void)self;
+            (void)ReadIO;
             if (err)
             {
                 TCS.TrySetException<SystemException>(err);
@@ -354,6 +414,10 @@ namespace Ayla
     {
         auto* socketHandle = reinterpret_cast<SocketHandle*>(handle);
         auto sqe = socketHandle->m_CompletionPort->get_scoped_sqe();
+        if (!sqe)
+        {
+            return false;
+        }
         io_uring_prep_read(sqe, socketHandle->m_fd, outBytes.data(), outBytes.size_bytes(), (__u64)-1);
         io_uring_sqe_set_data(sqe, overlap);
         return true;

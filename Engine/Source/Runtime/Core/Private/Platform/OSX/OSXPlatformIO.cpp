@@ -25,17 +25,46 @@
 #include <mutex>
 #include <condition_variable>
 #include <thread>
+#include <vector>
 
 namespace Ayla
 {
     class IOCompletionPort
     {
     private:
+        enum class FileOperation
+        {
+            Read,
+            Write
+        };
+
+        struct Completion
+        {
+            IOCompletionOverlapped* m_Overlap = nullptr;
+            size_t m_Bytes = 0;
+            int32 m_Error = 0;
+        };
+
+        struct FileRequest
+        {
+            FileOperation m_Operation = FileOperation::Read;
+            int m_Fd = -1;
+            const uint8* m_WriteData = nullptr;
+            uint8* m_ReadData = nullptr;
+            size_t m_Size = 0;
+            IOCompletionOverlapped* m_Overlap = nullptr;
+        };
+
         int m_Kqueue;
 
-        std::queue<std::pair<IOCompletionOverlapped*, size_t>> m_Overlaps;
+        std::queue<Completion> m_Overlaps;
         std::mutex m_Mutex;
         std::condition_variable m_Cond;
+
+        std::queue<FileRequest> m_FileRequests;
+        std::mutex m_FileMutex;
+        std::condition_variable m_FileCond;
+        std::vector<std::thread> m_FileWorkers;
 
         std::stop_source m_DispatchCancel;
 
@@ -43,10 +72,24 @@ namespace Ayla
         IOCompletionPort()
         {
             m_Kqueue = kqueue();
+            constexpr size_t kFileWorkerCount = 2;
+            for (size_t i = 0; i < kFileWorkerCount; ++i)
+            {
+                m_FileWorkers.emplace_back([this]() { FileWorker(this->m_DispatchCancel.get_token()); });
+            }
         }
 
         ~IOCompletionPort() noexcept
         {
+            RequestStop();
+            for (auto& worker : m_FileWorkers)
+            {
+                if (worker.joinable())
+                {
+                    worker.join();
+                }
+            }
+
             if (m_Kqueue >= 0)
             {
                 close(m_Kqueue);
@@ -84,34 +127,128 @@ namespace Ayla
                 return false;
             }
 
-            auto [overlap, res] = m_Overlaps.front();
+            auto completion = m_Overlaps.front();
             m_Overlaps.pop();
             lock.unlock();
 
-            overlap->Complete(res);
+            if (completion.m_Error == 0)
+            {
+                completion.m_Overlap->Complete(completion.m_Bytes);
+            }
+            else
+            {
+                completion.m_Overlap->Failed(completion.m_Error);
+            }
 
             return true;
         }
 
-        void QueueInterruptSignal() noexcept
+        void RequestStop() noexcept
         {
-            auto lock = std::unique_lock{ m_Mutex };
             m_DispatchCancel.request_stop();
             m_Cond.notify_all();
+            m_FileCond.notify_all();
         }
 
         void QueueCompletion(IOCompletionOverlapped* overlap, size_t result) noexcept
         {
             auto lock = std::unique_lock{ m_Mutex };
-            m_Overlaps.emplace(overlap, result);
+            m_Overlaps.emplace(Completion
+            {
+                .m_Overlap = overlap,
+                .m_Bytes = result,
+                .m_Error = 0
+            });
             m_Cond.notify_one();
         }
 
         void QueueFailure(IOCompletionOverlapped* overlap, int32 err) noexcept
         {
             auto lock = std::unique_lock{ m_Mutex };
-            m_Overlaps.emplace(overlap, static_cast<size_t>(err));
+            m_Overlaps.emplace(Completion
+            {
+                .m_Overlap = overlap,
+                .m_Bytes = 0,
+                .m_Error = err
+            });
             m_Cond.notify_one();
+        }
+
+        bool QueueFileRead(int fd, std::span<uint8> outBytes, IOCompletionOverlapped* overlap) noexcept
+        {
+            return QueueFileRequest(FileRequest
+            {
+                .m_Operation = FileOperation::Read,
+                .m_Fd = fd,
+                .m_ReadData = outBytes.data(),
+                .m_Size = outBytes.size_bytes(),
+                .m_Overlap = overlap
+            });
+        }
+
+        bool QueueFileWrite(int fd, std::span<const uint8> inBytes, IOCompletionOverlapped* overlap) noexcept
+        {
+            return QueueFileRequest(FileRequest
+            {
+                .m_Operation = FileOperation::Write,
+                .m_Fd = fd,
+                .m_WriteData = inBytes.data(),
+                .m_Size = inBytes.size_bytes(),
+                .m_Overlap = overlap
+            });
+        }
+
+    private:
+        bool QueueFileRequest(FileRequest request) noexcept
+        {
+            if (m_DispatchCancel.stop_requested())
+            {
+                return false;
+            }
+
+            auto lock = std::unique_lock{ m_FileMutex };
+            m_FileRequests.emplace(request);
+            lock.unlock();
+            m_FileCond.notify_one();
+            return true;
+        }
+
+        void FileWorker(std::stop_token cancellationToken) noexcept
+        {
+            while (true)
+            {
+                auto lock = std::unique_lock{ m_FileMutex };
+                m_FileCond.wait(lock, [this, &cancellationToken]()
+                {
+                    return !m_FileRequests.empty() || cancellationToken.stop_requested();
+                });
+
+                if (m_FileRequests.empty())
+                {
+                    if (cancellationToken.stop_requested())
+                    {
+                        break;
+                    }
+                    continue;
+                }
+
+                FileRequest request = m_FileRequests.front();
+                m_FileRequests.pop();
+                lock.unlock();
+
+                ssize_t result = request.m_Operation == FileOperation::Read
+                    ? read(request.m_Fd, request.m_ReadData, request.m_Size)
+                    : write(request.m_Fd, request.m_WriteData, request.m_Size);
+
+                if (result >= 0)
+                {
+                    QueueCompletion(request.m_Overlap, static_cast<size_t>(result));
+                }
+                else
+                {
+                    QueueFailure(request.m_Overlap, errno);
+                }
+            }
         }
     };
 
@@ -170,8 +307,9 @@ namespace Ayla
 
     void OSXPlatformIO::QueueInterruptSignal(void* handle, int32 size) noexcept
     {
+        (void)size;
         auto iocp = reinterpret_cast<IOCompletionPort*>(handle);
-        iocp->QueueInterruptSignal();
+        iocp->RequestStop();
     }
 
     void OSXPlatformIO::OpenFileHandle(void*& Handle, String InFilename, FileMode InFileMode, FileAccessMode InAccessMode, FileSharedMode InSharedMode) noexcept
@@ -250,10 +388,12 @@ namespace Ayla
         return static_cast<int64>(st.st_size);
     }
 
-    Action<IOCompletionOverlapped*, size_t, int32> OSXPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
+    MoveOnlyFunction<void(IOCompletionOverlapped*, size_t, int32)> OSXPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
     {
         return [TCS, WriteIO](IOCompletionOverlapped* self, size_t written, int32 err)
         {
+            (void)self;
+            (void)WriteIO;
             if (err)
             {
                 TCS.TrySetException<SystemException>(err);
@@ -268,25 +408,15 @@ namespace Ayla
     bool OSXPlatformIO::WriteFile(void* handle, std::span<const uint8> inBytes, IOCompletionOverlapped* overlap) noexcept
     {
         auto* socketHandle = reinterpret_cast<SocketHandle*>(handle);
-        std::thread([socketHandle, inBytes, overlap]()
-        {
-            ssize_t written = write(socketHandle->m_fd, inBytes.data(), inBytes.size_bytes());
-            if (written >= 0)
-            {
-                overlap->Complete(static_cast<size_t>(written));
-            }
-            else
-            {
-                overlap->Failed(errno);
-            }
-        }).detach();
-        return true;
+        return socketHandle->m_CompletionPort->QueueFileWrite(socketHandle->m_fd, inBytes, overlap);
     }
 
-    Action<IOCompletionOverlapped*, size_t, int32> OSXPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
+    MoveOnlyFunction<void(IOCompletionOverlapped*, size_t, int32)> OSXPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
     {
         return [TCS, ReadIO](IOCompletionOverlapped* self, size_t read, int32 err)
         {
+            (void)self;
+            (void)ReadIO;
             if (err)
             {
                 TCS.TrySetException<SystemException>(err);
@@ -301,19 +431,7 @@ namespace Ayla
     bool OSXPlatformIO::ReadFile(void* handle, std::span<uint8> outBytes, IOCompletionOverlapped* overlap) noexcept
     {
         auto* socketHandle = reinterpret_cast<SocketHandle*>(handle);
-        std::thread([socketHandle, outBytes, overlap]()
-        {
-            ssize_t bytesRead = read(socketHandle->m_fd, outBytes.data(), outBytes.size_bytes());
-            if (bytesRead >= 0)
-            {
-                overlap->Complete(static_cast<size_t>(bytesRead));
-            }
-            else
-            {
-                overlap->Failed(errno);
-            }
-        }).detach();
-        return true;
+        return socketHandle->m_CompletionPort->QueueFileRead(socketHandle->m_fd, outBytes, overlap);
     }
 }
 
