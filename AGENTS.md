@@ -20,6 +20,9 @@
 
 ## Instruction Storage
 
+- Use `AGENTS.md` as the default shared repository instruction source.
+- Individual users may create `AGENTS.local.md` for personal local instructions. When this file exists, agents should read and apply it in addition to `AGENTS.md`.
+- `AGENTS.local.md` is local-only and must not be committed or shared with other users.
 - Keep short, always-on repository policies in `AGENTS.md`.
 - When a requested persistent instruction is mainly useful for a recurring workflow, verification procedure, tool usage pattern, or detailed domain guide, create or update a repository-local skill under `.codex/skills/<skill-name>/SKILL.md` and link it from `AGENTS.md`.
 - Prefer scripts only for deterministic, repeatedly executed operations where a command or code snippet would otherwise be rewritten often.
