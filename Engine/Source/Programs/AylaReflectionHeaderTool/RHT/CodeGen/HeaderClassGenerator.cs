@@ -159,8 +159,10 @@ internal class HeaderClassGenerator
                 m_Parent.HeaderText += m_Parent.IndentedMacroLine("{");
                 m_Parent.Indented(() =>
                 {
-                    var owned = function.Flags.HasFlag(SFunction.FFlags.Static) ? string.Empty : $"{className}::";
-                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"using signature_t = {function.ReturnType.FullName}({owned}*)({string.Join(", ", function.Parameters.Select(p => p.Variable.TypeName.FullName))});");
+                    bool isStatic = function.Flags.HasFlag(SFunction.FFlags.Static);
+                    var owned = isStatic ? string.Empty : $"{className}::";
+                    var constQualifier = !isStatic && function.Flags.HasFlag(SFunction.FFlags.Const) ? " const" : string.Empty;
+                    m_Parent.HeaderText += m_Parent.IndentedMacroLine($"using signature_t = {function.ReturnType.FullName}({owned}*)({string.Join(", ", function.Parameters.Select(p => p.Variable.TypeName.FullName))}){constQualifier};");
                     m_Parent.HeaderText += m_Parent.IndentedMacroLine($"constexpr auto ptr = (signature_t)&{className}::{function.Name};");
                     m_Parent.HeaderText += m_Parent.IndentedMacroLine($"return ::std::experimental::reflect::reflexpr_method<{access}, signature_t, ptr>();");
                 });

@@ -13,6 +13,19 @@ namespace Ayla
 {
     struct CORE_API OSXPlatformAtomics : public UnixPlatformAtomics
     {
+        using UnixPlatformAtomics::InterlockedIncrement;
+        using UnixPlatformAtomics::InterlockedDecrement;
+        using UnixPlatformAtomics::InterlockedAdd;
+        using UnixPlatformAtomics::InterlockedExchange;
+        using UnixPlatformAtomics::InterlockedCompareExchange;
+        using UnixPlatformAtomics::InterlockedAnd;
+        using UnixPlatformAtomics::InterlockedOr;
+        using UnixPlatformAtomics::InterlockedXor;
+        using UnixPlatformAtomics::AtomicRead;
+        using UnixPlatformAtomics::AtomicRead_Relaxed;
+        using UnixPlatformAtomics::AtomicStore;
+        using UnixPlatformAtomics::AtomicStore_Relaxed;
+
         static FORCEINLINE ssize_t InterlockedIncrement(volatile ssize_t* Value) noexcept
         {
             return __sync_add_and_fetch(Value, 1);

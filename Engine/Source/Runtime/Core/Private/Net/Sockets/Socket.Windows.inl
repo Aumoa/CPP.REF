@@ -15,6 +15,8 @@ namespace Ayla
 {
 	struct Socket::PlatformSocket
 	{
+		using socket_len_type = int;
+
 		const SOCKET m_Socket;
 		const AddressFamily m_AddressFamily;
 		const SocketType m_SocketType;

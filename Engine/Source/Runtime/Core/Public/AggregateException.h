@@ -10,10 +10,22 @@ namespace Ayla
 	{
 		const std::vector<std::exception_ptr> m_InnerExceptions;
 
+	private:
+		template<std::ranges::input_range IR>
+		static std::vector<std::exception_ptr> ToVector(IR&& exceptions)
+		{
+			std::vector<std::exception_ptr> result;
+			for (auto&& exception : exceptions)
+			{
+				result.emplace_back(std::forward<decltype(exception)>(exception));
+			}
+			return result;
+		}
+
 	public:
 		template<std::ranges::input_range IR>
 		AggregateException(IR&& exceptions) requires std::convertible_to<std::ranges::range_value_t<IR>, std::exception_ptr>
-			: m_InnerExceptions(std::ranges::to<std::vector>(std::forward<IR>(exceptions)))
+			: m_InnerExceptions(ToVector(std::forward<IR>(exceptions)))
 		{
 		}
 
