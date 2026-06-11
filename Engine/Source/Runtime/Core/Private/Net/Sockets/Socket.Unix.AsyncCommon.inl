@@ -36,19 +36,13 @@ namespace Ayla
 
 		inline void SetSocketResult(TaskCompletionSource<> tcs)
 		{
-			if (!tcs.GetTask().IsCompleted())
-			{
-				tcs.SetResult();
-			}
+			tcs.TrySetResult();
 		}
 
 		template<class T, class U>
 		void SetSocketResult(TaskCompletionSource<T> tcs, U&& result)
 		{
-			if (!tcs.GetTask().IsCompleted())
-			{
-				tcs.SetResult(std::forward<U>(result));
-			}
+			tcs.TrySetResult(std::forward<U>(result));
 		}
 
 		inline int32 GetSubmitFailureError() noexcept
