@@ -1,44 +1,57 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+#include "IntegralTypes.h"
 #include "MoveOnlyFunction.h"
 #include "Threading/ThreadPool.h"
 #include <sys/event.h>
 #include <sys/socket.h>
+#include <atomic>
 #include <fcntl.h>
 #include <unistd.h>
 #include <cerrno>
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <span>
 #include <stop_token>
 #include <thread>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace Ayla
 {
 	namespace
 	{
+		class OSXSocketAsyncQueue;
+
 		class OSXSocketOperation
 		{
+			using cancellation_callback_t = std::stop_callback<MoveOnlyFunction<void()>>;
+
+			uintptr_t m_Id = 0;
+			OSXSocketAsyncQueue* m_Queue = nullptr;
 			int m_Socket = INVALID_SOCKET;
 			int16 m_Filter = 0;
 			MoveOnlyFunction<bool(int32)> m_Completion;
+			std::optional<cancellation_callback_t> m_Cancellation;
 
 		public:
-			OSXSocketOperation(int socket, int16 filter, MoveOnlyFunction<bool(int32)> completion)
-				: m_Socket(socket)
-				, m_Filter(filter)
-				, m_Completion(std::move(completion))
-			{
-			}
+			OSXSocketOperation(uintptr_t id, OSXSocketAsyncQueue& queue, int socket, int16 filter, MoveOnlyFunction<bool(int32)> completion, std::stop_token cancellationToken);
 
+			uintptr_t GetId() const noexcept { return m_Id; }
 			int GetSocket() const noexcept { return m_Socket; }
 			int16 GetFilter() const noexcept { return m_Filter; }
 
 			bool Complete(int32 error)
 			{
-				return m_Completion(error);
+				bool retry = m_Completion(error);
+				if (!retry)
+				{
+					m_Cancellation.reset();
+				}
+				return retry;
 			}
 		};
 
@@ -48,6 +61,9 @@ namespace Ayla
 
 			int m_Kqueue = -1;
 			std::mutex m_KqueueMutex;
+			std::mutex m_OperationsMutex;
+			std::unordered_map<uintptr_t, std::unique_ptr<OSXSocketOperation>> m_Operations;
+			std::atomic<uintptr_t> m_NextOperationId = 1;
 			std::stop_source m_StopSource;
 			std::thread m_DispatchThread;
 			int32 m_InitializationError = 0;
@@ -100,32 +116,105 @@ namespace Ayla
 				}
 			}
 
-			bool Submit(int socket, int16 filter, MoveOnlyFunction<bool(int32)> completion)
+			bool Submit(int socket, int16 filter, MoveOnlyFunction<bool(int32)> completion, std::stop_token cancellationToken)
 			{
 				if (m_InitializationError != 0)
 				{
 					errno = m_InitializationError;
 					return false;
 				}
+				if (cancellationToken.stop_requested())
+				{
+					errno = ECANCELED;
+					return false;
+				}
 
-				auto operation = std::make_unique<OSXSocketOperation>(socket, filter, std::move(completion));
-				if (!Register(operation.get()))
+				uintptr_t operationId = m_NextOperationId.fetch_add(1, std::memory_order_relaxed);
+				if (operationId == 0)
+				{
+					operationId = m_NextOperationId.fetch_add(1, std::memory_order_relaxed);
+				}
+
+				auto operation = std::make_unique<OSXSocketOperation>(operationId, *this, socket, filter, std::move(completion), cancellationToken);
+				if (!QueueOperation(operation))
 				{
 					return false;
 				}
 
-				operation.release();
+				if (cancellationToken.stop_requested())
+				{
+					Cancel(operationId);
+				}
+
 				return true;
 			}
 
+			void Cancel(uintptr_t operationId) noexcept
+			{
+				std::unique_ptr<OSXSocketOperation> operation = ExtractOperation(operationId);
+				if (!operation)
+				{
+					return;
+				}
+
+				DeleteEvent(*operation);
+				ThreadPool::QueueUserWorkItem([operation = std::move(operation)]() mutable
+				{
+					operation->Complete(ECANCELED);
+				});
+			}
+
 		private:
-			bool Register(OSXSocketOperation* operation) noexcept
+			bool QueueOperation(std::unique_ptr<OSXSocketOperation>& operation) noexcept
+			{
+				OSXSocketOperation* operationPtr = operation.get();
+				auto lock = std::unique_lock{ m_OperationsMutex };
+				m_Operations.emplace(operationPtr->GetId(), std::move(operation));
+
+				if (Register(*operationPtr))
+				{
+					return true;
+				}
+
+				auto iter = m_Operations.find(operationPtr->GetId());
+				if (iter != m_Operations.end())
+				{
+					operation = std::move(iter->second);
+					m_Operations.erase(iter);
+				}
+				return false;
+			}
+
+			std::unique_ptr<OSXSocketOperation> ExtractOperation(uintptr_t operationId) noexcept
+			{
+				auto lock = std::unique_lock{ m_OperationsMutex };
+				auto iter = m_Operations.find(operationId);
+				if (iter == m_Operations.end())
+				{
+					return nullptr;
+				}
+
+				std::unique_ptr<OSXSocketOperation> operation = std::move(iter->second);
+				m_Operations.erase(iter);
+				return operation;
+			}
+
+			bool Register(OSXSocketOperation& operation) noexcept
 			{
 				struct kevent event;
-				EV_SET(&event, operation->GetSocket(), operation->GetFilter(), EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, operation);
+				EV_SET(&event, operation.GetSocket(), operation.GetFilter(), EV_ADD | EV_ENABLE | EV_ONESHOT, 0, 0, reinterpret_cast<void*>(operation.GetId()));
 
 				auto lock = std::unique_lock{ m_KqueueMutex };
 				return kevent(m_Kqueue, &event, 1, nullptr, 0, nullptr) == 0;
+			}
+
+			void DeleteEvent(const OSXSocketOperation& operation) noexcept
+			{
+				struct kevent event;
+				EV_SET(&event, operation.GetSocket(), operation.GetFilter(), EV_DELETE, 0, 0, nullptr);
+
+				auto lock = std::unique_lock{ m_KqueueMutex };
+				kevent(m_Kqueue, &event, 1, nullptr, 0, nullptr);
 			}
 
 			void QueueWakeup() noexcept
@@ -165,28 +254,49 @@ namespace Ayla
 						continue;
 					}
 
-					auto* operation = reinterpret_cast<OSXSocketOperation*>(event.udata);
-					if (operation == nullptr)
+					uintptr_t operationId = reinterpret_cast<uintptr_t>(event.udata);
+					if (operationId == 0)
+					{
+						continue;
+					}
+
+					std::unique_ptr<OSXSocketOperation> operation = ExtractOperation(operationId);
+					if (!operation)
 					{
 						continue;
 					}
 
 					int32 error = (event.flags & EV_ERROR) != 0 ? static_cast<int32>(event.data) : 0;
-					ThreadPool::QueueUserWorkItem([this, operation, error]()
+					ThreadPool::QueueUserWorkItem([this, operation = std::move(operation), error]() mutable
 					{
 						if (operation->Complete(error))
 						{
-							if (Register(operation))
+							if (QueueOperation(operation))
 							{
 								return;
 							}
 							operation->Complete(errno);
 						}
-						delete operation;
 					});
 				}
 			}
 		};
+
+		OSXSocketOperation::OSXSocketOperation(uintptr_t id, OSXSocketAsyncQueue& queue, int socket, int16 filter, MoveOnlyFunction<bool(int32)> completion, std::stop_token cancellationToken)
+			: m_Id(id)
+			, m_Queue(&queue)
+			, m_Socket(socket)
+			, m_Filter(filter)
+			, m_Completion(std::move(completion))
+		{
+			if (cancellationToken.stop_possible())
+			{
+				m_Cancellation.emplace(cancellationToken, [this]()
+				{
+					m_Queue->Cancel(m_Id);
+				});
+			}
+		}
 
 		inline int SetNonBlocking(int socket)
 		{
@@ -252,7 +362,8 @@ namespace Ayla
 						RestoreBlockingMode(socket, previousFlags);
 						SetSocketResult(tcs, clientSocket);
 						return false;
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -324,7 +435,8 @@ namespace Ayla
 
 						SetSocketResult(tcs);
 						return false;
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -372,7 +484,8 @@ namespace Ayla
 						RestoreBlockingMode(socket, previousFlags);
 						SetSocketResult(tcs, static_cast<size_t>(result));
 						return false;
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -419,7 +532,8 @@ namespace Ayla
 						RestoreBlockingMode(socket, previousFlags);
 						SetSocketResult(tcs, static_cast<size_t>(result));
 						return false;
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -480,7 +594,8 @@ namespace Ayla
 						RestoreBlockingMode(socket, previousFlags);
 						SetSocketResult(tcs, static_cast<size_t>(result));
 						return false;
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -538,7 +653,8 @@ namespace Ayla
 							SockAddrToIPEndPoint(state->m_Address)
 						});
 						return false;
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{

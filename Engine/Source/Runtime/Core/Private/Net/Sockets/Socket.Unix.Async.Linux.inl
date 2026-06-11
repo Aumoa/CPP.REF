@@ -1,34 +1,47 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+#include "IntegralTypes.h"
 #include "MoveOnlyFunction.h"
 #include "Threading/ThreadPool.h"
 #include <liburing.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
+#include <atomic>
+#include <cerrno>
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <span>
 #include <stop_token>
 #include <thread>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace Ayla
 {
 	namespace
 	{
+		class LinuxSocketAsyncQueue;
+
 		class LinuxSocketOperation
 		{
+			using cancellation_callback_t = std::stop_callback<MoveOnlyFunction<void()>>;
+
+			uint64 m_Id = 0;
+			LinuxSocketAsyncQueue* m_Queue = nullptr;
 			MoveOnlyFunction<void(int32)> m_Completion;
+			std::optional<cancellation_callback_t> m_Cancellation;
 
 		public:
-			explicit LinuxSocketOperation(MoveOnlyFunction<void(int32)> completion)
-				: m_Completion(std::move(completion))
-			{
-			}
+			LinuxSocketOperation(uint64 id, LinuxSocketAsyncQueue& queue, MoveOnlyFunction<void(int32)> completion, std::stop_token cancellationToken);
+
+			uint64 GetId() const noexcept { return m_Id; }
 
 			void Complete(int32 result)
 			{
+				m_Cancellation.reset();
 				m_Completion(result);
 			}
 		};
@@ -39,6 +52,9 @@ namespace Ayla
 
 			io_uring m_Ring;
 			std::mutex m_RingMutex;
+			std::mutex m_OperationsMutex;
+			std::unordered_map<uint64, std::unique_ptr<LinuxSocketOperation>> m_Operations;
+			std::atomic<uint64> m_NextOperationId = 1;
 			std::stop_source m_StopSource;
 			std::thread m_DispatchThread;
 			int32 m_InitializationError = 0;
@@ -79,15 +95,26 @@ namespace Ayla
 			}
 
 			template<class TPrepare>
-			bool Submit(TPrepare&& prepare, MoveOnlyFunction<void(int32)> completion)
+			bool Submit(TPrepare&& prepare, MoveOnlyFunction<void(int32)> completion, std::stop_token cancellationToken)
 			{
 				if (m_InitializationError != 0)
 				{
 					errno = m_InitializationError;
 					return false;
 				}
+				if (cancellationToken.stop_requested())
+				{
+					errno = ECANCELED;
+					return false;
+				}
 
-				auto operation = std::make_unique<LinuxSocketOperation>(std::move(completion));
+				uint64 operationId = m_NextOperationId.fetch_add(1, std::memory_order_relaxed);
+				if (operationId == 0)
+				{
+					operationId = m_NextOperationId.fetch_add(1, std::memory_order_relaxed);
+				}
+
+				auto operation = std::make_unique<LinuxSocketOperation>(operationId, *this, std::move(completion), cancellationToken);
 
 				auto lock = std::unique_lock{ m_RingMutex };
 				io_uring_sqe* sqe = io_uring_get_sqe(&m_Ring);
@@ -97,17 +124,48 @@ namespace Ayla
 				}
 
 				prepare(sqe);
-				io_uring_sqe_set_data(sqe, operation.get());
+				io_uring_sqe_set_data(sqe, reinterpret_cast<void*>(operationId));
+
+				{
+					auto operationsLock = std::unique_lock{ m_OperationsMutex };
+					m_Operations.emplace(operationId, std::move(operation));
+				}
+
 				int submitResult = io_uring_submit(&m_Ring);
 				if (submitResult < 0)
 				{
-					errno = -submitResult;
-					operation.release();
+					int submitError = -submitResult;
+					lock.unlock();
+					errno = submitError;
+					auto operationsLock = std::unique_lock{ m_OperationsMutex };
+					m_Operations.erase(operationId);
 					return false;
 				}
 
-				operation.release();
+				lock.unlock();
+				if (cancellationToken.stop_requested())
+				{
+					Cancel(operationId);
+				}
+
 				return true;
+			}
+
+			void Cancel(uint64 operationId) noexcept
+			{
+				if (m_InitializationError != 0 || operationId == 0)
+				{
+					return;
+				}
+
+				auto lock = std::unique_lock{ m_RingMutex };
+				io_uring_sqe* sqe = io_uring_get_sqe(&m_Ring);
+				if (sqe != nullptr)
+				{
+					io_uring_prep_cancel(sqe, reinterpret_cast<void*>(operationId), 0);
+					io_uring_sqe_set_data(sqe, nullptr);
+					io_uring_submit(&m_Ring);
+				}
 			}
 
 		private:
@@ -143,11 +201,11 @@ namespace Ayla
 						continue;
 					}
 
-					auto* operation = reinterpret_cast<LinuxSocketOperation*>(cqe->user_data);
+					uint64 operationId = static_cast<uint64>(cqe->user_data);
 					int32 operationResult = static_cast<int32>(cqe->res);
 					io_uring_cqe_seen(&m_Ring, cqe);
 
-					if (operation == nullptr)
+					if (operationId == 0)
 					{
 						if (stopToken.stop_requested())
 						{
@@ -156,14 +214,43 @@ namespace Ayla
 						continue;
 					}
 
-					ThreadPool::QueueUserWorkItem([operation, operationResult]()
+					std::unique_ptr<LinuxSocketOperation> operation;
 					{
-						std::unique_ptr<LinuxSocketOperation> ownedOperation(operation);
-						ownedOperation->Complete(operationResult);
+						auto operationsLock = std::unique_lock{ m_OperationsMutex };
+						auto iter = m_Operations.find(operationId);
+						if (iter != m_Operations.end())
+						{
+							operation = std::move(iter->second);
+							m_Operations.erase(iter);
+						}
+					}
+
+					if (!operation)
+					{
+						continue;
+					}
+
+					ThreadPool::QueueUserWorkItem([operation = std::move(operation), operationResult]() mutable
+					{
+						operation->Complete(operationResult);
 					});
 				}
 			}
 		};
+
+		LinuxSocketOperation::LinuxSocketOperation(uint64 id, LinuxSocketAsyncQueue& queue, MoveOnlyFunction<void(int32)> completion, std::stop_token cancellationToken)
+			: m_Id(id)
+			, m_Queue(&queue)
+			, m_Completion(std::move(completion))
+		{
+			if (cancellationToken.stop_possible())
+			{
+				m_Cancellation.emplace(cancellationToken, [this]()
+				{
+					m_Queue->Cancel(m_Id);
+				});
+			}
+		}
 
 		class UnixSocketAsyncBackend
 		{
@@ -194,7 +281,8 @@ namespace Ayla
 						}
 
 						SetSocketResult(tcs, result);
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -231,7 +319,8 @@ namespace Ayla
 						}
 
 						SetSocketResult(tcs);
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -261,7 +350,8 @@ namespace Ayla
 						}
 
 						SetSocketResult(tcs, static_cast<size_t>(result));
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -289,7 +379,8 @@ namespace Ayla
 						}
 
 						SetSocketResult(tcs, static_cast<size_t>(result));
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -343,7 +434,8 @@ namespace Ayla
 						}
 
 						SetSocketResult(tcs, static_cast<size_t>(result));
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
@@ -397,7 +489,8 @@ namespace Ayla
 							static_cast<size_t>(result),
 							SockAddrToIPEndPoint(state->m_Address)
 						});
-					});
+					},
+					cancellationToken);
 
 				if (!submitted)
 				{
