@@ -62,7 +62,7 @@ namespace Ayla
 			int m_Kqueue = -1;
 			std::mutex m_KqueueMutex;
 			std::mutex m_OperationsMutex;
-			std::unordered_map<uintptr_t, std::unique_ptr<OSXSocketOperation>> m_Operations;
+			std::unordered_map<uintptr_t, std::shared_ptr<OSXSocketOperation>> m_Operations;
 			std::atomic<uintptr_t> m_NextOperationId = 1;
 			std::stop_source m_StopSource;
 			std::thread m_DispatchThread;
@@ -135,7 +135,7 @@ namespace Ayla
 					operationId = m_NextOperationId.fetch_add(1, std::memory_order_relaxed);
 				}
 
-				auto operation = std::make_unique<OSXSocketOperation>(operationId, *this, socket, filter, std::move(completion), cancellationToken);
+				auto operation = std::make_shared<OSXSocketOperation>(operationId, *this, socket, filter, std::move(completion), cancellationToken);
 				if (!QueueOperation(operation))
 				{
 					return false;
@@ -151,25 +151,25 @@ namespace Ayla
 
 			void Cancel(uintptr_t operationId) noexcept
 			{
-				std::unique_ptr<OSXSocketOperation> operation = ExtractOperation(operationId);
+				std::shared_ptr<OSXSocketOperation> operation = ExtractOperation(operationId);
 				if (!operation)
 				{
 					return;
 				}
 
 				DeleteEvent(*operation);
-				ThreadPool::QueueUserWorkItem([operation = std::move(operation)]() mutable
+				ThreadPool::QueueUserWorkItem([operation]()
 				{
 					operation->Complete(ECANCELED);
 				});
 			}
 
 		private:
-			bool QueueOperation(std::unique_ptr<OSXSocketOperation>& operation) noexcept
+			bool QueueOperation(const std::shared_ptr<OSXSocketOperation>& operation) noexcept
 			{
 				OSXSocketOperation* operationPtr = operation.get();
 				auto lock = std::unique_lock{ m_OperationsMutex };
-				m_Operations.emplace(operationPtr->GetId(), std::move(operation));
+				m_Operations.emplace(operationPtr->GetId(), operation);
 
 				if (Register(*operationPtr))
 				{
@@ -179,13 +179,12 @@ namespace Ayla
 				auto iter = m_Operations.find(operationPtr->GetId());
 				if (iter != m_Operations.end())
 				{
-					operation = std::move(iter->second);
 					m_Operations.erase(iter);
 				}
 				return false;
 			}
 
-			std::unique_ptr<OSXSocketOperation> ExtractOperation(uintptr_t operationId) noexcept
+			std::shared_ptr<OSXSocketOperation> ExtractOperation(uintptr_t operationId) noexcept
 			{
 				auto lock = std::unique_lock{ m_OperationsMutex };
 				auto iter = m_Operations.find(operationId);
@@ -194,7 +193,7 @@ namespace Ayla
 					return nullptr;
 				}
 
-				std::unique_ptr<OSXSocketOperation> operation = std::move(iter->second);
+				std::shared_ptr<OSXSocketOperation> operation = iter->second;
 				m_Operations.erase(iter);
 				return operation;
 			}
@@ -260,14 +259,14 @@ namespace Ayla
 						continue;
 					}
 
-					std::unique_ptr<OSXSocketOperation> operation = ExtractOperation(operationId);
+					std::shared_ptr<OSXSocketOperation> operation = ExtractOperation(operationId);
 					if (!operation)
 					{
 						continue;
 					}
 
 					int32 error = (event.flags & EV_ERROR) != 0 ? static_cast<int32>(event.data) : 0;
-					ThreadPool::QueueUserWorkItem([this, operation = std::move(operation), error]() mutable
+					ThreadPool::QueueUserWorkItem([this, operation, error]()
 					{
 						if (operation->Complete(error))
 						{

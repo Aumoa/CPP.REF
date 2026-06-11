@@ -53,7 +53,7 @@ namespace Ayla
 			io_uring m_Ring;
 			std::mutex m_RingMutex;
 			std::mutex m_OperationsMutex;
-			std::unordered_map<uint64, std::unique_ptr<LinuxSocketOperation>> m_Operations;
+			std::unordered_map<uint64, std::shared_ptr<LinuxSocketOperation>> m_Operations;
 			std::atomic<uint64> m_NextOperationId = 1;
 			std::stop_source m_StopSource;
 			std::thread m_DispatchThread;
@@ -114,7 +114,7 @@ namespace Ayla
 					operationId = m_NextOperationId.fetch_add(1, std::memory_order_relaxed);
 				}
 
-				auto operation = std::make_unique<LinuxSocketOperation>(operationId, *this, std::move(completion), cancellationToken);
+				auto operation = std::make_shared<LinuxSocketOperation>(operationId, *this, std::move(completion), cancellationToken);
 
 				auto lock = std::unique_lock{ m_RingMutex };
 				io_uring_sqe* sqe = io_uring_get_sqe(&m_Ring);
@@ -128,7 +128,7 @@ namespace Ayla
 
 				{
 					auto operationsLock = std::unique_lock{ m_OperationsMutex };
-					m_Operations.emplace(operationId, std::move(operation));
+					m_Operations.emplace(operationId, operation);
 				}
 
 				int submitResult = io_uring_submit(&m_Ring);
@@ -214,13 +214,13 @@ namespace Ayla
 						continue;
 					}
 
-					std::unique_ptr<LinuxSocketOperation> operation;
+					std::shared_ptr<LinuxSocketOperation> operation;
 					{
 						auto operationsLock = std::unique_lock{ m_OperationsMutex };
 						auto iter = m_Operations.find(operationId);
 						if (iter != m_Operations.end())
 						{
-							operation = std::move(iter->second);
+							operation = iter->second;
 							m_Operations.erase(iter);
 						}
 					}
@@ -230,7 +230,7 @@ namespace Ayla
 						continue;
 					}
 
-					ThreadPool::QueueUserWorkItem([operation = std::move(operation), operationResult]() mutable
+					ThreadPool::QueueUserWorkItem([operation, operationResult]()
 					{
 						operation->Complete(operationResult);
 					});
