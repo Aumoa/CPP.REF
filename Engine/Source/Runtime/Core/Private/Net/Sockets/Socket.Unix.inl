@@ -102,7 +102,7 @@ namespace Ayla
 		[[noreturn]]
 		static void Throw()
 		{
-			throw SocketException(static_cast<SocketError>(errno));
+			throw SocketException(UnixErrnoToSocketError(errno));
 		}
 
 		Task<std::shared_ptr<Socket>> AcceptAsync(std::stop_token cancellationToken)
