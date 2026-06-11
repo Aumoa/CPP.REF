@@ -5,6 +5,12 @@
 - The project aims to combine suitable strengths from Unity and Unreal Engine.
 - The project is primarily for learning and experimentation.
 
+## Design Principles
+
+- Prefer faithful object-oriented design by default, with clear responsibilities, encapsulation, and extension points.
+- Performance-critical code may deliberately bend object-oriented design when doing so improves performance without significantly harming readability, maintainability, or local reasoning.
+- Use Microsoft's recommended C# design guidelines and object-oriented patterns from major engines such as Unreal Engine as major references, adapting them to this project's goals rather than copying them mechanically.
+
 ## Code Style
 
 - Repository files and generated documentation should be written in English.
@@ -21,6 +27,16 @@
 ## Review Rules
 
 - Use the repository-local `ayla-pr-review` skill at `.codex/skills/ayla-pr-review/SKILL.md` for pull request reviews, branch diff reviews, CI failure reviews, and merge-readiness checks.
+
+## GitHub CLI And Shared-State Safety
+
+- Codex may use the `gh` command for read-only GitHub inspection when it is available. Use the repository-local `ayla-build` and `ayla-pr-review` skills for detailed Actions validation workflows.
+- Codex may perform local-only actions at its own discretion, including read-only checks, local commits, and local merges.
+- On shared working branches such as `dev`, `master`, `main`, release branches, or any branch that appears to be used directly by other people, Codex must request explicit user approval before any action that can affect other users, remote branches, hosted services, or shared state.
+- On clearly isolated task branches, especially branches whose names start with `codex/`, Codex may perform non-destructive shared-state actions at its own discretion when they support the requested work. This includes pushing that branch, updating a pull request for that branch, or triggering GitHub Actions through that branch.
+- Destructive or broad shared-state actions still require explicit user approval. This includes force-pushing, deleting remote branches or resources, publishing or deploying to shared environments, or changing shared working branches.
+- If Codex is unsure whether a branch is isolated, it must treat the branch as shared and request approval before shared-state actions.
+- Before merging a task branch into a protected shared branch, remove branch-local CI or GitHub Actions configuration changes that would affect the protected branch. Such temporary settings may exist on task branches, but they must be reverted or removed before approval and merge.
 
 ## Instruction Storage
 

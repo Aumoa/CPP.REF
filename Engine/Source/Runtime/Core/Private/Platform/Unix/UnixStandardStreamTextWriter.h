@@ -6,6 +6,7 @@
 
 #include "Platform/PlatformCommon.h"
 #include "IO/TextWriter.h"
+#include <cerrno>
 #include <unistd.h>
 
 namespace Ayla
@@ -24,7 +25,29 @@ namespace Ayla
 		virtual void Write(String value) override
 		{
 			auto ws = value.AsCodepage();
-			write(m_SD, ws.c_str(), ws.length());
+			const char* cursor = ws.c_str();
+			size_t remaining = ws.length();
+			while (remaining > 0)
+			{
+				ssize_t written = write(m_SD, cursor, remaining);
+				if (written < 0)
+				{
+					if (errno == EINTR)
+					{
+						continue;
+					}
+
+					break;
+				}
+
+				if (written == 0)
+				{
+					break;
+				}
+
+				cursor += written;
+				remaining -= (size_t)written;
+			}
 		}
 
 		int32 GetNativeHandle() const { return m_SD; }

@@ -6,7 +6,7 @@
 #include "Threading/SpinlockConditionVariable.h"
 #include "Platform/PlatformMacros.h"
 #include "Action.h"
-#include <functional>
+#include "MoveOnlyFunction.h"
 #include <chrono>
 #include <queue>
 #include <map>
@@ -18,11 +18,7 @@ namespace Ayla
 	{
 	public:
 		template<class TBody>
-#if __cpp_lib_move_only_function
-		using function_t = std::move_only_function<TBody>;
-#else
-		using function_t = std::function<TBody>;
-#endif
+		using function_t = MoveOnlyFunction<TBody>;
 
 	private:
 		static int32 MinWorkerThreads;

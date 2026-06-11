@@ -30,6 +30,8 @@ If `SampleGame/SampleGame.aproject` does not exist, build the engine target inst
 dotnet Engine/Binaries/DotNET/AylaBuildTool.dll build --target Engine
 ```
 
+When the current changes do not touch shader code, shader assets, ShaderCompileWorker, shader build rules, shader binary loading, or shader dependency handling, append `--skip-shaders` to native build checks so shaders are not compiled separately.
+
 Preserve user-requested configuration, editor, platform, or target options when they are provided.
 
 ## Generation Checks
@@ -47,3 +49,9 @@ When SampleGame is absent, inspect the current repository targets and choose the
 - Prefer focused checks that match the touched subsystem.
 - Report when a build or generation command cannot be run.
 - Keep generated C++ IDE projects out of normal native build verification unless the user asks for diagnostics from them.
+- When `gh` is available and a relevant GitHub Actions run exists, verify compile results for Windows, macOS, and Linux at the job level.
+- If `gh` or Actions access is unavailable, report that Actions validation was skipped and perform a stricter source and workflow review for Windows, macOS, and Linux support.
+- On shared working branches such as `dev`, `master`, `main`, or release branches, do not push only to create or test an Actions run unless the user explicitly approves that shared-state action first.
+- On clearly isolated task branches, especially branches whose names start with `codex/`, Codex may push that branch at its own discretion when doing so is useful for build or Actions validation.
+- Destructive or broad shared-state actions still require explicit user approval. If branch ownership is unclear, treat the branch as shared.
+- Branch-local workflow or CI trigger changes may be used for validation on isolated task branches, but remove or revert those temporary settings before merging into protected shared branches.

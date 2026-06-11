@@ -160,14 +160,14 @@ namespace Ayla
 			return dynamic_cast<U*>(m_Ptr) != nullptr;
 		}
 
-		template<class S>
-		constexpr auto Get(this S&& self) noexcept { return const_cast<T*>(self.m_Ptr); }
+		constexpr T* Get() noexcept { return m_Ptr; }
+		constexpr T* Get() const noexcept { return m_Ptr; }
 
 		constexpr operator bool() const noexcept { return m_Ptr; }
 		constexpr auto operator <=>(const SharedPtr& other) const noexcept { return m_Ptr <=> other.m_Ptr; }
 
-		template<class S>
-		constexpr auto operator ->(this S&& self) noexcept { return const_cast<T*>(self.m_Ptr); }
+		constexpr T* operator ->() noexcept { return Get(); }
+		constexpr T* operator ->() const noexcept { return Get(); }
 
 		inline SharedPtr& operator =(const SharedPtr& other) noexcept
 		{

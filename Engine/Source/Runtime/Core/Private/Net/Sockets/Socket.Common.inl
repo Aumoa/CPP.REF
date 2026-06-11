@@ -104,7 +104,7 @@ namespace Ayla
 		}
 		else
 		{
-			throw SocketException(static_cast<SocketError>(WSAEAFNOSUPPORT));
+			throw SocketException(SocketError::AddressFamilyNotSupported);
 		}
 	}
 }

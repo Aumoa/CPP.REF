@@ -93,13 +93,20 @@ namespace Ayla
 		ObjectReferenceWrapper BindGCHandle__Unsafe(ssize_t gcHandlePtr);
 		ObjectReferenceWrapper AsWrapper();
 		
-		template<class T>
-		auto AsShared(this T&& self)
+		template<std::derived_from<Object> T = Object>
+		auto AsShared()
 		{
-			using U = std::remove_const_t<std::remove_reference_t<T>>;
-			auto& hack = const_cast<U&>(self);
-			hack.AddRef();
-			return SharedPtr<U>(&hack);
+			auto* self = static_cast<T*>(this);
+			self->AddRef();
+			return SharedPtr<T>(self);
+		}
+
+		template<std::derived_from<Object> T = Object>
+		auto AsShared() const
+		{
+			auto* self = const_cast<T*>(static_cast<const T*>(this));
+			self->AddRef();
+			return SharedPtr<T>(self);
 		}
 
 		Object& operator =(const Object&) = delete;
@@ -112,7 +119,7 @@ namespace Ayla
 			std::optional<SharedPtr<T>> ptr;
 			ConfigureNew(typeid(T), CreationFlags::None, [&]()
 			{
-				ptr.emplace((new T(std::forward<TArgs>(args)...))->AsShared());
+				ptr.emplace((new T(std::forward<TArgs>(args)...))->template AsShared<T>());
 			});
 			return std::move(ptr).value();
 		}

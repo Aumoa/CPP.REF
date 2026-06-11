@@ -16,7 +16,7 @@ namespace Ayla
 
 	VertexFactory* D3D12Shader::GetVertexFactory() const
 	{
-		return m_CreationInfo.VertexFactory.get();
+		return m_CreationInfo.m_VertexFactory.get();
 	}
 
 	bool D3D12Shader::Has(ShaderType type) const
@@ -24,25 +24,25 @@ namespace Ayla
 		switch (type)
 		{
 		case ShaderType::Vertex:
-			return !m_CreationInfo.VertexShader.Bytecode.empty();
+			return !m_CreationInfo.m_VertexShader.Bytecode.empty();
 		case ShaderType::Pixel:
-			return !m_CreationInfo.FragmentShader.Bytecode.empty();
+			return !m_CreationInfo.m_FragmentShader.Bytecode.empty();
 		case ShaderType::Domain:
-			return !m_CreationInfo.DomainShader.Bytecode.empty();
+			return !m_CreationInfo.m_DomainShader.Bytecode.empty();
 		case ShaderType::Hull:
-			return !m_CreationInfo.HullShader.Bytecode.empty();
+			return !m_CreationInfo.m_HullShader.Bytecode.empty();
 		case ShaderType::Geometry:
-			return !m_CreationInfo.GeometryShader.Bytecode.empty();
+			return !m_CreationInfo.m_GeometryShader.Bytecode.empty();
 		case ShaderType::Compute:
-			return !m_CreationInfo.ComputeShader.Bytecode.empty();
+			return !m_CreationInfo.m_ComputeShader.Bytecode.empty();
 		case ShaderType::RayGeneration:
-			return !m_CreationInfo.RayGenerationShader.Bytecode.empty();
+			return !m_CreationInfo.m_RayGenerationShader.Bytecode.empty();
 		case ShaderType::ClosestHit:
-			return !m_CreationInfo.ClosestHitShader.Bytecode.empty();
+			return !m_CreationInfo.m_ClosestHitShader.Bytecode.empty();
 		case ShaderType::AnyHit:
-			return !m_CreationInfo.AnyHitShader.Bytecode.empty();
+			return !m_CreationInfo.m_AnyHitShader.Bytecode.empty();
 		case ShaderType::Miss:
-			return !m_CreationInfo.MissShader.Bytecode.empty();
+			return !m_CreationInfo.m_MissShader.Bytecode.empty();
 		default:
 			return false;
 		}
@@ -53,25 +53,25 @@ namespace Ayla
 		switch (type)
 		{
 		case ShaderType::Vertex:
-			return m_CreationInfo.VertexShader;
+			return m_CreationInfo.m_VertexShader;
 		case ShaderType::Pixel:
-			return m_CreationInfo.FragmentShader;
+			return m_CreationInfo.m_FragmentShader;
 		case ShaderType::Domain:
-			return m_CreationInfo.DomainShader;
+			return m_CreationInfo.m_DomainShader;
 		case ShaderType::Hull:
-			return m_CreationInfo.HullShader;
+			return m_CreationInfo.m_HullShader;
 		case ShaderType::Geometry:
-			return m_CreationInfo.GeometryShader;
+			return m_CreationInfo.m_GeometryShader;
 		case ShaderType::Compute:
-			return m_CreationInfo.ComputeShader;
+			return m_CreationInfo.m_ComputeShader;
 		case ShaderType::RayGeneration:
-			return m_CreationInfo.RayGenerationShader;
+			return m_CreationInfo.m_RayGenerationShader;
 		case ShaderType::ClosestHit:
-			return m_CreationInfo.ClosestHitShader;
+			return m_CreationInfo.m_ClosestHitShader;
 		case ShaderType::AnyHit:
-			return m_CreationInfo.AnyHitShader;
+			return m_CreationInfo.m_AnyHitShader;
 		case ShaderType::Miss:
-			return m_CreationInfo.MissShader;
+			return m_CreationInfo.m_MissShader;
 		default:
 			throw InvalidOperationException(TEXT("Invalid shader type."));
 		}
