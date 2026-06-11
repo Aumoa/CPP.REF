@@ -179,6 +179,11 @@ namespace Ayla
 
         void QueueWakeup() noexcept
         {
+            if (m_InitializationError != 0)
+            {
+                return;
+            }
+
             auto lock = std::unique_lock{ m_RingMutex };
             io_uring_sqe* sqe = io_uring_get_sqe(&m_Ring);
             if (sqe != nullptr)
