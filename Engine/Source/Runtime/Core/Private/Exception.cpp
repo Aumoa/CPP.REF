@@ -42,8 +42,9 @@ namespace Ayla
 			}
 
 #if __has_include(<stacktrace>)
-			auto ss = std::format("{}", m_Stacktrace);
-			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), String::FromCodepage(ss));
+			std::ostringstream ss;
+			ss << m_Stacktrace;
+			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n{} in "), String::FromCodepage(ss.str()));
 #else
 			Composed += String::Format(TEXT("--- End of inner exception stack trace ---\n"));
 #endif
@@ -52,8 +53,9 @@ namespace Ayla
 		else
 		{
 #if __has_include(<stacktrace>)
-			auto ss = std::format("{}", m_Stacktrace);
-			return String::Format(TEXT("{}: {}\n{}"), String::FromCodepage(typeid(*this).name()), m_Message, String::FromCodepage(ss));
+			std::ostringstream ss;
+			ss << m_Stacktrace;
+			return String::Format(TEXT("{}: {}\n{}"), String::FromCodepage(typeid(*this).name()), m_Message, String::FromCodepage(ss.str()));
 #else
 			return String::Format(TEXT("{}: {}"), String::FromCodepage(typeid(*this).name()), m_Message);
 #endif

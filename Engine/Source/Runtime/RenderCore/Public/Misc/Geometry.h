@@ -815,7 +815,7 @@ namespace Ayla
                 1, 3, 2,
             };
 
-            for ( size_t j = 0; j < _countof( faces ); j += 3 )
+            for ( size_t j = 0; j < AE_ARRAYSIZE( faces ); j += 3 )
             {
                 uint32_t v0 = faces[j];
                 uint32_t v1 = faces[j + 1];
@@ -880,7 +880,7 @@ namespace Ayla
                 5, 0, 3
             };
 
-            for (size_t j = 0; j < _countof(faces); j += 3)
+            for (size_t j = 0; j < AE_ARRAYSIZE(faces); j += 3)
             {
                 uint32_t v0 = faces[j];
                 uint32_t v1 = faces[j + 1];
@@ -995,7 +995,7 @@ namespace Ayla
             };
 
             size_t t = 0;
-            for ( size_t j = 0; j < _countof( faces ); j += 5, ++t )
+            for ( size_t j = 0; j < AE_ARRAYSIZE( faces ); j += 5, ++t )
             {
                 uint32_t v0 = faces[j];
                 uint32_t v1 = faces[j + 1];
@@ -1100,7 +1100,7 @@ namespace Ayla
                 11, 7, 5
             };
 
-            for (size_t j = 0; j < _countof(faces); j += 3)
+            for (size_t j = 0; j < AE_ARRAYSIZE(faces); j += 3)
             {
                 uint32_t v0 = faces[j];
                 uint32_t v1 = faces[j + 1];
@@ -1185,7 +1185,7 @@ namespace Ayla
             XMVECTOR scaleNegateZ = XMVectorMultiply(scaleVector, g_XMNegateZ);
             XMVECTOR scaleNegateXZ = XMVectorMultiply(scaleVector, XMVectorMultiply(g_XMNegateX, g_XMNegateZ));
 
-            for (size_t i = 0; i < _countof(TeapotPatches); i++)
+            for (size_t i = 0; i < AE_ARRAYSIZE(TeapotPatches); i++)
             {
                 TeapotPatch const& patch = TeapotPatches[i];
 

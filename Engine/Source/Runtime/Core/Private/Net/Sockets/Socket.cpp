@@ -75,7 +75,7 @@ namespace Ayla
 	{
 		EnsureSocket();
 		sockaddr_storage clientAddr;
-		int clientAddrLen = sizeof(clientAddr);
+		PlatformSocket::socket_len_type clientAddrLen = sizeof(clientAddr);
 		auto clientSocket = accept(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrLen);
 		if (clientSocket == INVALID_SOCKET)
 		{
@@ -117,7 +117,7 @@ namespace Ayla
 	{
 		EnsureSocket();
 		sockaddr_storage addr;
-		int addrLen = sizeof(addr);
+		PlatformSocket::socket_len_type addrLen = sizeof(addr);
 
 		int result = recvfrom(m_Socket->m_Socket, reinterpret_cast<char*>(buffer.data()),
 			static_cast<int>(buffer.size()), 0, reinterpret_cast<sockaddr*>(&addr), &addrLen);
@@ -193,7 +193,7 @@ namespace Ayla
 	{
 		EnsureSocket();
 		sockaddr_storage addr;
-		int addrLen = sizeof(addr);
+		PlatformSocket::socket_len_type addrLen = sizeof(addr);
 		int result = getsockname(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen);
 		PlatformSocket::ThrowIfFailure(result);
 		return SockAddrToIPEndPoint(addr);
@@ -203,7 +203,7 @@ namespace Ayla
 	{
 		EnsureSocket();
 		sockaddr_storage addr;
-		int addrLen = sizeof(addr);
+		PlatformSocket::socket_len_type addrLen = sizeof(addr);
 		int result = getpeername(m_Socket->m_Socket, reinterpret_cast<sockaddr*>(&addr), &addrLen);
 		PlatformSocket::ThrowIfFailure(result);
 		return SockAddrToIPEndPoint(addr);

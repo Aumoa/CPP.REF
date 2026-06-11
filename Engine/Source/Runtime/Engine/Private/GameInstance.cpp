@@ -68,7 +68,7 @@ namespace Ayla
 
 	SharedPtr<Engine> GameInstance::GetEngine()
 	{
-		return m_Engine->AsShared();
+		return m_Engine->AsShared<Engine>();
 	}
 
 	SharedPtr<Scene> GameInstance::GetEntryScene_Implementation()

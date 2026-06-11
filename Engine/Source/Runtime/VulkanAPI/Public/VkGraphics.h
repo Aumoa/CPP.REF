@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MoveOnlyFunction.h"
 #include "Graphics.h"
 #include "VkCommon.h"
 #include "VkGraphics.gen.h"
@@ -19,11 +20,7 @@ namespace Ayla
 
     public:
         template<class TBody>
-#if __cpp_lib_move_only_function
-        using function_t = std::move_only_function<TBody>;
-#else
-        using function_t = std::function<TBody>;
-#endif
+        using function_t = MoveOnlyFunction<TBody>;
 
     private:
         VkInstanceRef m_Instance;
