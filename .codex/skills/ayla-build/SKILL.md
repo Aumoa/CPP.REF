@@ -44,6 +44,16 @@ dotnet Engine/Binaries/DotNET/AylaBuildTool.dll generate --project SampleGame/Sa
 
 When SampleGame is absent, inspect the current repository targets and choose the engine project path that matches the requested workflow.
 
+## Unit Test Checks
+
+Use the AylaBuildTool `test` command for native unit test execution. It builds the selected test module first, then runs the produced executable:
+
+```powershell
+dotnet Engine/Binaries/DotNET/AylaBuildTool.dll test --target AylaUnitTests --config Shipping --skip-shaders
+```
+
+When the current changes do not touch shader-related code or assets, keep `--skip-shaders` on unit test checks.
+
 ## Verification Notes
 
 - Prefer focused checks that match the touched subsystem.
