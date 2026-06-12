@@ -56,3 +56,4 @@ When SampleGame is absent, inspect the current repository targets and choose the
 - On clearly isolated task branches, especially branches whose names start with `codex/`, Codex may push that branch at its own discretion when doing so is useful for build or Actions validation.
 - Destructive or broad shared-state actions still require explicit user approval. If branch ownership is unclear, treat the branch as shared.
 - Branch-local workflow or CI trigger changes may be used for validation on isolated task branches, but remove or revert those temporary settings before merging into protected shared branches.
+- Permanent CI policy changes, such as enabling pull request compile checks for protected branch targets, are allowed when intentionally requested and should be reviewed as normal workflow changes.

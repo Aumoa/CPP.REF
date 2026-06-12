@@ -31,6 +31,7 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 
 - Before approving or merging into protected shared branches such as `dev`, `master`, `main`, or release branches, check whether the PR includes CI, GitHub Actions, branch trigger, permission, environment, or workflow configuration changes that were only needed for task-branch validation.
 - Temporary branch-local CI settings are allowed on isolated task branches, but they must be removed before the task branch is approved for merge into a protected shared branch.
+- Do not block intentionally permanent CI policy changes, such as enabling pull request compile checks for protected branch targets, merely because they affect the protected branch after merge.
 - Require a revert commit or a separate cleanup commit when temporary CI settings would otherwise affect the protected branch after merge.
 - Treat unremoved temporary CI or Actions configuration as a merge blocker, even if the code changes themselves look correct.
 
