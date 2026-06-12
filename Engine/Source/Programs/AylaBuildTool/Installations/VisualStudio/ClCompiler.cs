@@ -69,35 +69,34 @@ internal class ClCompiler : CppCompiler
             );
         }
 
-        switch (m_TargetInfo.Config)
+        var profile = m_TargetInfo.Config.GetTargetProfile();
+        switch (profile.Optimization)
         {
-            case Configuration.Debug:
-            case Configuration.DebugGame:
+            case OptimizationMode.Debug:
                 m_CommandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi- " +
                     // Disable optimization.
                     "/Od " +
                     // Enable fast runtime checks.
-                    "/RTC1 " +
-                    // Multithreaded DLL
-                    "/MDd "
+                    "/RTC1 "
                 );
                 break;
-            case Configuration.Development:
-            case Configuration.Shipping:
+            case OptimizationMode.Release:
                 m_CommandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi " +
                     // Enables function-level linking.
                     "/Gy " +
                     // Creates fast code.
-                    "/O2 " +
-                    // Multithreaded DLL
-                    "/MD "
+                    "/O2 "
                 );
                 break;
         }
+
+        m_CommandBuilder.Append(profile.UsesDebugRuntime
+            ? "/MDd "
+            : "/MD ");
 
         List<string> includes = [];
         foreach (var includeDirectory in item.Resolver.IncludePaths

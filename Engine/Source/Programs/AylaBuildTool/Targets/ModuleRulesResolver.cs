@@ -64,7 +64,7 @@ internal class ModuleRulesResolver
             yield return "_UNICODE";
             yield return "UNICODE";
 
-            if (m_TargetInfo.Config != Configuration.Shipping)
+            if (m_TargetInfo.Config.GetTargetProfile().EnablesAssertions)
             {
                 yield return "DO_CHECK=1";
             }

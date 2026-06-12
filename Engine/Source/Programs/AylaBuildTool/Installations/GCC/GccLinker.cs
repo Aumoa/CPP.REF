@@ -15,7 +15,7 @@ internal class GccLinker : UnixLinker
             commands.Add("-shared");
         }
 
-        if (m_TargetInfo.Config is Configuration.Development or Configuration.Shipping)
+        if (m_TargetInfo.Config.GetTargetProfile().IsOptimized)
         {
             commands.Add("-ffunction-sections");
             commands.Add("-fdata-sections");

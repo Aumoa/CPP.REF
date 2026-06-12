@@ -304,7 +304,7 @@ internal static class VSCCppProjectGenerator
                         break;
                 }
 
-                if (targetInfo.Config != AylaEngine.Configuration.Shipping)
+                if (targetInfo.Config.GetTargetProfile().EnablesAssertions)
                 {
                     set = set.Append("DO_CHECK=1");
                 }

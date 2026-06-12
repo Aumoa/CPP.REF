@@ -281,7 +281,7 @@ internal static class VSCppProjectGenerator
                         AppendFormatLine("""<ConfigurationType>Makefile</ConfigurationType>""");
                         AppendFormatLine("""<PlatformToolset>{0}</PlatformToolset>""", PlatformToolset);
                         AppendFormatLine("""<CharacterSet>Unicode</CharacterSet>""");
-                        AppendFormatLine("""<UseDebugLibraries>{0}</UseDebugLibraries>""", LibraryDebugLevel(buildConfig).ToString().ToLower());
+                        AppendFormatLine("""<UseDebugLibraries>{0}</UseDebugLibraries>""", buildConfig.Config.GetTargetProfile().UsesDebugRuntime.ToString().ToLower());
                     });
                     AppendFormatLine("""</PropertyGroup>""");
                 }
@@ -388,20 +388,11 @@ internal static class VSCppProjectGenerator
                 return string.Join(';', includes);
             }
 
-            static bool LibraryDebugLevel(TargetInfo value) => value.Config switch
-            {
-                Configuration.Debug => true,
-                Configuration.DebugGame => true,
-                Configuration.Development => false,
-                Configuration.Shipping => false,
-                _ => throw new InvalidOperationException()
-            };
-
             static string GenerateProjectPreprocessorDefs(ModuleRulesResolver resolver, TargetInfo targetInfo)
             {
                 var additionalMacros = resolver.AdditionalMacros
                     .Concat(["UNICODE", "_UNICODE"]);
-                if (targetInfo.Config != Configuration.Shipping)
+                if (targetInfo.Config.GetTargetProfile().EnablesAssertions)
                 {
                     additionalMacros = additionalMacros.Append("DO_CHECK=1");
                 }

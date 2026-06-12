@@ -15,7 +15,7 @@ internal class ClangLinker : UnixLinker
             commands.Add("-dynamiclib");
         }
 
-        if (m_TargetInfo.Config is Configuration.Development or Configuration.Shipping)
+        if (m_TargetInfo.Config.GetTargetProfile().IsOptimized)
         {
             commands.Add("-Wl,-dead_strip");
         }

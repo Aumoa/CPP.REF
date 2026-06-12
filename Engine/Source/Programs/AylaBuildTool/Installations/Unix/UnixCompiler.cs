@@ -40,16 +40,20 @@ internal abstract class UnixCompiler : CppCompiler
             AddCompilerCommands(argument);
         }
 
-        switch (m_TargetInfo.Config)
+        var profile = m_TargetInfo.Config.GetTargetProfile();
+        switch (profile.Optimization)
         {
-            case Configuration.Debug:
-            case Configuration.DebugGame:
-                AddCompilerCommands("-Og", "-ggdb", "-fno-omit-frame-pointer", "-fno-inline", "-D_GLIBCXX_DEBUG");
+            case OptimizationMode.Debug:
+                AddCompilerCommands("-Og", "-ggdb", "-fno-omit-frame-pointer", "-fno-inline");
                 break;
-            case Configuration.Development:
-            case Configuration.Shipping:
+            case OptimizationMode.Release:
                 AddCompilerCommands("-O3");
                 break;
+        }
+
+        if (profile.UsesDebugAbi)
+        {
+            AddCompilerCommands("-D_GLIBCXX_DEBUG");
         }
 
         List<string> includes = [];
