@@ -2,7 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Console.h"
+#include "ScriptingTestBootstrap.h"
 #include "UnitTestRunner.h"
+#include "Tests/ManagedInteropTest.h"
 #include "Tests/NumericsTest.h"
 #include <csignal>
 #include <memory>
@@ -21,8 +23,10 @@ Task<int32> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 	PLATFORM_UNREFERENCED_PARAMETER(argc);
 	PLATFORM_UNREFERENCED_PARAMETER(argv);
 
+	ScriptingTestBootstrap scriptingBootstrap;
 	UnitTestRunner runner;
 	runner.AddFixture(TEXT("Numerics"), std::make_unique<NumericsTest>());
+	runner.AddFixture(TEXT("ManagedInterop"), std::make_unique<ManagedInteropTest>());
 
 	co_return co_await runner.RunAsync(cancellationToken);
 }
