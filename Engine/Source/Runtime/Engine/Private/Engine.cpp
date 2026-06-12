@@ -60,19 +60,19 @@ namespace Ayla
 		tasks.emplace_back(Task<>::Create([this, shaderDirectory, shaderBinaryFeature]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};
-			sci.VertexFactory = std::make_shared<PositionColorVertexFactory>();
+			sci.m_VertexFactory = std::make_shared<PositionColorVertexFactory>();
 			std::vector<Task<>> tasks;
 			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultVertex"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
-				sci.VertexShader.Bytecode = std::move(bytecode);
-				sci.VertexShader.EntrypointName = TEXT("main");
+				sci.m_VertexShader.Bytecode = std::move(bytecode);
+				sci.m_VertexShader.EntrypointName = TEXT("main");
 			}));
 			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultPixel"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
-				sci.FragmentShader.Bytecode = std::move(bytecode);
-				sci.FragmentShader.EntrypointName = TEXT("main");
+				sci.m_FragmentShader.Bytecode = std::move(bytecode);
+				sci.m_FragmentShader.EntrypointName = TEXT("main");
 			}));
 
 			co_await Task<>::WhenAll(tasks);
@@ -86,20 +86,20 @@ namespace Ayla
 			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultRayGeneration"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
-				sci.RayGenerationShader.Bytecode = std::move(bytecode);
-				sci.RayGenerationShader.EntrypointName = TEXT("DefaultRayGeneration");
+				sci.m_RayGenerationShader.Bytecode = std::move(bytecode);
+				sci.m_RayGenerationShader.EntrypointName = TEXT("DefaultRayGeneration");
 			}));
 			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultHit"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
-				sci.ClosestHitShader.Bytecode = std::move(bytecode);
-				sci.ClosestHitShader.EntrypointName = TEXT("DefaultClosestHit");
+				sci.m_ClosestHitShader.Bytecode = std::move(bytecode);
+				sci.m_ClosestHitShader.EntrypointName = TEXT("DefaultClosestHit");
 			}));
 			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultMiss"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
-				sci.MissShader.Bytecode = std::move(bytecode);
-				sci.MissShader.EntrypointName = TEXT("DefaultMiss");
+				sci.m_MissShader.Bytecode = std::move(bytecode);
+				sci.m_MissShader.EntrypointName = TEXT("DefaultMiss");
 			}));
 
 			co_await Task<>::WhenAll(tasks);

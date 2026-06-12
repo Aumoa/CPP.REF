@@ -51,9 +51,6 @@ namespace Ayla
         template<typename T>
         inline static T CubicTangent(T const& p1, T const& p2, T const& p3, T const& p4, float t)
         {
-            using DirectX::operator*;
-            using DirectX::operator+;
-
             return p1 * (-1 + 2 * t - t * t) +
                 p2 * (1 - 4 * t + 3 * t * t) +
                 p3 * (2 * t - 3 * t * t) +
@@ -82,7 +79,7 @@ namespace Ayla
         // Calls the specified outputVertex function for each generated vertex,
         // passing the position, normal, and texture coordinate as parameters.
         template<typename TOutputFunc>
-        static void CreatePatchVertices(_In_reads_(16) DirectX::XMVECTOR patch[16], size_t tessellation, bool isMirrored, TOutputFunc outputVertex)
+        static void CreatePatchVertices(DirectX::XMVECTOR patch[16], size_t tessellation, bool isMirrored, TOutputFunc outputVertex)
         {
             using namespace DirectX;
 

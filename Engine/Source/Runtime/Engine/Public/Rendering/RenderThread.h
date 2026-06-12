@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MoveOnlyFunction.h"
 #include "RenderThread.gen.h"
 
 namespace Ayla
@@ -16,11 +17,7 @@ namespace Ayla
 
 	public:
 		template<class TBody>
-#if __cpp_lib_move_only_function
-		using function_t = std::move_only_function<TBody>;
-#else
-		using function_t = std::function<TBody>;
-#endif
+		using function_t = MoveOnlyFunction<TBody>;
 
 	private:
 		static RenderThread* m_Current;

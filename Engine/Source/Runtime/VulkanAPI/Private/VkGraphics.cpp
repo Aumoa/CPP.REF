@@ -192,10 +192,12 @@ namespace Ayla
             "VK_KHR_get_physical_device_properties2"
         };
 
-        std::vector<const char*> extensions =
-            std::ranges::to<std::vector<const char*>>(
-                app.GetVulkanExtensionNames() | Linq::Concat(kExtensions)
-            );
+        auto extensionNames = app.GetVulkanExtensionNames() | Linq::Concat(kExtensions);
+        std::vector<const char*> extensions;
+        for (const char* extensionName : extensionNames)
+        {
+            extensions.emplace_back(extensionName);
+        }
         
         VkInstanceCreateInfo vkInstanceCreateInfo =
         {

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Platform/PlatformMacros.h"
 #include <type_traits>
 #include <optional>
 #include <functional>
@@ -217,4 +218,4 @@ namespace Ayla::LaunguageSupportMacros
 
 #define al_lock(Mtx) ::Ayla::LaunguageSupportMacros::lock_append(std::unique_lock(Mtx)) << [&](std::unique_lock<std::remove_reference_t<decltype(Mtx)>>& lock_)
 
-#define interface struct __declspec(novtable)
+#define interface struct PLATFORM_NOVTABLE
