@@ -35,6 +35,7 @@ namespace Ayla
 			int m_Socket = INVALID_SOCKET;
 			int16 m_Filter = 0;
 			MoveOnlyFunction<bool(int32)> m_Completion;
+			std::atomic_bool m_CancellationRequested = false;
 			std::optional<cancellation_callback_t> m_Cancellation;
 
 		public:
@@ -43,6 +44,12 @@ namespace Ayla
 			uintptr_t GetId() const noexcept { return m_Id; }
 			int GetSocket() const noexcept { return m_Socket; }
 			int16 GetFilter() const noexcept { return m_Filter; }
+			bool IsCancellationRequested() const noexcept { return m_CancellationRequested.load(std::memory_order_acquire); }
+
+			bool RequestCancellation() noexcept
+			{
+				return !m_CancellationRequested.exchange(true, std::memory_order_acq_rel);
+			}
 
 			bool Complete(int32 error)
 			{
@@ -157,6 +164,7 @@ namespace Ayla
 					return;
 				}
 
+				operation->RequestCancellation();
 				DeleteEvent(*operation);
 				ThreadPool::QueueUserWorkItem([operation]()
 				{
@@ -167,6 +175,12 @@ namespace Ayla
 		private:
 			bool QueueOperation(const std::shared_ptr<OSXSocketOperation>& operation) noexcept
 			{
+				if (operation->IsCancellationRequested())
+				{
+					errno = ECANCELED;
+					return false;
+				}
+
 				OSXSocketOperation* operationPtr = operation.get();
 				auto lock = std::unique_lock{ m_OperationsMutex };
 				m_Operations.emplace(operationPtr->GetId(), operation);
@@ -268,8 +282,20 @@ namespace Ayla
 					int32 error = (event.flags & EV_ERROR) != 0 ? static_cast<int32>(event.data) : 0;
 					ThreadPool::QueueUserWorkItem([this, operation, error]()
 					{
+						if (operation->IsCancellationRequested())
+						{
+							operation->Complete(ECANCELED);
+							return;
+						}
+
 						if (operation->Complete(error))
 						{
+							if (operation->IsCancellationRequested())
+							{
+								operation->Complete(ECANCELED);
+								return;
+							}
+
 							if (QueueOperation(operation))
 							{
 								return;
@@ -292,7 +318,10 @@ namespace Ayla
 			{
 				m_Cancellation.emplace(cancellationToken, [this]()
 				{
-					m_Queue->Cancel(m_Id);
+					if (RequestCancellation())
+					{
+						m_Queue->Cancel(m_Id);
+					}
 				});
 			}
 		}

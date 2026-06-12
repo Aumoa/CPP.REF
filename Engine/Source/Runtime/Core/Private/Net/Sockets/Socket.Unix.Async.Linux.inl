@@ -120,6 +120,7 @@ namespace Ayla
 				io_uring_sqe* sqe = io_uring_get_sqe(&m_Ring);
 				if (sqe == nullptr)
 				{
+					errno = EAGAIN;
 					return false;
 				}
 
