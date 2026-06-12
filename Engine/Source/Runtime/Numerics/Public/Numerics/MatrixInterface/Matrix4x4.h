@@ -113,28 +113,10 @@ namespace Ayla
 
 	public:
 		template<TIsMatrix<T, 4, 4> IMatrix>
-		static auto Determinant(const IMatrix& M)
-		{
-			return Determinant(Matrix4x4(M));
-		}
+		static auto Determinant(const IMatrix& M);
 
 		template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
-		static auto Decompose(const IMatrix& M, ITranslation& OutT, IScale& OutS, IQuaternion& OutQ)
-		{
-			Translate3D<T> translate;
-			Scale3D<T> scale;
-			Quaternion<T> rot;
-
-			auto R = Decompose(Matrix4x4(M), translate, scale, rot);
-			if (R)
-			{
-				OutT = translate;
-				OutS = scale;
-				OutQ = rot;
-			}
-
-			return R;
-		}
+		static auto Decompose(const IMatrix& M, ITranslation& OutT, IScale& OutS, IQuaternion& OutQ);
 
 		template<TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
 		auto Decompose(ITranslation& OutT, IScale& OutS, IQuaternion& OutQ) const
@@ -143,10 +125,7 @@ namespace Ayla
 		}
 
 		template<TIsMatrix<T, 4, 4> IMatrixL, TIsMatrix<T, 4, 4> IMatrixR>
-		static auto Multiply(const IMatrixL ML, const IMatrixR& MR)
-		{
-			return Multiply(Matrix4x4(ML), Matrix4x4(MR));
-		}
+		static auto Multiply(const IMatrixL& ML, const IMatrixR& MR);
 
 
 		template<TIsVector<T, 3> ILocation, TIsVector<T, 3> IDir, TIsVector<T, 3> IUp>
@@ -156,22 +135,13 @@ namespace Ayla
 		static auto AffineTransformation(const ITranslation& translate, const IScale& scale, const IQuaternion& rot);
 
 		template<TIsVector<T, 3> ITranslation>
-		static auto Translation(const ITranslation& translate)
-		{
-			return Translation(Vector3(translate));
-		}
+		static auto Translation(const ITranslation& translate);
 
 		template<TIsVector<T, 3> IScale>
-		static auto Scale(const IScale& S)
-		{
-			return Scale(Scale3D(S));
-		}
+		static auto Scale(const IScale& S);
 
 		template<TIsVector<T, 3> IAxis>
-		static auto Rotation(const IAxis& Axis, const Radians<T>& Angle)
-		{
-			return Rotation(Vector3(Axis), Angle);
-		}
+		static auto Rotation(const IAxis& Axis, const Radians<T>& Angle);
 
 		inline String ToString() const
 		{
@@ -186,10 +156,7 @@ namespace Ayla
 
 	public:
 		template<TIsMatrix<T, 4, 4> IMatrix>
-		static Matrix4x4 Inverse(const IMatrix& M)
-		{
-			return Inverse(Matrix4x4(M));
-		}
+		static Matrix4x4 Inverse(const IMatrix& M);
 
 		Matrix4x4 Inverse() const;
 
@@ -226,16 +193,10 @@ namespace Ayla
 		}
 
 		template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> IVector>
-		static IVector TransformVector(const IMatrix& M, const IVector& V)
-		{
-			return TransformVector(Matrix4x4<T>(M), Vector3<T>(V));
-		}
+		static IVector TransformVector(const IMatrix& M, const IVector& V);
 
 		template<TIsVector<T, 3> IVector>
-		IVector TransformVector(const IVector& V) const
-		{
-			return TransformVector(*this, Vector3<T>(V));
-		}
+		IVector TransformVector(const IVector& V) const;
 	};
 
 	template<>
@@ -248,6 +209,14 @@ namespace Ayla
 
 #define FLOAT3(x) DirectX::XMLoadFloat3(reinterpret_cast<const DirectX::XMFLOAT3*>(&x))
 #define FLOAT4(x) reinterpret_cast<const DirectX::XMVECTOR&>(x)
+
+		template<class T>
+		static Matrix4x4<T> StoreXMMATRIX(const DirectX::XMMATRIX& XM)
+		{
+			Matrix4x4<T> result;
+			DirectX::XMStoreFloat4x4(reinterpret_cast<DirectX::XMFLOAT4X4*>(&result), XM);
+			return result;
+		}
 
 		template<class T>
 		static constexpr T Determinant(const Matrix4x4<T>& M)
@@ -504,7 +473,7 @@ namespace Ayla
 			if constexpr (std::same_as<T, float>)
 			{
 				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixTranslation(translate.X, translate.Y, translate.Z));
+				return StoreXMMATRIX<T>(XMMatrixTranslation(translate.X, translate.Y, translate.Z));
 			}
 			else
 			{
@@ -526,7 +495,7 @@ namespace Ayla
 			if constexpr (std::same_as<T, float>)
 			{
 				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixScaling(scale.X, scale.Y, scale.Z));
+				return StoreXMMATRIX<T>(XMMatrixScaling(scale.X, scale.Y, scale.Z));
 			}
 			else
 			{
@@ -548,7 +517,7 @@ namespace Ayla
 			if constexpr (std::same_as<T, float>)
 			{
 				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationAxis(FLOAT3(Axis), Angle.Value));
+				return StoreXMMATRIX<T>(XMMatrixRotationAxis(FLOAT3(Axis), Angle.Value));
 			}
 			else
 			{
@@ -590,7 +559,7 @@ namespace Ayla
 			if constexpr (std::same_as<T, float>)
 			{
 				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationX(Angle.Value));
+				return StoreXMMATRIX<T>(XMMatrixRotationX(Angle.Value));
 			}
 			else
 			{
@@ -613,7 +582,7 @@ namespace Ayla
 			if constexpr (std::same_as<T, float>)
 			{
 				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationY(Angle.Value));
+				return StoreXMMATRIX<T>(XMMatrixRotationY(Angle.Value));
 			}
 			else
 			{
@@ -636,7 +605,7 @@ namespace Ayla
 			if constexpr (std::same_as<T, float>)
 			{
 				using namespace DirectX;
-				return reinterpret_cast<Matrix4x4<T>&>(XMMatrixRotationZ(Angle.Value));
+				return StoreXMMATRIX<T>(XMMatrixRotationZ(Angle.Value));
 			}
 			else
 			{
@@ -665,9 +634,70 @@ namespace Ayla
 	using Matrix4x4F = Matrix4x4<float>;
 
 	template<class T>
+	template<TIsMatrix<T, 4, 4> IMatrix>
+	auto Matrix4x4<T>::Determinant(const IMatrix& M)
+	{
+		return Matrix4x4<>::Determinant(Matrix4x4<T>(M));
+	}
+
+	template<class T>
+	template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> ITranslation, TIsVector<T, 3> IScale, TIsVector<T, 4> IQuaternion>
+	auto Matrix4x4<T>::Decompose(const IMatrix& M, ITranslation& OutT, IScale& OutS, IQuaternion& OutQ)
+	{
+		Translate3D<T> translate;
+		Scale3D<T> scale;
+		Quaternion<T> rot;
+
+		auto R = Matrix4x4<>::Decompose(Matrix4x4<T>(M), translate, scale, rot);
+		if (R)
+		{
+			OutT = translate;
+			OutS = scale;
+			OutQ = rot;
+		}
+
+		return R;
+	}
+
+	template<class T>
+	template<TIsMatrix<T, 4, 4> IMatrixL, TIsMatrix<T, 4, 4> IMatrixR>
+	auto Matrix4x4<T>::Multiply(const IMatrixL& ML, const IMatrixR& MR)
+	{
+		return Matrix4x4<>::Multiply(Matrix4x4<T>(ML), Matrix4x4<T>(MR));
+	}
+
+	template<class T>
+	template<TIsVector<T, 3> ITranslation>
+	auto Matrix4x4<T>::Translation(const ITranslation& translate)
+	{
+		return Matrix4x4<>::Translation(Vector3<T>(translate));
+	}
+
+	template<class T>
+	template<TIsVector<T, 3> IScale>
+	auto Matrix4x4<T>::Scale(const IScale& S)
+	{
+		return Matrix4x4<>::Scale(Scale3D<T>(S));
+	}
+
+	template<class T>
+	template<TIsVector<T, 3> IAxis>
+	auto Matrix4x4<T>::Rotation(const IAxis& Axis, const Radians<T>& Angle)
+	{
+		return Matrix4x4<>::Rotation(Vector3<T>(Axis), Angle);
+	}
+
+	template<class T>
+	template<TIsMatrix<T, 4, 4> IMatrix>
+	Matrix4x4<T> Matrix4x4<T>::Inverse(const IMatrix& M)
+	{
+		return Matrix4x4<>::Inverse(Matrix4x4<T>(M));
+	}
+
+	template<class T>
 	inline Matrix4x4<T> Matrix4x4<T>::Inverse() const
 	{
-		return Inverse(*this);
+		return Matrix4x4<>::Inverse(*this);
 	}
 
 	template<class T>
@@ -678,10 +708,24 @@ namespace Ayla
 	}
 
 	template<class T>
+	template<TIsMatrix<T, 4, 4> IMatrix, TIsVector<T, 3> IVector>
+	IVector Matrix4x4<T>::TransformVector(const IMatrix& M, const IVector& V)
+	{
+		return Matrix4x4<>::TransformVector(Matrix4x4<T>(M), Vector3<T>(V));
+	}
+
+	template<class T>
+	template<TIsVector<T, 3> IVector>
+	IVector Matrix4x4<T>::TransformVector(const IVector& V) const
+	{
+		return Matrix4x4<>::TransformVector(*this, Vector3<T>(V));
+	}
+
+	template<class T>
 	template<TIsVector<T, 3> ILocation, TIsVector<T, 3> IDir, TIsVector<T, 3> IUp>
 	Matrix4x4<T> Matrix4x4<T>::LookToLH(const ILocation& Location, const IDir& Dir, const IUp& Up)
 	{
-		return LookToLH(Vector3<T>(Location), Vector3<T>(Dir), Vector3<T>(Up));
+		return Matrix4x4<>::LookToLH(Vector3<T>(Location), Vector3<T>(Dir), Vector3<T>(Up));
 	}
 
 	template<class T>
