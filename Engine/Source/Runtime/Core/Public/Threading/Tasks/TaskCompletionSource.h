@@ -43,6 +43,19 @@ namespace Ayla
 			SetResultImpl(std::forward<U>(result));
 		}
 
+		bool TrySetResult() const
+		{
+			Xassert(IsValid(), TEXT("m_Task is null."));
+			return m_Task->TrySetResult();
+		}
+
+		template<class U>
+		bool TrySetResult(U&& result) const
+		{
+			Xassert(IsValid(), TEXT("m_Task is null."));
+			return m_Task->TrySetResult(std::forward<U>(result));
+		}
+
 		template<class TException>
 		bool TrySetException(const TException& exceptionObject) const
 		{
