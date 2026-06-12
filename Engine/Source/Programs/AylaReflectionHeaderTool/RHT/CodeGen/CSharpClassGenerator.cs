@@ -350,7 +350,7 @@ internal class CSharpClassGenerator
                     m_SourceCode += m_Parent.IndentedLine("__return_value = default;");
                 }
 
-                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedExceptionInterop.Capture(exception);");
+                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedCallBoundary.Capture(exception);");
             });
             m_SourceCode += m_Parent.IndentedLine("}");
         });

@@ -49,12 +49,12 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         {
             if (returnType_ == TypeName.Void)
             {
-                return formatLine($"global::Ayla.NativeException.ThrowIfFailed({bodyStmt});");
+                return formatLine($"global::Ayla.NativeCallBoundary.ThrowIfFailed({bodyStmt});");
             }
 
             string source = string.Empty;
             source += formatLine($"{returnType_.CSharpBindingName} __return_value;");
-            source += formatLine($"global::Ayla.NativeException.ThrowIfFailed({bodyStmt});");
+            source += formatLine($"global::Ayla.NativeCallBoundary.ThrowIfFailed({bodyStmt});");
             source += formatLine($"return {FormatCSharpReturnValue(returnType_, "__return_value")};");
             return source;
         }, true);
@@ -169,7 +169,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
                 source += formatLine($"__return_value = {bodyStmt};");
             }
 
-            source += formatLine("return global::Ayla.NativeCallStatus.Success;");
+            source += formatLine("return global::Ayla.ManagedCallBoundary.Succeed();");
             return source;
         });
     }
@@ -234,7 +234,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         });
     }
 
-    public void GenerateCppNativeToCSharpStatus(Action<string> formatLine, Action<Action> indented)
+    public void GenerateCppNativeToCSharpStatus(Action<string> formatLine)
     {
         List<string> scoped = [];
         List<string> arguments = [];
@@ -286,13 +286,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         GenerateCppBodyDefault(formatLine, scoped, arguments, bodyStmt =>
         {
             formatLine($"auto __status = {bodyStmt};");
-            formatLine("if (__status != ::Ayla::NativeCallStatus::Success)");
-            formatLine("{");
-            indented(() =>
-            {
-                formatLine("::Ayla::ManagedExceptionInterop::ThrowLastException();");
-            });
-            formatLine("}");
+            formatLine("::Ayla::ManagedCallBoundary::ThrowIfFailed(__status);");
 
             if (returnType_ == TypeName.Void)
             {

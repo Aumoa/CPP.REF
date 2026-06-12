@@ -75,6 +75,8 @@
 #include "Marshal/ManagedTaskWrapper.h"
 #include "Marshal/NativeExceptionInterop.h"
 #include "Marshal/ManagedExceptionInterop.h"
+#include "Marshal/NativeCallBoundary.h"
+#include "Marshal/ManagedCallBoundary.h"
 
 #include "Diagnostics/Debug.h"
 #include "Diagnostics/LogMacros.h"

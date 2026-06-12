@@ -128,7 +128,7 @@ internal class CppClassGenerator
 
                 string callable = "callable";
                 var codeGen = new FunctionBodyGenerator(parameters.AddFirstTemp(SharedPtrTypeName.SharedObject, "self"), callable, returnType);
-                codeGen.GenerateCppNativeToCSharpStatus(m_Parent.WriteIndentedLine, m_Parent.Indented);
+                codeGen.GenerateCppNativeToCSharpStatus(m_Parent.WriteIndentedLine);
             });
             m_Parent.WriteIndentedLine("}");
 
@@ -226,20 +226,13 @@ internal class CppClassGenerator
 
     private void GenerateNativeCallStatusBody(FunctionBodyGenerator codeGen)
     {
-        m_Parent.WriteIndentedLine("try");
+        m_Parent.WriteIndentedLine("return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus");
         m_Parent.WriteIndentedLine("{");
         m_Parent.Indented(() =>
         {
             codeGen.GenerateCppCSharpToNativeStatus(m_Parent.WriteIndentedLine);
         });
-        m_Parent.WriteIndentedLine("}");
-        m_Parent.WriteIndentedLine("catch (...)");
-        m_Parent.WriteIndentedLine("{");
-        m_Parent.Indented(() =>
-        {
-            m_Parent.WriteIndentedLine("return ::Ayla::NativeExceptionInterop::CaptureCurrentException();");
-        });
-        m_Parent.WriteIndentedLine("}");
+        m_Parent.WriteIndentedLine("});");
     }
 
     private static string AppendCppOutParameter(string parametersDeclare, TypeName returnType)
