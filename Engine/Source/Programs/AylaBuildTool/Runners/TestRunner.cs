@@ -49,7 +49,7 @@ internal static class TestRunner
 
         Console.WriteLine("Running test target '{0}'...", targetName);
         var output = await Terminal.ExecuteCommandAsync(
-            string.Join(' ', options.Arguments.Select(EscapeArgument)),
+            options.Arguments,
             new Terminal.Options
             {
                 Executable = executableFileName,
@@ -64,20 +64,5 @@ internal static class TestRunner
         }
 
         Console.WriteLine("Test target '{0}' passed.", targetName);
-    }
-
-    private static string EscapeArgument(string value)
-    {
-        if (value.Length == 0)
-        {
-            return "\"\"";
-        }
-
-        if (value.Any(char.IsWhiteSpace) == false && value.Contains('"') == false)
-        {
-            return value;
-        }
-
-        return "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
     }
 }

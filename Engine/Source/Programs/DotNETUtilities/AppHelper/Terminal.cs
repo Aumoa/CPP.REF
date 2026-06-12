@@ -126,8 +126,28 @@ public static class Terminal
 
     public static async ValueTask<Output> ExecuteCommandAsync(string command, Options options, CancellationToken cancellationToken = default)
     {
+        return await ExecuteProcessAsync(
+            command,
+            options,
+            () => StartProcess(options.Executable, command, options.WorkingDirectory, options.Environments),
+            cancellationToken);
+    }
+
+    public static async ValueTask<Output> ExecuteCommandAsync(IEnumerable<string> arguments, Options options, CancellationToken cancellationToken = default)
+    {
+        var argumentArray = arguments.ToArray();
+        var command = string.Join(' ', argumentArray.Select(FormatArgumentForDisplay));
+        return await ExecuteProcessAsync(
+            command,
+            options,
+            () => StartProcess(options.Executable, argumentArray, options.WorkingDirectory, options.Environments),
+            cancellationToken);
+    }
+
+    private static async ValueTask<Output> ExecuteProcessAsync(string command, Options options, Func<Process> startProcess, CancellationToken cancellationToken)
+    {
         var sw = Stopwatch.StartNew();
-        var process = StartProcess(options.Executable, command, options.WorkingDirectory, options.Environments);
+        var process = startProcess();
 
         List<Log> logs = [];
         List<Log> stdout = [];
@@ -198,16 +218,24 @@ public static class Terminal
         };
     }
 
+    private static string FormatArgumentForDisplay(string value)
+    {
+        if (value.Length == 0)
+        {
+            return "\"\"";
+        }
+
+        if (value.Any(char.IsWhiteSpace) == false && value.Contains('"') == false)
+        {
+            return value;
+        }
+
+        return "\"" + value.Replace("\"", "\\\"") + "\"";
+    }
+
     private static Process StartProcess(string? executable, string command, string workingDirectory, IEnumerable<KeyValuePair<string, string>> environments)
     {
-        var processInfo = new ProcessStartInfo
-        {
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            RedirectStandardInput = false,
-            UseShellExecute = false,
-            WorkingDirectory = workingDirectory
-        };
+        var processInfo = CreateProcessStartInfo(workingDirectory, environments);
 
         if (executable == null)
         {
@@ -220,11 +248,49 @@ public static class Terminal
             processInfo.Arguments = command;
         }
 
+        return StartProcess(processInfo);
+    }
+
+    private static Process StartProcess(string? executable, IEnumerable<string> arguments, string workingDirectory, IEnumerable<KeyValuePair<string, string>> environments)
+    {
+        if (executable == null)
+        {
+            Console.WriteLine("Internal error: Cannot start argument-list process without an executable.");
+            throw TerminateException.Internal();
+        }
+
+        var processInfo = CreateProcessStartInfo(workingDirectory, environments);
+        processInfo.FileName = executable;
+
+        foreach (var argument in arguments)
+        {
+            processInfo.ArgumentList.Add(argument);
+        }
+
+        return StartProcess(processInfo);
+    }
+
+    private static ProcessStartInfo CreateProcessStartInfo(string workingDirectory, IEnumerable<KeyValuePair<string, string>> environments)
+    {
+        var processInfo = new ProcessStartInfo
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            RedirectStandardInput = false,
+            UseShellExecute = false,
+            WorkingDirectory = workingDirectory
+        };
+
         foreach (var env in environments)
         {
             processInfo.Environment[env.Key] = env.Value;
         }
 
+        return processInfo;
+    }
+
+    private static Process StartProcess(ProcessStartInfo processInfo)
+    {
         var process = Process.Start(processInfo);
         if (process == null)
         {
