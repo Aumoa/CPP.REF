@@ -27,6 +27,7 @@
 ## Review Rules
 
 - Use the repository-local `ayla-pr-review` skill at `.codex/skills/ayla-pr-review/SKILL.md` for pull request reviews, branch diff reviews, CI failure reviews, and merge-readiness checks.
+- Before approving a pull request, understand the intent of the changed code. If the intent cannot be inferred from the source, tests, pull request description, or surrounding context, ask the pull request author to explain it and do not approve until that uncertainty is resolved.
 
 ## GitHub CLI And Shared-State Safety
 

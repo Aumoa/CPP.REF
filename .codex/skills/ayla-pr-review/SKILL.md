@@ -14,6 +14,9 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - Lead with actionable findings ordered by severity.
 - Ground findings in concrete source locations, logs, commands, or diffs.
 - Separate blockers from residual risks and optional follow-up ideas.
+- Understand the author's intended behavior and design before approving a pull request.
+- If the intent of changed code cannot be inferred from names, structure, comments, tests, pull request description, or surrounding implementation, ask the pull request author to explain it.
+- Treat unresolved intent uncertainty as a merge-readiness blocker. Do not approve until the author explains the intent or the code is clarified enough to review its behavior.
 - When reviewing CI or build changes, connect workflow edits back to the actual AylaBuildTool, module rules, generated files, and platform-specific code paths they exercise.
 
 ## GitHub Actions
