@@ -23,6 +23,7 @@ namespace Ayla
 		ManagedStringWrapper m_SourceFile;
 		ManagedStringWrapper m_SourceFunction;
 		int32 m_SourceLine;
+		uint64 m_ExceptionToken;
 	};
 
 	class CORE_API NativeExceptionInterop
@@ -30,6 +31,8 @@ namespace Ayla
 	public:
 		static NativeCallStatus CaptureCurrentException() noexcept;
 		static NativeCallStatus CaptureException(std::exception_ptr exception) noexcept;
+		static std::exception_ptr GetCapturedException(uint64 exceptionToken) noexcept;
+		static void ReleaseCapturedException(uint64 exceptionToken) noexcept;
 		static NativeExceptionInfo GetLastException() noexcept;
 		static void ClearLastException() noexcept;
 	};
@@ -38,5 +41,6 @@ namespace Ayla
 extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::NativeExceptionInfo Ayla__NativeExceptionInterop__GetLastException__Injected();
+	PLATFORM_SHARED_EXPORT void Ayla__NativeExceptionInterop__ReleaseCapturedException__Injected(::Ayla::uint64 exceptionToken) noexcept;
 	PLATFORM_SHARED_EXPORT void Ayla__NativeExceptionInterop__ClearLastException__Injected();
 }

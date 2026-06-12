@@ -14,7 +14,8 @@ namespace Ayla
 		static NativeCallStatus CaptureException(
 			ManagedStringWrapper typeName,
 			ManagedStringWrapper message,
-			ManagedStringWrapper details) noexcept;
+			ManagedStringWrapper details,
+			uint64 nativeExceptionToken) noexcept;
 
 		static void ThrowLastException();
 		static void ClearLastException() noexcept;
@@ -26,5 +27,6 @@ extern "C"
 	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__ManagedExceptionInterop__CaptureException__Injected(
 		::Ayla::ManagedStringWrapper typeName,
 		::Ayla::ManagedStringWrapper message,
-		::Ayla::ManagedStringWrapper details) noexcept;
+		::Ayla::ManagedStringWrapper details,
+		::Ayla::uint64 nativeExceptionToken) noexcept;
 }

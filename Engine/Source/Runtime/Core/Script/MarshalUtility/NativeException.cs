@@ -9,6 +9,7 @@ public sealed class NativeException : Exception
     public string NativeSourceFile { get; }
     public string NativeSourceFunction { get; }
     public int NativeSourceLine { get; }
+    internal ulong NativeExceptionToken { get; }
 
     private NativeException(
         string nativeTypeName,
@@ -16,7 +17,8 @@ public sealed class NativeException : Exception
         string nativeDetails,
         string nativeSourceFile,
         string nativeSourceFunction,
-        int nativeSourceLine)
+        int nativeSourceLine,
+        ulong nativeExceptionToken)
         : base(message)
     {
         NativeTypeName = nativeTypeName;
@@ -24,6 +26,23 @@ public sealed class NativeException : Exception
         NativeSourceFile = nativeSourceFile;
         NativeSourceFunction = nativeSourceFunction;
         NativeSourceLine = nativeSourceLine;
+        NativeExceptionToken = nativeExceptionToken;
+    }
+
+    ~NativeException()
+    {
+        if (NativeExceptionToken == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            ReleaseCapturedException__Injected(NativeExceptionToken);
+        }
+        catch
+        {
+        }
     }
 
     public static void ThrowIfFailed(NativeCallStatus status)
@@ -35,7 +54,19 @@ public sealed class NativeException : Exception
 
         NativeExceptionInfo info = GetLastException__Injected();
         ClearLastException__Injected();
-        throw FromInfo(info);
+
+        NativeException exception;
+        try
+        {
+            exception = FromInfo(info);
+        }
+        catch
+        {
+            ReleaseCapturedException__Injected(info.m_ExceptionToken);
+            throw;
+        }
+
+        throw exception;
     }
 
     private static NativeException FromInfo(NativeExceptionInfo info)
@@ -52,7 +83,8 @@ public sealed class NativeException : Exception
             nativeDetails,
             nativeSourceFile,
             nativeSourceFunction,
-            info.m_SourceLine);
+            info.m_SourceLine,
+            info.m_ExceptionToken);
     }
 
     public override string ToString()
@@ -62,6 +94,9 @@ public sealed class NativeException : Exception
 
     [DllImport("Core", EntryPoint = "Ayla__NativeExceptionInterop__GetLastException__Injected")]
     private static extern NativeExceptionInfo GetLastException__Injected();
+
+    [DllImport("Core", EntryPoint = "Ayla__NativeExceptionInterop__ReleaseCapturedException__Injected")]
+    private static extern void ReleaseCapturedException__Injected(ulong exceptionToken);
 
     [DllImport("Core", EntryPoint = "Ayla__NativeExceptionInterop__ClearLastException__Injected")]
     private static extern void ClearLastException__Injected();

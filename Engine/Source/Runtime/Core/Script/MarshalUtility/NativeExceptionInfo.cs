@@ -11,4 +11,5 @@ public readonly struct NativeExceptionInfo
     public readonly ManagedStringWrapper m_SourceFile;
     public readonly ManagedStringWrapper m_SourceFunction;
     public readonly int m_SourceLine;
+    public readonly ulong m_ExceptionToken;
 }

@@ -9,6 +9,7 @@ public static class ManagedExceptionInterop
         string typeName = exception.GetType().FullName ?? exception.GetType().Name;
         string message = exception.Message;
         string details = exception.ToString();
+        ulong nativeExceptionToken = exception is NativeException nativeException ? nativeException.NativeExceptionToken : 0;
 
         fixed (char* typeNamePtr = typeName)
         fixed (char* messagePtr = message)
@@ -17,7 +18,8 @@ public static class ManagedExceptionInterop
             return CaptureException__Injected(
                 new ManagedStringWrapper(typeNamePtr, typeName.Length),
                 new ManagedStringWrapper(messagePtr, message.Length),
-                new ManagedStringWrapper(detailsPtr, details.Length));
+                new ManagedStringWrapper(detailsPtr, details.Length),
+                nativeExceptionToken);
         }
     }
 
@@ -25,5 +27,6 @@ public static class ManagedExceptionInterop
     private static extern NativeCallStatus CaptureException__Injected(
         ManagedStringWrapper typeName,
         ManagedStringWrapper message,
-        ManagedStringWrapper details);
+        ManagedStringWrapper details,
+        ulong nativeExceptionToken);
 }
