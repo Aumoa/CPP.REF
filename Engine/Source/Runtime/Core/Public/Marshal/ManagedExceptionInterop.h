@@ -15,7 +15,8 @@ namespace Ayla
 			ManagedStringWrapper typeName,
 			ManagedStringWrapper message,
 			ManagedStringWrapper details,
-			uint64 nativeExceptionToken) noexcept;
+			uint64 nativeExceptionToken,
+			uint64 managedExceptionToken) noexcept;
 
 		static void ThrowLastException();
 		static void ClearLastException() noexcept;
@@ -28,5 +29,6 @@ extern "C"
 		::Ayla::ManagedStringWrapper typeName,
 		::Ayla::ManagedStringWrapper message,
 		::Ayla::ManagedStringWrapper details,
-		::Ayla::uint64 nativeExceptionToken) noexcept;
+		::Ayla::uint64 nativeExceptionToken,
+		::Ayla::uint64 managedExceptionToken) noexcept;
 }

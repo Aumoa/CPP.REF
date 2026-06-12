@@ -2,6 +2,7 @@
 
 #include "Marshal/NativeExceptionInterop.h"
 #include "Exception.h"
+#include "ManagedException.h"
 #include <atomic>
 #include <mutex>
 #include <typeinfo>
@@ -22,6 +23,7 @@ namespace Ayla
 			String m_SourceFunction;
 			int32 m_SourceLine = 0;
 			uint64 m_ExceptionToken = 0;
+			uint64 m_ManagedExceptionToken = 0;
 		};
 
 		thread_local LastNativeException GLastNativeException;
@@ -61,7 +63,8 @@ namespace Ayla
 			String sourceFile = {},
 			String sourceFunction = {},
 			int32 sourceLine = 0,
-			uint64 exceptionToken = 0) noexcept
+			uint64 exceptionToken = 0,
+			uint64 managedExceptionToken = 0) noexcept
 		{
 			try
 			{
@@ -73,6 +76,7 @@ namespace Ayla
 				GLastNativeException.m_SourceFunction = std::move(sourceFunction);
 				GLastNativeException.m_SourceLine = sourceLine;
 				GLastNativeException.m_ExceptionToken = exceptionToken;
+				GLastNativeException.m_ManagedExceptionToken = managedExceptionToken;
 			}
 			catch (...)
 			{
@@ -84,6 +88,35 @@ namespace Ayla
 				GLastNativeException.m_SourceFunction = {};
 				GLastNativeException.m_SourceLine = 0;
 				GLastNativeException.m_ExceptionToken = 0;
+				GLastNativeException.m_ManagedExceptionToken = managedExceptionToken;
+			}
+		}
+
+		void StoreManagedException(const ManagedException& exception, uint64 exceptionToken) noexcept
+		{
+			try
+			{
+				StoreException(
+					exception.GetManagedTypeName(),
+					exception.GetMessage(),
+					exception.GetManagedDetails(),
+					{},
+					{},
+					0,
+					exceptionToken,
+					exception.GetManagedExceptionToken());
+			}
+			catch (...)
+			{
+				StoreException(
+					TEXT("System.Exception"),
+					TEXT("Failed to capture managed exception details."),
+					TEXT("Failed to capture managed exception details."),
+					{},
+					{},
+					0,
+					exceptionToken,
+					exception.GetManagedExceptionToken());
 			}
 		}
 
@@ -110,7 +143,8 @@ namespace Ayla
 					{},
 					{},
 					0,
-					exceptionToken);
+					exceptionToken,
+					0);
 			}
 		}
 
@@ -131,7 +165,8 @@ namespace Ayla
 					{},
 					{},
 					0,
-					exceptionToken);
+					exceptionToken,
+					0);
 			}
 		}
 
@@ -162,7 +197,6 @@ namespace Ayla
 
 	NativeCallStatus NativeExceptionInterop::CaptureException(std::exception_ptr exception) noexcept
 	{
-		uint64 exceptionToken = RegisterException(exception);
 		try
 		{
 			if (exception)
@@ -175,16 +209,24 @@ namespace Ayla
 				TEXT("No active native exception was captured."),
 				TEXT("No active native exception was captured."));
 		}
+		catch (const ManagedException& e)
+		{
+			uint64 exceptionToken = e.GetManagedExceptionToken() == 0 ? RegisterException(exception) : 0;
+			StoreManagedException(e, exceptionToken);
+		}
 		catch (const Exception& e)
 		{
+			uint64 exceptionToken = RegisterException(exception);
 			StoreAylaException(e, exceptionToken);
 		}
 		catch (const std::exception& e)
 		{
+			uint64 exceptionToken = RegisterException(exception);
 			StoreStdException(e, exceptionToken);
 		}
 		catch (...)
 		{
+			uint64 exceptionToken = RegisterException(exception);
 			StoreException(
 				TEXT("Unknown native exception"),
 				TEXT("An unknown native exception was thrown."),
@@ -192,7 +234,8 @@ namespace Ayla
 				{},
 				{},
 				0,
-				exceptionToken);
+				exceptionToken,
+				0);
 		}
 
 		return NativeCallStatus::Exception;
@@ -252,7 +295,8 @@ namespace Ayla
 			.m_SourceFile = ToManagedString(GLastNativeException.m_SourceFile),
 			.m_SourceFunction = ToManagedString(GLastNativeException.m_SourceFunction),
 			.m_SourceLine = GLastNativeException.m_SourceLine,
-			.m_ExceptionToken = GLastNativeException.m_ExceptionToken
+			.m_ExceptionToken = GLastNativeException.m_ExceptionToken,
+			.m_ManagedExceptionToken = GLastNativeException.m_ManagedExceptionToken
 		};
 	}
 

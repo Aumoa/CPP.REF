@@ -5,10 +5,11 @@
 
 namespace Ayla
 {
-	ManagedException::ManagedException(String managedTypeName, String message, String managedDetails)
+	ManagedException::ManagedException(String managedTypeName, String message, String managedDetails, uint64 managedExceptionToken)
 		: Exception(message)
 		, m_ManagedTypeName(std::move(managedTypeName))
 		, m_ManagedDetails(std::move(managedDetails))
+		, m_ManagedExceptionToken(managedExceptionToken)
 	{
 	}
 

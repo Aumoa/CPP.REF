@@ -55,6 +55,13 @@ public sealed class NativeException : Exception
         NativeExceptionInfo info = GetLastException__Injected();
         ClearLastException__Injected();
 
+        if (info.m_ManagedExceptionToken != 0)
+        {
+            ReleaseCapturedException__Injected(info.m_ExceptionToken);
+            ManagedExceptionInterop.ThrowCaptured(info.m_ManagedExceptionToken);
+            return;
+        }
+
         NativeException exception;
         try
         {
@@ -63,6 +70,7 @@ public sealed class NativeException : Exception
         catch
         {
             ReleaseCapturedException__Injected(info.m_ExceptionToken);
+            ManagedExceptionInterop.ReleaseCaptured(info.m_ManagedExceptionToken);
             throw;
         }
 

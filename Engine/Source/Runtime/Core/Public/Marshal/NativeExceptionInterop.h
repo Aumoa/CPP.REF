@@ -24,6 +24,7 @@ namespace Ayla
 		ManagedStringWrapper m_SourceFunction;
 		int32 m_SourceLine;
 		uint64 m_ExceptionToken;
+		uint64 m_ManagedExceptionToken;
 	};
 
 	class CORE_API NativeExceptionInterop

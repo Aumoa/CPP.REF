@@ -15,6 +15,7 @@ namespace Ayla
 			String m_Message;
 			String m_Details;
 			std::exception_ptr m_NativeException;
+			uint64 m_ManagedExceptionToken = 0;
 		};
 
 		thread_local LastManagedException GLastManagedException;
@@ -36,7 +37,8 @@ namespace Ayla
 		ManagedStringWrapper typeName,
 		ManagedStringWrapper message,
 		ManagedStringWrapper details,
-		uint64 nativeExceptionToken) noexcept
+		uint64 nativeExceptionToken,
+		uint64 managedExceptionToken) noexcept
 	{
 		try
 		{
@@ -45,6 +47,7 @@ namespace Ayla
 			GLastManagedException.m_Message = CopyManagedString(message, TEXT("Failed to capture managed exception message."));
 			GLastManagedException.m_Details = CopyManagedString(details, GLastManagedException.m_Message);
 			GLastManagedException.m_NativeException = NativeExceptionInterop::GetCapturedException(nativeExceptionToken);
+			GLastManagedException.m_ManagedExceptionToken = managedExceptionToken;
 		}
 		catch (...)
 		{
@@ -53,6 +56,7 @@ namespace Ayla
 			GLastManagedException.m_Message = TEXT("Failed to capture managed exception details.");
 			GLastManagedException.m_Details = GLastManagedException.m_Message;
 			GLastManagedException.m_NativeException = nullptr;
+			GLastManagedException.m_ManagedExceptionToken = managedExceptionToken;
 		}
 
 		return NativeCallStatus::Exception;
@@ -79,7 +83,8 @@ namespace Ayla
 		throw ManagedException(
 			std::move(exception.m_TypeName),
 			std::move(exception.m_Message),
-			std::move(exception.m_Details));
+			std::move(exception.m_Details),
+			exception.m_ManagedExceptionToken);
 	}
 
 	void ManagedExceptionInterop::ClearLastException() noexcept
@@ -94,8 +99,9 @@ extern "C"
 		::Ayla::ManagedStringWrapper typeName,
 		::Ayla::ManagedStringWrapper message,
 		::Ayla::ManagedStringWrapper details,
-		::Ayla::uint64 nativeExceptionToken) noexcept
+		::Ayla::uint64 nativeExceptionToken,
+		::Ayla::uint64 managedExceptionToken) noexcept
 	{
-		return ::Ayla::ManagedExceptionInterop::CaptureException(typeName, message, details, nativeExceptionToken);
+		return ::Ayla::ManagedExceptionInterop::CaptureException(typeName, message, details, nativeExceptionToken, managedExceptionToken);
 	}
 }
