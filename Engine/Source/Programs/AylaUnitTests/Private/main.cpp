@@ -6,6 +6,7 @@
 #include "UnitTestRunner.h"
 #include "Tests/ManagedInteropTest.h"
 #include "Tests/NumericsTest.h"
+#include "Tests/ObjectLifetimeTest.h"
 #include <csignal>
 #include <memory>
 
@@ -27,6 +28,7 @@ Task<int32> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 	UnitTestRunner runner;
 	runner.AddFixture(TEXT("Numerics"), std::make_unique<NumericsTest>());
 	runner.AddFixture(TEXT("ManagedInterop"), std::make_unique<ManagedInteropTest>());
+	runner.AddFixture(TEXT("ObjectLifetime"), std::make_unique<ObjectLifetimeTest>());
 
 	co_return co_await runner.RunAsync(cancellationToken);
 }
