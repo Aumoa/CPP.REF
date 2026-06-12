@@ -41,6 +41,7 @@
 - GitHub App or bot credentials should be used only for author-side pull request activity, such as replying to existing review feedback, explaining pushed commits, updating pull request descriptions, reporting validation results, or asking for re-review when requested.
 - If a GitHub write has a required actor and receives a 401, 403, or permission error, do not retry with a different actor. Diagnose and report the credential or permission mismatch.
 - Before merging a task branch into a protected shared branch, remove branch-local CI or GitHub Actions configuration changes that would affect the protected branch. Such temporary settings may exist on task branches, but they must be reverted or removed before approval and merge.
+- Permanent CI or GitHub Actions policy changes, such as running compile checks for pull requests targeting `dev`, are normal repository policy changes and must not be treated as temporary branch-local validation settings.
 
 ## Instruction Storage
 
