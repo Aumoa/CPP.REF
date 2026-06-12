@@ -21,6 +21,7 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - Use `gh` to inspect Actions runs, jobs, and logs when the command is available.
 - When `gh` is available, verify compile results for each supported platform in GitHub Actions: Windows, macOS, and Linux. Prefer job-level conclusions over only checking the overall workflow conclusion.
 - If `gh` or Actions access is unavailable, state that Actions validation was skipped and perform a stricter source and workflow review for Windows, macOS, and Linux support.
+- Before using GitHub credentials for remote validation, pull request updates, or bot-authored review responses, follow `.codex/skills/github-app-credential-policy/SKILL.md`.
 - Local-only review actions, including read-only checks, local commits, and local merges, may be performed at Codex's discretion.
 - On shared working branches such as `dev`, `master`, `main`, release branches, or branches that appear to be used directly by other people, request explicit user approval before shared-state actions.
 - On clearly isolated task branches, especially branches whose names start with `codex/`, non-destructive shared-state actions may be performed at Codex's discretion when they support the review or validation work. This includes pushing that branch, updating its pull request, or triggering Actions through that branch.
@@ -30,6 +31,7 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 
 - Before approving or merging into protected shared branches such as `dev`, `master`, `main`, or release branches, check whether the PR includes CI, GitHub Actions, branch trigger, permission, environment, or workflow configuration changes that were only needed for task-branch validation.
 - Temporary branch-local CI settings are allowed on isolated task branches, but they must be removed before the task branch is approved for merge into a protected shared branch.
+- Do not block intentionally permanent CI policy changes, such as enabling pull request compile checks for protected branch targets, merely because they affect the protected branch after merge.
 - Require a revert commit or a separate cleanup commit when temporary CI settings would otherwise affect the protected branch after merge.
 - Treat unremoved temporary CI or Actions configuration as a merge blocker, even if the code changes themselves look correct.
 
@@ -58,3 +60,5 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - Write external PR review comments in English unless the user asks otherwise.
 - Explain the interpretation and recommendation to the user in Korean when the surrounding conversation is Korean.
 - Clearly state whether the reviewed change is safe to merge, needs fixes first, or needs CI/runtime validation before judgment.
+- Submit review feedback, approvals, change requests, and independent code-evaluation comments only with the current ordinary GitHub user account.
+- Use GitHub App or bot credentials only for author-side pull request responses, such as replying to existing review feedback, explaining pushed commits, reporting validation results, or asking for re-review when requested.

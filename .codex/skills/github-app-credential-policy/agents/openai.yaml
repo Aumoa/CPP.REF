@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub App Credentials"
+  short_description: "Choose safe GitHub actors and broker tokens."
+  default_prompt: "Use the CPP.REF GitHub credential policy for this operation."
