@@ -34,6 +34,13 @@ When the current changes do not touch shader code, shader assets, ShaderCompileW
 
 Preserve user-requested configuration, editor, platform, or target options when they are provided.
 
+## Test Checks
+
+- When a dedicated unit test target, test command, or focused executable test exists for the touched subsystem, run it after refreshing AylaBuildTool if the build tool changed.
+- Add or update focused tests for deterministic logic that is practical to isolate, such as math utilities, parsers, serializers, build graph decisions, module rule resolution, reflection metadata, interop marshalling, lifetime management, and state transformations.
+- If a change is not practical to cover with focused tests, use the nearest build, generation, integration, runtime, or platform check and report that rationale.
+- When tests exist and current changes do not touch shader-related code or assets, keep `--skip-shaders` on test-driven AylaBuildTool checks when the command supports it.
+
 ## Generation Checks
 
 Use generation checks when changes affect project scanning, rules, generated code, reflection headers, shaders, or solution/materialization flows:
@@ -47,6 +54,7 @@ When SampleGame is absent, inspect the current repository targets and choose the
 ## Verification Notes
 
 - Prefer focused checks that match the touched subsystem.
+- Before committing feature work with tests, run the relevant tests when practical and report the result.
 - Report when a build or generation command cannot be run.
 - Keep generated C++ IDE projects out of normal native build verification unless the user asks for diagnostics from them.
 - When `gh` is available and a relevant GitHub Actions run exists, verify compile results for Windows, macOS, and Linux at the job level.
