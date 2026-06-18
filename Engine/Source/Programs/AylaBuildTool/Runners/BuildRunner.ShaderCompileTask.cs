@@ -22,7 +22,7 @@ internal static partial class BuildRunner
             m_ResolverFactory = resolverFactory;
         }
 
-        public async Task<Terminal.Output> CompileAsync(IList<ModuleTask> moduleTasks, Installation installation, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> CompileAsync(IReadOnlyList<ModuleTask> moduleTasks, Installation installation, CancellationToken cancellationToken)
         {
             try
             {

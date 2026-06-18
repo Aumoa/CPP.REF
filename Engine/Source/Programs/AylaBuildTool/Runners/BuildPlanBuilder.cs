@@ -2,71 +2,92 @@ namespace AylaEngine;
 
 internal sealed class BuildPlanBuilder
 {
-    private readonly ModuleProject[] m_TargetProjects;
-    private readonly BuildRunner.ModuleTask[] m_ModuleTasks;
-    private readonly BuildRunner.ScriptTask[] m_ScriptTasks;
-    private readonly BuildRunner.ShaderCompileTask[] m_ShaderTasks;
+    private readonly BuildPlanTarget[] m_Targets;
     private readonly Installation m_Installation;
-    private readonly TargetInfo m_TargetInfo;
     private readonly ScriptProjectFactory m_ScriptProjectFactory;
+    private readonly HashSet<BuildRunner.CompileTask> m_EnqueuedCompileTasks = [];
+    private readonly HashSet<BuildRunner.ModuleTask> m_EnqueuedLinkTasks = [];
+    private readonly HashSet<BuildRunner.ScriptTask> m_EnqueuedScriptTasks = [];
 
     public BuildPlanBuilder(
-        IEnumerable<ModuleProject> targetProjects,
-        IEnumerable<BuildRunner.ModuleTask> moduleTasks,
-        IEnumerable<BuildRunner.ScriptTask> scriptTasks,
-        IEnumerable<BuildRunner.ShaderCompileTask> shaderTasks,
+        IEnumerable<BuildPlanTarget> targets,
         Installation installation,
-        TargetInfo targetInfo,
         ScriptProjectFactory scriptProjectFactory)
     {
-        m_TargetProjects = targetProjects.ToArray();
-        m_ModuleTasks = moduleTasks.ToArray();
-        m_ScriptTasks = scriptTasks.ToArray();
-        m_ShaderTasks = shaderTasks.ToArray();
+        m_Targets = targets.ToArray();
         m_Installation = installation;
-        m_TargetInfo = targetInfo;
         m_ScriptProjectFactory = scriptProjectFactory;
     }
 
     public BuildPlan Build()
     {
         List<BuildAction> buildActions = [];
-        EnqueueCompileActions(buildActions);
-        EnqueueShaderCompileActions(buildActions);
-        EnqueueLinkActions(buildActions);
-        EnqueueScriptCompileActions(buildActions);
+        var shaderCompileWorkerTask = FindShaderCompileWorkerTask();
+        foreach (var target in m_Targets)
+        {
+            EnqueueCompileActions(buildActions, target);
+            EnqueueShaderCompileActions(buildActions, target, shaderCompileWorkerTask);
+            EnqueueLinkActions(buildActions, target);
+            EnqueueScriptCompileActions(buildActions, target);
+        }
+
         return new BuildPlan(buildActions);
     }
 
-    private void EnqueueCompileActions(List<BuildAction> buildActions)
+    private BuildRunner.ModuleTask? FindShaderCompileWorkerTask()
     {
-        var allCompiles = m_ModuleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
+        return m_Targets
+            .SelectMany(target => target.ModuleTasks)
+            .FirstOrDefault(moduleTask => string.Equals(moduleTask.Resolver.Name, "ShaderCompileWorker", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void EnqueueCompileActions(List<BuildAction> buildActions, BuildPlanTarget target)
+    {
+        var allCompiles = target.ModuleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
         foreach (var compileTask in allCompiles)
         {
+            if (m_EnqueuedCompileTasks.Add(compileTask) == false)
+            {
+                continue;
+            }
+
             buildActions.Add(new BuildAction(
-                ct => compileTask.CompileAsync(m_Installation, m_TargetInfo, ct),
+                ct => compileTask.CompileAsync(m_Installation, target.TargetInfo, ct),
                 output => string.Join('\n', [compileTask.Command.SourceCode.FilePath, .. output.Logs.Select(l => l.Value)])));
         }
     }
 
-    private void EnqueueShaderCompileActions(List<BuildAction> buildActions)
+    private void EnqueueShaderCompileActions(List<BuildAction> buildActions, BuildPlanTarget target, BuildRunner.ModuleTask? shaderCompileWorkerTask)
     {
-        foreach (var shaderTask in m_ShaderTasks)
+        foreach (var shaderTask in target.ShaderTasks)
         {
             buildActions.Add(new BuildAction(
-                ct => shaderTask.CompileAsync(m_ModuleTasks, m_Installation, ct),
+                async ct =>
+                {
+                    if (shaderCompileWorkerTask != null)
+                    {
+                        await shaderCompileWorkerTask.Task;
+                    }
+
+                    return await shaderTask.CompileAsync(target.ModuleTasks, m_Installation, ct);
+                },
                 _ => $"Compiling shaders for {shaderTask.Group.Name}"));
         }
     }
 
-    private void EnqueueLinkActions(List<BuildAction> buildActions)
+    private void EnqueueLinkActions(List<BuildAction> buildActions, BuildPlanTarget target)
     {
-        foreach (var moduleTask in m_ModuleTasks)
+        foreach (var moduleTask in target.ModuleTasks)
         {
-            if (moduleTask.NeedLink(m_TargetInfo))
+            if (m_EnqueuedLinkTasks.Add(moduleTask) == false)
+            {
+                continue;
+            }
+
+            if (moduleTask.NeedLink(target.TargetInfo))
             {
                 buildActions.Add(new BuildAction(
-                    ct => moduleTask.LinkAsync(m_ModuleTasks, m_Installation, m_TargetInfo, ct),
+                    ct => moduleTask.LinkAsync(target.ModuleTasks, m_Installation, target.TargetInfo, ct),
                     output => string.Join('\n', output.Logs.Select(p => p.Value))));
             }
             else
@@ -76,15 +97,20 @@ internal sealed class BuildPlanBuilder
         }
     }
 
-    private void EnqueueScriptCompileActions(List<BuildAction> buildActions)
+    private void EnqueueScriptCompileActions(List<BuildAction> buildActions, BuildPlanTarget target)
     {
-        Dictionary<string, CSProject> virtualProjects = m_TargetProjects
-            .Where(p => p.GetRule(m_TargetInfo).Script.Enabled)
+        Dictionary<string, CSProject> virtualProjects = target.TargetProjects
+            .Where(p => p.GetRule(target.TargetInfo).Script.Enabled)
             .ToDictionary(p => p.ScriptProjectFileName, p => m_ScriptProjectFactory.GetScriptProject(p));
 
         Task? previousScriptTask = null;
-        foreach (var scriptTask in SortScriptTasksByDependency())
+        foreach (var scriptTask in SortScriptTasksByDependency(target))
         {
+            if (m_EnqueuedScriptTasks.Add(scriptTask) == false)
+            {
+                continue;
+            }
+
             var prerequisiteTask = previousScriptTask;
             buildActions.Add(new BuildAction(
                 async ct =>
@@ -94,21 +120,21 @@ internal sealed class BuildPlanBuilder
                         await prerequisiteTask;
                     }
 
-                    return await scriptTask.BuildAsync(m_ScriptTasks, virtualProjects, m_TargetInfo, ct);
+                    return await scriptTask.BuildAsync(target.ScriptTasks, virtualProjects, target.TargetInfo, ct);
                 },
                 output => string.Join('\n', output.Logs.Select(p => p.Value))));
             previousScriptTask = scriptTask.Task;
         }
     }
 
-    private List<BuildRunner.ScriptTask> SortScriptTasksByDependency()
+    private static List<BuildRunner.ScriptTask> SortScriptTasksByDependency(BuildPlanTarget target)
     {
-        Dictionary<string, BuildRunner.ScriptTask> taskByName = m_ScriptTasks.ToDictionary(p => p.Resolver.Name, StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, BuildRunner.ScriptTask> taskByName = target.ScriptTasks.ToDictionary(p => p.Resolver.Name, StringComparer.OrdinalIgnoreCase);
         Dictionary<BuildRunner.ScriptTask, bool> resolvedTasks = [];
         HashSet<BuildRunner.ScriptTask> resolvingTasks = [];
         List<BuildRunner.ScriptTask> sortedTasks = [];
 
-        foreach (var scriptTask in m_ScriptTasks)
+        foreach (var scriptTask in target.ScriptTasks)
         {
             Visit(scriptTask);
         }

@@ -12,55 +12,12 @@ internal static partial class BuildRunner
         var solution = await SolutionLoader.CreateDefault().LoadAsync(Global.EngineDirectory, options.ProjectFile, cancellationToken);
         var resolverFactory = new ModuleRulesResolverFactory(solution);
         var scriptProjectFactory = new ScriptProjectFactory(solution, resolverFactory);
-        Dictionary<GroupDescriptor, int> compilationTaskCounts = [];
-        IEnumerable<ModuleProject> targetProjects;
-        if (string.IsNullOrEmpty(options.Target))
-        {
-            targetProjects = solution.Projects.OfType<ModuleProject>();
-        }
-        else
-        {
-            var targetProject = (ModuleProject?)solution.FindProject(options.Target);
-            if (targetProject == null)
-            {
-                Console.Error.WriteLine("Target '{0}' is not found in solution.", options.Target);
-                throw TerminateException.User();
-            }
-
-            if (targetProject is not ModuleProject mp)
-            {
-                Console.Error.WriteLine("Target '{0}' is not module project. Non module project must be build with specified build program.", options.Target);
-                throw TerminateException.User();
-            }
-
-            List<string> requiredProjects = [];
-            var resolver = resolverFactory.GetResolver(mp, buildTarget);
-            if (mp.GetRule(buildTarget).Type == ModuleType.Game)
-            {
-                requiredProjects.Add("Engine");
-                requiredProjects.Add("Launch");
-                requiredProjects.Add("Direct3D12");
-                requiredProjects.Add("WindowsAPI");
-            }
-            else if (mp.GetRule(buildTarget).Type == ModuleType.Application)
-            {
-                // Application type (e.g., Launch) requires ApplicationCore and rendering APIs
-                // Dependencies are specified in the module's rule file
-            }
-            else if (mp.GetRule(buildTarget).Type == ModuleType.Console)
-            {
-                // Console applications don't require ApplicationCore, Launch, or rendering APIs
-                // They only need Core and platform-specific dependencies (handled by WithBuiltInDependencyModule)
-            }
-
-            var depends = solution.FindDepends(resolver.DependencyModuleNames.Concat(requiredProjects)).OfType<ModuleProject>();
-            targetProjects = depends.Append(targetProject).Distinct();
-        }
+        ModuleProject[] targetProjects = ResolveTargetProjects(buildTarget, options.Target);
 
         var installation = Installation.CreateDefaultInstallation();
-        CppCompiler? compiler = null;
-
-        Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
+        Dictionary<TargetInfo, CppCompiler> compilerCache = [];
+        Dictionary<(TargetInfo TargetInfo, ModuleProject Project), ModuleTask> moduleTaskCache = [];
+        Dictionary<(TargetInfo TargetInfo, ModuleProject Project), ScriptTask> scriptTaskCache = [];
 
         if (options.Clean == CleanOptions.CleanOnly)
         {
@@ -100,7 +57,7 @@ internal static partial class BuildRunner
 
                     var resolver = resolverFactory.GetResolver(project, buildTarget);
                     var compileEnvironment = new CppCompileEnvironment(resolver, buildTarget, project.Group);
-                    DeletePchFiles(await GetCompilerAsync(), compileEnvironment.PchSettings);
+                    DeletePchFiles(await GetCompilerAsync(buildTarget), compileEnvironment.PchSettings);
                 }
 
                 var bindingsDir = Path.Combine(intDir, "Bindings");
@@ -128,7 +85,7 @@ internal static partial class BuildRunner
 
         if (options.Clean is CleanOptions.GenerateOnly or CleanOptions.CleanOnly)
         {
-            await DispatchGenerateHeaderWorkers();
+            await DispatchGenerateHeaderWorkers(targetProjects, buildTarget, []);
             await GenerateRunner.RunAsync(new GenerateOptions
             {
                 ProjectFile = options.ProjectFile,
@@ -137,116 +94,190 @@ internal static partial class BuildRunner
             return;
         }
 
-        await DispatchGenerateHeaderWorkers();
-
-        List<ModuleTask> moduleTasks = [];
-        List<ScriptTask> scriptTasks = [];
-        List<ShaderCompileTask> shaderTasks = [];
-        int skippedShaderFileCount = 0;
-
-        foreach (var project in targetProjects)
-        {
-            var resolver = resolverFactory.GetResolver(project, buildTarget);
-            var compileEnvironment = new CppCompileEnvironment(resolver, buildTarget, project.Group);
-            List<CppCompileCommand> allCompiles = [];
-            List<CompileTask> needCompiles = [];
-
-            if (project.GetRule(buildTarget).Type != ModuleType.ThirdParty)
-            {
-                CompileTask? pchCompileTask = null;
-                if (compileEnvironment.PchSettings != null)
-                {
-                    await compileEnvironment.PchSettings.WriteSourceFileAsync(cancellationToken);
-
-                    var pchCommand = CppCompileCommand.CreatePch(compileEnvironment);
-                    if ((await GetCompilerAsync()).GetCompileOutputFilePaths(pchCommand).Contains(pchCommand.ObjectFilePath))
-                    {
-                        allCompiles.Add(pchCommand);
-                    }
-
-                    if (await NeedCompileAsync(pchCommand))
-                    {
-                        pchCompileTask = new CompileTask(pchCommand);
-                        needCompiles.Add(pchCompileTask);
-                    }
-                }
-
-                Task? previousPchConsumerTask = pchCompileTask?.Task;
-                foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
-                {
-                    if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
-                    {
-                        var command = new CppCompileCommand(compileEnvironment, sourceCode);
-                        allCompiles.Add(command);
-                        Task[] prerequisiteTasks = command.UsesPch && previousPchConsumerTask != null
-                            ? [previousPchConsumerTask]
-                            : [];
-
-                        var pchWillRebuild = command.UsesPch && pchCompileTask != null;
-                        if (pchWillRebuild || await NeedCompileAsync(command))
-                        {
-                            var compileTask = new CompileTask(command, prerequisiteTasks);
-                            needCompiles.Add(compileTask);
-                            if (command.UsesPch)
-                            {
-                                previousPchConsumerTask = compileTask.Task;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (options.SkipShaders)
-            {
-                skippedShaderFileCount += project.GetSourceCodes().Count(sc => sc.Type == SourceCodeType.HLSLShader);
-            }
-            else
-            {
-                // Collect HLSL shader files for compilation
-                var shaderFiles = project.GetSourceCodes()
-                    .Where(sc => sc.Type == SourceCodeType.HLSLShader)
-                    .ToArray();
-
-                if (shaderFiles.Any())
-                {
-                    shaderTasks.Add(new ShaderCompileTask(project, buildTarget, shaderFiles, solution.EngineGroup, resolverFactory));
-                }
-            }
-
-            moduleTasks.Add(new ModuleTask(installation, resolver, allCompiles.ToArray(), needCompiles.ToArray()));
-            if (resolver.Rules.Script.Enabled)
-            {
-                var scriptTask = new ScriptTask(resolver, scriptProjectFactory.GetScriptProject(project));
-                if (scriptTask.NeedBuild(buildTarget))
-                {
-                    scriptTasks.Add(scriptTask);
-                }
-            }
-        }
+        var (primaryPlanTarget, skippedShaderFileCount) = await CreateBuildPlanTargetAsync(targetProjects, buildTarget, options.SkipShaders, includeScripts: true);
+        List<BuildPlanTarget> planTargets = [primaryPlanTarget];
 
         if (skippedShaderFileCount > 0)
         {
             Console.WriteLine("Skipped shader compilation for {0} shader file(s).", skippedShaderFileCount);
         }
 
-        await EnsureShaderCompileWorkerAsync();
+        if (primaryPlanTarget.ShaderTasks.Count > 0)
+        {
+            var workerTargetInfo = new TargetInfo { Platform = buildTarget.Platform, Config = Configuration.Development, Editor = false };
+            var workerTargetProjects = ResolveTargetProjects(workerTargetInfo, "ShaderCompileWorker");
+            var (workerPlanTarget, _) = await CreateBuildPlanTargetAsync(workerTargetProjects, workerTargetInfo, skipShaders: true, includeScripts: false);
+            planTargets.Insert(0, workerPlanTarget);
+        }
 
         // Execute CMake builds for third-party modules
-        await ExecuteCMakeBuilds();
+        await ExecuteCMakeBuilds(planTargets);
 
         var buildPlan = new BuildPlanBuilder(
-            targetProjects,
-            moduleTasks,
-            scriptTasks,
-            shaderTasks,
+            planTargets,
             installation,
-            buildTarget,
             scriptProjectFactory).Build();
         await buildPlan.ExecuteAsync(cancellationToken);
 
         return;
 
-        async ValueTask<bool> NeedCompileAsync(CppCompileCommand command)
+        ModuleProject[] ResolveTargetProjects(TargetInfo targetInfo, string? targetName)
+        {
+            if (string.IsNullOrEmpty(targetName))
+            {
+                return solution.Projects.OfType<ModuleProject>().ToArray();
+            }
+
+            var foundTargetProject = solution.FindProject(targetName);
+            if (foundTargetProject == null)
+            {
+                Console.Error.WriteLine("Target '{0}' is not found in solution.", targetName);
+                throw TerminateException.User();
+            }
+
+            if (foundTargetProject is not ModuleProject targetProject)
+            {
+                Console.Error.WriteLine("Target '{0}' is not module project. Non module project must be build with specified build program.", targetName);
+                throw TerminateException.User();
+            }
+
+            List<string> requiredProjects = [];
+            var resolver = resolverFactory.GetResolver(targetProject, targetInfo);
+            if (targetProject.GetRule(targetInfo).Type == ModuleType.Game)
+            {
+                requiredProjects.Add("Engine");
+                requiredProjects.Add("Launch");
+                requiredProjects.Add("Direct3D12");
+                requiredProjects.Add("WindowsAPI");
+            }
+            else if (targetProject.GetRule(targetInfo).Type == ModuleType.Application)
+            {
+                // Application type (e.g., Launch) requires ApplicationCore and rendering APIs.
+                // Dependencies are specified in the module's rule file.
+            }
+            else if (targetProject.GetRule(targetInfo).Type == ModuleType.Console)
+            {
+                // Console applications use built-in platform dependencies from ModuleRulesResolver.
+            }
+
+            var depends = solution.FindDepends(resolver.DependencyModuleNames.Concat(requiredProjects)).OfType<ModuleProject>();
+            return depends.Append(targetProject).Distinct().ToArray();
+        }
+
+        async Task<(BuildPlanTarget Target, int SkippedShaderFileCount)> CreateBuildPlanTargetAsync(ModuleProject[] projects, TargetInfo targetInfo, bool skipShaders, bool includeScripts)
+        {
+            Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
+            await DispatchGenerateHeaderWorkers(projects, targetInfo, generatedSourceCodes);
+
+            List<ModuleTask> moduleTasks = [];
+            List<ScriptTask> scriptTasks = [];
+            List<ShaderCompileTask> shaderTasks = [];
+            int skippedShaderFileCount = 0;
+
+            foreach (var project in projects)
+            {
+                var resolver = resolverFactory.GetResolver(project, targetInfo);
+                var moduleTaskKey = (targetInfo, project);
+                if (moduleTaskCache.TryGetValue(moduleTaskKey, out var moduleTask) == false)
+                {
+                    var compileEnvironment = new CppCompileEnvironment(resolver, targetInfo, project.Group);
+                    List<CppCompileCommand> allCompiles = [];
+                    List<CompileTask> needCompiles = [];
+
+                    if (project.GetRule(targetInfo).Type != ModuleType.ThirdParty)
+                    {
+                        CompileTask? pchCompileTask = null;
+                        if (compileEnvironment.PchSettings != null)
+                        {
+                            await compileEnvironment.PchSettings.WriteSourceFileAsync(cancellationToken);
+
+                            var pchCommand = CppCompileCommand.CreatePch(compileEnvironment);
+                            if ((await GetCompilerAsync(targetInfo)).GetCompileOutputFilePaths(pchCommand).Contains(pchCommand.ObjectFilePath))
+                            {
+                                allCompiles.Add(pchCommand);
+                            }
+
+                            if (await NeedCompileAsync(pchCommand, targetInfo))
+                            {
+                                pchCompileTask = new CompileTask(pchCommand);
+                                needCompiles.Add(pchCompileTask);
+                            }
+                        }
+
+                        Task? previousPchConsumerTask = pchCompileTask?.Task;
+                        foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
+                        {
+                            if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
+                            {
+                                var command = new CppCompileCommand(compileEnvironment, sourceCode);
+                                allCompiles.Add(command);
+                                Task[] prerequisiteTasks = command.UsesPch && previousPchConsumerTask != null
+                                    ? [previousPchConsumerTask]
+                                    : [];
+
+                                var pchWillRebuild = command.UsesPch && pchCompileTask != null;
+                                if (pchWillRebuild || await NeedCompileAsync(command, targetInfo))
+                                {
+                                    var compileTask = new CompileTask(command, prerequisiteTasks);
+                                    needCompiles.Add(compileTask);
+                                    if (command.UsesPch)
+                                    {
+                                        previousPchConsumerTask = compileTask.Task;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    moduleTask = new ModuleTask(installation, resolver, allCompiles.ToArray(), needCompiles.ToArray());
+                    moduleTaskCache.Add(moduleTaskKey, moduleTask);
+                }
+
+                moduleTasks.Add(moduleTask);
+
+                if (skipShaders)
+                {
+                    skippedShaderFileCount += project.GetSourceCodes().Count(sc => sc.Type == SourceCodeType.HLSLShader);
+                }
+                else
+                {
+                    var shaderFiles = project.GetSourceCodes()
+                        .Where(sc => sc.Type == SourceCodeType.HLSLShader)
+                        .ToArray();
+
+                    if (shaderFiles.Any())
+                    {
+                        shaderTasks.Add(new ShaderCompileTask(project, targetInfo, shaderFiles, solution.EngineGroup, resolverFactory));
+                    }
+                }
+
+                if (includeScripts && resolver.Rules.Script.Enabled)
+                {
+                    var scriptTaskKey = (targetInfo, project);
+                    if (scriptTaskCache.TryGetValue(scriptTaskKey, out var scriptTask) == false)
+                    {
+                        scriptTask = new ScriptTask(resolver, scriptProjectFactory.GetScriptProject(project));
+                        if (scriptTask.NeedBuild(targetInfo))
+                        {
+                            scriptTaskCache.Add(scriptTaskKey, scriptTask);
+                        }
+                        else
+                        {
+                            scriptTask = null;
+                        }
+                    }
+
+                    if (scriptTask != null)
+                    {
+                        scriptTasks.Add(scriptTask);
+                    }
+                }
+            }
+
+            return (new BuildPlanTarget(targetInfo, projects, moduleTasks, scriptTasks, shaderTasks), skippedShaderFileCount);
+        }
+
+        async ValueTask<bool> NeedCompileAsync(CppCompileCommand command, TargetInfo targetInfo)
         {
             if (options.Clean == CleanOptions.Rebuild)
             {
@@ -255,7 +286,7 @@ internal static partial class BuildRunner
 
             if (command.CreatesPch)
             {
-                if ((await GetCompilerAsync()).GetCompileOutputFilePaths(command).Any(filePath => File.Exists(filePath) == false))
+                if ((await GetCompilerAsync(targetInfo)).GetCompileOutputFilePaths(command).Any(filePath => File.Exists(filePath) == false))
                 {
                     return true;
                 }
@@ -266,9 +297,16 @@ internal static partial class BuildRunner
                 SourceCodeCache.LoadCached(command.CacheFilePath).IsModified(cached);
         }
 
-        async ValueTask<CppCompiler> GetCompilerAsync()
+        async ValueTask<CppCompiler> GetCompilerAsync(TargetInfo targetInfo)
         {
-            return compiler ??= await installation.SpawnCompilerAsync(buildTarget, cancellationToken);
+            if (compilerCache.TryGetValue(targetInfo, out var compiler))
+            {
+                return compiler;
+            }
+
+            compiler = await installation.SpawnCompilerAsync(targetInfo, cancellationToken);
+            compilerCache.Add(targetInfo, compiler);
+            return compiler;
         }
 
         void DeletePchFiles(CppCompiler activeCompiler, CppPchSettings? pchSettings)
@@ -284,46 +322,28 @@ internal static partial class BuildRunner
             }
         }
 
-        async Task EnsureShaderCompileWorkerAsync()
-        {
-            if (!shaderTasks.Any())
-            {
-                return;
-            }
-
-            var workerTargetInfo = new TargetInfo { Platform = buildTarget.Platform, Config = Configuration.Development, Editor = false };
-            var workerPath = Path.Combine(solution.EngineGroup.Output(workerTargetInfo, FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
-
-            Console.WriteLine("Building ShaderCompileWorker (Development)...");
-            await RunAsync(new BuildOptions
-            {
-                ProjectFile = options.ProjectFile,
-                Target = "ShaderCompileWorker",
-                Config = Configuration.Development,
-                Editor = false,
-                GeneratorType = options.GeneratorType,
-            }, cancellationToken);
-
-            if (!File.Exists(workerPath))
-            {
-                Console.Error.WriteLine("Error: Shader compile worker executable not found at {0}", workerPath);
-                throw TerminateException.Abort();
-            }
-        }
-
-        async Task ExecuteCMakeBuilds()
+        async Task ExecuteCMakeBuilds(IEnumerable<BuildPlanTarget> targets)
         {
             bool hasFailure = false;
+            HashSet<(TargetInfo TargetInfo, ModuleTask ModuleTask)> visitedTasks = [];
 
-            foreach (var module in moduleTasks)
+            foreach (var target in targets)
             {
-                try
+                foreach (var module in target.ModuleTasks)
                 {
-                    await module.BuildCMakeAsync(buildTarget, cancellationToken);
-                }
-                catch (TerminalExecutionException)
-                {
-                    hasFailure = true;
+                    if (visitedTasks.Add((target.TargetInfo, module)) == false)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        await module.BuildCMakeAsync(target.TargetInfo, cancellationToken);
+                    }
+                    catch (TerminalExecutionException)
+                    {
+                        hasFailure = true;
+                    }
                 }
             }
 
@@ -333,19 +353,19 @@ internal static partial class BuildRunner
             }
         }
 
-        async Task DispatchGenerateHeaderWorkers()
+        async Task DispatchGenerateHeaderWorkers(ModuleProject[] projects, TargetInfo targetInfo, Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes)
         {
             Console.Write("Generating reflection header files...");
 
             List<GenerateReflectionHeaderTask> tasks = [];
 
-            foreach (var project in targetProjects)
+            foreach (var project in projects)
             {
                 foreach (var sourceCode in project.GetSourceCodes())
                 {
                     if (sourceCode.Type == SourceCodeType.Header)
                     {
-                        var ght = new GenerateReflectionHeaderTask(project, buildTarget, sourceCode);
+                        var ght = new GenerateReflectionHeaderTask(project, targetInfo, sourceCode);
                         tasks.Add(ght);
                     }
                 }

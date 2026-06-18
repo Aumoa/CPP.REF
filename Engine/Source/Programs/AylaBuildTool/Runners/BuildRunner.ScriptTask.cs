@@ -48,7 +48,7 @@ internal static partial class BuildRunner
             return false;
         }
 
-        public async Task<Terminal.Output> BuildAsync(IList<ScriptTask> scriptTasks, Dictionary<string, CSProject> virtualProjects, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> BuildAsync(IReadOnlyList<ScriptTask> scriptTasks, Dictionary<string, CSProject> virtualProjects, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             try
             {

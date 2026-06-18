@@ -78,7 +78,7 @@ internal static partial class BuildRunner
             m_CompletionSource.SetResult();
         }
 
-        public async Task<Terminal.Output> LinkAsync(IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> LinkAsync(IReadOnlyList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             try
             {
