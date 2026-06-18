@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Platform/PlatformMacros.h"
-#include <functional>
+#include "MoveOnlyFunction.h"
 #include <mutex>
 #include <memory>
 
@@ -15,11 +15,7 @@ namespace Ayla
 	{
 	public:
 		template<class TBody>
-#if __cpp_lib_move_only_function
-		using function_t = std::move_only_function<TBody>;
-#else
-		using function_t = std::function<TBody>;
-#endif
+		using function_t = MoveOnlyFunction<TBody>;
 
 	public:
 		virtual void Post(function_t<void()> continuation) = 0;

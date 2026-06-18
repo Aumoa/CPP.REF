@@ -8,7 +8,7 @@
 #include "Threading/Tasks/TaskCreationOptions.h"
 #include "InvalidOperationException.h"
 #include "TaskCanceledException.h"
-#include <functional>
+#include "MoveOnlyFunction.h"
 #include <mutex>
 #include <condition_variable>
 #include <exception>
@@ -35,11 +35,7 @@ namespace Ayla
 
 	public:
 		template<class TBody>
-#if __cpp_lib_move_only_function
-		using function_t = std::move_only_function<TBody>;
-#else
-		using function_t = std::function<TBody>;
-#endif
+		using function_t = MoveOnlyFunction<TBody>;
 
 	protected:
 		mutable std::mutex m_Mutex;
@@ -150,6 +146,21 @@ namespace Ayla
 			m_Status = TaskStatus::RanToCompletion;
 
 			UnlockAndInvokeContinuations(lock);
+		}
+
+		bool TrySetResult()
+		{
+			std::unique_lock lock(m_Mutex);
+			if (IsCompleted())
+			{
+				return false;
+			}
+
+			check(m_Status == TaskStatus::Running);
+			m_Status = TaskStatus::RanToCompletion;
+
+			UnlockAndInvokeContinuations(lock);
+			return true;
 		}
 
 		bool TryCancel(std::stop_token stoppingToken = {}, std::source_location src = std::source_location::current()) noexcept
@@ -271,10 +282,27 @@ namespace Ayla
 			}
 
 			check(m_Status == TaskStatus::Running);
-			m_Status = TaskStatus::RanToCompletion;
 			m_Promise.emplace(std::forward<U>(args)...);
+			m_Status = TaskStatus::RanToCompletion;
 
 			UnlockAndInvokeContinuations(lock);
+		}
+
+		template<class... U>
+		bool TrySetResult(U&&... args) requires std::constructible_from<T, U...>
+		{
+			std::unique_lock lock(m_Mutex);
+			if (IsCompleted())
+			{
+				return false;
+			}
+
+			check(m_Status == TaskStatus::Running);
+			m_Promise.emplace(std::forward<U>(args)...);
+			m_Status = TaskStatus::RanToCompletion;
+
+			UnlockAndInvokeContinuations(lock);
+			return true;
 		}
 	};
 }

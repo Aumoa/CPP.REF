@@ -183,7 +183,7 @@ namespace Ayla
 		return (int64)LargeInteger.QuadPart;
 	}
 
-	std::move_only_function<void(IOCompletionOverlapped*, size_t, int32)> WindowsPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
+	MoveOnlyFunction<void(IOCompletionOverlapped*, size_t, int32)> WindowsPlatformIO::FileIOWrittenAction(TaskCompletionSource<size_t> TCS, void* WriteIO) noexcept
 	{
 		return [TCS, WriteIO](IOCompletionOverlapped* Self, size_t Written, int32 ErrorCode)
 		{
@@ -230,7 +230,7 @@ namespace Ayla
 		return true;
 	}
 
-	std::move_only_function<void(IOCompletionOverlapped*, size_t, int32)> WindowsPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
+	MoveOnlyFunction<void(IOCompletionOverlapped*, size_t, int32)> WindowsPlatformIO::FileIOReadAction(TaskCompletionSource<size_t> TCS, void* ReadIO) noexcept
 	{
 		return [TCS, ReadIO](IOCompletionOverlapped* Self, size_t Read, int32 ErrorCode)
 		{

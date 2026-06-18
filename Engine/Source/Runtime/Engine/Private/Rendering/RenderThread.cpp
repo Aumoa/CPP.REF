@@ -14,7 +14,7 @@ namespace Ayla
 		m_Current = this;
 	}
 
-	RenderThread::~RenderThread()
+	RenderThread::~RenderThread() noexcept
 	{
 	}
 

@@ -20,10 +20,9 @@ namespace Ayla
 			m_Task = std::make_shared<SharedTask<T>>();
 		}
 
-		template<class C>
-		SharedTask<T>* GetTask(this C&& c) noexcept
+		SharedTask<T>* GetTask() noexcept
 		{
-			return c.m_Task.get();
+			return m_Task.get();
 		}
 
 	public:

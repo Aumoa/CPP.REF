@@ -1,3 +1,6 @@
 [submodule "Engine/Source/ThirdParty/freetype"]
 	path = Engine/Source/ThirdParty/freetype/src
 	url = https://github.com/freetype/freetype.git
+[submodule "Engine/Source/ThirdParty/DirectXShaderCompiler"]
+	path = Engine/Source/ThirdParty/DirectXShaderCompiler
+	url = https://github.com/microsoft/DirectXShaderCompiler.git

@@ -225,6 +225,44 @@
 
 namespace DirectX
 {
+#if (__cplusplus >= 202002L)
+    namespace Internal
+    {
+        template<size_t RowCount, size_t ColumnCount>
+        constexpr bool MatrixEquals(const float(&left)[RowCount][ColumnCount], const float(&right)[RowCount][ColumnCount]) noexcept
+        {
+            for (size_t row = 0; row < RowCount; ++row)
+            {
+                for (size_t column = 0; column < ColumnCount; ++column)
+                {
+                    if (left[row][column] != right[row][column])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        template<size_t RowCount, size_t ColumnCount>
+        constexpr std::partial_ordering MatrixCompare(const float(&left)[RowCount][ColumnCount], const float(&right)[RowCount][ColumnCount]) noexcept
+        {
+            for (size_t row = 0; row < RowCount; ++row)
+            {
+                for (size_t column = 0; column < ColumnCount; ++column)
+                {
+                    if (auto order = left[row][column] <=> right[row][column]; order != 0)
+                    {
+                        return order;
+                    }
+                }
+            }
+
+            return std::partial_ordering::equivalent;
+        }
+    }
+#endif
 
     /****************************************************************************
      *
@@ -854,8 +892,8 @@ namespace DirectX
         float& operator() (size_t Row, size_t Column) noexcept { return m[Row][Column]; }
 
 #if (__cplusplus >= 202002L)
-        bool operator == (const XMFLOAT3X3&) const = default;
-        auto operator <=> (const XMFLOAT3X3&) const = default;
+        constexpr bool operator == (const XMFLOAT3X3& other) const noexcept { return Internal::MatrixEquals(m, other.m); }
+        constexpr std::partial_ordering operator <=> (const XMFLOAT3X3& other) const noexcept { return Internal::MatrixCompare(m, other.m); }
 #endif
     };
 
@@ -898,8 +936,8 @@ namespace DirectX
         float& operator() (size_t Row, size_t Column) noexcept { return m[Row][Column]; }
 
 #if (__cplusplus >= 202002L)
-        bool operator == (const XMFLOAT4X3&) const = default;
-        auto operator <=> (const XMFLOAT4X3&) const = default;
+        constexpr bool operator == (const XMFLOAT4X3& other) const noexcept { return Internal::MatrixEquals(m, other.m); }
+        constexpr std::partial_ordering operator <=> (const XMFLOAT4X3& other) const noexcept { return Internal::MatrixCompare(m, other.m); }
 #endif
     };
 
@@ -945,8 +983,8 @@ namespace DirectX
         float& operator() (size_t Row, size_t Column) noexcept { return m[Row][Column]; }
 
 #if (__cplusplus >= 202002L)
-        bool operator == (const XMFLOAT3X4&) const = default;
-        auto operator <=> (const XMFLOAT3X4&) const = default;
+        constexpr bool operator == (const XMFLOAT3X4& other) const noexcept { return Internal::MatrixEquals(m, other.m); }
+        constexpr std::partial_ordering operator <=> (const XMFLOAT3X4& other) const noexcept { return Internal::MatrixCompare(m, other.m); }
 #endif
     };
 
@@ -994,8 +1032,8 @@ namespace DirectX
         float& operator() (size_t Row, size_t Column) noexcept { return m[Row][Column]; }
 
 #if (__cplusplus >= 202002L)
-        bool operator == (const XMFLOAT4X4&) const = default;
-        auto operator <=> (const XMFLOAT4X4&) const = default;
+        constexpr bool operator == (const XMFLOAT4X4& other) const noexcept { return Internal::MatrixEquals(m, other.m); }
+        constexpr std::partial_ordering operator <=> (const XMFLOAT4X4& other) const noexcept { return Internal::MatrixCompare(m, other.m); }
 #endif
     };
 
@@ -2277,4 +2315,3 @@ namespace DirectX
 #endif
 
 } // namespace DirectX
-

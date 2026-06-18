@@ -34,6 +34,13 @@ When the current changes do not touch shader code, shader assets, ShaderCompileW
 
 Preserve user-requested configuration, editor, platform, or target options when they are provided.
 
+## Test Checks
+
+- When a dedicated unit test target, test command, or focused executable test exists for the touched subsystem, run it after refreshing AylaBuildTool if the build tool changed.
+- Add or update focused tests for deterministic logic that is practical to isolate, such as math utilities, parsers, serializers, build graph decisions, module rule resolution, reflection metadata, interop marshalling, lifetime management, and state transformations.
+- If a change is not practical to cover with focused tests, use the nearest build, generation, integration, runtime, or platform check and report that rationale.
+- When tests exist and current changes do not touch shader-related code or assets, keep `--skip-shaders` on test-driven AylaBuildTool checks when the command supports it.
+
 ## Generation Checks
 
 Use generation checks when changes affect project scanning, rules, generated code, reflection headers, shaders, or solution/materialization flows:
@@ -47,5 +54,14 @@ When SampleGame is absent, inspect the current repository targets and choose the
 ## Verification Notes
 
 - Prefer focused checks that match the touched subsystem.
+- Before committing feature work with tests, run the relevant tests when practical and report the result.
 - Report when a build or generation command cannot be run.
 - Keep generated C++ IDE projects out of normal native build verification unless the user asks for diagnostics from them.
+- When `gh` is available and a relevant GitHub Actions run exists, verify compile results for Windows, macOS, and Linux at the job level.
+- If `gh` or Actions access is unavailable, report that Actions validation was skipped and perform a stricter source and workflow review for Windows, macOS, and Linux support.
+- Before using GitHub credentials for remote validation, branch publication, pull request updates, or bot-authored validation comments, follow `.codex/skills/github-app-credential-policy/SKILL.md`.
+- On shared working branches such as `dev`, `master`, `main`, or release branches, do not push only to create or test an Actions run unless the user explicitly approves that shared-state action first.
+- On clearly isolated task branches, especially branches whose names start with `codex/`, Codex may push that branch at its own discretion when doing so is useful for build or Actions validation.
+- Destructive or broad shared-state actions still require explicit user approval. If branch ownership is unclear, treat the branch as shared.
+- Branch-local workflow or CI trigger changes may be used for validation on isolated task branches, but remove or revert those temporary settings before merging into protected shared branches.
+- Permanent CI policy changes, such as enabling pull request compile checks for protected branch targets, are allowed when intentionally requested and should be reviewed as normal workflow changes.
