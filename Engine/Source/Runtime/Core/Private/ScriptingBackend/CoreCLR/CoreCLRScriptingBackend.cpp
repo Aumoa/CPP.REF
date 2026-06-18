@@ -12,6 +12,86 @@
 
 namespace Ayla
 {
+	namespace
+	{
+		constexpr int32 RequiredCoreCLRMajorVersion = 9;
+
+		void AddCoreCLRRuntimeDirectoryCandidate(std::vector<String>& candidates, String dotnetRoot)
+		{
+			if (dotnetRoot.IsEmpty())
+			{
+				return;
+			}
+
+			if (dotnetRoot.EndsWith(TEXT("Microsoft.NETCore.App"), StringComparison::CurrentCultureIgnoreCase))
+			{
+				candidates.emplace_back(dotnetRoot);
+			}
+			else
+			{
+				candidates.emplace_back(Path::Combine(dotnetRoot, TEXT("shared"), TEXT("Microsoft.NETCore.App")));
+			}
+		}
+
+		std::vector<String> GetCoreCLRRuntimeDirectoryCandidates()
+		{
+			std::vector<String> candidates;
+			AddCoreCLRRuntimeDirectoryCandidate(candidates, Environment::GetEnvironmentVariable(TEXT("DOTNET_ROOT")));
+
+#if PLATFORM_WINDOWS
+			AddCoreCLRRuntimeDirectoryCandidate(candidates, TEXT("C:\\Program Files\\dotnet"));
+#elif PLATFORM_LINUX
+			AddCoreCLRRuntimeDirectoryCandidate(candidates, TEXT("/usr/share/dotnet"));
+			AddCoreCLRRuntimeDirectoryCandidate(candidates, TEXT("/usr/lib/dotnet"));
+#elif PLATFORM_OSX
+			AddCoreCLRRuntimeDirectoryCandidate(candidates, TEXT("/usr/local/share/dotnet"));
+			AddCoreCLRRuntimeDirectoryCandidate(candidates, TEXT("/usr/share/dotnet"));
+			AddCoreCLRRuntimeDirectoryCandidate(candidates, TEXT("/usr/lib/dotnet"));
+#else
+#error TODO: Add other platform support.
+#endif
+
+			return candidates;
+		}
+
+		String ResolveCoreCLRPath()
+		{
+			bool bFoundRuntime = false;
+			Version bestVersion;
+			String bestRuntimeDirectory;
+
+			for (const String& runtimeRoot : GetCoreCLRRuntimeDirectoryCandidates())
+			{
+				if (Directory::Exists(runtimeRoot) == false)
+				{
+					continue;
+				}
+
+				for (const String& versionDirectory : Directory::GetDirectories(runtimeRoot))
+				{
+					auto versionStr = Path::GetFileName(versionDirectory);
+					Version version;
+					if (Version::TryParse(versionStr, version) && version.Major == RequiredCoreCLRMajorVersion)
+					{
+						if (bFoundRuntime == false || version > bestVersion)
+						{
+							bestVersion = version;
+							bestRuntimeDirectory = versionDirectory;
+							bFoundRuntime = true;
+						}
+					}
+				}
+			}
+
+			if (bFoundRuntime == false)
+			{
+				throw InvalidOperationException(TEXT("No suitable CoreCLR version found."));
+			}
+
+			return Path::Combine(bestRuntimeDirectory, TEXT("coreclr"));
+		}
+	}
+
 	struct CoreCLRScriptingBackend::Functions
 	{
 		coreclr_initialize_ptr coreclr_initialize = nullptr;
@@ -39,30 +119,7 @@ namespace Ayla
 			throw InvalidOperationException(TEXT("The assembly has been loaded."));
 		}
 
-#if PLATFORM_WINDOWS
-		String coreclr = TEXT("C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App");
-#elif PLATFORM_LINUX || PLATFORM_OSX
-		String coreclr = TEXT("/usr/lib/dotnet/shared/Microsoft.NETCore.App");
-#else
-#error TODO: Add other platform support.
-#endif
-
-		std::vector<Version> versions;
-		for (auto& versionDirectory : Directory::GetDirectories(coreclr))
-		{
-			auto versionStr = Path::GetFileName(versionDirectory);
-			Version version;
-			if (Version::TryParse(versionStr, version) && version.Major == 9)
-			{
-				versions.emplace_back(version);
-			}
-		}
-		if (versions.size() == 0)
-		{
-			throw InvalidOperationException(TEXT("No suitable CoreCLR version found."));
-		}
-		std::sort(versions.begin(), versions.end(), std::greater<>());
-		coreclr = Path::Combine(coreclr, versions.front().ToString(), TEXT("coreclr"));
+		String coreclr = ResolveCoreCLRPath();
 
 		m_Hosting = std::make_unique<DynamicLibrary>(coreclr);
 		if (m_Hosting->IsValid() == false)

@@ -132,8 +132,7 @@ namespace Ayla
 				}
 			}
 
-			auto rad = Angle.ToRadians().Value;
-			T halfAngle = rad * T(0.5);
+			Radians<T> halfAngle(Angle.ToRadians().Value * T(0.5));
 			T s = Math::Sin(halfAngle);
 			T c = Math::Cos(halfAngle);
 			Vector3<T> axis = Vector<>::Normalize(Axis);
