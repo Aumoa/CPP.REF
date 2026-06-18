@@ -176,20 +176,26 @@ internal static partial class BuildRunner
                     }
                 }
 
+                Task? previousPchConsumerTask = pchCompileTask?.Task;
                 foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
                 {
                     if (sourceCode.Type is SourceCodeType.SourceCode or SourceCodeType.ModuleInterface)
                     {
                         var command = new CppCompileCommand(compileEnvironment, sourceCode);
                         allCompiles.Add(command);
-                        Task[] prerequisiteTasks = command.UsesPch && pchCompileTask != null
-                            ? [pchCompileTask.Task]
+                        Task[] prerequisiteTasks = command.UsesPch && previousPchConsumerTask != null
+                            ? [previousPchConsumerTask]
                             : [];
 
                         var pchWillRebuild = command.UsesPch && pchCompileTask != null;
                         if (pchWillRebuild || await NeedCompileAsync(command))
                         {
-                            needCompiles.Add(new CompileTask(command, prerequisiteTasks));
+                            var compileTask = new CompileTask(command, prerequisiteTasks);
+                            needCompiles.Add(compileTask);
+                            if (command.UsesPch)
+                            {
+                                previousPchConsumerTask = compileTask.Task;
+                            }
                         }
                     }
                 }
@@ -451,7 +457,10 @@ internal static partial class BuildRunner
                     generatedSourceCodes.Add(task.Project, list);
                 }
 
-                list.Add(generatedSourceCode);
+                if (list.Any(sourceCode => string.Equals(sourceCode.FilePath, generatedSourceCode.FilePath, StringComparison.OrdinalIgnoreCase)) == false)
+                {
+                    list.Add(generatedSourceCode);
+                }
             }
 
             Console.WriteLine(" Done.");

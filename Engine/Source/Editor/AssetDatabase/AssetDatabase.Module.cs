@@ -7,6 +7,9 @@ public class AssetDatabase : ModuleRules
 {
     public AssetDatabase()
     {
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("CoreEd");

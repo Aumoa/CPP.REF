@@ -7,6 +7,9 @@ public class CoreEd : ModuleRules
 {
     public CoreEd()
     {
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Engine", "ApplicationCore");

@@ -153,6 +153,8 @@ internal class ClCompiler : CppCompiler
         }
 
         Directory.CreateDirectory(command.IntermediateDirectory);
+        File.Delete(command.ObjectFilePath);
+        File.Delete(command.DependenciesFilePath);
 
         var pdbFilePath = command.UsesPch && command.PchSettings != null
             ? command.PchSettings.PdbFilePath

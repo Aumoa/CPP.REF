@@ -9,6 +9,9 @@ public class VulkanAPI : ModuleRules
     public VulkanAPI()
     {
         Script.Enabled = true;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicIncludePaths("C:\\VulkanSDK\\1.4.335.0\\Include");
