@@ -7,17 +7,9 @@
 #include "Tests/ManagedInteropTest.h"
 #include "Tests/NumericsTest.h"
 #include "Tests/ObjectLifetimeTest.h"
-#include <csignal>
 #include <memory>
 
 using namespace Ayla;
-
-std::stop_source g_StopSource;
-
-void HandleSignal(int)
-{
-	g_StopSource.request_stop();
-}
 
 Task<int32> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 {
@@ -35,11 +27,10 @@ Task<int32> MainAsync(int argc, char** argv, std::stop_token cancellationToken)
 
 int main(int argc, char** argv)
 {
-	signal(SIGINT, HandleSignal);
-
 	try
 	{
-		return MainAsync(argc, argv, g_StopSource.get_token()).GetResult();
+		std::stop_source stopSource;
+		return MainAsync(argc, argv, stopSource.get_token()).GetResult();
 	}
 	catch (const Exception& ex)
 	{
