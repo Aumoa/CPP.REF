@@ -7,7 +7,6 @@ internal class ClCompiler : CppCompiler
     private readonly Installation m_Installation;
     private readonly TargetInfo m_TargetInfo;
     private readonly VisualStudioInstallation.Product m_Product;
-    private readonly StringBuilder m_CommandBuilder = new();
 
     public ClCompiler(Installation installation, TargetInfo targetInfo, VisualStudioInstallation.Product product)
     {
@@ -42,9 +41,9 @@ internal class ClCompiler : CppCompiler
             Logging = Terminal.Logging.None
         };
 
-        m_CommandBuilder.Clear();
+        var commandBuilder = new StringBuilder();
 
-        m_CommandBuilder.Append(
+        commandBuilder.Append(
             // Suppresses display of sign-on banner.
             "/nologo " +
             // Compiles without linking.
@@ -81,7 +80,7 @@ internal class ClCompiler : CppCompiler
 
         if (command.IsModuleInterface)
         {
-            m_CommandBuilder.Append(
+            commandBuilder.Append(
                 // Enables C++ modules.
                 "/exportModule "
             );
@@ -91,7 +90,7 @@ internal class ClCompiler : CppCompiler
         {
             case Configuration.Debug:
             case Configuration.DebugGame:
-                m_CommandBuilder.Append(
+                commandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi- " +
                     // Disable optimization.
@@ -104,7 +103,7 @@ internal class ClCompiler : CppCompiler
                 break;
             case Configuration.Development:
             case Configuration.Shipping:
-                m_CommandBuilder.Append(
+                commandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi " +
                     // Enables function-level linking.
@@ -125,7 +124,7 @@ internal class ClCompiler : CppCompiler
             includes.Add($"/I\"{includeDirectory}\"");
         }
 
-        m_CommandBuilder.Append(string.Join(' ', includes) + ' ');
+        commandBuilder.Append(string.Join(' ', includes) + ' ');
 
         List<string> macros = [];
         foreach (var macro in command.Environment.AdditionalMacros)
@@ -140,7 +139,7 @@ internal class ClCompiler : CppCompiler
             }
         }
 
-        m_CommandBuilder.Append(string.Join(' ', macros) + ' ');
+        commandBuilder.Append(string.Join(' ', macros) + ' ');
 
         List<string> disableWarnings = [];
         foreach (var disableWarning in command.Environment.DisableWarnings)
@@ -150,7 +149,7 @@ internal class ClCompiler : CppCompiler
 
         if (disableWarnings.Count > 0)
         {
-            m_CommandBuilder.Append(string.Join(' ', disableWarnings) + ' ');
+            commandBuilder.Append(string.Join(' ', disableWarnings) + ' ');
         }
 
         Directory.CreateDirectory(command.IntermediateDirectory);
@@ -159,7 +158,7 @@ internal class ClCompiler : CppCompiler
             ? command.PchSettings.PdbFilePath
             : command.PdbFilePath;
 
-        m_CommandBuilder.AppendFormat(
+        commandBuilder.AppendFormat(
             "/Fo\"{0}\" " +
             "/Fd\"{1}\" " +
             "/sourceDependencies \"{2}\" ",
@@ -173,7 +172,7 @@ internal class ClCompiler : CppCompiler
             var pchSettings = command.PchSettings
                 ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
 
-            m_CommandBuilder.AppendFormat(
+            commandBuilder.AppendFormat(
                 "/Yc\"{0}\" " +
                 "/Fp\"{1}\" " +
                 "/FS ",
@@ -186,7 +185,7 @@ internal class ClCompiler : CppCompiler
             var pchSettings = command.PchSettings
                 ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
 
-            m_CommandBuilder.AppendFormat(
+            commandBuilder.AppendFormat(
                 "/Yu\"{0}\" " +
                 "/Fp\"{1}\" " +
                 "/FI\"{0}\" " +
@@ -198,22 +197,22 @@ internal class ClCompiler : CppCompiler
 
         if (command.IsModuleInterface)
         {
-            m_CommandBuilder.AppendFormat(
+            commandBuilder.AppendFormat(
                 "/ifcOutput \"{0}\" ",
                 command.IntermediateDirectory
             );
 
-            m_CommandBuilder.AppendFormat(
+            commandBuilder.AppendFormat(
                 "/ifcSearchDir \"{0}\" ",
                 command.IntermediateDirectory
             );
         }
 
-        m_CommandBuilder.AppendFormat("\"{0}\"", command.SourceCode.FilePath);
+        commandBuilder.AppendFormat("\"{0}\"", command.SourceCode.FilePath);
         Terminal.Output output;
         using (await GetAccess(cancellationToken))
         {
-            output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+            output = await Terminal.ExecuteCommandAsync(commandBuilder.ToString(), options, cancellationToken);
         }
         
         if (output.ExitCode == 0)
@@ -231,7 +230,7 @@ internal class ClCompiler : CppCompiler
         {
             var commandLog = new Terminal.Log
             {
-                Value = $"cl.exe {m_CommandBuilder}",
+                Value = $"cl.exe {commandBuilder}",
                 Verbosity = Terminal.Verbose.Info
             };
 
