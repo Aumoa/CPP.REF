@@ -59,10 +59,6 @@ internal static partial class BuildRunner
 
         var installation = Installation.CreateDefaultInstallation();
         CppCompiler? compiler = null;
-        int compiled = 0;
-        int totalActions = 0;
-        int log = 1;
-        HashSet<string> loggedTerminalFailures = [];
 
         Dictionary<ModuleProject, List<SourceCodeDescriptor>> generatedSourceCodes = [];
 
@@ -234,47 +230,19 @@ internal static partial class BuildRunner
             Console.WriteLine("Skipped shader compilation for {0} shader file(s).", skippedShaderFileCount);
         }
 
-        totalActions = moduleTasks.Sum(p => p.NeedCompileTasks.Length) + moduleTasks.Count(p => p.NeedLink(buildTarget)) + scriptTasks.Count() + shaderTasks.Count();
-        log = totalActions switch
-        {
-            >= 0 and < 10 => 1,
-            >= 10 and < 100 => 2,
-            >= 100 and < 1000 => 3,
-            >= 1000 and < 10000 => 4,
-            >= 10000 and < 100000 => 5,
-            _ => 6
-        };
-
         await EnsureShaderCompileWorkerAsync();
 
         // Execute CMake builds for third-party modules
         await ExecuteCMakeBuilds();
 
-        DispatchCompileWorkers();
-        DispatchShaderCompileWorkers();
-        DispatchLinkWorkers();
-        DispatchScriptCompileWorkers();
-        var buildTasks = moduleTasks.Select(p => p.Task).Concat(scriptTasks.Select(p => p.Task)).Concat(shaderTasks.Select(p => p.Task)).ToArray();
-        try
-        {
-            await Task.WhenAll(buildTasks);
-        }
-        catch
-        {
-            foreach (var task in buildTasks.Where(p => p.IsFaulted))
-            {
-                LogTaskFailure(task.Exception);
-            }
-
-            throw TerminateException.User();
-        }
+        List<BuildAction> buildActions = [];
+        EnqueueCompileActions(buildActions);
+        EnqueueShaderCompileActions(buildActions);
+        EnqueueLinkActions(buildActions);
+        EnqueueScriptCompileActions(buildActions);
+        await new BuildActionExecutor(buildActions).ExecuteAsync(cancellationToken);
 
         return;
-
-        string MakeOutputPrefix(double elapsedSeconds)
-        {
-            return string.Format($"[{{0,{log}}}/{{1,{log}}} {{2,5:F1}}s]", Interlocked.Increment(ref compiled), totalActions, elapsedSeconds);
-        }
 
         async ValueTask<bool> NeedCompileAsync(CppCompileCommand command)
         {
@@ -311,45 +279,6 @@ internal static partial class BuildRunner
             foreach (var filePath in activeCompiler.GetPchCleanupFilePaths(pchSettings).Distinct())
             {
                 File.Delete(filePath);
-            }
-        }
-
-        void LogTaskFailure(Exception? exception)
-        {
-            if (exception == null)
-            {
-                return;
-            }
-
-            IEnumerable<Exception> exceptions = exception is AggregateException ae
-                ? ae.Flatten().InnerExceptions
-                : [exception];
-
-            foreach (var ex in exceptions)
-            {
-                if (ex is TerminalExecutionException terminalException)
-                {
-                    var output = terminalException.Output;
-                    var key = $"{output.Executable}\n{output.Command}\n{output.ExitCode}";
-                    lock (loggedTerminalFailures)
-                    {
-                        if (!loggedTerminalFailures.Add(key))
-                        {
-                            continue;
-                        }
-                    }
-
-                    var logText = string.Join('\n', output.Logs.Select(l => l.Value));
-                    Console.Error.WriteLine("{0} Terminal execution failed with code {1}\n{2}{3}",
-                        MakeOutputPrefix(output.ElapsedSeconds),
-                        output.ExitCode,
-                        output.Command,
-                        string.IsNullOrWhiteSpace(logText) ? string.Empty : "\n" + logText);
-                }
-                else if (ex is not OperationCanceledException)
-                {
-                    Console.Error.WriteLine(ex.Message);
-                }
             }
         }
 
@@ -466,64 +395,91 @@ internal static partial class BuildRunner
             Console.WriteLine(" Done.");
         }
 
-        void DispatchScriptCompileWorkers()
+        void EnqueueScriptCompileActions(List<BuildAction> buildActions)
         {
             Dictionary<string, CSProject> virtualProjects = targetProjects
                 .OfType<ModuleProject>()
                 .Where(p => p.GetRule(buildTarget).Script.Enabled)
                 .ToDictionary(p => p.ScriptProjectFileName, p => scriptProjectFactory.GetScriptProject(p));
 
-            foreach (var scriptTask in scriptTasks)
+            Task? previousScriptTask = null;
+            foreach (var scriptTask in SortScriptTasksByDependency())
             {
-                scriptTask.BuildAsync(scriptTasks, virtualProjects, buildTarget, cancellationToken).ContinueWith(r =>
+                var prerequisiteTask = previousScriptTask;
+                buildActions.Add(new BuildAction(
+                    async ct =>
+                    {
+                        if (prerequisiteTask != null)
+                        {
+                            await prerequisiteTask;
+                        }
+
+                        return await scriptTask.BuildAsync(scriptTasks, virtualProjects, buildTarget, ct);
+                    },
+                    output => string.Join('\n', output.Logs.Select(p => p.Value))));
+                previousScriptTask = scriptTask.Task;
+            }
+
+            List<ScriptTask> SortScriptTasksByDependency()
+            {
+                Dictionary<string, ScriptTask> taskByName = scriptTasks.ToDictionary(p => p.Resolver.Name, StringComparer.OrdinalIgnoreCase);
+                Dictionary<ScriptTask, bool> resolvedTasks = [];
+                HashSet<ScriptTask> resolvingTasks = [];
+                List<ScriptTask> sortedTasks = [];
+
+                foreach (var scriptTask in scriptTasks)
                 {
-                    if (r.IsFaulted)
+                    Visit(scriptTask);
+                }
+
+                return sortedTasks;
+
+                void Visit(ScriptTask scriptTask)
+                {
+                    if (resolvedTasks.ContainsKey(scriptTask))
                     {
                         return;
                     }
 
-                    var output = r.Result;
-                    Console.WriteLine("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
-                });
+                    if (resolvingTasks.Add(scriptTask) == false)
+                    {
+                        throw new InvalidOperationException($"Cyclic script dependency detected at '{scriptTask.Resolver.Name}'.");
+                    }
+
+                    foreach (var dependencyName in scriptTask.Resolver.DependencyModuleNames)
+                    {
+                        if (taskByName.TryGetValue(dependencyName, out var dependencyTask))
+                        {
+                            Visit(dependencyTask);
+                        }
+                    }
+
+                    resolvingTasks.Remove(scriptTask);
+                    resolvedTasks.Add(scriptTask, true);
+                    sortedTasks.Add(scriptTask);
+                }
             }
         }
 
-        void DispatchShaderCompileWorkers()
+        void EnqueueShaderCompileActions(List<BuildAction> buildActions)
         {
             foreach (var shaderTask in shaderTasks)
             {
-                shaderTask.CompileAsync(moduleTasks, installation, cancellationToken).ContinueWith(r =>
-                {
-                    if (r.IsFaulted)
-                    {
-                        return;
-                    }
-
-                    var output = r.Result;
-                    if (output.Logs.Any())
-                    {
-                        Console.WriteLine("{0} Compiling shaders for {1}", MakeOutputPrefix(output.ElapsedSeconds), shaderTask.Group.Name);
-                    }
-                });
+                buildActions.Add(new BuildAction(
+                    ct => shaderTask.CompileAsync(moduleTasks, installation, ct),
+                    _ => $"Compiling shaders for {shaderTask.Group.Name}"));
             }
         }
 
-        void DispatchLinkWorkers()
+        void EnqueueLinkActions(List<BuildAction> buildActions)
         {
             foreach (var moduleTask in moduleTasks)
             {
                 if (moduleTask.NeedLink(buildTarget))
                 {
-                    moduleTask.LinkAsync(moduleTasks, installation, buildTarget, cancellationToken).ContinueWith(r =>
-                    {
-                        if (r.IsFaulted)
-                        {
-                            return;
-                        }
-
-                        var output = r.Result;
-                        Console.WriteLine("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), string.Join('\n', output.Logs.Select(p => p.Value)));
-                    });
+                    buildActions.Add(new BuildAction(
+                        ct => moduleTask.LinkAsync(moduleTasks, installation, buildTarget, ct),
+                        output => string.Join('\n', output.Logs.Select(p => p.Value))));
                 }
                 else
                 {
@@ -532,23 +488,14 @@ internal static partial class BuildRunner
             }
         }
 
-        void DispatchCompileWorkers()
+        void EnqueueCompileActions(List<BuildAction> buildActions)
         {
             var allCompiles = moduleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
             foreach (var compileTask in allCompiles)
             {
-                compileTask.CompileAsync(installation, buildTarget, cancellationToken).ContinueWith(r =>
-                {
-                    if (r.IsFaulted)
-                    {
-                        return;
-                    }
-
-                    var output = r.Result;
-                    string fileText = string.Format("{0} {1}", MakeOutputPrefix(output.ElapsedSeconds), compileTask.Command.SourceCode.FilePath);
-                    string[] outputs = [fileText, .. output.Logs.Select(l => l.Value)];
-                    Console.WriteLine(string.Join('\n', outputs));
-                });
+                buildActions.Add(new BuildAction(
+                    ct => compileTask.CompileAsync(installation, buildTarget, ct),
+                    output => string.Join('\n', [compileTask.Command.SourceCode.FilePath, .. output.Logs.Select(l => l.Value)])));
             }
         }
     }
