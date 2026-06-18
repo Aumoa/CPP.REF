@@ -23,12 +23,12 @@ namespace Ayla
 		struct TestCaseResult
 		{
 			String Name;
-			int32 Passes;
+			int32 Passes = 0;
 			std::vector<String> Failures;
 			String ExceptionMessage;
 		};
 
-		struct Assert
+		struct CORE_API Assert
 		{
 		private:
 			struct AcquisitionScope
