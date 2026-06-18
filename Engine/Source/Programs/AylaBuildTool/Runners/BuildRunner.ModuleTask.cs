@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class ModuleTask : ITask
+    internal class ModuleTask : ITask
     {
         public readonly ModuleRulesResolver Resolver;
         public readonly CompileTask[] NeedCompileTasks;

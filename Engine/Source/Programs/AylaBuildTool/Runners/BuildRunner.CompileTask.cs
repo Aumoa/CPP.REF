@@ -1,8 +1,8 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class CompileTask : ITask
+    internal class CompileTask : ITask
     {
         public readonly CppCompileCommand Command;
         private readonly Task[] m_PrerequisiteTasks;

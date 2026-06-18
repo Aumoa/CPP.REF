@@ -2,7 +2,7 @@ namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class ShaderCompileTask : ITask
+    internal class ShaderCompileTask : ITask
     {
         private const int MaxShaderTypeDetectionLines = 20; // Maximum lines to scan for shader type annotation
 

@@ -138,7 +138,6 @@ internal static partial class BuildRunner
         }
 
         await DispatchGenerateHeaderWorkers();
-        Dictionary<ModuleProject, int> buildGraph = [];
 
         List<ModuleTask> moduleTasks = [];
         List<ScriptTask> scriptTasks = [];
@@ -235,12 +234,15 @@ internal static partial class BuildRunner
         // Execute CMake builds for third-party modules
         await ExecuteCMakeBuilds();
 
-        List<BuildAction> buildActions = [];
-        EnqueueCompileActions(buildActions);
-        EnqueueShaderCompileActions(buildActions);
-        EnqueueLinkActions(buildActions);
-        EnqueueScriptCompileActions(buildActions);
-        await new BuildActionExecutor(buildActions).ExecuteAsync(cancellationToken);
+        var buildPlan = new BuildPlanBuilder(
+            targetProjects,
+            moduleTasks,
+            scriptTasks,
+            shaderTasks,
+            installation,
+            buildTarget,
+            scriptProjectFactory).Build();
+        await buildPlan.ExecuteAsync(cancellationToken);
 
         return;
 
@@ -393,110 +395,6 @@ internal static partial class BuildRunner
             }
 
             Console.WriteLine(" Done.");
-        }
-
-        void EnqueueScriptCompileActions(List<BuildAction> buildActions)
-        {
-            Dictionary<string, CSProject> virtualProjects = targetProjects
-                .OfType<ModuleProject>()
-                .Where(p => p.GetRule(buildTarget).Script.Enabled)
-                .ToDictionary(p => p.ScriptProjectFileName, p => scriptProjectFactory.GetScriptProject(p));
-
-            Task? previousScriptTask = null;
-            foreach (var scriptTask in SortScriptTasksByDependency())
-            {
-                var prerequisiteTask = previousScriptTask;
-                buildActions.Add(new BuildAction(
-                    async ct =>
-                    {
-                        if (prerequisiteTask != null)
-                        {
-                            await prerequisiteTask;
-                        }
-
-                        return await scriptTask.BuildAsync(scriptTasks, virtualProjects, buildTarget, ct);
-                    },
-                    output => string.Join('\n', output.Logs.Select(p => p.Value))));
-                previousScriptTask = scriptTask.Task;
-            }
-
-            List<ScriptTask> SortScriptTasksByDependency()
-            {
-                Dictionary<string, ScriptTask> taskByName = scriptTasks.ToDictionary(p => p.Resolver.Name, StringComparer.OrdinalIgnoreCase);
-                Dictionary<ScriptTask, bool> resolvedTasks = [];
-                HashSet<ScriptTask> resolvingTasks = [];
-                List<ScriptTask> sortedTasks = [];
-
-                foreach (var scriptTask in scriptTasks)
-                {
-                    Visit(scriptTask);
-                }
-
-                return sortedTasks;
-
-                void Visit(ScriptTask scriptTask)
-                {
-                    if (resolvedTasks.ContainsKey(scriptTask))
-                    {
-                        return;
-                    }
-
-                    if (resolvingTasks.Add(scriptTask) == false)
-                    {
-                        throw new InvalidOperationException($"Cyclic script dependency detected at '{scriptTask.Resolver.Name}'.");
-                    }
-
-                    foreach (var dependencyName in scriptTask.Resolver.DependencyModuleNames)
-                    {
-                        if (taskByName.TryGetValue(dependencyName, out var dependencyTask))
-                        {
-                            Visit(dependencyTask);
-                        }
-                    }
-
-                    resolvingTasks.Remove(scriptTask);
-                    resolvedTasks.Add(scriptTask, true);
-                    sortedTasks.Add(scriptTask);
-                }
-            }
-        }
-
-        void EnqueueShaderCompileActions(List<BuildAction> buildActions)
-        {
-            foreach (var shaderTask in shaderTasks)
-            {
-                buildActions.Add(new BuildAction(
-                    ct => shaderTask.CompileAsync(moduleTasks, installation, ct),
-                    _ => $"Compiling shaders for {shaderTask.Group.Name}"));
-            }
-        }
-
-        void EnqueueLinkActions(List<BuildAction> buildActions)
-        {
-            foreach (var moduleTask in moduleTasks)
-            {
-                if (moduleTask.NeedLink(buildTarget))
-                {
-                    buildActions.Add(new BuildAction(
-                        ct => moduleTask.LinkAsync(moduleTasks, installation, buildTarget, ct),
-                        output => string.Join('\n', output.Logs.Select(p => p.Value))));
-                }
-                else
-                {
-                    moduleTask.SetComplete();
-                }
-            }
-        }
-
-        void EnqueueCompileActions(List<BuildAction> buildActions)
-        {
-            var allCompiles = moduleTasks.SelectMany(p => p.NeedCompileTasks).ToArray();
-            foreach (var compileTask in allCompiles)
-            {
-                buildActions.Add(new BuildAction(
-                    ct => compileTask.CompileAsync(installation, buildTarget, ct),
-                    output => string.Join('\n', [compileTask.Command.SourceCode.FilePath, .. output.Logs.Select(l => l.Value)])));
-            }
         }
     }
 }

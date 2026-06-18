@@ -6,7 +6,7 @@ namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class ScriptTask(ModuleRulesResolver resolver, CSProject scriptProject) : ITask
+    internal class ScriptTask(ModuleRulesResolver resolver, CSProject scriptProject) : ITask
     {
         private readonly TaskCompletionSource m_CompletionSource = new();
 
