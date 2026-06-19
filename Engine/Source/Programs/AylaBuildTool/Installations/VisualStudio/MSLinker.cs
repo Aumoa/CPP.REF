@@ -16,7 +16,7 @@ internal class MSLinker : Linker
         m_Product = product;
     }
 
-    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompiler.CompileItem[] sourceObjects, CancellationToken cancellationToken)
+    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompileCommand[] sourceObjects, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {
@@ -57,10 +57,7 @@ internal class MSLinker : Linker
 
         for (int i = 0; i < sourceObjects.Length; ++i)
         {
-            var intermediateDirectory = sourceObjects[i].Descriptor.Intermediate(module.Name, m_TargetInfo, FolderPolicy.PathType.Current);
-            var fileName = Path.GetFileName(sourceObjects[i].SourceCode.FilePath);
-            var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-            m_CommandBuilder.AppendFormat("\"{0}\" ", objectFileName);
+            m_CommandBuilder.AppendFormat("\"{0}\" ", sourceObjects[i].ObjectFilePath);
         }
 
         string libraryPath = Path.Combine(m_Product.Directory, "lib", m_TargetInfo.Platform.Architecture switch

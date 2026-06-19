@@ -11,6 +11,8 @@ internal class ModuleRulesResolver
         Rules = rules;
         EngineGroup = solution.EngineGroup;
         PrimaryGroup = solution.PrimaryGroup;
+        m_PchUsage = rules.PchUsage;
+        m_PrivatePchHeaderFile = rules.PrivatePchHeaderFile;
 
         PrivateDependencyModuleNames = WithBuiltInDependencyModule(rules.PrivateDependencyModuleNames).Distinct().ToArray();
         PrivateIncludePaths = rules.PrivateIncludePaths.Distinct().Select(p => AbsoluteIncludePath(targetProject, p)).ToArray();
@@ -173,6 +175,10 @@ internal class ModuleRulesResolver
     public readonly ModuleRules Rules;
     public string RuleFilePath => Project.RuleFilePath;
     public string Name => Project.Name;
+    private readonly PchUsageMode m_PchUsage;
+    private readonly string? m_PrivatePchHeaderFile;
+    public PchUsageMode PchUsage => m_PchUsage;
+    public string? PrivatePchHeaderFile => m_PrivatePchHeaderFile;
     public GroupDescriptor Group => Project.Group;
     public readonly GroupDescriptor EngineGroup;
     public readonly GroupDescriptor PrimaryGroup;

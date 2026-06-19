@@ -9,6 +9,9 @@ public class GameAssembly : ModuleRules
     {
         Script.Enabled = true;
         Type = ModuleType.Game;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics", "RenderCore", "Engine");
