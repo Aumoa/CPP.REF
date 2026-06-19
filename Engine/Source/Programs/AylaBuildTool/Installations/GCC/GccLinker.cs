@@ -6,7 +6,7 @@ internal class GccLinker : UnixLinker
     {
     }
 
-    protected override ValueTask<string[]> ConfigureCommandsAsync(bool isShared, CancellationToken cancellationToken)
+    protected override ValueTask<string[]> ConfigureCommandsAsync(ModuleRulesResolver module, bool isShared, CancellationToken cancellationToken)
     {
         List<string> commands = [];
 
@@ -15,7 +15,7 @@ internal class GccLinker : UnixLinker
             commands.Add("-shared");
         }
 
-        if (m_TargetInfo.Config.GetTargetProfile().IsOptimized)
+        if (module.BuildProfile.IsOptimized)
         {
             commands.Add("-ffunction-sections");
             commands.Add("-fdata-sections");

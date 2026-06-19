@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 internal record GroupDescriptor
 {
@@ -6,7 +6,9 @@ internal record GroupDescriptor
 
     public string Name { get; init; } = string.Empty;
 
-    public bool IsEngine { get; init; }
+    public SourceGroupKind Kind { get; init; } = SourceGroupKind.Project;
+
+    public bool IsEngine => Kind == SourceGroupKind.Engine;
 
     public string SourceDirectory { get; init; } = string.Empty;
 
@@ -18,11 +20,16 @@ internal record GroupDescriptor
 
     public static GroupDescriptor FromRoot(string rootPath, bool isEngine)
     {
+        return FromRoot(rootPath, isEngine ? SourceGroupKind.Engine : SourceGroupKind.Project);
+    }
+
+    public static GroupDescriptor FromRoot(string rootPath, SourceGroupKind kind)
+    {
         return new GroupDescriptor
         {
             RootDirectory = rootPath,
             Name = Path.GetFileName(Path.GetFullPath(rootPath)),
-            IsEngine = isEngine,
+            Kind = kind,
             SourceDirectory = Path.Combine(rootPath, "Source"),
             IntermediateDirectory = Path.Combine(rootPath, "Intermediate"),
             BinariesDirectory = Path.Combine(rootPath, "Binaries"),

@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 public enum Configuration
 {
@@ -33,30 +33,35 @@ public enum AbiMode
 }
 
 public readonly record struct BuildConfigurationProfile(
+    string Name,
     OptimizationMode Optimization,
     RuntimeLibraryMode RuntimeLibrary,
     AssertionMode Assertions,
     AbiMode Abi)
 {
     public static BuildConfigurationProfile Debug { get; } = new(
+        nameof(Debug),
         OptimizationMode.Debug,
         RuntimeLibraryMode.Debug,
         AssertionMode.Enabled,
         AbiMode.Debug);
 
     public static BuildConfigurationProfile DebugGame { get; } = new(
+        nameof(DebugGame),
         OptimizationMode.Debug,
         RuntimeLibraryMode.Release,
         AssertionMode.Enabled,
         AbiMode.Release);
 
     public static BuildConfigurationProfile Development { get; } = new(
+        nameof(Development),
         OptimizationMode.Release,
         RuntimeLibraryMode.Release,
         AssertionMode.Enabled,
         AbiMode.Release);
 
     public static BuildConfigurationProfile Release { get; } = new(
+        nameof(Release),
         OptimizationMode.Release,
         RuntimeLibraryMode.Release,
         AssertionMode.Disabled,

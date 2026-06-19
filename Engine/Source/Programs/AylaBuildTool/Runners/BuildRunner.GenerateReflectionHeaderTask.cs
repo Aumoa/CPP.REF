@@ -1,4 +1,4 @@
-﻿using AylaEngine.RHT;
+using AylaEngine.RHT;
 
 namespace AylaEngine;
 
@@ -35,7 +35,8 @@ internal static partial class BuildRunner
         public async Task<SourceCodeDescriptor> WriteAsync(RHTGeneratedSource generatedSource, CancellationToken cancellationToken = default)
         {
             var fileName = Path.GetFileNameWithoutExtension(m_SourceCode.FilePath);
-            var intDir = m_Project.Group.Intermediate(m_Project.Name, m_BuildTarget, FolderPolicy.PathType.Current);
+            var buildProfile = BuildProfileResolver.Resolve(m_Project, m_BuildTarget);
+            var intDir = m_Project.Group.Intermediate(m_Project.Name, m_BuildTarget, buildProfile, FolderPolicy.PathType.Current);
             var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
             var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
             var generatedBindingCode = Path.Combine(m_Project.SourceDirectory, "Script", "Bindings", fileName + ".bindings.cs");

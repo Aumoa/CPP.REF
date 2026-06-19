@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using static AylaEngine.CppCompiler;
 
 namespace AylaEngine;
@@ -29,7 +29,7 @@ internal static partial class BuildRunner
                 return true;
             }
 
-            var outputFileName = Resolver.Group.OutputFileName(m_Installation, targetInfo, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
+            var outputFileName = Resolver.Group.OutputFileName(m_Installation, targetInfo, Resolver.BuildProfile, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
             if (File.Exists(outputFileName) == false)
             {
                 return true;
@@ -55,7 +55,7 @@ internal static partial class BuildRunner
 
             var cmakeSource = Path.GetFullPath(Path.Combine(project.SourceDirectory, rule.ThirdParty.CMakeSource));
             var cmakeIntDir = project.Group.Intermediate(project.Name, targetInfo.Platform, FolderPolicy.PathType.Current);
-            var cmakeOutDir = project.Group.Output(targetInfo, FolderPolicy.PathType.Current);
+            var cmakeOutDir = project.Group.Output(targetInfo, BuildProfileResolver.Resolve(project, targetInfo), FolderPolicy.PathType.Current);
             string[] ps =
             [
                 $"-S \"{cmakeSource}\"",

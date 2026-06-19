@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 internal static class FolderPolicy
 {
@@ -15,6 +15,12 @@ internal static class FolderPolicy
         return PathPolicy(result, pathType);
     }
 
+    public static string Intermediate(this GroupDescriptor descriptor, string name, ITargetInfo targetInfo, BuildConfigurationProfile profile, PathType pathType)
+    {
+        var result = Path.Combine(descriptor.IntermediateDirectory, name, targetInfo.Platform.Name, GetConfigurationFolderName(targetInfo, profile));
+        return PathPolicy(result, pathType);
+    }
+
     public static string Intermediate(this GroupDescriptor descriptor, string name, PlatformInfo platformInfo, PathType pathType)
     {
         var result = Path.Combine(descriptor.IntermediateDirectory, name, platformInfo.Name);
@@ -27,9 +33,21 @@ internal static class FolderPolicy
         return PathPolicy(result, pathType);
     }
 
+    public static string Output(this GroupDescriptor descriptor, ITargetInfo targetInfo, BuildConfigurationProfile profile, PathType pathType)
+    {
+        var result = Path.Combine(descriptor.BinariesDirectory, targetInfo.Platform.Name, GetConfigurationFolderName(targetInfo, profile));
+        return PathPolicy(result, pathType);
+    }
+
     public static string OutputFileName(this GroupDescriptor descriptor, Installation installation,  ITargetInfo targetInfo, string projectName, ModuleType moduleType, PathType pathType)
     {
         var result = Path.Combine(Output(descriptor, targetInfo, pathType), installation.OutputFileName(projectName, moduleType));
+        return PathPolicy(result, pathType);
+    }
+
+    public static string OutputFileName(this GroupDescriptor descriptor, Installation installation, ITargetInfo targetInfo, BuildConfigurationProfile profile, string projectName, ModuleType moduleType, PathType pathType)
+    {
+        var result = Path.Combine(Output(descriptor, targetInfo, profile, pathType), installation.OutputFileName(projectName, moduleType));
         return PathPolicy(result, pathType);
     }
 
@@ -50,5 +68,10 @@ internal static class FolderPolicy
             default:
                 return value;
         }
+    }
+
+    private static string GetConfigurationFolderName(ITargetInfo targetInfo, BuildConfigurationProfile profile)
+    {
+        return profile.Name + (targetInfo.Editor ? "-Editor" : string.Empty);
     }
 }

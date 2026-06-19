@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -69,7 +69,7 @@ internal class ClCompiler : CppCompiler
             );
         }
 
-        var profile = m_TargetInfo.Config.GetTargetProfile();
+        var profile = item.Resolver.BuildProfile;
         switch (profile.Optimization)
         {
             case OptimizationMode.Debug:
@@ -135,7 +135,7 @@ internal class ClCompiler : CppCompiler
         }
 
         var fileName = Path.GetFileName(item.SourceCode.FilePath);
-        var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
+        var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, profile, FolderPolicy.PathType.Current);
         var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
         var pdbFileName = Path.Combine(intermediateDirectory, fileName + ".pdb");
         var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps");

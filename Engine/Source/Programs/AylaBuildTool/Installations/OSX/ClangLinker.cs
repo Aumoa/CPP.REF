@@ -1,4 +1,4 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 internal class ClangLinker : UnixLinker
 {
@@ -6,7 +6,7 @@ internal class ClangLinker : UnixLinker
     {
     }
 
-    protected override ValueTask<string[]> ConfigureCommandsAsync(bool isShared, CancellationToken cancellationToken)
+    protected override ValueTask<string[]> ConfigureCommandsAsync(ModuleRulesResolver module, bool isShared, CancellationToken cancellationToken)
     {
         List<string> commands = [];
 
@@ -15,7 +15,7 @@ internal class ClangLinker : UnixLinker
             commands.Add("-dynamiclib");
         }
 
-        if (m_TargetInfo.Config.GetTargetProfile().IsOptimized)
+        if (module.BuildProfile.IsOptimized)
         {
             commands.Add("-Wl,-dead_strip");
         }

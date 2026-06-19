@@ -70,7 +70,8 @@ internal static partial class BuildRunner
         {
             foreach (var project in targetProjects.OfType<ModuleProject>())
             {
-                var intDir = project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
+                var buildProfile = BuildProfileResolver.Resolve(project, buildTarget);
+                var intDir = project.Group.Intermediate(project.Name, buildTarget, buildProfile, FolderPolicy.PathType.Current);
                 if (Directory.Exists(intDir))
                 {
                     foreach (var sourceCode in project.GetSourceCodes())
@@ -110,7 +111,7 @@ internal static partial class BuildRunner
                 }
             }
 
-            var engineOutput = solution.EngineGroup.Output(buildTarget, FolderPolicy.PathType.Current);
+            var engineOutput = solution.EngineGroup.Output(buildTarget, BuildProfileResolver.Resolve(solution.EngineGroup, buildTarget), FolderPolicy.PathType.Current);
             if (Directory.Exists(engineOutput))
             {
                 Directory.Delete(engineOutput, true);
@@ -118,7 +119,7 @@ internal static partial class BuildRunner
 
             if (solution.PrimaryGroup != null && solution.PrimaryGroup != solution.EngineGroup)
             {
-                var primaryOutput = solution.PrimaryGroup.Output(buildTarget, FolderPolicy.PathType.Current);
+                var primaryOutput = solution.PrimaryGroup.Output(buildTarget, BuildProfileResolver.Resolve(solution.PrimaryGroup, buildTarget), FolderPolicy.PathType.Current);
                 if (Directory.Exists(primaryOutput))
                 {
                     Directory.Delete(primaryOutput, true);
@@ -153,7 +154,7 @@ internal static partial class BuildRunner
 
             if (project.GetRule(buildTarget).Type != ModuleType.ThirdParty)
             {
-                var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, FolderPolicy.PathType.Current);
+                var intDir = resolver.Group.Intermediate(resolver.Name, buildTarget, resolver.BuildProfile, FolderPolicy.PathType.Current);
 
                 foreach (var sourceCode in project.GetSourceCodes().Concat(generatedSourceCodes.GetValueOrDefault(project, [])))
                 {
@@ -310,7 +311,7 @@ internal static partial class BuildRunner
             }
 
             var workerTargetInfo = new TargetInfo { Platform = buildTarget.Platform, Config = Configuration.Development, Editor = false };
-            var workerPath = Path.Combine(solution.EngineGroup.Output(workerTargetInfo, FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
+            var workerPath = Path.Combine(solution.EngineGroup.Output(workerTargetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, workerTargetInfo), FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
 
             Console.WriteLine("Building ShaderCompileWorker (Development)...");
             await RunAsync(new BuildOptions

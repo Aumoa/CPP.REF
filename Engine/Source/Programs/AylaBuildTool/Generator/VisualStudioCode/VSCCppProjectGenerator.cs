@@ -168,7 +168,7 @@ internal static class VSCCppProjectGenerator
                 string compilerPath = await installation.GetCompilerPath(targetInfo, cancellationToken);
                 string intelliSenseMode = await installation.GetIntelliSenseMode(targetInfo, cancellationToken);
                 var rule = resolver.Rules;
-                var outputFileName = project.Group.OutputFileName(installation, targetInfo, project.Name, rule.Type, FolderPolicy.PathType.Linux);
+                var outputFileName = project.Group.OutputFileName(installation, targetInfo, resolver.BuildProfile, project.Name, rule.Type, FolderPolicy.PathType.Linux);
                 var fileName = Path.GetFileName(outputFileName);
                 if (fileName.StartsWith("lib") && fileName.EndsWith(".so"))
                 {
@@ -181,7 +181,7 @@ internal static class VSCCppProjectGenerator
                 {
                     Name = FormatTargetName(targetInfo),
                     IncludePath = resolver.IncludePaths.ToArray(),
-                    Defines = AppendPlatformMacros(resolver.AdditionalMacros).Select(FormatMacro).ToArray(),
+                    Defines = AppendPlatformMacros(resolver.AdditionalMacros, resolver.BuildProfile).Select(FormatMacro).ToArray(),
                     CompilerPath = compilerPath,
                     CStandard = "c11",
                     CppStandard = "c++23",
@@ -272,10 +272,10 @@ internal static class VSCCppProjectGenerator
                     Name = FormatTargetName(targetInfo),
                     Type = "cppdbg",
                     Request = "launch",
-                    Program = Path.Combine(solution.EngineGroup.Output(targetInfo, FolderPolicy.PathType.Linux)) + "/Launch",
+                    Program = Path.Combine(solution.EngineGroup.Output(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)) + "/Launch",
                     Arguments = [.. args],
                     StopAtEntry = false,
-                    WorkingDirectory = Path.Combine(solution.EngineGroup.Output(targetInfo, FolderPolicy.PathType.Linux)),
+                    WorkingDirectory = Path.Combine(solution.EngineGroup.Output(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)),
                     Environment = [
                         new LaunchConfigurationEnvironment
                         {
@@ -289,7 +289,7 @@ internal static class VSCCppProjectGenerator
                 });
             }
 
-            IEnumerable<MacroSet> AppendPlatformMacros(IEnumerable<MacroSet> set)
+            IEnumerable<MacroSet> AppendPlatformMacros(IEnumerable<MacroSet> set, BuildConfigurationProfile profile)
             {
                 switch (targetInfo.Platform.Group)
                 {
@@ -304,7 +304,7 @@ internal static class VSCCppProjectGenerator
                         break;
                 }
 
-                if (targetInfo.Config.GetTargetProfile().EnablesAssertions)
+                if (profile.EnablesAssertions)
                 {
                     set = set.Append("DO_CHECK=1");
                 }
