@@ -1,4 +1,4 @@
 interface:
   display_name: "Ayla Build"
-  short_description: "Build and generate Ayla projects correctly."
+  short_description: "Build, test, and generate Ayla projects correctly."
   default_prompt: "Use the Ayla build workflow to verify this repository."

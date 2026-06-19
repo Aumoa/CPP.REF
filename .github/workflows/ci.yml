@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - dev
+  pull_request:
+    branches:
+      - dev
 
 jobs:
   build:
@@ -40,3 +43,6 @@ jobs:
 
       - name: Build
         run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll build --target "Engine" --config Shipping --skip-shaders
+
+      - name: Run unit tests
+        run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll test --target "AylaUnitTests" --config Shipping --skip-shaders

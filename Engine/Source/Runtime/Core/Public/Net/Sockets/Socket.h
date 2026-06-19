@@ -49,7 +49,9 @@ namespace Ayla
 		size_t SendTo(std::span<const uint8> buffer, const IPEndPoint& remoteEP);
 		size_t ReceiveFrom(std::span<uint8> buffer, IPEndPoint& remoteEP);
 
-		// Asynchronous operations using Task
+		// Asynchronous operations using Task.
+		// Send and receive calls complete a single native socket operation, so callers must loop when a protocol requires the full buffer to be transferred.
+		// Buffer spans passed to async calls must remain valid until the returned task completes.
 		Task<std::shared_ptr<Socket>> AcceptAsync(std::stop_token cancellationToken = {});
 		Task<> ConnectAsync(const IPEndPoint& remoteEP, std::stop_token cancellationToken = {});
 		Task<size_t> SendAsync(std::span<const uint8> buffer, std::stop_token cancellationToken = {});
