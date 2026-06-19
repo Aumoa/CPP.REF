@@ -6,17 +6,9 @@ Keep this plan sorted by priority. When an item is completed, remove it from thi
 
 This plan starts after source group ownership, module-specific build profiles, and effective profile routing have landed. It tracks only the remaining work needed to stabilize the build configuration model and then add module PCH support.
 
-## Priority 0 - Lock The Current Build Configuration Policy
+## Priority 0 - Validate Real DebugGame Behavior
 
-1. Add effective-profile path policy tests.
-
-   Validate that `FolderPolicy` uses the effective profile name for module artifacts such as intermediate directories, native output directories, generated headers, generated sources, scripts, shaders, and test executables.
-
-   Cover editor suffix behavior as part of the path tests.
-
-## Priority 1 - Validate Real DebugGame Behavior
-
-2. Verify the intended DebugGame reuse and compatibility behavior.
+1. Verify the intended DebugGame reuse and compatibility behavior.
 
    Run a clean or controlled build sequence that proves the actual artifact layout and incremental behavior:
 
@@ -26,7 +18,7 @@ This plan starts after source group ownership, module-specific build profiles, a
    - Project `Debug` artifacts are not accidentally reused by `DebugGame`, because `DebugGame` intentionally uses release runtime and release ABI for compatibility with engine Release artifacts.
    - Linking Project DebugGame modules against Engine Release modules does not introduce runtime library or ABI mismatches.
 
-3. Validate generated IDE project metadata.
+2. Validate generated IDE project metadata.
 
    Regenerate Visual Studio and Visual Studio Code project files for `SampleGame` when practical, then inspect the generated DebugGame metadata:
 
@@ -37,27 +29,27 @@ This plan starts after source group ownership, module-specific build profiles, a
 
    Generated IDE projects must continue to behave as navigation and diagnostic entry points while AylaBuildTool remains the actual native build entry point.
 
-## Priority 2 - Reduce Future Misuse
+## Priority 1 - Reduce Future Misuse
 
-4. Review the legacy target-wide profile API.
+3. Review the legacy target-wide profile API.
 
    `Configuration.GetTargetProfile()` remains available for compatibility with the previous target-wide behavior. Review whether it should stay as-is, be renamed to make legacy use explicit, or be restricted to call sites that truly need target-wide semantics.
 
    New build pipeline code should prefer module effective profiles over target-wide configuration profiles.
 
-5. Clarify output path terminology if ambiguity remains.
+4. Clarify output path terminology if ambiguity remains.
 
    If future changes keep mixing requested target configuration paths with effective module profile paths, introduce clearer helper names or wrapper methods, such as module output versus target output concepts.
 
    The goal is to make it difficult to accidentally place module artifacts in requested-configuration folders when the effective profile differs.
 
-## Priority 3 - Add Module PCH Support
+## Priority 2 - Add Module PCH Support
 
-6. Design the ModuleRules PCH API.
+5. Design the ModuleRules PCH API.
 
    Add an explicit ModuleRules-level way to opt into a PCH header. The API should keep the PCH decision local to the module, allow modules to use `CoreMinimal.h` or their own module-specific PCH, and avoid forcing a global engine-wide PCH policy too early.
 
-7. Implement PCH build actions.
+6. Implement PCH build actions.
 
    Add PCH compile actions before source compile actions and route PCH artifacts through the module effective-profile intermediate directory.
 
@@ -68,7 +60,7 @@ This plan starts after source group ownership, module-specific build profiles, a
    - Cache and dependency tracking that includes the selected PCH header and PCH compiler options.
    - Clean/rebuild behavior for PCH artifacts.
 
-8. Validate `CoreMinimal.h` as the first practical PCH.
+7. Validate `CoreMinimal.h` as the first practical PCH.
 
    Start with modules that naturally include `CoreMinimal.h`, verify that the PCH is used by source files that opt in, and confirm that it does not hide missing includes or introduce unwanted module dependencies.
 

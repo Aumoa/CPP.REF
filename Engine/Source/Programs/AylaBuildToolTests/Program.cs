@@ -6,7 +6,9 @@ internal static class Program
     [
         new("BuildProfileResolver maps engine configurations", BuildProfileResolverMapsEngineConfigurations),
         new("BuildProfileResolver maps project configurations", BuildProfileResolverMapsProjectConfigurations),
-        new("BuildConfigurationProfile exposes compiler policy flags", BuildConfigurationProfileExposesCompilerPolicyFlags)
+        new("BuildConfigurationProfile exposes compiler policy flags", BuildConfigurationProfileExposesCompilerPolicyFlags),
+        new("FolderPolicy uses effective profiles for module paths", FolderPolicyUsesEffectiveProfilesForModulePaths),
+        new("FolderPolicy preserves editor suffix for effective profiles", FolderPolicyPreservesEditorSuffixForEffectiveProfiles)
     ];
 
     private static int Main()
@@ -96,13 +98,46 @@ internal static class Program
             usesDebugAbi: false);
     }
 
-    private static TargetInfo Target(Configuration configuration)
+    private static void FolderPolicyUsesEffectiveProfilesForModulePaths()
+    {
+        var installation = new FakeInstallation();
+        var target = Target(Configuration.DebugGame);
+        var engineGroup = GroupDescriptor.FromRoot("Engine", SourceGroupKind.Engine);
+        var projectGroup = GroupDescriptor.FromRoot("SampleGame", SourceGroupKind.Project);
+        var engineProfile = BuildProfileResolver.Resolve(engineGroup, target);
+        var projectProfile = BuildProfileResolver.Resolve(projectGroup, target);
+
+        AssertPath(@"Engine\Intermediate\Core\Win64\Release", engineGroup.Intermediate("Core", target, engineProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\Release", engineGroup.Output(target, engineProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\Release\Core.out", engineGroup.OutputFileName(installation, target, engineProfile, "Core", ModuleType.Library, FolderPolicy.PathType.Windows));
+
+        AssertPath(@"SampleGame\Intermediate\GameAssembly\Win64\DebugGame", projectGroup.Intermediate("GameAssembly", target, projectProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Binaries\Win64\DebugGame", projectGroup.Output(target, projectProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Binaries\Win64\DebugGame\GameAssembly.out", projectGroup.OutputFileName(installation, target, projectProfile, "GameAssembly", ModuleType.Game, FolderPolicy.PathType.Windows));
+    }
+
+    private static void FolderPolicyPreservesEditorSuffixForEffectiveProfiles()
+    {
+        var target = Target(Configuration.DebugGame, editor: true);
+        var engineGroup = GroupDescriptor.FromRoot("Engine", SourceGroupKind.Engine);
+        var projectGroup = GroupDescriptor.FromRoot("SampleGame", SourceGroupKind.Project);
+        var engineProfile = BuildProfileResolver.Resolve(engineGroup, target);
+        var projectProfile = BuildProfileResolver.Resolve(projectGroup, target);
+
+        AssertPath(@"Engine\Intermediate\Core\Win64\Release-Editor", engineGroup.Intermediate("Core", target, engineProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\Release-Editor", engineGroup.Output(target, engineProfile, FolderPolicy.PathType.Windows));
+
+        AssertPath(@"SampleGame\Intermediate\GameAssembly\Win64\DebugGame-Editor", projectGroup.Intermediate("GameAssembly", target, projectProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Binaries\Win64\DebugGame-Editor", projectGroup.Output(target, projectProfile, FolderPolicy.PathType.Windows));
+    }
+
+    private static TargetInfo Target(Configuration configuration, bool editor = false)
     {
         return new TargetInfo
         {
             Platform = PlatformInfo.Win64,
             Config = configuration,
-            Editor = false
+            Editor = editor
         };
     }
 
@@ -140,6 +175,47 @@ internal static class Program
         if (EqualityComparer<T>.Default.Equals(actual, expected) == false)
         {
             throw new InvalidOperationException($"Profile '{profileName}' expected '{expected}', but got '{actual}'.");
+        }
+    }
+
+    private static void AssertPath(string expected, string actual)
+    {
+        if (actual != expected)
+        {
+            throw new InvalidOperationException($"Expected path '{expected}', but got '{actual}'.");
+        }
+    }
+
+    private sealed class FakeInstallation : Installation
+    {
+        public override ValueTask<string> GetCompilerPath(TargetInfo targetInfo, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override ValueTask<string> GetIntelliSenseMode(TargetInfo targetInfo, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override ValueTask<CppCompiler> SpawnCompilerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override ValueTask<Linker> SpawnLinkerAsync(TargetInfo targetInfo, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override ValueTask<string[]> ParseDependenciesAsync(string depsFileName, CancellationToken cancellationToken)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override string OutputFileName(string projectName, ModuleType moduleType)
+        {
+            return projectName + ".out";
         }
     }
 
