@@ -6,7 +6,7 @@ internal record GroupDescriptor
 
     public string Name { get; init; } = string.Empty;
 
-    public SourceGroupKind Kind { get; init; } = SourceGroupKind.Project;
+    public required SourceGroupKind Kind { get; init; }
 
     public bool IsEngine => Kind == SourceGroupKind.Engine;
 
@@ -17,11 +17,6 @@ internal record GroupDescriptor
     public string BinariesDirectory { get; init; } = string.Empty;
 
     public string ContentDirectory { get; init; } = string.Empty;
-
-    public static GroupDescriptor FromRoot(string rootPath, bool isEngine)
-    {
-        return FromRoot(rootPath, isEngine ? SourceGroupKind.Engine : SourceGroupKind.Project);
-    }
 
     public static GroupDescriptor FromRoot(string rootPath, SourceGroupKind kind)
     {
