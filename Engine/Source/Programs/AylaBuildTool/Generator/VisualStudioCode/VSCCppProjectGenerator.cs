@@ -140,6 +140,40 @@ internal static class VSCCppProjectGenerator
         WriteIndented = true
     };
 
+    private static string[] CreateTaskArguments(
+        string currentAssemblyLocation,
+        string[] projectArgs,
+        string projectName,
+        TargetInfo targetInfo,
+        string? cleanMode = null)
+    {
+        List<string> arguments =
+        [
+            currentAssemblyLocation,
+            "build",
+            .. projectArgs,
+            "--target",
+            projectName,
+            "--config",
+            targetInfo.Config.ToString(),
+            "--generator",
+            "VisualStudioCode"
+        ];
+
+        if (targetInfo.Editor)
+        {
+            arguments.Add("--editor");
+        }
+
+        if (cleanMode != null)
+        {
+            arguments.Add("--clean");
+            arguments.Add(cleanMode);
+        }
+
+        return arguments.ToArray();
+    }
+
     public static async ValueTask GenerateAsync(Solution solution, ModuleRulesResolverFactory resolverFactory, ModuleProject project, List<string> outputFolders, CancellationToken cancellationToken)
     {
         string vscode_FullName = Path.Combine(project.SourceDirectory, ".vscode");
@@ -195,14 +229,7 @@ internal static class VSCCppProjectGenerator
                     Label = project.Name + " Build " + FormatTargetName(targetInfo),
                     Type = "shell",
                     Command = "dotnet",
-                    Arguments = [
-                        currentAssemblyLocation, "build",
-                        .. projectArgs,
-                        "--target", project.Name,
-                        "--config", targetInfo.Config.ToString(),
-                        "--generator", "VisualStudioCode",
-                        targetInfo.Editor ? "--editor" : string.Empty
-                    ],
+                    Arguments = CreateTaskArguments(currentAssemblyLocation, projectArgs, project.Name, targetInfo),
                     Group = new()
                     {
                         Kind = "build",
@@ -218,15 +245,7 @@ internal static class VSCCppProjectGenerator
                     Label = project.Name + " Clean " + FormatTargetName(targetInfo),
                     Type = "shell",
                     Command = "dotnet",
-                    Arguments = [
-                        currentAssemblyLocation, "build",
-                        .. projectArgs,
-                        "--target", project.Name,
-                        "--config", targetInfo.Config.ToString(),
-                        "--generator", "VisualStudioCode",
-                        targetInfo.Editor ? "--editor" : string.Empty,
-                        "--clean", "CleanOnly"
-                    ],
+                    Arguments = CreateTaskArguments(currentAssemblyLocation, projectArgs, project.Name, targetInfo, "CleanOnly"),
                     Group = new()
                     {
                         Kind = "clean",
@@ -242,15 +261,7 @@ internal static class VSCCppProjectGenerator
                     Label = project.Name + " Generate " + FormatTargetName(targetInfo),
                     Type = "shell",
                     Command = "dotnet",
-                    Arguments = [
-                        currentAssemblyLocation, "build",
-                        .. projectArgs,
-                        "--target", project.Name,
-                        "--config", targetInfo.Config.ToString(),
-                        "--generator", "VisualStudioCode",
-                        targetInfo.Editor ? "--editor" : string.Empty,
-                        "--clean", "GenerateOnly"
-                    ],
+                    Arguments = CreateTaskArguments(currentAssemblyLocation, projectArgs, project.Name, targetInfo, "GenerateOnly"),
                     Group = new()
                     {
                         Kind = "generate",
