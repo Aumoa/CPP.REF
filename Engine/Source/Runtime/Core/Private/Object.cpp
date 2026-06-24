@@ -10,6 +10,8 @@
 #include "Reflection/ReflectionMacros.h"
 #include "ScriptingBackend/ScriptingBackend.h"
 #include "Marshal/CoreCLRFunctions.h"
+#include "Marshal/ManagedCallBoundary.h"
+#include "Marshal/NativeCallBoundary.h"
 #include "Marshal/ManagedStringWrapper.h"
 
 ACLASS__IMPL_CLASS_REGISTER(Ayla, Object);
@@ -67,9 +69,9 @@ namespace Ayla
 
 		static int s_StaticConstruct = []() -> int
 		{
-			using signature_t = CoreCLRFunctions(*)();
+			using signature_t = NativeCallStatus(*)(CoreCLRFunctions*);
 			auto function = (signature_t)ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.CoreCLRFunctions", "Get__Invoke");
-			g_CoreCLRFunctions = function();
+			ManagedCallBoundary::ThrowIfFailed(function(&g_CoreCLRFunctions));
 			return 0;
 		}();
 
@@ -91,7 +93,7 @@ namespace Ayla
 		auto lock = std::unique_lock{ m_Spinlock };
 		if (m_Refs++ == 0 && m_GCHandle != 0)
 		{
-			g_CoreCLRFunctions.AsHardHandle__Invoke(&m_GCHandle);
+			ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_AsHardHandle__Invoke(&m_GCHandle));
 		}
 	}
 
@@ -108,7 +110,7 @@ namespace Ayla
 			}
 			else
 			{
-				g_CoreCLRFunctions.AsWeakHandle__Invoke(&m_GCHandle);
+				ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_AsWeakHandle__Invoke(&m_GCHandle));
 			}
 		}
 	}
@@ -144,43 +146,63 @@ namespace Ayla
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self)
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__BeginWriteGCHandle__Injected(void* self, ::Ayla::ssize_t* handle) noexcept
 	{
-		auto self_ = (::Ayla::Object*)self;
-		self_->m_Spinlock.lock();
-		return self_->m_GCHandle;
+		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
+		{
+			auto self_ = (::Ayla::Object*)self;
+			self_->m_Spinlock.lock();
+			*handle = self_->m_GCHandle;
+			return ::Ayla::NativeCallStatus::Success;
+		});
 	}
 
-	PLATFORM_SHARED_EXPORT void Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr)
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr) noexcept
 	{
-		auto self_ = (::Ayla::Object*)self;
-		self_->m_GCHandle = handle;
-		if (releaseIntPtr)
+		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
-			--self_->m_Refs;
-			check(self_->m_Refs != 0 || self_->m_GCHandle);
-		}
-		if (self_->m_Refs == 0 && handle == 0)
-		{
+			auto self_ = (::Ayla::Object*)self;
+			self_->m_GCHandle = handle;
+			if (releaseIntPtr)
+			{
+				--self_->m_Refs;
+				check(self_->m_Refs != 0 || self_->m_GCHandle);
+			}
+			if (self_->m_Refs == 0 && handle == 0)
+			{
+				self_->m_Spinlock.unlock();
+				delete self_;
+				return ::Ayla::NativeCallStatus::Success;
+			}
 			self_->m_Spinlock.unlock();
-			delete self_;
-			return;
-		}
-		self_->m_Spinlock.unlock();
+			return ::Ayla::NativeCallStatus::Success;
+		});
 	}
 
-	PLATFORM_SHARED_EXPORT::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedType__Injected()
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__GetManagedType__Injected(::Ayla::ManagedTypeWrapper* result) noexcept
 	{
-		return ::Ayla::Object::GetManagedType();
+		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
+		{
+			*result = ::Ayla::Object::GetManagedType();
+			return ::Ayla::NativeCallStatus::Success;
+		});
 	}
 
-	PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper Ayla__Object__AsWrapper__Injected(::Ayla::Object* self)
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__AsWrapper__Injected(::Ayla::Object* self, ::Ayla::ObjectReferenceWrapper* result) noexcept
 	{
-		return self->AsWrapper();
+		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
+		{
+			*result = self->AsWrapper();
+			return ::Ayla::NativeCallStatus::Success;
+		});
 	}
 
-	PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedTypeFromPtr__Injected(::Ayla::Object* self)
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__GetManagedTypeFromPtr__Injected(::Ayla::Object* self, ::Ayla::ManagedTypeWrapper* result) noexcept
 	{
-		return self->GetType()->GetManagedType();
+		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
+		{
+			*result = self->GetType()->GetManagedType();
+			return ::Ayla::NativeCallStatus::Success;
+		});
 	}
 }
