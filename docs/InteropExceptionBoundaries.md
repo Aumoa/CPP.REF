@@ -215,6 +215,7 @@ The tests verify:
 
 - a managed exception can cross a native frame, appear as `Ayla::ManagedException`, and restore as the original managed exception object;
 - a native exception can cross a managed frame, appear as `Ayla.NativeException`, and restore as the original native exception type;
+- a `CoreCLRFunctions` managed activation failure is reported to C++ as `Ayla::ManagedException` instead of escaping directly through an unmanaged callback;
 - object lifetime tests still pass after Core manual interop was routed through the same boundary helpers.
 
 Recommended verification command:

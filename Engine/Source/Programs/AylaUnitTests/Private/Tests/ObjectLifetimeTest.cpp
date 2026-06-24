@@ -2,6 +2,8 @@
 
 #include "Tests/ObjectLifetimeTest.h"
 #include "Tests/LifetimeTestObject.h"
+#include "Activator.h"
+#include "ManagedException.h"
 #include "Marshal/ObjectReferenceWrapper.h"
 #include "Reflection/TypeCollector.h"
 #include "ScriptingBackend/ScriptingBackend.h"
@@ -83,6 +85,36 @@ namespace Ayla
 						const ManagedTypeWrapper instanceManagedType = lifetimeObject->GetType()->GetManagedType();
 						Assert::True(instanceManagedType.NativeType == lifetimeObject->GetType());
 						Assert::NotNull(instanceManagedType.ScriptTypeGetter);
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed activation failure crosses CoreCLRFunctions boundary"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						Type* lifetimeType = TypeCollector::FindType(typeid(LifetimeTestObject));
+						Assert::NotNull(lifetimeType);
+
+						bool caughtManagedException = false;
+						try
+						{
+							SharedPtr<Object> object = Activator::CreateInstance(lifetimeType->GetManagedType());
+							PLATFORM_UNREFERENCED_PARAMETER(object);
+						}
+						catch (const ManagedException& ex)
+						{
+							caughtManagedException = true;
+							Assert::True(ex.GetManagedTypeName().Contains(TEXT("MissingMethodException")));
+							Assert::True(ex.GetManagedDetails().Contains(TEXT("ManagedLifetimeObject")));
+							Assert::True(ex.GetManagedExceptionToken() != 0);
+						}
+
+						Assert::True(caughtManagedException);
 
 						return Task<>::CompletedTask();
 					}
