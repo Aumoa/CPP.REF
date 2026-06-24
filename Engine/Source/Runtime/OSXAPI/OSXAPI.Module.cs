@@ -8,9 +8,11 @@ public class OSXAPI : ModuleRules
 	public OSXAPI()
 	{
 		Script.Enabled = true;
+		PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+		PrivatePchHeaderFile = "CoreMinimal.h";
+
 		AddPublicIncludePaths("Public");
 		AddPrivateIncludePaths("Private");
 		AddPublicDependencyModuleNames("ApplicationCore");
 	}
 }
-

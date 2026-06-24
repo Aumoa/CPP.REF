@@ -7,7 +7,6 @@ internal class ClCompiler : CppCompiler
     private readonly Installation m_Installation;
     private readonly TargetInfo m_TargetInfo;
     private readonly VisualStudioInstallation.Product m_Product;
-    private readonly StringBuilder m_CommandBuilder = new();
 
     public ClCompiler(Installation installation, TargetInfo targetInfo, VisualStudioInstallation.Product product)
     {
@@ -16,7 +15,25 @@ internal class ClCompiler : CppCompiler
         m_Product = product;
     }
 
-    public override async ValueTask<Terminal.Output> CompileAsync(CompileItem item, CancellationToken cancellationToken)
+    public override string[] GetCompileOutputFilePaths(CppCompileCommand command)
+    {
+        if (command.CreatesPch == false)
+        {
+            return base.GetCompileOutputFilePaths(command);
+        }
+
+        var pchSettings = command.PchSettings
+            ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+        return
+        [
+            command.ObjectFilePath,
+            pchSettings.PchFilePath,
+            pchSettings.PdbFilePath
+        ];
+    }
+
+    public override async ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {
@@ -24,9 +41,9 @@ internal class ClCompiler : CppCompiler
             Logging = Terminal.Logging.None
         };
 
-        m_CommandBuilder.Clear();
+        var commandBuilder = new StringBuilder();
 
-        m_CommandBuilder.Append(
+        commandBuilder.Append(
             // Suppresses display of sign-on banner.
             "/nologo " +
             // Compiles without linking.
@@ -61,19 +78,19 @@ internal class ClCompiler : CppCompiler
             "/Zi "
         );
 
-        if (item.SourceCode.Type == SourceCodeType.ModuleInterface)
+        if (command.IsModuleInterface)
         {
-            m_CommandBuilder.Append(
+            commandBuilder.Append(
                 // Enables C++ modules.
                 "/exportModule "
             );
         }
 
-        var profile = item.Resolver.BuildProfile;
+        var profile = command.Resolver.BuildProfile;
         switch (profile.Optimization)
         {
             case OptimizationMode.Debug:
-                m_CommandBuilder.Append(
+                commandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi- " +
                     // Disable optimization.
@@ -83,7 +100,7 @@ internal class ClCompiler : CppCompiler
                 );
                 break;
             case OptimizationMode.Release:
-                m_CommandBuilder.Append(
+                commandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi " +
                     // Enables function-level linking.
@@ -94,22 +111,22 @@ internal class ClCompiler : CppCompiler
                 break;
         }
 
-        m_CommandBuilder.Append(profile.UsesDebugRuntime
+        commandBuilder.Append(profile.UsesDebugRuntime
             ? "/MDd "
             : "/MD ");
 
         List<string> includes = [];
-        foreach (var includeDirectory in item.Resolver.IncludePaths
+        foreach (var includeDirectory in command.Environment.IncludePaths
             .Append(Path.Combine(m_Product.Directory, "include"))
             .Concat(VisualStudioInstallation.GatherWindowsKitInclude()))
         {
             includes.Add($"/I\"{includeDirectory}\"");
         }
 
-        m_CommandBuilder.Append(string.Join(' ', includes) + ' ');
+        commandBuilder.Append(string.Join(' ', includes) + ' ');
 
         List<string> macros = [];
-        foreach (var macro in item.Resolver.AdditionalMacros)
+        foreach (var macro in command.Environment.AdditionalMacros)
         {
             if (macro.Value == null)
             {
@@ -121,61 +138,88 @@ internal class ClCompiler : CppCompiler
             }
         }
 
-        m_CommandBuilder.Append(string.Join(' ', macros) + ' ');
+        commandBuilder.Append(string.Join(' ', macros) + ' ');
 
         List<string> disableWarnings = [];
-        foreach (var disableWarning in item.Resolver.DisableWarnings)
+        foreach (var disableWarning in command.Environment.DisableWarnings)
         {
             disableWarnings.Add($"/wd{disableWarning}");
         }
 
         if (disableWarnings.Count > 0)
         {
-            m_CommandBuilder.Append(string.Join(' ', disableWarnings) + ' ');
+            commandBuilder.Append(string.Join(' ', disableWarnings) + ' ');
         }
 
-        var fileName = Path.GetFileName(item.SourceCode.FilePath);
-        var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, profile, FolderPolicy.PathType.Current);
-        var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-        var pdbFileName = Path.Combine(intermediateDirectory, fileName + ".pdb");
-        var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps");
-        var cacheFileName = Path.Combine(intermediateDirectory, fileName + ".cache");
+        Directory.CreateDirectory(command.IntermediateDirectory);
+        File.Delete(command.ObjectFilePath);
+        File.Delete(command.DependenciesFilePath);
 
-        Directory.CreateDirectory(intermediateDirectory);
+        var pdbFilePath = command.UsesPch && command.PchSettings != null
+            ? command.PchSettings.PdbFilePath
+            : command.PdbFilePath;
 
-        m_CommandBuilder.AppendFormat(
+        commandBuilder.AppendFormat(
             "/Fo\"{0}\" " +
             "/Fd\"{1}\" " +
             "/sourceDependencies \"{2}\" ",
-            objectFileName,
-            pdbFileName,
-            depsFileName
+            command.ObjectFilePath,
+            pdbFilePath,
+            command.DependenciesFilePath
         );
 
-        if (item.SourceCode.Type == SourceCodeType.ModuleInterface)
+        if (command.CreatesPch)
         {
-            m_CommandBuilder.AppendFormat(
-                "/ifcOutput \"{0}\" ",
-                intermediateDirectory
-            );
+            var pchSettings = command.PchSettings
+                ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
 
-            m_CommandBuilder.AppendFormat(
-                "/ifcSearchDir \"{0}\" ",
-                intermediateDirectory
+            commandBuilder.AppendFormat(
+                "/Yc\"{0}\" " +
+                "/Fp\"{1}\" " +
+                "/FS ",
+                pchSettings.HeaderIncludeName,
+                pchSettings.PchFilePath
+            );
+        }
+        else if (command.UsesPch)
+        {
+            var pchSettings = command.PchSettings
+                ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+            commandBuilder.AppendFormat(
+                "/Yu\"{0}\" " +
+                "/Fp\"{1}\" " +
+                "/FI\"{0}\" " +
+                "/FS ",
+                pchSettings.HeaderIncludeName,
+                pchSettings.PchFilePath
             );
         }
 
-        m_CommandBuilder.AppendFormat("\"{0}\"", item.SourceCode.FilePath);
+        if (command.IsModuleInterface)
+        {
+            commandBuilder.AppendFormat(
+                "/ifcOutput \"{0}\" ",
+                command.IntermediateDirectory
+            );
+
+            commandBuilder.AppendFormat(
+                "/ifcSearchDir \"{0}\" ",
+                command.IntermediateDirectory
+            );
+        }
+
+        commandBuilder.AppendFormat("\"{0}\"", command.SourceCode.FilePath);
         Terminal.Output output;
         using (await GetAccess(cancellationToken))
         {
-            output = await Terminal.ExecuteCommandAsync(m_CommandBuilder.ToString(), options, cancellationToken);
+            output = await Terminal.ExecuteCommandAsync(commandBuilder.ToString(), options, cancellationToken);
         }
         
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
-            cached.SaveCached(cacheFileName);
+            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, command.CacheDependencyFilePaths, cancellationToken);
+            cached.SaveCached(command.CacheFilePath);
 
             output = output with
             {
@@ -185,15 +229,15 @@ internal class ClCompiler : CppCompiler
         }
         else
         {
-            var command = new Terminal.Log
+            var commandLog = new Terminal.Log
             {
-                Value = $"cl.exe {m_CommandBuilder}",
+                Value = $"cl.exe {commandBuilder}",
                 Verbosity = Terminal.Verbose.Info
             };
 
             output = output with
             {
-                Logs = [command, .. output.Logs],
+                Logs = [commandLog, .. output.Logs],
                 StdOut = [.. output.StdOut],
                 StdErr = [.. output.StdErr]
             };

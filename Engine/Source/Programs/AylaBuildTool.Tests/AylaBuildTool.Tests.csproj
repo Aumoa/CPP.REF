@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <EnableDefaultNamespace>false</EnableDefaultNamespace>
+    <RootNamespace>AylaEngine.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AylaBuildTool\AylaBuildTool.csproj" />
+  </ItemGroup>
+
+</Project>

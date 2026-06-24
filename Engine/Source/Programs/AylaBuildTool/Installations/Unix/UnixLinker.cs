@@ -23,7 +23,7 @@ internal abstract class UnixLinker : Linker
         return ValueTask.FromResult<string[]>([]);
     }
 
-    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompiler.CompileItem[] sourceObjects, CancellationToken cancellationToken)
+    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompileCommand[] sourceObjects, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {
@@ -44,10 +44,7 @@ internal abstract class UnixLinker : Linker
 
         for (int i = 0; i < sourceObjects.Length; ++i)
         {
-            var intermediateDirectory = sourceObjects[i].Descriptor.Intermediate(module.Name, m_TargetInfo, sourceObjects[i].Resolver.BuildProfile, FolderPolicy.PathType.Current);
-            var fileName = Path.GetFileName(sourceObjects[i].SourceCode.FilePath);
-            var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-            linkCommands.AppendFormat("\"{0}\" ", objectFileName);
+            linkCommands.AppendFormat("\"{0}\" ", sourceObjects[i].ObjectFilePath);
         }
 
         linkCommands.AppendFormat("-o\"{0}\" ", outputFileName);
