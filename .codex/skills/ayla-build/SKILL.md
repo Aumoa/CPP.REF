@@ -61,6 +61,12 @@ dotnet Engine/Binaries/DotNET/AylaBuildTool.dll test --target AylaUnitTests --co
 
 When the current changes do not touch shader-related code or assets, keep `--skip-shaders` on unit test checks.
 
+Use the `AylaBuildTool.Tests` project for deterministic C# build system policy tests:
+
+```powershell
+dotnet run --project Engine/Source/Programs/AylaBuildTool.Tests/AylaBuildTool.Tests.csproj
+```
+
 ## Verification Notes
 
 - Prefer focused checks that match the touched subsystem.

@@ -1,25 +1,26 @@
-﻿using static AylaEngine.CppCompiler;
-
 namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class CompileTask : ITask
+    internal class CompileTask : ITask
     {
-        public readonly CompileItem Item;
+        public readonly CppCompileCommand Command;
+        private readonly Task[] m_PrerequisiteTasks;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public CompileTask(CompileItem item)
+        public CompileTask(CppCompileCommand command, params Task[] prerequisiteTasks)
         {
-            Item = item;
+            Command = command;
+            m_PrerequisiteTasks = prerequisiteTasks;
         }
 
         public async Task<Terminal.Output> CompileAsync(Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             try
             {
+                await Task.WhenAll(m_PrerequisiteTasks);
                 var compiler = await installation.SpawnCompilerAsync(targetInfo, cancellationToken);
-                var output = await compiler.CompileAsync(Item, cancellationToken);
+                var output = await compiler.CompileAsync(Command, cancellationToken);
                 TerminalExecutionException.ThrowIfFailure(output);
                 m_CompletionSource.SetResult();
                 return output;
@@ -38,6 +39,6 @@ internal static partial class BuildRunner
 
         public Task Task => m_CompletionSource.Task;
 
-        public GroupDescriptor Group => Item.Descriptor;
+        public GroupDescriptor Group => Command.Descriptor;
     }
 }

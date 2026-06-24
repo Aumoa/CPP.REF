@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -13,7 +13,7 @@ internal abstract class UnixLinker : Linker
         m_TargetInfo = targetInfo;
     }
 
-    protected virtual ValueTask<string[]> ConfigureCommandsAsync(bool isShared, CancellationToken cancellationToken)
+    protected virtual ValueTask<string[]> ConfigureCommandsAsync(ModuleRulesResolver module, bool isShared, CancellationToken cancellationToken)
     {
         return ValueTask.FromResult<string[]>([]);
     }
@@ -23,7 +23,7 @@ internal abstract class UnixLinker : Linker
         return ValueTask.FromResult<string[]>([]);
     }
 
-    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompiler.CompileItem[] sourceObjects, CancellationToken cancellationToken)
+    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompileCommand[] sourceObjects, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {
@@ -33,26 +33,27 @@ internal abstract class UnixLinker : Linker
 
         var linkCommands = new StringBuilder();
 
-        var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputPath = module.Group.ModuleOutput(m_TargetInfo, module.BuildProfile, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.ModuleOutputFileName(m_Installation, m_TargetInfo, module.BuildProfile, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
-        foreach (var command in await ConfigureCommandsAsync(module.Rules.IsSharedLibrary(), cancellationToken))
+        foreach (var command in await ConfigureCommandsAsync(module, module.Rules.IsSharedLibrary(), cancellationToken))
         {
             linkCommands.Append(command + " ");
         }
 
         for (int i = 0; i < sourceObjects.Length; ++i)
         {
-            var intermediateDirectory = sourceObjects[i].Descriptor.Intermediate(module.Name, m_TargetInfo, FolderPolicy.PathType.Current);
-            var fileName = Path.GetFileName(sourceObjects[i].SourceCode.FilePath);
-            var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-            linkCommands.AppendFormat("\"{0}\" ", objectFileName);
+            linkCommands.AppendFormat("\"{0}\" ", sourceObjects[i].ObjectFilePath);
         }
 
         linkCommands.AppendFormat("-o\"{0}\" ", outputFileName);
 
-        string[] libPaths = [module.EngineGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current), module.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current)];
+        string[] libPaths =
+        [
+            module.EngineGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.EngineGroup, m_TargetInfo), FolderPolicy.PathType.Current),
+            module.PrimaryGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.PrimaryGroup, m_TargetInfo), FolderPolicy.PathType.Current)
+        ];
         foreach (var libPath in libPaths.Distinct())
         {
             linkCommands.AppendFormat("-L\"{0}\" ", libPath);

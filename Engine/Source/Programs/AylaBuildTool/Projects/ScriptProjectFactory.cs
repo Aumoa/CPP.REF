@@ -73,14 +73,15 @@ internal sealed class ScriptProjectFactory
 
         foreach (var targetInfo in TargetInfo.GetAllTargets())
         {
-            var outputPath = project.Group.Output(targetInfo, FolderPolicy.PathType.Current);
-            var optimized = targetInfo.Config.IsOptimized();
+            var profile = BuildProfileResolver.Resolve(project, targetInfo);
+            var outputPath = project.Group.ModuleOutput(targetInfo, profile, FolderPolicy.PathType.Current);
+            var optimized = profile.IsOptimized;
             List<string> defines = [];
             if (targetInfo.Editor)
             {
                 defines.Add("WITH_EDITOR");
             }
-            if (targetInfo.Config != Configuration.Shipping)
+            if (profile.EnablesAssertions)
             {
                 defines.Add("DO_CHECK");
             }

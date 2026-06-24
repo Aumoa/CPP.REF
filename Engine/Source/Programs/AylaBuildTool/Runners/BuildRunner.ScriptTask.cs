@@ -6,7 +6,7 @@ namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class ScriptTask(ModuleRulesResolver resolver, CSProject scriptProject) : ITask
+    internal class ScriptTask(ModuleRulesResolver resolver, CSProject scriptProject) : ITask
     {
         private readonly TaskCompletionSource m_CompletionSource = new();
 
@@ -20,7 +20,7 @@ internal static partial class BuildRunner
         {
             var assemblyName = Resolver.Name + ".Script";
             var sourceDirectory = resolver.Project.ScriptSourceDirectory;
-            string intDir = Group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
+            string intDir = Group.ModuleIntermediate(assemblyName, targetInfo, Resolver.BuildProfile, FolderPolicy.PathType.Current);
 
             if (Directory.Exists(intDir) == false)
             {
@@ -48,7 +48,7 @@ internal static partial class BuildRunner
             return false;
         }
 
-        public async Task<Terminal.Output> BuildAsync(IList<ScriptTask> scriptTasks, Dictionary<string, CSProject> virtualProjects, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> BuildAsync(IReadOnlyList<ScriptTask> scriptTasks, Dictionary<string, CSProject> virtualProjects, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             try
             {
@@ -120,7 +120,7 @@ internal static partial class BuildRunner
         {
             var assemblyName = Resolver.Name + ".Script";
             var sourceDirectory = resolver.Project.ScriptSourceDirectory;
-            string intDir = Group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
+            string intDir = Group.ModuleIntermediate(assemblyName, targetInfo, Resolver.BuildProfile, FolderPolicy.PathType.Current);
 
             if (Directory.Exists(intDir))
             {

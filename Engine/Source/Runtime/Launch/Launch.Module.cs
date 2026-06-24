@@ -8,9 +8,12 @@ public class Launch : ModuleRules
     public Launch()
     {
         Script.Enabled = true;
+        Type = ModuleType.Application;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "ApplicationCore", "RenderCore", "Engine");
-        Type = ModuleType.Application;
     }
 }

@@ -59,7 +59,7 @@ internal static class VSCppProjectGenerator
                     {
                         var rules = project.GetRule(buildConfig);
                         AppendFormatLine("""<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>""");
-                        AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Current));
+                        AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.ModuleOutput(buildConfig, BuildProfileResolver.Resolve(engineGroup, buildConfig), FolderPolicy.PathType.Current));
                         AppendFormatLine("""<LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>""");
                         
                         if (rules.Type == ModuleType.Application || rules.Type == ModuleType.Console)
@@ -68,12 +68,12 @@ internal static class VSCppProjectGenerator
                         }
                         else
                         {
-                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, FolderPolicy.PathType.Windows));
+                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe</LocalDebuggerCommand>""", engineGroup.ModuleOutput(buildConfig, BuildProfileResolver.Resolve(engineGroup, buildConfig), FolderPolicy.PathType.Windows));
                         }
 
                         if (rules.Type == ModuleType.Game)
                         {
-                            var outputFileName = project.Group.OutputFileName(installation, buildConfig, project.Name, rules.Type, FolderPolicy.PathType.Windows);
+                            var outputFileName = project.Group.ModuleOutputFileName(installation, buildConfig, BuildProfileResolver.Resolve(project, buildConfig), project.Name, rules.Type, FolderPolicy.PathType.Windows);
                             AppendFormatLine("""<LocalDebuggerCommandArguments>--gameassembly "{0}"</LocalDebuggerCommandArguments>""", Path.ChangeExtension(outputFileName, null));
                         }
                     });
@@ -281,7 +281,7 @@ internal static class VSCppProjectGenerator
                         AppendFormatLine("""<ConfigurationType>Makefile</ConfigurationType>""");
                         AppendFormatLine("""<PlatformToolset>{0}</PlatformToolset>""", PlatformToolset);
                         AppendFormatLine("""<CharacterSet>Unicode</CharacterSet>""");
-                        AppendFormatLine("""<UseDebugLibraries>{0}</UseDebugLibraries>""", LibraryDebugLevel(buildConfig).ToString().ToLower());
+                        AppendFormatLine("""<UseDebugLibraries>{0}</UseDebugLibraries>""", BuildProfileResolver.Resolve(project, buildConfig).UsesDebugRuntime.ToString().ToLower());
                     });
                     AppendFormatLine("""</PropertyGroup>""");
                 }
@@ -304,10 +304,10 @@ internal static class VSCppProjectGenerator
 
                     var configName = VSUtility.GetConfigName(buildTarget);
                     var archName = VSUtility.GetArchitectureName(buildTarget);
-                    var outDir = group.Output(buildTarget, FolderPolicy.PathType.Windows);
-                    var intDir = group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Windows);
                     var rules = project.GetRule(buildTarget);
                     var resolver = resolverFactory.GetResolver(project, buildTarget);
+                    var outDir = group.ModuleOutput(buildTarget, resolver.BuildProfile, FolderPolicy.PathType.Windows);
+                    var intDir = group.ModuleIntermediate(project.Name, buildTarget, resolver.BuildProfile, FolderPolicy.PathType.Windows);
                     var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                     var includes = GenerateIncludePaths(resolver);
                     var outputFileName = installation.OutputFileName(project.Name, rules.Type);
@@ -388,20 +388,11 @@ internal static class VSCppProjectGenerator
                 return string.Join(';', includes);
             }
 
-            static bool LibraryDebugLevel(TargetInfo value) => value.Config switch
-            {
-                Configuration.Debug => true,
-                Configuration.DebugGame => true,
-                Configuration.Development => false,
-                Configuration.Shipping => false,
-                _ => throw new InvalidOperationException()
-            };
-
             static string GenerateProjectPreprocessorDefs(ModuleRulesResolver resolver, TargetInfo targetInfo)
             {
                 var additionalMacros = resolver.AdditionalMacros
                     .Concat(["UNICODE", "_UNICODE"]);
-                if (targetInfo.Config != Configuration.Shipping)
+                if (resolver.BuildProfile.EnablesAssertions)
                 {
                     additionalMacros = additionalMacros.Append("DO_CHECK=1");
                 }
