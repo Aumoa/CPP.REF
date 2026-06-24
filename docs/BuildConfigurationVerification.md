@@ -2,12 +2,13 @@
 
 ## Scope
 
-This note records the first real build verification for module-specific build profiles after source group ownership and effective profile routing landed.
+This note records build and IDE metadata verification for module-specific build profiles after source group ownership and effective profile routing landed.
+
+The verification is tied to the `codex/build-config` PR branch as a change set, not to a single intermediate commit. This avoids stale provenance when review follow-up commits are added to the branch.
 
 ## Environment
 
 - Branch: `codex/build-config`
-- Commit under test: `7b77cacf`
 - Host platform: Windows
 - Native target: `SampleGame` `GameAssembly`
 - Shader compilation: skipped with `--skip-shaders`
@@ -64,6 +65,26 @@ dotnet Engine\Binaries\DotNET\AylaBuildTool.dll build --project SampleGame\Sampl
 
 Result: succeeded with exit code 0. The build produced only four project-side actions for `SampleGame\Binaries\Win64\Release` and `SampleGame\Intermediate\GameAssembly\Win64\Release`. It did not schedule engine compile or link actions.
 
+### Generated IDE Metadata
+
+Visual Studio and Visual Studio Code metadata were regenerated and inspected for `SampleGame`.
+
+```powershell
+dotnet Engine\Binaries\DotNET\AylaBuildTool.dll generate --project SampleGame\SampleGame.aproject
+dotnet Engine\Binaries\DotNET\AylaBuildTool.dll generate --project SampleGame\SampleGame.aproject --generator VisualStudioCode
+```
+
+The generated DebugGame metadata used the expected mixed-profile layout:
+
+- Visual Studio DebugGame metadata uses engine `Release` output and intermediate paths for engine modules.
+- Visual Studio DebugGame metadata uses project `DebugGame` output and intermediate paths for `GameAssembly`.
+- Visual Studio DebugGame metadata keeps `UseDebugLibraries` disabled for release-profile engine artifacts.
+- DebugGame preprocessor metadata includes configuration-sensitive values such as `CONFIG_STRING=TEXT("DebugGame")` and `DO_CHECK=1`.
+- Visual Studio Code DebugGame launch metadata runs `Launch` from `Engine\Binaries\Win64\Release`.
+- Visual Studio Code DebugGame launch metadata passes `GameAssembly` from `SampleGame\Binaries\Win64\DebugGame`.
+- Visual Studio Code Shipping launch metadata passes `GameAssembly` from `SampleGame\Binaries\Win64\Release`.
+- Visual Studio Code task metadata no longer emits empty argument entries for non-editor targets.
+
 ## Findings
 
 - `DebugGame` routes engine modules to Release-profile artifacts.
@@ -71,7 +92,4 @@ Result: succeeded with exit code 0. The build produced only four project-side ac
 - Engine Release-profile artifacts were reused by later `Development` and `Shipping` project builds when inputs were unchanged.
 - Project `Debug` artifact non-reuse is covered by the focused build profile and folder policy tests. A full `Debug` native build was not run in this pass.
 - Linking the project `DebugGame` module against engine Release-profile modules produced no link-time runtime library or ABI mismatch. This does not replace future runtime validation.
-
-## Next Verification
-
-The next step is generated IDE project metadata validation. That pass should inspect Visual Studio and Visual Studio Code metadata for output directories, intermediate directories, debugger commands, runtime library metadata, and configuration-sensitive preprocessor definitions.
+- Generated IDE metadata matches the effective module profile routing used by AylaBuildTool builds.
