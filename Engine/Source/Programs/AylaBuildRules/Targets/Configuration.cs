@@ -78,18 +78,6 @@ public readonly record struct BuildConfigurationProfile(
 
 public static class ConfigurationExtensions
 {
-    public static BuildConfigurationProfile GetTargetProfile(this Configuration configuration)
-    {
-        return configuration switch
-        {
-            Configuration.Debug => BuildConfigurationProfile.Debug,
-            Configuration.DebugGame => BuildConfigurationProfile.Debug,
-            Configuration.Development => BuildConfigurationProfile.Development,
-            Configuration.Shipping => BuildConfigurationProfile.Release,
-            _ => throw new ArgumentOutOfRangeException(nameof(configuration), configuration, null)
-        };
-    }
-
     public static BuildConfigurationProfile GetEngineProfile(this Configuration configuration)
     {
         return configuration switch
@@ -116,6 +104,13 @@ public static class ConfigurationExtensions
 
     public static bool IsOptimized(this Configuration configuration)
     {
-        return configuration.GetTargetProfile().IsOptimized;
+        return configuration switch
+        {
+            Configuration.Debug => false,
+            Configuration.DebugGame => false,
+            Configuration.Development => true,
+            Configuration.Shipping => true,
+            _ => throw new ArgumentOutOfRangeException(nameof(configuration), configuration, null)
+        };
     }
 }

@@ -10,6 +10,7 @@ internal static class Program
         new("BuildProfileResolver maps engine configurations", BuildProfileResolverMapsEngineConfigurations),
         new("BuildProfileResolver maps project configurations", BuildProfileResolverMapsProjectConfigurations),
         new("BuildConfigurationProfile exposes compiler policy flags", BuildConfigurationProfileExposesCompilerPolicyFlags),
+        new("Configuration.IsOptimized uses target-wide semantics", ConfigurationIsOptimizedUsesTargetWideSemantics),
         new("FolderPolicy uses effective profiles for module paths", FolderPolicyUsesEffectiveProfilesForModulePaths),
         new("FolderPolicy preserves editor suffix for effective profiles", FolderPolicyPreservesEditorSuffixForEffectiveProfiles)
     ];
@@ -124,6 +125,14 @@ internal static class Program
             usesDebugRuntime: false,
             enablesAssertions: false,
             usesDebugAbi: false);
+    }
+
+    private static void ConfigurationIsOptimizedUsesTargetWideSemantics()
+    {
+        AssertEqual(nameof(Configuration.Debug), false, Configuration.Debug.IsOptimized());
+        AssertEqual(nameof(Configuration.DebugGame), false, Configuration.DebugGame.IsOptimized());
+        AssertEqual(nameof(Configuration.Development), true, Configuration.Development.IsOptimized());
+        AssertEqual(nameof(Configuration.Shipping), true, Configuration.Shipping.IsOptimized());
     }
 
     private static void FolderPolicyUsesEffectiveProfilesForModulePaths()
