@@ -141,6 +141,11 @@ internal static partial class BuildRunner
 
         private static IEnumerable<string> GatherSourceCodes(string sourceDirectory)
         {
+            if (Directory.Exists(sourceDirectory) == false)
+            {
+                yield break;
+            }
+
             var allSourceFiles = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
             var objDir = Path.GetFullPath(Path.Combine(sourceDirectory, "obj"));
             var binDir = Path.GetFullPath(Path.Combine(sourceDirectory, "bin"));

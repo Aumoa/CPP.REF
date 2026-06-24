@@ -114,7 +114,7 @@ namespace Ayla
                 break;
             }
             case DestroyNotify:
-                // 종료 처리 필요시 구현
+                // Add shutdown handling here if needed.
                 break;
             }
         }
@@ -125,13 +125,25 @@ namespace Ayla
 
     DirectoryReference LinuxApplication::GetEngineDirectory() const
     {
-        // /proc/self/exe를 통해 실행 파일 경로를 얻음
+        // Resolve the current executable path through /proc/self/exe.
         char exePath[1024] = {0};
         ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
         if (len > 0)
         {
             FileReference exeFile(String(exePath, len));
             return exeFile.GetDirectory().GetParent().GetParent().GetParent().GetAbsolute();
+        }
+        return DirectoryReference();
+    }
+
+    DirectoryReference LinuxApplication::GetApplicationDirectory() const
+    {
+        char exePath[1024] = {0};
+        ssize_t len = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1);
+        if (len > 0)
+        {
+            FileReference exeFile(String(exePath, len));
+            return exeFile.GetDirectory().GetAbsolute();
         }
         return DirectoryReference();
     }

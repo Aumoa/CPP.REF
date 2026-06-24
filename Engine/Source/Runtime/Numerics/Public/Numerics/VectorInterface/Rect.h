@@ -60,11 +60,8 @@ namespace Ayla
 		template<TIsVector<T, 2> IPoint>
 		constexpr bool Contains(const IPoint& P) const;
 
-		template<TIsVector<Type, 2> IExtent>
-		constexpr Rect Extend(const IExtent& E) const
-		{
-			return Extend(*this, E);
-		}
+		template<TIsVector<T, 2> IExtent>
+		constexpr Rect Extend(const IExtent& E) const;
 
 		template<TIsVector<float, 4> IRectResult = Rect, TIsTransform<Vector2<T>> ITransform2D, TIsVector<float, 4> IRect>
 		static constexpr IRectResult TransformRect(const ITransform2D& Transform, const IRect& InRect);
@@ -333,6 +330,13 @@ namespace Ayla
 			return r;
 		}
 	};
+
+	template<class T>
+	template<TIsVector<T, 2> IExtent>
+	constexpr Rect<T> Rect<T>::Extend(const IExtent& E) const
+	{
+		return Rect<void>::Extend(*this, E);
+	}
 
 	template<class T>
 	template<TIsVector<float, 4> IRectResult, TIsTransform<Vector2<T>> ITransform2D, TIsVector<float, 4> IRect>
