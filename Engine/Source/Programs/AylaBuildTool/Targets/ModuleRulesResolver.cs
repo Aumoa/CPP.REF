@@ -9,6 +9,7 @@ internal class ModuleRulesResolver
         m_TargetInfo = targetInfo;
         Project = targetProject;
         Rules = rules;
+        BuildProfile = BuildProfileResolver.Resolve(targetProject, targetInfo);
         EngineGroup = solution.EngineGroup;
         PrimaryGroup = solution.PrimaryGroup;
         m_PchUsage = rules.PchUsage;
@@ -66,7 +67,7 @@ internal class ModuleRulesResolver
             yield return "_UNICODE";
             yield return "UNICODE";
 
-            if (m_TargetInfo.Config != Configuration.Shipping)
+            if (BuildProfile.EnablesAssertions)
             {
                 yield return "DO_CHECK=1";
             }
@@ -124,7 +125,8 @@ internal class ModuleRulesResolver
             return;
         }
 
-        var intDir = targetProject.Group.Intermediate(targetProject.Name, m_TargetInfo, FolderPolicy.PathType.Current);
+        var buildProfile = BuildProfileResolver.Resolve(targetProject, m_TargetInfo);
+        var intDir = targetProject.Group.ModuleIntermediate(targetProject.Name, m_TargetInfo, buildProfile, FolderPolicy.PathType.Current);
         dependencyModuleNames.AddRange(rules.PublicDependencyModuleNames);
         includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)).Append(intDir));
         additionalMacros.AddRange(rules.PublicAdditionalMacros);
@@ -173,6 +175,7 @@ internal class ModuleRulesResolver
 
     public readonly ModuleProject Project;
     public readonly ModuleRules Rules;
+    public readonly BuildConfigurationProfile BuildProfile;
     public string RuleFilePath => Project.RuleFilePath;
     public string Name => Project.Name;
     private readonly PchUsageMode m_PchUsage;

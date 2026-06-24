@@ -23,7 +23,8 @@ internal static partial class BuildRunner
         {
             foreach (var project in targetProjects.OfType<ModuleProject>())
             {
-                var intDir = project.Group.Intermediate(project.Name, buildTarget, FolderPolicy.PathType.Current);
+                var buildProfile = BuildProfileResolver.Resolve(project, buildTarget);
+                var intDir = project.Group.ModuleIntermediate(project.Name, buildTarget, buildProfile, FolderPolicy.PathType.Current);
                 if (Directory.Exists(intDir))
                 {
                     foreach (var sourceCode in project.GetSourceCodes())
@@ -67,7 +68,7 @@ internal static partial class BuildRunner
                 }
             }
 
-            var engineOutput = solution.EngineGroup.Output(buildTarget, FolderPolicy.PathType.Current);
+            var engineOutput = solution.EngineGroup.ModuleOutput(buildTarget, BuildProfileResolver.Resolve(solution.EngineGroup, buildTarget), FolderPolicy.PathType.Current);
             if (Directory.Exists(engineOutput))
             {
                 Directory.Delete(engineOutput, true);
@@ -75,7 +76,7 @@ internal static partial class BuildRunner
 
             if (solution.PrimaryGroup != null && solution.PrimaryGroup != solution.EngineGroup)
             {
-                var primaryOutput = solution.PrimaryGroup.Output(buildTarget, FolderPolicy.PathType.Current);
+                var primaryOutput = solution.PrimaryGroup.ModuleOutput(buildTarget, BuildProfileResolver.Resolve(solution.PrimaryGroup, buildTarget), FolderPolicy.PathType.Current);
                 if (Directory.Exists(primaryOutput))
                 {
                     Directory.Delete(primaryOutput, true);

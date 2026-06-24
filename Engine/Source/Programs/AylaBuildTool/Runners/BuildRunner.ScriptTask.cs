@@ -20,7 +20,7 @@ internal static partial class BuildRunner
         {
             var assemblyName = Resolver.Name + ".Script";
             var sourceDirectory = resolver.Project.ScriptSourceDirectory;
-            string intDir = Group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
+            string intDir = Group.ModuleIntermediate(assemblyName, targetInfo, Resolver.BuildProfile, FolderPolicy.PathType.Current);
 
             if (Directory.Exists(intDir) == false)
             {
@@ -120,7 +120,7 @@ internal static partial class BuildRunner
         {
             var assemblyName = Resolver.Name + ".Script";
             var sourceDirectory = resolver.Project.ScriptSourceDirectory;
-            string intDir = Group.Intermediate(assemblyName, targetInfo, FolderPolicy.PathType.Current);
+            string intDir = Group.ModuleIntermediate(assemblyName, targetInfo, Resolver.BuildProfile, FolderPolicy.PathType.Current);
 
             if (Directory.Exists(intDir))
             {

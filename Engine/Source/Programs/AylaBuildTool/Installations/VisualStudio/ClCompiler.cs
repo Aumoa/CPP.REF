@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -86,35 +86,34 @@ internal class ClCompiler : CppCompiler
             );
         }
 
-        switch (m_TargetInfo.Config)
+        var profile = command.Resolver.BuildProfile;
+        switch (profile.Optimization)
         {
-            case Configuration.Debug:
-            case Configuration.DebugGame:
+            case OptimizationMode.Debug:
                 commandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi- " +
                     // Disable optimization.
                     "/Od " +
                     // Enable fast runtime checks.
-                    "/RTC1 " +
-                    // Multithreaded DLL
-                    "/MDd "
+                    "/RTC1 "
                 );
                 break;
-            case Configuration.Development:
-            case Configuration.Shipping:
+            case OptimizationMode.Release:
                 commandBuilder.Append(
                     // Generates intrinsic functions
                     "/Oi " +
                     // Enables function-level linking.
                     "/Gy " +
                     // Creates fast code.
-                    "/O2 " +
-                    // Multithreaded DLL
-                    "/MD "
+                    "/O2 "
                 );
                 break;
         }
+
+        commandBuilder.Append(profile.UsesDebugRuntime
+            ? "/MDd "
+            : "/MD ");
 
         List<string> includes = [];
         foreach (var includeDirectory in command.Environment.IncludePaths

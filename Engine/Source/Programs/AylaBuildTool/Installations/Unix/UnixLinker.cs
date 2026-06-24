@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -13,7 +13,7 @@ internal abstract class UnixLinker : Linker
         m_TargetInfo = targetInfo;
     }
 
-    protected virtual ValueTask<string[]> ConfigureCommandsAsync(bool isShared, CancellationToken cancellationToken)
+    protected virtual ValueTask<string[]> ConfigureCommandsAsync(ModuleRulesResolver module, bool isShared, CancellationToken cancellationToken)
     {
         return ValueTask.FromResult<string[]>([]);
     }
@@ -33,11 +33,11 @@ internal abstract class UnixLinker : Linker
 
         var linkCommands = new StringBuilder();
 
-        var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputPath = module.Group.ModuleOutput(m_TargetInfo, module.BuildProfile, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.ModuleOutputFileName(m_Installation, m_TargetInfo, module.BuildProfile, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
-        foreach (var command in await ConfigureCommandsAsync(module.Rules.IsSharedLibrary(), cancellationToken))
+        foreach (var command in await ConfigureCommandsAsync(module, module.Rules.IsSharedLibrary(), cancellationToken))
         {
             linkCommands.Append(command + " ");
         }
@@ -49,7 +49,11 @@ internal abstract class UnixLinker : Linker
 
         linkCommands.AppendFormat("-o\"{0}\" ", outputFileName);
 
-        string[] libPaths = [module.EngineGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current), module.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current)];
+        string[] libPaths =
+        [
+            module.EngineGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.EngineGroup, m_TargetInfo), FolderPolicy.PathType.Current),
+            module.PrimaryGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.PrimaryGroup, m_TargetInfo), FolderPolicy.PathType.Current)
+        ];
         foreach (var libPath in libPaths.Distinct())
         {
             linkCommands.AppendFormat("-L\"{0}\" ", libPath);

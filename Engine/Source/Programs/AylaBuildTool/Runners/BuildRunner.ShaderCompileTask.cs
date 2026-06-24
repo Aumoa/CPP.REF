@@ -33,8 +33,8 @@ internal static partial class BuildRunner
                 }
 
                 var resolver = m_ResolverFactory.GetResolver(m_Project, m_TargetInfo);
-                var intDir = resolver.Group.Intermediate(resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
-                var outDir = resolver.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
+                var intDir = resolver.Group.ModuleIntermediate(resolver.Name, m_TargetInfo, resolver.BuildProfile, FolderPolicy.PathType.Current);
+                var outDir = resolver.Group.ModuleOutput(m_TargetInfo, resolver.BuildProfile, FolderPolicy.PathType.Current);
 
                 // Ensure directories exist
                 Directory.CreateDirectory(intDir);
@@ -56,7 +56,7 @@ internal static partial class BuildRunner
                 }
 
                 var workerTargetInfo = new TargetInfo { Platform = m_TargetInfo.Platform, Config = Configuration.Development, Editor = false };
-                var workerPath = Path.Combine(m_EngineGroup.Output(workerTargetInfo, FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
+                var workerPath = Path.Combine(m_EngineGroup.ModuleOutput(workerTargetInfo, BuildProfileResolver.Resolve(m_EngineGroup, workerTargetInfo), FolderPolicy.PathType.Current), PlatformUtility.GetExecutableFileName("ShaderCompileWorker"));
                 if (!File.Exists(workerPath))
                 {
                     Console.Error.WriteLine("Error: Shader compile worker executable not found at {0}", workerPath);
