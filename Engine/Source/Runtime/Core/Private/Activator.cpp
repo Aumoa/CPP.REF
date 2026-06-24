@@ -6,10 +6,10 @@
 
 namespace Ayla
 {
-	extern CoreCLRFunctions g_CoreCLRFunctions;
-
 	SharedPtr<Object> Activator::CreateInstance(ManagedTypeWrapper type)
 	{
+		EnsureCoreCLRFunctionsInitialized();
+
 		ObjectReferenceWrapper wrapper{};
 		ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_CreateManagedInstancePtr__Invoke((ssize_t)type.ScriptTypeGetter, &wrapper));
 		return wrapper.AsNative<Object>();

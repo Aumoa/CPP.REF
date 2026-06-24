@@ -1,6 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Marshal/ManagedExceptionInterop.h"
+#include "Marshal/CoreCLRFunctions.h"
 #include "ManagedException.h"
 #include <utility>
 
@@ -19,6 +20,7 @@ namespace Ayla
 		};
 
 		thread_local LastManagedException GLastManagedException;
+		thread_local bool GIsReleasingManagedExceptionToken = false;
 
 		String CopyManagedString(ManagedStringWrapper value, String fallback) noexcept
 		{
@@ -60,6 +62,32 @@ namespace Ayla
 		}
 
 		return NativeCallStatus::Exception;
+	}
+
+	void ManagedExceptionInterop::ReleaseCapturedException(uint64 managedExceptionToken) noexcept
+	{
+		if (managedExceptionToken == 0)
+		{
+			return;
+		}
+		if (GIsReleasingManagedExceptionToken)
+		{
+			return;
+		}
+
+		GIsReleasingManagedExceptionToken = true;
+		try
+		{
+			EnsureCoreCLRFunctionsInitialized();
+			if (g_CoreCLRFunctions.m_ReleaseManagedExceptionPtr__Invoke != nullptr)
+			{
+				g_CoreCLRFunctions.m_ReleaseManagedExceptionPtr__Invoke(managedExceptionToken);
+			}
+		}
+		catch (...)
+		{
+		}
+		GIsReleasingManagedExceptionToken = false;
 	}
 
 	void ManagedExceptionInterop::ThrowLastException()

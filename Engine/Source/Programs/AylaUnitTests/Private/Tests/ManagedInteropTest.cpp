@@ -15,6 +15,7 @@ namespace Ayla
 		const String NativeExceptionMessage = TEXT("native exception passport");
 		const String ManagedExceptionMessage = TEXT("managed exception passport");
 		bool GObservedManagedExceptionWrapper = false;
+		bool GSwallowedManagedExceptionWrapper = false;
 
 		int32 MultiplyForManagedCallback(int32 left, int32 right)
 		{
@@ -43,6 +44,26 @@ namespace Ayla
 				{
 					GObservedManagedExceptionWrapper = IsManagedInteropSmokeException(ex);
 					throw;
+				}
+
+				return NativeCallStatus::Success;
+			});
+		}
+
+		NativeCallStatus SwallowManagedExceptionInNative(ssize_t managedCallback) noexcept
+		{
+			return NativeCallBoundary::Invoke([&]() -> NativeCallStatus
+			{
+				using signature_t = NativeCallStatus(*)();
+				auto callback = reinterpret_cast<signature_t>(managedCallback);
+
+				try
+				{
+					ManagedCallBoundary::ThrowIfFailed(callback());
+				}
+				catch (const ManagedException& ex)
+				{
+					GSwallowedManagedExceptionWrapper = IsManagedInteropSmokeException(ex);
 				}
 
 				return NativeCallStatus::Success;
@@ -137,6 +158,25 @@ namespace Ayla
 
 						Assert::Equal(1, function(reinterpret_cast<ssize_t>(&ObserveManagedExceptionThroughNative)));
 						Assert::True(GObservedManagedExceptionWrapper);
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed exception token releases after native swallow"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t);
+						auto function = GetManagedInteropFunction<signature_t>("MeasureManagedExceptionTokenReleaseAfterNativeSwallow");
+
+						GSwallowedManagedExceptionWrapper = false;
+
+						Assert::Equal(0, function(reinterpret_cast<ssize_t>(&SwallowManagedExceptionInNative)));
+						Assert::True(GSwallowedManagedExceptionWrapper);
 
 						return Task<>::CompletedTask();
 					}

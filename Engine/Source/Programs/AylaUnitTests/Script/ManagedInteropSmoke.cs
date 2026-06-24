@@ -1,5 +1,7 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
+using System.Collections;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Ayla.Tests;
@@ -79,6 +81,17 @@ public static class ManagedInteropSmoke
         return 0;
     }
 
+    public static int MeasureManagedExceptionTokenReleaseAfterNativeSwallow(nint nativeBridge)
+    {
+        var bridge = Marshal.GetDelegateForFunctionPointer<NativeStatusBridge>(nativeBridge);
+        int beforeCount = GetCapturedManagedExceptionCount();
+
+        NativeCallBoundary.ThrowIfFailed(bridge(Marshal.GetFunctionPointerForDelegate(s_ThrowManagedExceptionCallback)));
+
+        int afterCount = GetCapturedManagedExceptionCount();
+        return afterCount - beforeCount;
+    }
+
     public static NativeCallStatus RoundTripNativeExceptionThroughManaged(nint nativeCallback)
     {
         s_ObservedNativeExceptionWrapper = 0;
@@ -108,6 +121,26 @@ public static class ManagedInteropSmoke
     public static int GetObservedNativeExceptionWrapper()
     {
         return s_ObservedNativeExceptionWrapper;
+    }
+
+    private static int GetCapturedManagedExceptionCount()
+    {
+        object exceptionsLock = GetManagedExceptionInteropField<object>("m_ManagedExceptionsLock");
+
+        lock (exceptionsLock)
+        {
+            ICollection exceptions = GetManagedExceptionInteropField<ICollection>("m_ManagedExceptions");
+            return exceptions.Count;
+        }
+    }
+
+    private static T GetManagedExceptionInteropField<T>(string fieldName) where T : class
+    {
+        FieldInfo field = typeof(ManagedExceptionInterop).GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException($"ManagedExceptionInterop field '{fieldName}' was not found.");
+
+        return field.GetValue(null) as T
+            ?? throw new InvalidOperationException($"ManagedExceptionInterop field '{fieldName}' has an unexpected value.");
     }
 
     private static NativeCallStatus ThrowManagedExceptionCallback()

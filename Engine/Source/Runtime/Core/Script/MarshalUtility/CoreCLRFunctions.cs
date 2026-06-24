@@ -10,6 +10,7 @@ internal unsafe struct CoreCLRFunctions
     public void* m_AsWeakHandlePtr;
     public void* m_CreateManagedInstancePtr;
     public void* m_FreeGCHandlePtr;
+    public void* m_ReleaseManagedExceptionPtr;
 
     private static NativeCallStatus Get__Invoke(CoreCLRFunctions* functions)
     {
@@ -20,7 +21,8 @@ internal unsafe struct CoreCLRFunctions
                 m_AsHardHandlePtr = (delegate* unmanaged[Cdecl]<nint*, NativeCallStatus>)&AsHardHandle__Invoke,
                 m_AsWeakHandlePtr = (delegate* unmanaged[Cdecl]<nint*, NativeCallStatus>)&AsWeakHandle__Invoke,
                 m_CreateManagedInstancePtr = (delegate* unmanaged[Cdecl]<nint, ObjectReferenceWrapper*, NativeCallStatus>)&CreateManagedInstance__Invoke,
-                m_FreeGCHandlePtr = (delegate* unmanaged[Cdecl]<nint, NativeCallStatus>)&FreeGCHandle__Invoke
+                m_FreeGCHandlePtr = (delegate* unmanaged[Cdecl]<nint, NativeCallStatus>)&FreeGCHandle__Invoke,
+                m_ReleaseManagedExceptionPtr = (delegate* unmanaged[Cdecl]<ulong, void>)&ReleaseManagedException__Invoke
             };
 
             return ManagedCallBoundary.Succeed();
@@ -110,6 +112,18 @@ internal unsafe struct CoreCLRFunctions
         catch (Exception ex)
         {
             return ManagedCallBoundary.Capture(ex);
+        }
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void ReleaseManagedException__Invoke(ulong managedExceptionToken)
+    {
+        try
+        {
+            ManagedExceptionInterop.ReleaseCaptured(managedExceptionToken);
+        }
+        catch
+        {
         }
     }
 }

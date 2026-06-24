@@ -21,5 +21,12 @@ namespace Ayla
 
 		using signature__FreeGCHandlePtr__Invoke__t = NativeCallStatus(*)(ssize_t);
 		signature__FreeGCHandlePtr__Invoke__t m_FreeGCHandlePtr__Invoke;
+
+		using signature__ReleaseManagedExceptionPtr__Invoke__t = void(*)(uint64);
+		signature__ReleaseManagedExceptionPtr__Invoke__t m_ReleaseManagedExceptionPtr__Invoke;
 	};
+
+	extern CoreCLRFunctions g_CoreCLRFunctions;
+
+	void EnsureCoreCLRFunctionsInitialized();
 }

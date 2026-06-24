@@ -92,7 +92,7 @@ namespace Ayla
 			}
 		}
 
-		void StoreManagedException(const ManagedException& exception, uint64 exceptionToken) noexcept
+		void StoreManagedException(const ManagedException& exception, uint64 exceptionToken, uint64 managedExceptionToken) noexcept
 		{
 			try
 			{
@@ -104,7 +104,7 @@ namespace Ayla
 					{},
 					0,
 					exceptionToken,
-					exception.GetManagedExceptionToken());
+					managedExceptionToken);
 			}
 			catch (...)
 			{
@@ -116,7 +116,7 @@ namespace Ayla
 					{},
 					0,
 					exceptionToken,
-					exception.GetManagedExceptionToken());
+					managedExceptionToken);
 			}
 		}
 
@@ -211,8 +211,14 @@ namespace Ayla
 		}
 		catch (const ManagedException& e)
 		{
-			uint64 exceptionToken = e.GetManagedExceptionToken() == 0 ? RegisterException(exception) : 0;
-			StoreManagedException(e, exceptionToken);
+			uint64 managedExceptionToken = e.GetManagedExceptionToken();
+			uint64 exceptionToken = managedExceptionToken == 0 ? RegisterException(exception) : 0;
+			if (managedExceptionToken != 0)
+			{
+				managedExceptionToken = e.DetachManagedExceptionToken();
+			}
+
+			StoreManagedException(e, exceptionToken, managedExceptionToken);
 		}
 		catch (const Exception& e)
 		{

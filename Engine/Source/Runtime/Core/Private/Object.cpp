@@ -13,6 +13,7 @@
 #include "Marshal/ManagedCallBoundary.h"
 #include "Marshal/NativeCallBoundary.h"
 #include "Marshal/ManagedStringWrapper.h"
+#include <mutex>
 
 ACLASS__IMPL_CLASS_REGISTER(Ayla, Object);
 
@@ -45,6 +46,17 @@ namespace Ayla
 	size_t Object::s_LiveObjects;
 	CoreCLRFunctions g_CoreCLRFunctions;
 
+	void EnsureCoreCLRFunctionsInitialized()
+	{
+		static std::once_flag s_InitializeCoreCLRFunctionsOnce;
+		std::call_once(s_InitializeCoreCLRFunctionsOnce, []()
+		{
+			using signature_t = NativeCallStatus(*)(CoreCLRFunctions*);
+			auto function = (signature_t)ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.CoreCLRFunctions", "Get__Invoke");
+			ManagedCallBoundary::ThrowIfFailed(function(&g_CoreCLRFunctions));
+		});
+	}
+
 	ManagedTypeWrapper Object::GetManagedType()
 	{
 		using signature_t = void*(*)();
@@ -67,13 +79,7 @@ namespace Ayla
 			throw InvalidOperationException(TEXT("Object must be created with Ayla::Object::New<T> function."));
 		}
 
-		static int s_StaticConstruct = []() -> int
-		{
-			using signature_t = NativeCallStatus(*)(CoreCLRFunctions*);
-			auto function = (signature_t)ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.CoreCLRFunctions", "Get__Invoke");
-			ManagedCallBoundary::ThrowIfFailed(function(&g_CoreCLRFunctions));
-			return 0;
-		}();
+		EnsureCoreCLRFunctionsInitialized();
 
 		PlatformAtomics::InterlockedIncrement(&s_LiveObjects);
 	}

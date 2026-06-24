@@ -18,6 +18,7 @@ namespace Ayla
 			uint64 nativeExceptionToken,
 			uint64 managedExceptionToken) noexcept;
 
+		static void ReleaseCapturedException(uint64 managedExceptionToken) noexcept;
 		static void ThrowLastException();
 		static void ClearLastException() noexcept;
 	};
