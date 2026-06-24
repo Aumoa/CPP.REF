@@ -33,8 +33,8 @@ internal abstract class UnixLinker : Linker
 
         var linkCommands = new StringBuilder();
 
-        var outputPath = module.Group.Output(m_TargetInfo, module.BuildProfile, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.BuildProfile, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputPath = module.Group.ModuleOutput(m_TargetInfo, module.BuildProfile, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.ModuleOutputFileName(m_Installation, m_TargetInfo, module.BuildProfile, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
         foreach (var command in await ConfigureCommandsAsync(module, module.Rules.IsSharedLibrary(), cancellationToken))
@@ -51,8 +51,8 @@ internal abstract class UnixLinker : Linker
 
         string[] libPaths =
         [
-            module.EngineGroup.Output(m_TargetInfo, BuildProfileResolver.Resolve(module.EngineGroup, m_TargetInfo), FolderPolicy.PathType.Current),
-            module.PrimaryGroup.Output(m_TargetInfo, BuildProfileResolver.Resolve(module.PrimaryGroup, m_TargetInfo), FolderPolicy.PathType.Current)
+            module.EngineGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.EngineGroup, m_TargetInfo), FolderPolicy.PathType.Current),
+            module.PrimaryGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.PrimaryGroup, m_TargetInfo), FolderPolicy.PathType.Current)
         ];
         foreach (var libPath in libPaths.Distinct())
         {

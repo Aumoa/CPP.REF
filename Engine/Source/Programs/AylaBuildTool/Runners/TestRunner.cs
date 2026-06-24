@@ -36,7 +36,7 @@ internal static class TestRunner
 
         var installation = Installation.CreateDefaultInstallation();
         var buildProfile = BuildProfileResolver.Resolve(moduleProject, targetInfo);
-        var executableFileName = moduleProject.Group.OutputFileName(
+        var executableFileName = moduleProject.Group.ModuleOutputFileName(
             installation,
             targetInfo,
             buildProfile,

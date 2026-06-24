@@ -12,6 +12,7 @@ internal static class Program
         new("BuildConfigurationProfile exposes compiler policy flags", BuildConfigurationProfileExposesCompilerPolicyFlags),
         new("Configuration.IsOptimized uses target-wide semantics", ConfigurationIsOptimizedUsesTargetWideSemantics),
         new("FolderPolicy uses effective profiles for module paths", FolderPolicyUsesEffectiveProfilesForModulePaths),
+        new("FolderPolicy exposes target configuration paths", FolderPolicyExposesTargetConfigurationPaths),
         new("FolderPolicy preserves editor suffix for effective profiles", FolderPolicyPreservesEditorSuffixForEffectiveProfiles)
     ];
 
@@ -144,13 +145,24 @@ internal static class Program
         var engineProfile = BuildProfileResolver.Resolve(engineGroup, target);
         var projectProfile = BuildProfileResolver.Resolve(projectGroup, target);
 
-        AssertPath(@"Engine\Intermediate\Core\Win64\Release", engineGroup.Intermediate("Core", target, engineProfile, FolderPolicy.PathType.Windows));
-        AssertPath(@"Engine\Binaries\Win64\Release", engineGroup.Output(target, engineProfile, FolderPolicy.PathType.Windows));
-        AssertPath(@"Engine\Binaries\Win64\Release\Core.out", engineGroup.OutputFileName(installation, target, engineProfile, "Core", ModuleType.Library, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Intermediate\Core\Win64\Release", engineGroup.ModuleIntermediate("Core", target, engineProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\Release", engineGroup.ModuleOutput(target, engineProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\Release\Core.out", engineGroup.ModuleOutputFileName(installation, target, engineProfile, "Core", ModuleType.Library, FolderPolicy.PathType.Windows));
 
-        AssertPath(@"SampleGame\Intermediate\GameAssembly\Win64\DebugGame", projectGroup.Intermediate("GameAssembly", target, projectProfile, FolderPolicy.PathType.Windows));
-        AssertPath(@"SampleGame\Binaries\Win64\DebugGame", projectGroup.Output(target, projectProfile, FolderPolicy.PathType.Windows));
-        AssertPath(@"SampleGame\Binaries\Win64\DebugGame\GameAssembly.out", projectGroup.OutputFileName(installation, target, projectProfile, "GameAssembly", ModuleType.Game, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Intermediate\GameAssembly\Win64\DebugGame", projectGroup.ModuleIntermediate("GameAssembly", target, projectProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Binaries\Win64\DebugGame", projectGroup.ModuleOutput(target, projectProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Binaries\Win64\DebugGame\GameAssembly.out", projectGroup.ModuleOutputFileName(installation, target, projectProfile, "GameAssembly", ModuleType.Game, FolderPolicy.PathType.Windows));
+    }
+
+    private static void FolderPolicyExposesTargetConfigurationPaths()
+    {
+        var installation = new FakeInstallation();
+        var target = Target(Configuration.DebugGame);
+        var engineGroup = GroupDescriptor.FromRoot("Engine", SourceGroupKind.Engine);
+
+        AssertPath(@"Engine\Intermediate\Core\Win64\DebugGame", engineGroup.TargetIntermediate("Core", target, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\DebugGame", engineGroup.TargetOutput(target, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\DebugGame\Core.out", engineGroup.TargetOutputFileName(installation, target, "Core", ModuleType.Library, FolderPolicy.PathType.Windows));
     }
 
     private static void FolderPolicyPreservesEditorSuffixForEffectiveProfiles()
@@ -161,11 +173,11 @@ internal static class Program
         var engineProfile = BuildProfileResolver.Resolve(engineGroup, target);
         var projectProfile = BuildProfileResolver.Resolve(projectGroup, target);
 
-        AssertPath(@"Engine\Intermediate\Core\Win64\Release-Editor", engineGroup.Intermediate("Core", target, engineProfile, FolderPolicy.PathType.Windows));
-        AssertPath(@"Engine\Binaries\Win64\Release-Editor", engineGroup.Output(target, engineProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Intermediate\Core\Win64\Release-Editor", engineGroup.ModuleIntermediate("Core", target, engineProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"Engine\Binaries\Win64\Release-Editor", engineGroup.ModuleOutput(target, engineProfile, FolderPolicy.PathType.Windows));
 
-        AssertPath(@"SampleGame\Intermediate\GameAssembly\Win64\DebugGame-Editor", projectGroup.Intermediate("GameAssembly", target, projectProfile, FolderPolicy.PathType.Windows));
-        AssertPath(@"SampleGame\Binaries\Win64\DebugGame-Editor", projectGroup.Output(target, projectProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Intermediate\GameAssembly\Win64\DebugGame-Editor", projectGroup.ModuleIntermediate("GameAssembly", target, projectProfile, FolderPolicy.PathType.Windows));
+        AssertPath(@"SampleGame\Binaries\Win64\DebugGame-Editor", projectGroup.ModuleOutput(target, projectProfile, FolderPolicy.PathType.Windows));
     }
 
     private static void Run(string name, List<string> failures, Action test)

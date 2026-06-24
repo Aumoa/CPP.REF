@@ -59,7 +59,7 @@ internal static class VSCppProjectGenerator
                     {
                         var rules = project.GetRule(buildConfig);
                         AppendFormatLine("""<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>""");
-                        AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.Output(buildConfig, BuildProfileResolver.Resolve(engineGroup, buildConfig), FolderPolicy.PathType.Current));
+                        AppendFormatLine("""<LocalDebuggerWorkingDirectory>{0}</LocalDebuggerWorkingDirectory>""", engineGroup.ModuleOutput(buildConfig, BuildProfileResolver.Resolve(engineGroup, buildConfig), FolderPolicy.PathType.Current));
                         AppendFormatLine("""<LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>""");
                         
                         if (rules.Type == ModuleType.Application || rules.Type == ModuleType.Console)
@@ -68,12 +68,12 @@ internal static class VSCppProjectGenerator
                         }
                         else
                         {
-                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe</LocalDebuggerCommand>""", engineGroup.Output(buildConfig, BuildProfileResolver.Resolve(engineGroup, buildConfig), FolderPolicy.PathType.Windows));
+                            AppendFormatLine("""<LocalDebuggerCommand>{0}\Launch.exe</LocalDebuggerCommand>""", engineGroup.ModuleOutput(buildConfig, BuildProfileResolver.Resolve(engineGroup, buildConfig), FolderPolicy.PathType.Windows));
                         }
 
                         if (rules.Type == ModuleType.Game)
                         {
-                            var outputFileName = project.Group.OutputFileName(installation, buildConfig, BuildProfileResolver.Resolve(project, buildConfig), project.Name, rules.Type, FolderPolicy.PathType.Windows);
+                            var outputFileName = project.Group.ModuleOutputFileName(installation, buildConfig, BuildProfileResolver.Resolve(project, buildConfig), project.Name, rules.Type, FolderPolicy.PathType.Windows);
                             AppendFormatLine("""<LocalDebuggerCommandArguments>--gameassembly "{0}"</LocalDebuggerCommandArguments>""", Path.ChangeExtension(outputFileName, null));
                         }
                     });
@@ -306,8 +306,8 @@ internal static class VSCppProjectGenerator
                     var archName = VSUtility.GetArchitectureName(buildTarget);
                     var rules = project.GetRule(buildTarget);
                     var resolver = resolverFactory.GetResolver(project, buildTarget);
-                    var outDir = group.Output(buildTarget, resolver.BuildProfile, FolderPolicy.PathType.Windows);
-                    var intDir = group.Intermediate(project.Name, buildTarget, resolver.BuildProfile, FolderPolicy.PathType.Windows);
+                    var outDir = group.ModuleOutput(buildTarget, resolver.BuildProfile, FolderPolicy.PathType.Windows);
+                    var intDir = group.ModuleIntermediate(project.Name, buildTarget, resolver.BuildProfile, FolderPolicy.PathType.Windows);
                     var pps = GenerateProjectPreprocessorDefs(resolver, buildTarget);
                     var includes = GenerateIncludePaths(resolver);
                     var outputFileName = installation.OutputFileName(project.Name, rules.Type);

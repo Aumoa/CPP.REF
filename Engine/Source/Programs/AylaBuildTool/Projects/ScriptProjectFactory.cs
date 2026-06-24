@@ -74,7 +74,7 @@ internal sealed class ScriptProjectFactory
         foreach (var targetInfo in TargetInfo.GetAllTargets())
         {
             var profile = BuildProfileResolver.Resolve(project, targetInfo);
-            var outputPath = project.Group.Output(targetInfo, profile, FolderPolicy.PathType.Current);
+            var outputPath = project.Group.ModuleOutput(targetInfo, profile, FolderPolicy.PathType.Current);
             var optimized = profile.IsOptimized;
             List<string> defines = [];
             if (targetInfo.Editor)

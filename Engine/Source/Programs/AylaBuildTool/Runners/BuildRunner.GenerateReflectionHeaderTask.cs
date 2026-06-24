@@ -36,7 +36,7 @@ internal static partial class BuildRunner
         {
             var fileName = Path.GetFileNameWithoutExtension(m_SourceCode.FilePath);
             var buildProfile = BuildProfileResolver.Resolve(m_Project, m_BuildTarget);
-            var intDir = m_Project.Group.Intermediate(m_Project.Name, m_BuildTarget, buildProfile, FolderPolicy.PathType.Current);
+            var intDir = m_Project.Group.ModuleIntermediate(m_Project.Name, m_BuildTarget, buildProfile, FolderPolicy.PathType.Current);
             var generatedHeader = Path.Combine(intDir, fileName + ".gen.h");
             var generatedSourceCode = Path.Combine(intDir, fileName + ".gen.cpp");
             var generatedBindingCode = Path.Combine(m_Project.SourceDirectory, "Script", "Bindings", fileName + ".bindings.cs");

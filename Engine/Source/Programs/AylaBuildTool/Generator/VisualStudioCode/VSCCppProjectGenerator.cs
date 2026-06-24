@@ -202,7 +202,7 @@ internal static class VSCCppProjectGenerator
                 string compilerPath = await installation.GetCompilerPath(targetInfo, cancellationToken);
                 string intelliSenseMode = await installation.GetIntelliSenseMode(targetInfo, cancellationToken);
                 var rule = resolver.Rules;
-                var outputFileName = project.Group.OutputFileName(installation, targetInfo, resolver.BuildProfile, project.Name, rule.Type, FolderPolicy.PathType.Linux);
+                var outputFileName = project.Group.ModuleOutputFileName(installation, targetInfo, resolver.BuildProfile, project.Name, rule.Type, FolderPolicy.PathType.Linux);
                 var fileName = Path.GetFileName(outputFileName);
                 if (fileName.StartsWith("lib") && fileName.EndsWith(".so"))
                 {
@@ -283,10 +283,10 @@ internal static class VSCCppProjectGenerator
                     Name = FormatTargetName(targetInfo),
                     Type = "cppdbg",
                     Request = "launch",
-                    Program = Path.Combine(solution.EngineGroup.Output(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)) + "/Launch",
+                    Program = Path.Combine(solution.EngineGroup.ModuleOutput(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)) + "/Launch",
                     Arguments = [.. args],
                     StopAtEntry = false,
-                    WorkingDirectory = Path.Combine(solution.EngineGroup.Output(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)),
+                    WorkingDirectory = Path.Combine(solution.EngineGroup.ModuleOutput(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)),
                     Environment = [
                         new LaunchConfigurationEnvironment
                         {

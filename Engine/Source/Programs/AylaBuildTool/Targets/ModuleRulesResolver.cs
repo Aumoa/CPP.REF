@@ -126,7 +126,7 @@ internal class ModuleRulesResolver
         }
 
         var buildProfile = BuildProfileResolver.Resolve(targetProject, m_TargetInfo);
-        var intDir = targetProject.Group.Intermediate(targetProject.Name, m_TargetInfo, buildProfile, FolderPolicy.PathType.Current);
+        var intDir = targetProject.Group.ModuleIntermediate(targetProject.Name, m_TargetInfo, buildProfile, FolderPolicy.PathType.Current);
         dependencyModuleNames.AddRange(rules.PublicDependencyModuleNames);
         includePaths.AddRange(rules.PublicIncludePaths.Select(p => AbsoluteIncludePath(targetProject, p)).Append(intDir));
         additionalMacros.AddRange(rules.PublicAdditionalMacros);

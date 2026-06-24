@@ -18,7 +18,7 @@ internal sealed class CppCompileEnvironment
         m_Resolver = resolver;
         m_TargetInfo = targetInfo;
         m_Descriptor = descriptor;
-        m_IntermediateDirectory = descriptor.Intermediate(resolver.Name, targetInfo, resolver.BuildProfile, FolderPolicy.PathType.Current);
+        m_IntermediateDirectory = descriptor.ModuleIntermediate(resolver.Name, targetInfo, resolver.BuildProfile, FolderPolicy.PathType.Current);
         m_PchUsage = resolver.PchUsage;
         m_PrivatePchHeaderFile = resolver.PrivatePchHeaderFile;
         m_PchSettings = CppPchSettings.CreateOrNull(this);
