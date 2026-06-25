@@ -48,7 +48,7 @@ namespace Ayla
 			GLastManagedException.m_TypeName = CopyManagedString(typeName, TEXT("System.Exception"));
 			GLastManagedException.m_Message = CopyManagedString(message, TEXT("Failed to capture managed exception message."));
 			GLastManagedException.m_Details = CopyManagedString(details, GLastManagedException.m_Message);
-			GLastManagedException.m_NativeException = NativeExceptionInterop::GetCapturedException(nativeExceptionToken);
+			GLastManagedException.m_NativeException = NativeExceptionInterop::TakeCapturedException(nativeExceptionToken);
 			GLastManagedException.m_ManagedExceptionToken = managedExceptionToken;
 		}
 		catch (...)

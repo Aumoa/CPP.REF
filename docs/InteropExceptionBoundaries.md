@@ -119,6 +119,8 @@ Maintain these invariants:
 - `CaptureCurrentException` and `CaptureException` must be `noexcept`.
 - `GetLastException` is thread-local state transfer; consumers should clear the last exception after reading.
 - Captured native exception tokens must be released when they are not restored back into native code.
+- `TakeCapturedException` transfers a native token back to C++ and removes it from the native token store.
+- A managed `NativeException` wrapper owns its native token while the exception is observed in C#; if managed code returns the native exception passport to C++, it must detach the token first.
 - If `NativeExceptionInfo.m_ManagedExceptionToken` is non-zero, C# should restore the managed exception instead of creating a `NativeException` wrapper.
 
 ### `ManagedExceptionInterop`
@@ -223,6 +225,7 @@ The tests verify:
 - a managed exception can cross a native frame, appear as `Ayla::ManagedException`, and restore as the original managed exception object;
 - a managed exception token is released when native code catches and consumes the `Ayla::ManagedException` wrapper without returning it to managed code;
 - a native exception can cross a managed frame, appear as `Ayla.NativeException`, and restore as the original native exception type;
+- a native exception token is removed from the native token store when managed code returns the native exception passport to C++;
 - a `CoreCLRFunctions` managed activation failure is reported to C++ as `Ayla::ManagedException` instead of escaping directly through an unmanaged callback;
 - object lifetime tests still pass after Core manual interop was routed through the same boundary helpers.
 

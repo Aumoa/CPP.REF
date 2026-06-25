@@ -16,7 +16,7 @@ public static class ManagedExceptionInterop
         string typeName = exception.GetType().FullName ?? exception.GetType().Name;
         string message = exception.Message;
         string details = exception.ToString();
-        ulong nativeExceptionToken = exception is NativeException nativeException ? nativeException.NativeExceptionToken : 0;
+        ulong nativeExceptionToken = exception is NativeException nativeException ? nativeException.DetachNativeExceptionToken() : 0;
         ulong managedExceptionToken = 0;
 
         try
@@ -37,6 +37,7 @@ public static class ManagedExceptionInterop
         }
         catch
         {
+            NativeException.ReleaseCaptured(nativeExceptionToken);
             ReleaseCaptured(managedExceptionToken);
             throw;
         }

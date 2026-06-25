@@ -9,7 +9,8 @@ public sealed class NativeException : Exception
     public string NativeSourceFile { get; }
     public string NativeSourceFunction { get; }
     public int NativeSourceLine { get; }
-    internal ulong NativeExceptionToken { get; }
+    private ulong m_NativeExceptionToken;
+    internal ulong NativeExceptionToken => m_NativeExceptionToken;
 
     private NativeException(
         string nativeTypeName,
@@ -26,23 +27,31 @@ public sealed class NativeException : Exception
         NativeSourceFile = nativeSourceFile;
         NativeSourceFunction = nativeSourceFunction;
         NativeSourceLine = nativeSourceLine;
-        NativeExceptionToken = nativeExceptionToken;
+        m_NativeExceptionToken = nativeExceptionToken;
     }
 
     ~NativeException()
     {
-        if (NativeExceptionToken == 0)
+        if (m_NativeExceptionToken == 0)
         {
             return;
         }
 
         try
         {
-            ReleaseCapturedException__Injected(NativeExceptionToken);
+            ReleaseCapturedException__Injected(m_NativeExceptionToken);
         }
         catch
         {
         }
+    }
+
+    internal ulong DetachNativeExceptionToken()
+    {
+        ulong nativeExceptionToken = m_NativeExceptionToken;
+        m_NativeExceptionToken = 0;
+        GC.SuppressFinalize(this);
+        return nativeExceptionToken;
     }
 
     public static void ThrowIfFailed(NativeCallStatus status)
@@ -57,7 +66,7 @@ public sealed class NativeException : Exception
 
         if (info.m_ManagedExceptionToken != 0)
         {
-            ReleaseCapturedException__Injected(info.m_ExceptionToken);
+            ReleaseCaptured(info.m_ExceptionToken);
             ManagedExceptionInterop.ThrowCaptured(info.m_ManagedExceptionToken);
             return;
         }
@@ -69,7 +78,7 @@ public sealed class NativeException : Exception
         }
         catch
         {
-            ReleaseCapturedException__Injected(info.m_ExceptionToken);
+            ReleaseCaptured(info.m_ExceptionToken);
             ManagedExceptionInterop.ReleaseCaptured(info.m_ManagedExceptionToken);
             throw;
         }
@@ -93,6 +102,16 @@ public sealed class NativeException : Exception
             nativeSourceFunction,
             info.m_SourceLine,
             info.m_ExceptionToken);
+    }
+
+    internal static void ReleaseCaptured(ulong nativeExceptionToken)
+    {
+        if (nativeExceptionToken == 0)
+        {
+            return;
+        }
+
+        ReleaseCapturedException__Injected(nativeExceptionToken);
     }
 
     public override string ToString()

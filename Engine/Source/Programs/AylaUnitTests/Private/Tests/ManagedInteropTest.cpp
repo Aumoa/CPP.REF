@@ -194,6 +194,7 @@ namespace Ayla
 						auto roundTrip = GetManagedInteropFunction<round_trip_signature_t>("RoundTripNativeExceptionThroughManaged");
 						auto getObservedNativeException = GetManagedInteropFunction<observed_signature_t>("GetObservedNativeExceptionWrapper");
 
+						size_t beforeExceptionCount = NativeExceptionInterop::GetCapturedExceptionCount();
 						bool restoredNativeException = false;
 						try
 						{
@@ -210,6 +211,7 @@ namespace Ayla
 
 						Assert::True(restoredNativeException);
 						Assert::Equal(1, getObservedNativeException());
+						Assert::Equal(beforeExceptionCount, NativeExceptionInterop::GetCapturedExceptionCount());
 
 						return Task<>::CompletedTask();
 					}

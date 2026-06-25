@@ -33,7 +33,9 @@ namespace Ayla
 		static NativeCallStatus CaptureCurrentException() noexcept;
 		static NativeCallStatus CaptureException(std::exception_ptr exception) noexcept;
 		static std::exception_ptr GetCapturedException(uint64 exceptionToken) noexcept;
+		static std::exception_ptr TakeCapturedException(uint64 exceptionToken) noexcept;
 		static void ReleaseCapturedException(uint64 exceptionToken) noexcept;
+		static size_t GetCapturedExceptionCount() noexcept;
 		static NativeExceptionInfo GetLastException() noexcept;
 		static void ClearLastException() noexcept;
 	};

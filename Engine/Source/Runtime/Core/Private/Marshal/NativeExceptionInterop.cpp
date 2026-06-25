@@ -266,6 +266,32 @@ namespace Ayla
 		}
 	}
 
+	std::exception_ptr NativeExceptionInterop::TakeCapturedException(uint64 exceptionToken) noexcept
+	{
+		if (exceptionToken == 0)
+		{
+			return nullptr;
+		}
+
+		try
+		{
+			std::scoped_lock lock(GNativeExceptionsMutex);
+			auto it = GNativeExceptions.find(exceptionToken);
+			if (it == GNativeExceptions.end())
+			{
+				return nullptr;
+			}
+
+			std::exception_ptr exception = std::move(it->second);
+			GNativeExceptions.erase(it);
+			return exception;
+		}
+		catch (...)
+		{
+			return nullptr;
+		}
+	}
+
 	void NativeExceptionInterop::ReleaseCapturedException(uint64 exceptionToken) noexcept
 	{
 		if (exceptionToken == 0)
@@ -280,6 +306,19 @@ namespace Ayla
 		}
 		catch (...)
 		{
+		}
+	}
+
+	size_t NativeExceptionInterop::GetCapturedExceptionCount() noexcept
+	{
+		try
+		{
+			std::scoped_lock lock(GNativeExceptionsMutex);
+			return GNativeExceptions.size();
+		}
+		catch (...)
+		{
+			return 0;
 		}
 	}
 
