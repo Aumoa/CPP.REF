@@ -146,6 +146,22 @@ namespace Ayla
 			},
 			TestCase
 			{
+				.Name = TEXT("Core debug log boundary"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)();
+						auto function = GetManagedInteropFunction<signature_t>("InvokeCoreDebugLog");
+
+						Assert::Equal(1, function());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
 				.Name = TEXT("Managed exception restores after native frame"),
 				.TestFuncs =
 				{

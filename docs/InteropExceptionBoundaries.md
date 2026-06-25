@@ -175,6 +175,16 @@ Current callback responsibilities:
 
 When adding callbacks to this table, use `m_` field names on both sides and preserve sequential layout.
 
+### `Debug` Manual Exports
+
+Locations:
+
+- `Engine/Source/Runtime/Core/Private/Diagnostics/Debug.cpp`
+- `Engine/Source/Runtime/Core/Script/Diagnostics/Debug.cs`
+
+`Debug.Log` is a normal managed-to-native call and should return `NativeCallStatus`.
+The managed wrapper should call `NativeCallBoundary.ThrowIfFailed` so native failures do not escape directly across the ABI boundary.
+
 ### `Object` Manual Exports
 
 Locations:
@@ -226,6 +236,7 @@ The tests verify:
 - a managed exception token is released when native code catches and consumes the `Ayla::ManagedException` wrapper without returning it to managed code;
 - a native exception can cross a managed frame, appear as `Ayla.NativeException`, and restore as the original native exception type;
 - a native exception token is removed from the native token store when managed code returns the native exception passport to C++;
+- `Debug.Log` uses the native call boundary from managed code;
 - a `CoreCLRFunctions` managed activation failure is reported to C++ as `Ayla::ManagedException` instead of escaping directly through an unmanaged callback;
 - object lifetime tests still pass after Core manual interop was routed through the same boundary helpers.
 

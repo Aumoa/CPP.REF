@@ -53,6 +53,12 @@ public static class ManagedInteropSmoke
         return s_Counter;
     }
 
+    public static int InvokeCoreDebugLog()
+    {
+        Ayla.Debug.LogInfo("ManagedInterop", "Core debug log boundary smoke");
+        return 1;
+    }
+
     public static int RoundTripManagedExceptionThroughNative(nint nativeBridge)
     {
         var bridge = Marshal.GetDelegateForFunctionPointer<NativeStatusBridge>(nativeBridge);
