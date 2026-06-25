@@ -104,6 +104,4 @@ public partial class Object : IDisposable, IStaticObject
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedTypeFromPtr__Injected")]
     private static extern NativeCallStatus GetManagedTypeFromPtr__Injected(nint instancePtr, out ManagedTypeWrapper result);
 
-    [DllImport("Core", EntryPoint = "Ayla__Object__ReleaseIntermediatePtr__Injected")]
-    internal static extern void ReleaseIntermediatePtr__Injected(nint instancePtr);
 }
