@@ -59,13 +59,19 @@ namespace Ayla
 
 	ManagedTypeWrapper Object::GetManagedType()
 	{
-		using signature_t = void*(*)();
-
-		static ManagedTypeWrapper s_Type =
+		static ManagedTypeWrapper s_Type = []()
 		{
-			.NativeType = TypeCollector::FindType(typeid(Object)),
-			.ScriptTypeGetter = reinterpret_cast<signature_t>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.Object", "GetScriptType__Invoke"))()
-		};
+			using signature_t = NativeCallStatus(*)(void**);
+			auto function = reinterpret_cast<signature_t>(ScriptingBackend::Get().GetFunctionPointer("Core.Script", "Ayla.Object", "GetScriptType__Invoke"));
+			void* scriptTypeGetter = nullptr;
+			ManagedCallBoundary::ThrowIfFailed(function(&scriptTypeGetter));
+
+			return ManagedTypeWrapper
+			{
+				.NativeType = TypeCollector::FindType(typeid(Object)),
+				.ScriptTypeGetter = scriptTypeGetter
+			};
+		}();
 
 		return s_Type;
 	}

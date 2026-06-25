@@ -3,6 +3,7 @@
 #include "Tests/LifetimeTestObject.h"
 #include "Reflection/ReflectionMacros.h"
 #include "Reflection/TypeCollector.h"
+#include "Marshal/ManagedCallBoundary.h"
 #include "ScriptingBackend/ScriptingBackend.h"
 
 ACLASS__IMPL_CLASS_REGISTER(Ayla, LifetimeTestObject);
@@ -40,16 +41,22 @@ namespace Ayla
 
 	ManagedTypeWrapper LifetimeTestObject::GetManagedType()
 	{
-		using signature_t = void*(*)();
-
-		static ManagedTypeWrapper s_Type =
+		static ManagedTypeWrapper s_Type = []()
 		{
-			.NativeType = TypeCollector::FindType(typeid(LifetimeTestObject)),
-			.ScriptTypeGetter = reinterpret_cast<signature_t>(ScriptingBackend::Get().GetFunctionPointer(
+			using signature_t = NativeCallStatus(*)(void**);
+			auto function = reinterpret_cast<signature_t>(ScriptingBackend::Get().GetFunctionPointer(
 				"AylaUnitTests.Script",
 				"Ayla.Tests.ManagedLifetimeObject",
-				"GetScriptType__Invoke"))()
-		};
+				"GetScriptType__Invoke"));
+			void* scriptTypeGetter = nullptr;
+			ManagedCallBoundary::ThrowIfFailed(function(&scriptTypeGetter));
+
+			return ManagedTypeWrapper
+			{
+				.NativeType = TypeCollector::FindType(typeid(LifetimeTestObject)),
+				.ScriptTypeGetter = scriptTypeGetter
+			};
+		}();
 
 		return s_Type;
 	}

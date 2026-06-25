@@ -197,6 +197,8 @@ Locations:
 `Object` is the main foundational class where manual C++/C# interop exists below RHT.
 Its native exports are now status-returning boundary functions.
 Managed code should call the checked wrapper methods instead of directly calling private `__Injected` P/Invokes.
+C++ code that asks managed code for a `GetScriptTypeDelegate` function pointer should call a status-returning `GetScriptType__Invoke` helper and pass the returned status to `ManagedCallBoundary::ThrowIfFailed`.
+The returned `ScriptTypeGetter` delegate is still a normal managed delegate used later from managed code.
 
 Current wrapper responsibilities:
 
@@ -237,6 +239,7 @@ The tests verify:
 - a native exception can cross a managed frame, appear as `Ayla.NativeException`, and restore as the original native exception type;
 - a native exception token is removed from the native token store when managed code returns the native exception passport to C++;
 - `Debug.Log` uses the native call boundary from managed code;
+- script type getter pointer callbacks report managed failures through `ManagedCallBoundary`;
 - a `CoreCLRFunctions` managed activation failure is reported to C++ as `Ayla::ManagedException` instead of escaping directly through an unmanaged callback;
 - object lifetime tests still pass after Core manual interop was routed through the same boundary helpers.
 
