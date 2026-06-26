@@ -27,10 +27,18 @@ public static class ManagedInteropSmoke
         public int Marker { get; } = marker;
     }
 
+    private sealed class ThrowingExceptionDetailsException : Exception
+    {
+        public override string Message => throw new InvalidOperationException("Message accessor failed.");
+        public override string ToString() => throw new InvalidOperationException("ToString accessor failed.");
+    }
+
     private static int s_Counter;
     private static int s_ObservedNativeExceptionWrapper;
     private static ManagedInteropSmokeException? s_LastManagedException;
+    private static ThrowingExceptionDetailsException? s_LastThrowingDetailsException;
     private static readonly NativeStatusCallback s_ThrowManagedExceptionCallback = ThrowManagedExceptionCallback;
+    private static readonly NativeStatusCallback s_ThrowManagedExceptionWithThrowingDetailsCallback = ThrowManagedExceptionWithThrowingDetailsCallback;
 
     public static int Add(int left, int right)
     {
@@ -75,6 +83,34 @@ public static class ManagedInteropSmoke
                 && IsManagedInteropSmokeException(ex)
                     ? 1
                     : -1;
+        }
+        catch (NativeException)
+        {
+            return -2;
+        }
+        catch
+        {
+            return -3;
+        }
+
+        return 0;
+    }
+
+    public static int RoundTripManagedExceptionWithThrowingDetailsThroughNative(nint nativeBridge)
+    {
+        var bridge = Marshal.GetDelegateForFunctionPointer<NativeStatusBridge>(nativeBridge);
+        int beforeCount = GetCapturedManagedExceptionCount();
+
+        try
+        {
+            NativeCallBoundary.ThrowIfFailed(bridge(Marshal.GetFunctionPointerForDelegate(s_ThrowManagedExceptionWithThrowingDetailsCallback)));
+        }
+        catch (ThrowingExceptionDetailsException ex)
+        {
+            int afterCount = GetCapturedManagedExceptionCount();
+            return ReferenceEquals(ex, s_LastThrowingDetailsException) && afterCount == beforeCount
+                ? 1
+                : -1;
         }
         catch (NativeException)
         {
@@ -285,6 +321,19 @@ public static class ManagedInteropSmoke
         {
             s_LastManagedException = new ManagedInteropSmokeException(ManagedExceptionMessage, 42);
             throw s_LastManagedException;
+        }
+        catch (Exception ex)
+        {
+            return ManagedCallBoundary.Capture(ex);
+        }
+    }
+
+    private static NativeCallStatus ThrowManagedExceptionWithThrowingDetailsCallback()
+    {
+        try
+        {
+            s_LastThrowingDetailsException = new ThrowingExceptionDetailsException();
+            throw s_LastThrowingDetailsException;
         }
         catch (Exception ex)
         {

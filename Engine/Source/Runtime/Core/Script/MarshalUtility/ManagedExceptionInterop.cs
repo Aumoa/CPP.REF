@@ -13,9 +13,9 @@ public static class ManagedExceptionInterop
 
     public static unsafe NativeCallStatus Capture(global::System.Exception exception)
     {
-        string typeName = exception.GetType().FullName ?? exception.GetType().Name;
-        string message = exception.Message;
-        string details = exception.ToString();
+        string typeName = GetSafeTypeName(exception);
+        string message = GetSafeMessage(exception);
+        string details = GetSafeDetails(exception, typeName, message);
         ulong nativeExceptionToken = exception is NativeException nativeException ? nativeException.DetachNativeExceptionToken() : 0;
         ulong managedExceptionToken = 0;
 
@@ -40,6 +40,43 @@ public static class ManagedExceptionInterop
             NativeException.ReleaseCaptured(nativeExceptionToken);
             ReleaseCaptured(managedExceptionToken);
             throw;
+        }
+    }
+
+    private static string GetSafeTypeName(global::System.Exception exception)
+    {
+        try
+        {
+            var type = exception.GetType();
+            return type.FullName ?? type.Name;
+        }
+        catch
+        {
+            return "System.Exception";
+        }
+    }
+
+    private static string GetSafeMessage(global::System.Exception exception)
+    {
+        try
+        {
+            return exception.Message ?? string.Empty;
+        }
+        catch
+        {
+            return "Failed to capture managed exception message.";
+        }
+    }
+
+    private static string GetSafeDetails(global::System.Exception exception, string typeName, string message)
+    {
+        try
+        {
+            return exception.ToString();
+        }
+        catch
+        {
+            return $"{typeName}: {message}";
         }
     }
 

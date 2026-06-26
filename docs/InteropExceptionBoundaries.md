@@ -140,6 +140,7 @@ Maintain these invariants:
 - `ManagedExceptionInterop.Capture` registers an `ExceptionDispatchInfo` only for real managed-origin exceptions.
 - If the exception is a `NativeException`, capture should pass the native exception token back to native code instead of registering a new managed token.
 - `ThrowCaptured` removes the token before rethrowing so the restored exception has single-consumer ownership.
+- `Capture` must read managed exception type, message, and details through safe fallback helpers because custom exception accessors can throw while the boundary is already transferring failure state.
 - `CaptureException` on the native side must retain the managed token in `ManagedException` so a later native-to-managed return can restore the original managed exception.
 - A native `ManagedException` wrapper owns its managed token while the exception is observed in C++; if native code catches and consumes the wrapper, wrapper destruction must release the managed token.
 - `NativeExceptionInterop::CaptureException` should detach a `ManagedException` token only when it is returning the managed exception passport back to managed code.

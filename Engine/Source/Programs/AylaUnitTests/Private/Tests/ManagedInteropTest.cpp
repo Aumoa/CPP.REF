@@ -15,7 +15,9 @@ namespace Ayla
 	{
 		const String NativeExceptionMessage = TEXT("native exception passport");
 		const String ManagedExceptionMessage = TEXT("managed exception passport");
+		const String ManagedExceptionFallbackMessage = TEXT("Failed to capture managed exception message.");
 		bool GObservedManagedExceptionWrapper = false;
+		bool GObservedThrowingDetailsManagedExceptionWrapper = false;
 		bool GSwallowedManagedExceptionWrapper = false;
 		std::atomic<int32> GConcurrentManagedExceptionWrapperCount = 0;
 
@@ -28,6 +30,14 @@ namespace Ayla
 		{
 			return exception.GetManagedTypeName().Contains(TEXT("ManagedInteropSmokeException"))
 				&& exception.GetMessage() == ManagedExceptionMessage
+				&& exception.GetManagedExceptionToken() != 0;
+		}
+
+		bool IsThrowingDetailsManagedExceptionWrapper(const ManagedException& exception)
+		{
+			return exception.GetManagedTypeName().Contains(TEXT("ThrowingExceptionDetailsException"))
+				&& exception.GetMessage() == ManagedExceptionFallbackMessage
+				&& exception.GetManagedDetails().Contains(ManagedExceptionFallbackMessage)
 				&& exception.GetManagedExceptionToken() != 0;
 		}
 
@@ -45,6 +55,27 @@ namespace Ayla
 				catch (const ManagedException& ex)
 				{
 					GObservedManagedExceptionWrapper = IsManagedInteropSmokeException(ex);
+					throw;
+				}
+
+				return NativeCallStatus::Succeeded;
+			});
+		}
+
+		NativeCallStatus ObserveThrowingDetailsManagedExceptionThroughNative(ssize_t managedCallback) noexcept
+		{
+			return NativeCallBoundary::Invoke([&]() -> NativeCallStatus
+			{
+				using signature_t = NativeCallStatus(*)();
+				auto callback = reinterpret_cast<signature_t>(managedCallback);
+
+				try
+				{
+					ManagedCallBoundary::ThrowIfFailed(callback());
+				}
+				catch (const ManagedException& ex)
+				{
+					GObservedThrowingDetailsManagedExceptionWrapper = IsThrowingDetailsManagedExceptionWrapper(ex);
 					throw;
 				}
 
@@ -201,6 +232,25 @@ namespace Ayla
 
 						Assert::Equal(1, function(reinterpret_cast<ssize_t>(&ObserveManagedExceptionThroughNative)));
 						Assert::True(GObservedManagedExceptionWrapper);
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed exception capture tolerates throwing details"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t);
+						auto function = GetManagedInteropFunction<signature_t>("RoundTripManagedExceptionWithThrowingDetailsThroughNative");
+
+						GObservedThrowingDetailsManagedExceptionWrapper = false;
+
+						Assert::Equal(1, function(reinterpret_cast<ssize_t>(&ObserveThrowingDetailsManagedExceptionThroughNative)));
+						Assert::True(GObservedThrowingDetailsManagedExceptionWrapper);
 
 						return Task<>::CompletedTask();
 					}
