@@ -22,7 +22,7 @@ extern "C"
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			::Ayla::Debug::Log(category.AsString(), logLevel, message.AsString());
-			return ::Ayla::NativeCallStatus::Success;
+			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}
 

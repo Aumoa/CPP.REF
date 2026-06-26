@@ -11,7 +11,7 @@ namespace Ayla
 {
 	enum class NativeCallStatus : int32
 	{
-		Success = 0,
+		Succeeded = 0,
 		Exception = 1
 	};
 

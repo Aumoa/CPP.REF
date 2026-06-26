@@ -4,7 +4,7 @@ public static class ManagedCallBoundary
 {
     public static NativeCallStatus Succeed()
     {
-        return NativeCallStatus.Success;
+        return NativeCallStatus.Succeeded;
     }
 
     public static NativeCallStatus Capture(global::System.Exception exception)

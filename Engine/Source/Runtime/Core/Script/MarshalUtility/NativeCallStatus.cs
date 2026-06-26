@@ -2,6 +2,6 @@ namespace Ayla;
 
 public enum NativeCallStatus : int
 {
-    Success = 0,
+    Succeeded = 0,
     Exception = 1
 }

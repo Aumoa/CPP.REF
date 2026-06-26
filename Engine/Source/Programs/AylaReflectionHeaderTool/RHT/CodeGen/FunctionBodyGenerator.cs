@@ -431,7 +431,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
                 formatLine($"*__return_value = {bodyStmt};");
             }
 
-            formatLine("return ::Ayla::NativeCallStatus::Success;");
+            formatLine("return ::Ayla::NativeCallStatus::Succeeded;");
         });
     }
 

@@ -165,7 +165,7 @@ extern "C"
 			auto self_ = (::Ayla::Object*)self;
 			self_->m_Spinlock.lock();
 			*handle = self_->m_GCHandle;
-			return ::Ayla::NativeCallStatus::Success;
+			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}
 
@@ -184,10 +184,10 @@ extern "C"
 			{
 				self_->m_Spinlock.unlock();
 				delete self_;
-				return ::Ayla::NativeCallStatus::Success;
+				return ::Ayla::NativeCallStatus::Succeeded;
 			}
 			self_->m_Spinlock.unlock();
-			return ::Ayla::NativeCallStatus::Success;
+			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}
 
@@ -196,7 +196,7 @@ extern "C"
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			*result = ::Ayla::Object::GetManagedType();
-			return ::Ayla::NativeCallStatus::Success;
+			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}
 
@@ -205,7 +205,7 @@ extern "C"
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			*result = self->AsWrapper();
-			return ::Ayla::NativeCallStatus::Success;
+			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}
 
@@ -214,7 +214,7 @@ extern "C"
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			*result = self->GetType()->GetManagedType();
-			return ::Ayla::NativeCallStatus::Success;
+			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}
 }

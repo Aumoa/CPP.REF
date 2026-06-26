@@ -48,7 +48,7 @@ namespace Ayla
 					throw;
 				}
 
-				return NativeCallStatus::Success;
+				return NativeCallStatus::Succeeded;
 			});
 		}
 
@@ -73,7 +73,7 @@ namespace Ayla
 					throw;
 				}
 
-				return NativeCallStatus::Success;
+				return NativeCallStatus::Succeeded;
 			});
 		}
 
@@ -93,7 +93,7 @@ namespace Ayla
 					GSwallowedManagedExceptionWrapper = IsManagedInteropSmokeException(ex);
 				}
 
-				return NativeCallStatus::Success;
+				return NativeCallStatus::Succeeded;
 			});
 		}
 

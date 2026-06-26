@@ -11,7 +11,7 @@ namespace Ayla
 	public:
 		static void ThrowIfFailed(NativeCallStatus status)
 		{
-			if (status == NativeCallStatus::Success)
+			if (status == NativeCallStatus::Succeeded)
 			{
 				return;
 			}
