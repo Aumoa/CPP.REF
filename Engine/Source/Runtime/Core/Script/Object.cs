@@ -36,7 +36,7 @@ public partial class Object : IDisposable, IStaticObject
             return;
         }
 
-        var gcHandlePtr = ClearGCHandle__Injected(nativePointer, m_GCHandleSerial);
+        var gcHandlePtr = ClearGCHandle(nativePointer, m_GCHandleSerial);
         m_GCHandleSerial = 0;
         if (gcHandlePtr != 0)
         {
@@ -57,7 +57,7 @@ public partial class Object : IDisposable, IStaticObject
             throw new ObjectDisposedException(GetType().FullName);
         }
 
-        return AsWrapper__Injected(nativePointer) with
+        return AsWrapper(nativePointer) with
         {
             IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal)
         };
@@ -65,35 +65,82 @@ public partial class Object : IDisposable, IStaticObject
 
     public virtual ManagedTypeWrapper GetClass() => StaticClass();
 
-    public static ManagedTypeWrapper StaticClass() => GetManagedType__Injected();
+    public static ManagedTypeWrapper StaticClass() => GetManagedType();
 
     public static implicit operator bool(Object self) => self != null;
 
     private static GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof(Object);
 
-    private static nint GetScriptType__Invoke()
+    private static unsafe NativeCallStatus GetScriptType__Invoke(nint* result)
     {
-        return Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);
+        try
+        {
+            *result = Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);
+            return ManagedCallBoundary.Succeed();
+        }
+        catch (Exception ex)
+        {
+            return ManagedCallBoundary.Capture(ex);
+        }
+    }
+
+    internal static nint BeginWriteGCHandle(nint instancePtr)
+    {
+        NativeCallBoundary.ThrowIfFailed(BeginWriteGCHandle__Injected(instancePtr, out nint handle));
+        return handle;
+    }
+
+    internal static void EndWriteGCHandle(nint instancePtr, nint handle, bool releaseIntPtr)
+    {
+        _ = EndWriteGCHandleAndGetSerial(instancePtr, handle, releaseIntPtr);
+    }
+
+    internal static ulong EndWriteGCHandleAndGetSerial(nint instancePtr, nint handle, bool releaseIntPtr)
+    {
+        NativeCallBoundary.ThrowIfFailed(EndWriteGCHandle__Injected(instancePtr, handle, releaseIntPtr, out ulong gcHandleSerial));
+        return gcHandleSerial;
+    }
+
+    internal static nint ClearGCHandle(nint instancePtr, ulong gcHandleSerial)
+    {
+        NativeCallBoundary.ThrowIfFailed(ClearGCHandle__Injected(instancePtr, gcHandleSerial, out nint handle));
+        return handle;
+    }
+
+    internal static ManagedTypeWrapper GetManagedType()
+    {
+        NativeCallBoundary.ThrowIfFailed(GetManagedType__Injected(out ManagedTypeWrapper result));
+        return result;
+    }
+
+    internal static ObjectReferenceWrapper AsWrapper(nint instancePtr)
+    {
+        NativeCallBoundary.ThrowIfFailed(AsWrapper__Injected(instancePtr, out ObjectReferenceWrapper result));
+        return result;
+    }
+
+    internal static ManagedTypeWrapper GetManagedTypeFromPtr(nint instancePtr)
+    {
+        NativeCallBoundary.ThrowIfFailed(GetManagedTypeFromPtr__Injected(instancePtr, out ManagedTypeWrapper result));
+        return result;
     }
 
     [DllImport("Core", EntryPoint = "Ayla__Object__BeginWriteGCHandle__Injected")]
-    internal static extern nint BeginWriteGCHandle__Injected(nint instancePtr);
+    private static extern NativeCallStatus BeginWriteGCHandle__Injected(nint instancePtr, out nint handle);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__EndWriteGCHandle__Injected")]
-    internal static extern ulong EndWriteGCHandle__Injected(nint instancePtr, nint handle, bool releaseIntPtr);
+    private static extern NativeCallStatus EndWriteGCHandle__Injected(nint instancePtr, nint handle, [MarshalAs(UnmanagedType.I1)] bool releaseIntPtr, out ulong gcHandleSerial);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__ClearGCHandle__Injected")]
-    internal static extern nint ClearGCHandle__Injected(nint instancePtr, ulong gcHandleSerial);
+    private static extern NativeCallStatus ClearGCHandle__Injected(nint instancePtr, ulong gcHandleSerial, out nint handle);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedType__Injected")]
-    internal static extern ManagedTypeWrapper GetManagedType__Injected();
+    private static extern NativeCallStatus GetManagedType__Injected(out ManagedTypeWrapper result);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__AsWrapper__Injected")]
-    internal static extern ObjectReferenceWrapper AsWrapper__Injected(nint instancePtr);
+    private static extern NativeCallStatus AsWrapper__Injected(nint instancePtr, out ObjectReferenceWrapper result);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedTypeFromPtr__Injected")]
-    internal static extern ManagedTypeWrapper GetManagedTypeFromPtr__Injected(nint instancePtr);
+    private static extern NativeCallStatus GetManagedTypeFromPtr__Injected(nint instancePtr, out ManagedTypeWrapper result);
 
-    [DllImport("Core", EntryPoint = "Ayla__Object__ReleaseIntermediatePtr__Injected")]
-    internal static extern void ReleaseIntermediatePtr__Injected(nint instancePtr);
 }

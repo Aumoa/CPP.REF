@@ -148,6 +148,21 @@ namespace Ayla
 			UnlockAndInvokeContinuations(lock);
 		}
 
+		bool TrySetResult()
+		{
+			std::unique_lock lock(m_Mutex);
+			if (IsCompleted())
+			{
+				return false;
+			}
+
+			check(m_Status == TaskStatus::Running);
+			m_Status = TaskStatus::RanToCompletion;
+
+			UnlockAndInvokeContinuations(lock);
+			return true;
+		}
+
 		bool TryCancel(std::stop_token stoppingToken = {}, std::source_location src = std::source_location::current()) noexcept
 		{
 			std::unique_lock lock(m_Mutex);
@@ -267,10 +282,27 @@ namespace Ayla
 			}
 
 			check(m_Status == TaskStatus::Running);
-			m_Status = TaskStatus::RanToCompletion;
 			m_Promise.emplace(std::forward<U>(args)...);
+			m_Status = TaskStatus::RanToCompletion;
 
 			UnlockAndInvokeContinuations(lock);
+		}
+
+		template<class... U>
+		bool TrySetResult(U&&... args) requires std::constructible_from<T, U...>
+		{
+			std::unique_lock lock(m_Mutex);
+			if (IsCompleted())
+			{
+				return false;
+			}
+
+			check(m_Status == TaskStatus::Running);
+			m_Promise.emplace(std::forward<U>(args)...);
+			m_Status = TaskStatus::RanToCompletion;
+
+			UnlockAndInvokeContinuations(lock);
+			return true;
 		}
 	};
 }

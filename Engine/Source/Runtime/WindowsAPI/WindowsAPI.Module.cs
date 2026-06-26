@@ -8,6 +8,9 @@ public class WindowsAPI : ModuleRules
     public WindowsAPI()
     {
         Script.Enabled = true;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("ApplicationCore");

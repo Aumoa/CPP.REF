@@ -13,6 +13,7 @@
 #include "Reflection/ReflectionMacros.h"
 #include "Marshal/ObjectReferenceWrapper.h"
 #include "Marshal/ManagedTypeWrapper.h"
+#include "Marshal/NativeExceptionInterop.h"
 #include "Threading/Spinlock.h"
 #include <vector>
 #include <functional>
@@ -21,10 +22,10 @@
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__BeginWriteGCHandle__Injected(void* self);
-	PLATFORM_SHARED_EXPORT ::Ayla::uint64 Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr);
-	PLATFORM_SHARED_EXPORT ::Ayla::ssize_t Ayla__Object__ClearGCHandle__Injected(void* self, ::Ayla::uint64 gcHandleSerial);
-	PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper Ayla__Object__GetManagedType__Injected();
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__BeginWriteGCHandle__Injected(void* self, ::Ayla::ssize_t* handle) noexcept;
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr, ::Ayla::uint64* gcHandleSerial) noexcept;
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__ClearGCHandle__Injected(void* self, ::Ayla::uint64 gcHandleSerial, ::Ayla::ssize_t* handle) noexcept;
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__GetManagedType__Injected(::Ayla::ManagedTypeWrapper* result) noexcept;
 }
 
 namespace Ayla
@@ -39,10 +40,10 @@ namespace Ayla
 		friend TypeRegister;
 		friend Type;
 		friend RuntimeType;
-		friend ::Ayla::ssize_t (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self);
-		friend ::Ayla::uint64 (::Ayla__Object__EndWriteGCHandle__Injected)(void* self, ssize_t handle, bool releaseIntPtr);
-		friend ::Ayla::ssize_t (::Ayla__Object__ClearGCHandle__Injected)(void* self, uint64 gcHandleSerial);
-		friend ::Ayla::ManagedTypeWrapper (::Ayla__Object__GetManagedType__Injected)();
+		friend ::Ayla::NativeCallStatus (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self, ::Ayla::ssize_t* handle) noexcept;
+		friend ::Ayla::NativeCallStatus (::Ayla__Object__EndWriteGCHandle__Injected)(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr, ::Ayla::uint64* gcHandleSerial) noexcept;
+		friend ::Ayla::NativeCallStatus (::Ayla__Object__ClearGCHandle__Injected)(void* self, ::Ayla::uint64 gcHandleSerial, ::Ayla::ssize_t* handle) noexcept;
+		friend ::Ayla::NativeCallStatus (::Ayla__Object__GetManagedType__Injected)(::Ayla::ManagedTypeWrapper* result) noexcept;
 
 	public:
 		using This = Object;
@@ -92,7 +93,7 @@ namespace Ayla
 		void ReleaseRef();
 		ObjectReferenceWrapper BindGCHandle__Unsafe(ssize_t gcHandlePtr);
 		ObjectReferenceWrapper AsWrapper();
-		
+
 		template<std::derived_from<Object> T = Object>
 		auto AsShared()
 		{

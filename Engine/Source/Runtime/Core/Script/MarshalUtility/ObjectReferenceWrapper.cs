@@ -17,16 +17,16 @@ public struct ObjectReferenceWrapper
             return null;
         }
 
-        var managedType = Object.GetManagedTypeFromPtr__Injected(Ptr);
+        var managedType = Object.GetManagedTypeFromPtr(Ptr);
         var scriptType = managedType.GetScriptType();
 
-        var handlePtr = Object.BeginWriteGCHandle__Injected(Ptr);
+        var handlePtr = Object.BeginWriteGCHandle(Ptr);
         var writeCompleted = false;
         try
         {
             if (!typeof(T).IsAssignableFrom(scriptType))
             {
-                Object.EndWriteGCHandle__Injected(Ptr, handlePtr, true);
+                Object.EndWriteGCHandle(Ptr, handlePtr, true);
                 writeCompleted = true;
                 throw new InvalidCastException($"Cannot convert managed wrapper type '{scriptType.FullName}' to '{typeof(T).FullName}'.");
             }
@@ -36,7 +36,7 @@ public struct ObjectReferenceWrapper
                 var target = GCHandle.FromIntPtr(handlePtr).Target;
                 if (target != null)
                 {
-                    Object.EndWriteGCHandle__Injected(Ptr, handlePtr, true);
+                    Object.EndWriteGCHandle(Ptr, handlePtr, true);
                     writeCompleted = true;
                     if (target is T t)
                     {
@@ -53,7 +53,7 @@ public struct ObjectReferenceWrapper
                 var newHandlePtr = (nint)GCHandle.Alloc(@this, GCHandleType.Normal);
                 try
                 {
-                    var gcHandleSerial = Object.EndWriteGCHandle__Injected(ptr, newHandlePtr, true);
+                    var gcHandleSerial = Object.EndWriteGCHandleAndGetSerial(ptr, newHandlePtr, true);
                     writeCompleted = true;
                     return new ObjectReferenceWrapper
                     {
@@ -74,7 +74,7 @@ public struct ObjectReferenceWrapper
         {
             if (!writeCompleted)
             {
-                Object.EndWriteGCHandle__Injected(Ptr, 0, true);
+                Object.EndWriteGCHandle(Ptr, 0, true);
             }
 
             throw;

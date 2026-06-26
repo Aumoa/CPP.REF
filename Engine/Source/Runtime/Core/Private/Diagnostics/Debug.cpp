@@ -3,6 +3,7 @@
 #include "Diagnostics/Debug.h"
 #include "Platform/PlatformProcess.h"
 #include "Console.h"
+#include "Marshal/NativeCallBoundary.h"
 #include "Marshal/ManagedStringWrapper.h"
 
 namespace Ayla
@@ -16,9 +17,13 @@ namespace Ayla
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT void Ayla__Debug__Log__Injected(::Ayla::ManagedStringWrapper category, ::Ayla::LogVerbosity logLevel, ::Ayla::ManagedStringWrapper message)
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Debug__Log__Injected(::Ayla::ManagedStringWrapper category, ::Ayla::LogVerbosity logLevel, ::Ayla::ManagedStringWrapper message) noexcept
 	{
-		::Ayla::Debug::Log(category.AsString(), logLevel, message.AsString());
+		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
+		{
+			::Ayla::Debug::Log(category.AsString(), logLevel, message.AsString());
+			return ::Ayla::NativeCallStatus::Succeeded;
+		});
 	}
 
 	PLATFORM_SHARED_EXPORT void Ayla__Debug__EnsureMessage__Injected(bool condition, ::Ayla::ManagedStringWrapper message)

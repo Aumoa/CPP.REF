@@ -15,13 +15,13 @@ public static class Debug
         {
             var category_wrapper = new ManagedStringWrapper(categoryPtr, category.Length);
             var message_wrapper = new ManagedStringWrapper(messagePtr, message.Length);
-            Ayla__Debug__Log__Injected(category_wrapper, logLevel, message_wrapper);
+            NativeCallBoundary.ThrowIfFailed(Ayla__Debug__Log__Injected(category_wrapper, logLevel, message_wrapper));
         }
 
         return;
 
         [DllImport("Core")]
-        static extern void Ayla__Debug__Log__Injected(ManagedStringWrapper category, LogVerbosity logLevel, ManagedStringWrapper message);
+        static extern NativeCallStatus Ayla__Debug__Log__Injected(ManagedStringWrapper category, LogVerbosity logLevel, ManagedStringWrapper message);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

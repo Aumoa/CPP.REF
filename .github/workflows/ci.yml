@@ -4,9 +4,18 @@ on:
   push:
     branches:
       - dev
+  pull_request:
+    branches:
+      - dev
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,3 +49,6 @@ jobs:
 
       - name: Build
         run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll build --target "Engine" --config Shipping --skip-shaders
+
+      - name: Run unit tests
+        run: dotnet ./Engine/Binaries/DotNET/AylaBuildTool.dll test --target "AylaUnitTests" --config Shipping --skip-shaders

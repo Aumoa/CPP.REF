@@ -53,6 +53,9 @@ compile_commands.json
 *.tmp
 *.temp
 
+# Local agent instructions
+AGENTS.local.md
+
 # Operating system metadata
 .DS_Store
 Thumbs.db

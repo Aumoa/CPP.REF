@@ -1,8 +1,8 @@
-﻿namespace AylaEngine;
+namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private interface ITask
+    internal interface ITask
     {
         GroupDescriptor Group { get; }
     }

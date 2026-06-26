@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -16,7 +16,7 @@ internal class MSLinker : Linker
         m_Product = product;
     }
 
-    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompiler.CompileItem[] sourceObjects, CancellationToken cancellationToken)
+    public override async ValueTask<Terminal.Output> LinkAsync(ModuleRulesResolver module, CppCompileCommand[] sourceObjects, CancellationToken cancellationToken)
     {
         var options = new Terminal.Options
         {
@@ -26,8 +26,8 @@ internal class MSLinker : Linker
 
         m_CommandBuilder.Clear();
 
-        var outputPath = module.Group.Output(m_TargetInfo, FolderPolicy.PathType.Current);
-        var outputFileName = module.Group.OutputFileName(m_Installation, m_TargetInfo, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
+        var outputPath = module.Group.ModuleOutput(m_TargetInfo, module.BuildProfile, FolderPolicy.PathType.Current);
+        var outputFileName = module.Group.ModuleOutputFileName(m_Installation, m_TargetInfo, module.BuildProfile, module.Rules.Name, module.Rules.Type, FolderPolicy.PathType.Current);
         Directory.CreateDirectory(outputPath);
 
         if (module.Rules.IsSharedLibrary())
@@ -57,10 +57,7 @@ internal class MSLinker : Linker
 
         for (int i = 0; i < sourceObjects.Length; ++i)
         {
-            var intermediateDirectory = sourceObjects[i].Descriptor.Intermediate(module.Name, m_TargetInfo, FolderPolicy.PathType.Current);
-            var fileName = Path.GetFileName(sourceObjects[i].SourceCode.FilePath);
-            var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-            m_CommandBuilder.AppendFormat("\"{0}\" ", objectFileName);
+            m_CommandBuilder.AppendFormat("\"{0}\" ", sourceObjects[i].ObjectFilePath);
         }
 
         string libraryPath = Path.Combine(m_Product.Directory, "lib", m_TargetInfo.Platform.Architecture switch
@@ -71,8 +68,8 @@ internal class MSLinker : Linker
 
         foreach (var libPath in VisualStudioInstallation.GatherWindowsKitSharedLibrary(m_TargetInfo.Platform.Architecture)
             .Append(libraryPath)
-            .Append(module.EngineGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
-            .Append(module.PrimaryGroup.Output(m_TargetInfo, FolderPolicy.PathType.Current))
+            .Append(module.EngineGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.EngineGroup, m_TargetInfo), FolderPolicy.PathType.Current))
+            .Append(module.PrimaryGroup.ModuleOutput(m_TargetInfo, BuildProfileResolver.Resolve(module.PrimaryGroup, m_TargetInfo), FolderPolicy.PathType.Current))
             .Distinct())
         {
             m_CommandBuilder.Append($"/LIBPATH:\"{libPath}\" ");

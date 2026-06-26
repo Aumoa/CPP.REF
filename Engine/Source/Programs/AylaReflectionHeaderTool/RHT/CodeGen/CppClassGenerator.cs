@@ -83,15 +83,25 @@ internal class CppClassGenerator
         m_Parent.WriteIndentedLine("{");
         m_Parent.Indented(() =>
         {
-            m_Parent.WriteIndentedLine($"using signature_t = void*(*)();");
-            m_Parent.WriteIndentedLine($"static ::Ayla::ManagedTypeWrapper s_Type =");
+            m_Parent.WriteIndentedLine($"static ::Ayla::ManagedTypeWrapper s_Type = []()");
             m_Parent.WriteIndentedLine("{");
             m_Parent.Indented(() =>
             {
-                m_Parent.WriteIndentedLine($".NativeType = ::Ayla::TypeCollector::FindType(typeid({className})),");
-                m_Parent.WriteIndentedLine($".ScriptTypeGetter = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Context.ScriptAssemblyName}\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"GetScriptType__Invoke\"))()");
+                m_Parent.WriteIndentedLine($"using signature_t = ::Ayla::NativeCallStatus(*)(void**);");
+                m_Parent.WriteIndentedLine($"auto function = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Context.ScriptAssemblyName}\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"GetScriptType__Invoke\"));");
+                m_Parent.WriteIndentedLine($"void* scriptTypeGetter = nullptr;");
+                m_Parent.WriteIndentedLine($"::Ayla::ManagedCallBoundary::ThrowIfFailed(function(&scriptTypeGetter));");
+                m_Parent.WriteIndentedLine("");
+                m_Parent.WriteIndentedLine($"return ::Ayla::ManagedTypeWrapper");
+                m_Parent.WriteIndentedLine("{");
+                m_Parent.Indented(() =>
+                {
+                    m_Parent.WriteIndentedLine($".NativeType = ::Ayla::TypeCollector::FindType(typeid({className})),");
+                    m_Parent.WriteIndentedLine($".ScriptTypeGetter = scriptTypeGetter");
+                });
+                m_Parent.WriteIndentedLine("};");
             });
-            m_Parent.WriteIndentedLine("};");
+            m_Parent.WriteIndentedLine("}();");
             m_Parent.WriteIndentedLine("");
             m_Parent.WriteIndentedLine($"return s_Type;");
         });
@@ -121,13 +131,14 @@ internal class CppClassGenerator
             m_Parent.Indented(() =>
             {
                 var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
-                m_Parent.WriteIndentedLine($"using signature_t = {returnType.CppBindingName}(*)({invokeParametersDeclare});");
+                invokeParametersDeclare = AppendCppOutParameter(invokeParametersDeclare, returnType);
+                m_Parent.WriteIndentedLine($"using signature_t = ::Ayla::NativeCallStatus(*)({invokeParametersDeclare});");
                 m_Parent.WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Context.ScriptAssemblyName}\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"{function.Name}__Invoke\"));");
                 m_Parent.WriteIndentedLine($"auto self = AsShared();");
 
                 string callable = "callable";
                 var codeGen = new FunctionBodyGenerator(parameters.AddFirstTemp(SharedPtrTypeName.SharedObject, "self"), callable, returnType);
-                codeGen.GenerateCppNativeToCSharp(m_Parent.WriteIndentedLine);
+                codeGen.GenerateCppNativeToCSharpStatus(m_Parent.WriteIndentedLine);
             });
             m_Parent.WriteIndentedLine("}");
 
@@ -160,11 +171,18 @@ internal class CppClassGenerator
 
     private void GenerateGetManagedTypeExport(string @namespace, string className, ClassName classType)
     {
-        m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::ManagedTypeWrapper {classType.CppName[2..].Replace("::", "__")}__GetManagedType()");
+        m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {classType.CppName[2..].Replace("::", "__")}__GetManagedType(::Ayla::ManagedTypeWrapper* result) noexcept");
         m_Parent.WriteIndentedLine("{");
         m_Parent.Indented(() =>
         {
-            m_Parent.WriteIndentedLine($"return {@namespace}::{className}::GetManagedType();");
+            m_Parent.WriteIndentedLine("return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus");
+            m_Parent.WriteIndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_Parent.WriteIndentedLine($"*result = {@namespace}::{className}::GetManagedType();");
+                m_Parent.WriteIndentedLine($"return ::Ayla::NativeCallStatus::Succeeded;");
+            });
+            m_Parent.WriteIndentedLine("});");
         });
         m_Parent.WriteIndentedLine("}");
         m_Parent.WriteIndentedLine("");
@@ -180,12 +198,13 @@ internal class CppClassGenerator
             string constructorFullName = $"{@namespace.Replace("::", "__")}__{className}__{constructor.Name}__{i}__Injected";
             string callable = $"::Ayla::Object::ScriptNew<{classType.CppName}>";
             var codeGen = new FunctionBodyGenerator(parameters, callable, PlaceholderName.Value);
+            parametersDeclare = AppendCppOutParameter(parametersDeclare, "::Ayla::ObjectReferenceWrapper");
 
-            m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::ObjectReferenceWrapper {constructorFullName}({parametersDeclare})");
+            m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {constructorFullName}({parametersDeclare}) noexcept");
             m_Parent.WriteIndentedLine("{");
             m_Parent.Indented(() =>
             {
-                codeGen.GenerateCppCSharpToNative(m_Parent.WriteIndentedLine);
+                GenerateNativeCallStatusBody(codeGen);
             });
             m_Parent.WriteIndentedLine("}");
         }
@@ -210,15 +229,38 @@ internal class CppClassGenerator
             string parametersDeclare = isStatic
                 ? ParametersGenerator.GenerateCppBindings(parameters)
                 : ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+            parametersDeclare = AppendCppOutParameter(parametersDeclare, returnType);
 
-            m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT {returnType.CppBindingName} {functionFullName}({parametersDeclare})");
+            m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {functionFullName}({parametersDeclare}) noexcept");
             m_Parent.WriteIndentedLine("{");
             m_Parent.Indented(() =>
             {
-                codeGen.GenerateCppCSharpToNative(m_Parent.WriteIndentedLine);
+                GenerateNativeCallStatusBody(codeGen);
             });
             m_Parent.WriteIndentedLine("}");
         }
+    }
+
+    private void GenerateNativeCallStatusBody(FunctionBodyGenerator codeGen)
+    {
+        m_Parent.WriteIndentedLine("return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus");
+        m_Parent.WriteIndentedLine("{");
+        m_Parent.Indented(() =>
+        {
+            codeGen.GenerateCppCSharpToNativeStatus(m_Parent.WriteIndentedLine);
+        });
+        m_Parent.WriteIndentedLine("});");
+    }
+
+    private static string AppendCppOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCppOutParameter(parametersDeclare, returnType.CppBindingName);
+    }
+
+    private static string AppendCppOutParameter(string parametersDeclare, string returnBindingName)
+    {
+        string outParameter = $"{returnBindingName}* __return_value";
+        return string.IsNullOrEmpty(parametersDeclare) ? outParameter : $"{parametersDeclare}, {outParameter}";
     }
 
     private ParameterCollection CollectParameters(IEnumerable<SParameter> parameters)
