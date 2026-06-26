@@ -14,7 +14,7 @@ internal sealed class CppPchSettings
         m_HeaderIncludeName = headerIncludeName;
         m_OutputName = environment.Resolver.Name + ".pch";
         m_SourceFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".cpp");
-        m_PchFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".pch");
+        m_PchFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName);
         m_PdbFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".pdb");
         m_CacheFilePath = Path.Combine(environment.IntermediateDirectory, m_OutputName + ".cache");
     }
