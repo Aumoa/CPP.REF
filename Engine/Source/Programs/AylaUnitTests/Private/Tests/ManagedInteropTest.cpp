@@ -7,6 +7,7 @@
 #include "Marshal/NativeCallBoundary.h"
 #include "Marshal/NativeExceptionInterop.h"
 #include "ScriptingBackend/ScriptingBackend.h"
+#include <atomic>
 
 namespace Ayla
 {
@@ -16,6 +17,7 @@ namespace Ayla
 		const String ManagedExceptionMessage = TEXT("managed exception passport");
 		bool GObservedManagedExceptionWrapper = false;
 		bool GSwallowedManagedExceptionWrapper = false;
+		std::atomic<int32> GConcurrentManagedExceptionWrapperCount = 0;
 
 		int32 MultiplyForManagedCallback(int32 left, int32 right)
 		{
@@ -43,6 +45,31 @@ namespace Ayla
 				catch (const ManagedException& ex)
 				{
 					GObservedManagedExceptionWrapper = IsManagedInteropSmokeException(ex);
+					throw;
+				}
+
+				return NativeCallStatus::Success;
+			});
+		}
+
+		NativeCallStatus ObserveManagedExceptionThroughNativeConcurrently(ssize_t managedCallback) noexcept
+		{
+			return NativeCallBoundary::Invoke([&]() -> NativeCallStatus
+			{
+				using signature_t = NativeCallStatus(*)();
+				auto callback = reinterpret_cast<signature_t>(managedCallback);
+
+				try
+				{
+					ManagedCallBoundary::ThrowIfFailed(callback());
+				}
+				catch (const ManagedException& ex)
+				{
+					if (IsManagedInteropSmokeException(ex))
+					{
+						GConcurrentManagedExceptionWrapperCount.fetch_add(1, std::memory_order_relaxed);
+					}
+
 					throw;
 				}
 
@@ -200,6 +227,32 @@ namespace Ayla
 			},
 			TestCase
 			{
+				.Name = TEXT("Managed exception roundtrip is isolated on managed threads"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t, int32, int32);
+						auto function = GetManagedInteropFunction<signature_t>("RoundTripManagedExceptionThroughNativeOnManagedThreads");
+
+						constexpr int32 ThreadCount = 4;
+						constexpr int32 IterationCount = 8;
+						constexpr int32 ExpectedCount = ThreadCount * IterationCount;
+
+						GConcurrentManagedExceptionWrapperCount.store(0, std::memory_order_relaxed);
+
+						Assert::Equal(ExpectedCount, function(
+							reinterpret_cast<ssize_t>(&ObserveManagedExceptionThroughNativeConcurrently),
+							ThreadCount,
+							IterationCount));
+						Assert::Equal(ExpectedCount, GConcurrentManagedExceptionWrapperCount.load(std::memory_order_relaxed));
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
 				.Name = TEXT("Native exception restores after managed frame"),
 				.TestFuncs =
 				{
@@ -250,6 +303,32 @@ namespace Ayla
 						ManagedCallBoundary::ThrowIfFailed(consume(reinterpret_cast<ssize_t>(&ThrowNativeExceptionCallback)));
 
 						Assert::Equal(1, getObservedNativeException());
+						Assert::Equal(beforeExceptionCount, NativeExceptionInterop::GetCapturedExceptionCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Native exception tokens release on managed threads"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t, int32, int32);
+						auto function = GetManagedInteropFunction<signature_t>("ConsumeNativeExceptionThroughManagedThreads");
+
+						constexpr int32 ThreadCount = 4;
+						constexpr int32 IterationCount = 8;
+						constexpr int32 ExpectedCount = ThreadCount * IterationCount;
+
+						size_t beforeExceptionCount = NativeExceptionInterop::GetCapturedExceptionCount();
+
+						Assert::Equal(ExpectedCount, function(
+							reinterpret_cast<ssize_t>(&ThrowNativeExceptionCallback),
+							ThreadCount,
+							IterationCount));
 						Assert::Equal(beforeExceptionCount, NativeExceptionInterop::GetCapturedExceptionCount());
 
 						return Task<>::CompletedTask();

@@ -3,6 +3,8 @@
 using System.Collections;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ayla.Tests;
 
@@ -70,8 +72,7 @@ public static class ManagedInteropSmoke
         catch (ManagedInteropSmokeException ex)
         {
             return ReferenceEquals(ex, s_LastManagedException)
-                && ex.Message == ManagedExceptionMessage
-                && ex.Marker == 42
+                && IsManagedInteropSmokeException(ex)
                     ? 1
                     : -1;
         }
@@ -85,6 +86,16 @@ public static class ManagedInteropSmoke
         }
 
         return 0;
+    }
+
+    public static int RoundTripManagedExceptionThroughNativeOnManagedThreads(nint nativeBridge, int threadCount, int iterationCount)
+    {
+        var bridge = Marshal.GetDelegateForFunctionPointer<NativeStatusBridge>(nativeBridge);
+        int beforeCount = GetCapturedManagedExceptionCount();
+        int result = RunConcurrent(threadCount, iterationCount, () => RoundTripManagedExceptionThroughNativeOnce(bridge));
+        int afterCount = GetCapturedManagedExceptionCount();
+
+        return result < 0 || afterCount == beforeCount ? result : int.MinValue + 1;
     }
 
     public static int MeasureManagedExceptionTokenReleaseAfterNativeSwallow(nint nativeBridge)
@@ -127,7 +138,7 @@ public static class ManagedInteropSmoke
 
         try
         {
-            ConsumeNativeException(nativeCallback);
+            s_ObservedNativeExceptionWrapper = ConsumeNativeException(nativeCallback) ? 1 : -1;
             CollectFinalizers();
             return ManagedCallBoundary.Succeed();
         }
@@ -137,12 +148,37 @@ public static class ManagedInteropSmoke
         }
     }
 
+    public static int ConsumeNativeExceptionThroughManagedThreads(nint nativeCallback, int threadCount, int iterationCount)
+    {
+        int result = RunConcurrent(threadCount, iterationCount, () => ConsumeNativeException(nativeCallback));
+        CollectFinalizers();
+        return result;
+    }
+
     public static int GetObservedNativeExceptionWrapper()
     {
         return s_ObservedNativeExceptionWrapper;
     }
 
-    private static void ConsumeNativeException(nint nativeCallback)
+    private static bool RoundTripManagedExceptionThroughNativeOnce(NativeStatusBridge bridge)
+    {
+        try
+        {
+            NativeCallBoundary.ThrowIfFailed(bridge(Marshal.GetFunctionPointerForDelegate(s_ThrowManagedExceptionCallback)));
+        }
+        catch (ManagedInteropSmokeException ex)
+        {
+            return IsManagedInteropSmokeException(ex);
+        }
+        catch
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    private static bool ConsumeNativeException(nint nativeCallback)
     {
         var callback = Marshal.GetDelegateForFunctionPointer<NativeStatusCallback>(nativeCallback);
 
@@ -152,14 +188,68 @@ public static class ManagedInteropSmoke
         }
         catch (NativeException ex)
         {
-            s_ObservedNativeExceptionWrapper = IsNativeExceptionWrapper(ex) ? 1 : -1;
+            return IsNativeExceptionWrapper(ex);
         }
+
+        return false;
     }
 
     private static bool IsNativeExceptionWrapper(NativeException ex)
     {
         return ex.NativeTypeName.Contains(nameof(InvalidOperationException), StringComparison.Ordinal)
             && ex.Message == NativeExceptionMessage;
+    }
+
+    private static bool IsManagedInteropSmokeException(ManagedInteropSmokeException ex)
+    {
+        return ex.Message == ManagedExceptionMessage
+            && ex.Marker == 42;
+    }
+
+    private static int RunConcurrent(int threadCount, int iterationCount, Func<bool> action)
+    {
+        if (threadCount <= 0 || iterationCount <= 0)
+        {
+            return -1;
+        }
+
+        int successCount = 0;
+        int failureCount = 0;
+
+        using var start = new ManualResetEventSlim(false);
+        Task[] tasks = new Task[threadCount];
+
+        for (int threadIndex = 0; threadIndex < threadCount; ++threadIndex)
+        {
+            tasks[threadIndex] = Task.Run(() =>
+            {
+                start.Wait();
+
+                for (int iterationIndex = 0; iterationIndex < iterationCount; ++iterationIndex)
+                {
+                    try
+                    {
+                        if (action())
+                        {
+                            Interlocked.Increment(ref successCount);
+                        }
+                        else
+                        {
+                            Interlocked.Increment(ref failureCount);
+                        }
+                    }
+                    catch
+                    {
+                        Interlocked.Increment(ref failureCount);
+                    }
+                }
+            });
+        }
+
+        start.Set();
+        Task.WaitAll(tasks);
+
+        return failureCount == 0 ? successCount : -failureCount;
     }
 
     private static void CollectFinalizers()

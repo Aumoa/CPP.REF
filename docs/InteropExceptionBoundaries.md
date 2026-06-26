@@ -240,6 +240,8 @@ The tests verify:
 - a native exception can cross a managed frame, appear as `Ayla.NativeException`, and restore as the original native exception type;
 - a native exception token is removed from the native token store when managed code returns the native exception passport to C++;
 - a native exception token is released when managed code catches and consumes the `Ayla.NativeException` wrapper without returning it to C++;
+- managed worker threads can concurrently round-trip managed exceptions through native frames without cross-thread token leakage;
+- managed worker threads can concurrently consume native exception wrappers and release the captured native tokens;
 - `Debug.Log` uses the native call boundary from managed code;
 - script type getter pointer callbacks report managed failures through `ManagedCallBoundary`;
 - a `CoreCLRFunctions` managed activation failure is reported to C++ as `Ayla::ManagedException` instead of escaping directly through an unmanaged callback;
