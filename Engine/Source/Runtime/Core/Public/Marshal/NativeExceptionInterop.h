@@ -43,7 +43,7 @@ namespace Ayla
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT ::Ayla::NativeExceptionInfo Ayla__NativeExceptionInterop__GetLastException__Injected();
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeExceptionInfo Ayla__NativeExceptionInterop__GetLastException__Injected() noexcept;
 	PLATFORM_SHARED_EXPORT void Ayla__NativeExceptionInterop__ReleaseCapturedException__Injected(::Ayla::uint64 exceptionToken) noexcept;
-	PLATFORM_SHARED_EXPORT void Ayla__NativeExceptionInterop__ClearLastException__Injected();
+	PLATFORM_SHARED_EXPORT void Ayla__NativeExceptionInterop__ClearLastException__Injected() noexcept;
 }

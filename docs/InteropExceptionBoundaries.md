@@ -221,7 +221,7 @@ Not every Core P/Invoke should use the full exception boundary contract.
 | Path | Reason |
 | --- | --- |
 | `ManagedStringWrapper.FreeIntRef__Injected` | Low-level release operation. It should remain simple and non-throwing; adding status handling would make disposal paths more fragile. |
-| `NativeExceptionInterop` and `ManagedExceptionInterop` exported helpers | These are the boundary implementation itself. They must be simple enough to run while exception state is already being transferred. |
+| `NativeExceptionInterop` and `ManagedExceptionInterop` exported helpers | These are the boundary implementation itself. They must be simple and non-throwing enough to run while exception state is already being transferred. |
 | `Debug.Ensure` and `Debug.Assert` exports | These are diagnostic/assertion paths that may deliberately break or become unreachable in check builds. Treating them as recoverable interop exceptions would change their semantics. |
 
 If one of these paths starts executing user code or allocation-heavy logic, revisit this decision.

@@ -353,7 +353,7 @@ namespace Ayla
 
 extern "C"
 {
-	PLATFORM_SHARED_EXPORT ::Ayla::NativeExceptionInfo Ayla__NativeExceptionInterop__GetLastException__Injected()
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeExceptionInfo Ayla__NativeExceptionInterop__GetLastException__Injected() noexcept
 	{
 		return ::Ayla::NativeExceptionInterop::GetLastException();
 	}
@@ -363,7 +363,7 @@ extern "C"
 		::Ayla::NativeExceptionInterop::ReleaseCapturedException(exceptionToken);
 	}
 
-	PLATFORM_SHARED_EXPORT void Ayla__NativeExceptionInterop__ClearLastException__Injected()
+	PLATFORM_SHARED_EXPORT void Ayla__NativeExceptionInterop__ClearLastException__Injected() noexcept
 	{
 		::Ayla::NativeExceptionInterop::ClearLastException();
 	}
