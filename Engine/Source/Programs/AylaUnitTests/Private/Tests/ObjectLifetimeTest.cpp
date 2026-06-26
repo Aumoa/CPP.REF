@@ -231,6 +231,43 @@ namespace Ayla
 						return Task<>::CompletedTask();
 					}
 				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed wrapper replacement waits for pending finalizer"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using create_pending_t = ssize_t(*)(ObjectReferenceWrapper);
+						using hold_after_pending_t = ssize_t(*)(ObjectReferenceWrapper);
+						using dispose_t = void(*)();
+
+						auto createPendingFinalizer = GetManagedLifetimeFunction<create_pending_t>("CreatePendingFinalizer");
+						auto holdAfterPendingFinalizer = GetManagedLifetimeFunction<hold_after_pending_t>("HoldAfterPendingFinalizer");
+						auto disposeHeld = GetManagedLifetimeFunction<dispose_t>("DisposeHeld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+
+						auto firstWrapper = ObjectReferenceWrapper::FromObject(object);
+						Assert::Equal(nativePointer, createPendingFinalizer(firstWrapper));
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						auto secondWrapper = ObjectReferenceWrapper::FromObject(object);
+						Assert::Equal(nativePointer, holdAfterPendingFinalizer(secondWrapper));
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						disposeHeld();
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
 			}
 		};
 	}

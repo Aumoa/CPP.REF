@@ -39,6 +39,19 @@ public static class ManagedObjectLifetimeSmoke
         return nativePointer;
     }
 
+    public static nint CreatePendingFinalizer(ObjectReferenceWrapper wrapper)
+    {
+        var nativePointer = CreateUnheldNoInlining(wrapper);
+        GC.Collect();
+        return nativePointer;
+    }
+
+    public static nint HoldAfterPendingFinalizer(ObjectReferenceWrapper wrapper)
+    {
+        GC.Collect();
+        return Hold(wrapper);
+    }
+
     public static nint ReplaceStaleWeakHandle(ObjectReferenceWrapper wrapper)
     {
         InstallCollectedWeakHandle(wrapper.Ptr);

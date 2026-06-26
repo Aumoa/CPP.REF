@@ -12,51 +12,60 @@ public struct ObjectReferenceWrapper
 
     public T? AsManaged<T>() where T : Object
     {
-        if (Ptr == 0)
+        var ptr = Ptr;
+        if (ptr == 0)
         {
             return null;
         }
 
-        var managedType = Object.GetManagedTypeFromPtr(Ptr);
+        var managedType = Object.GetManagedTypeFromPtr(ptr);
         var scriptType = managedType.GetScriptType();
 
-        var handlePtr = Object.BeginWriteGCHandle(Ptr);
+        var handlePtr = Object.BeginWriteGCHandle(ptr);
+        var writeLocked = true;
         var writeCompleted = false;
         var staleHandlePtr = nint.Zero;
         try
         {
             if (!typeof(T).IsAssignableFrom(scriptType))
             {
-                Object.EndWriteGCHandle(Ptr, handlePtr, true);
-                writeCompleted = true;
+                EndWrite(handlePtr, true);
                 throw new InvalidCastException($"Cannot convert managed wrapper type '{scriptType.FullName}' to '{typeof(T).FullName}'.");
+            }
+
+            var existing = TryGetExistingManagedObject(handlePtr);
+            if (existing != null)
+            {
+                return existing;
             }
 
             if (handlePtr != 0)
             {
-                var target = GCHandle.FromIntPtr(handlePtr).Target;
-                if (target != null)
-                {
-                    Object.EndWriteGCHandle(Ptr, handlePtr, true);
-                    writeCompleted = true;
-                    if (target is T t)
-                    {
-                        return t;
-                    }
+                EndWrite(handlePtr, false);
+                handlePtr = 0;
+                GC.WaitForPendingFinalizers();
 
-                    throw new InvalidCastException($"Cannot convert existing managed wrapper type '{target.GetType().FullName}' to '{typeof(T).FullName}'.");
+                handlePtr = Object.BeginWriteGCHandle(ptr);
+                writeLocked = true;
+                existing = TryGetExistingManagedObject(handlePtr);
+                if (existing != null)
+                {
+                    return existing;
                 }
 
-                staleHandlePtr = handlePtr;
+                if (handlePtr != 0)
+                {
+                    staleHandlePtr = handlePtr;
+                }
             }
 
-            var ptr = Ptr;
             Func<object, ObjectReferenceWrapper> locker = @this =>
             {
                 var newHandlePtr = (nint)GCHandle.Alloc(@this, GCHandleType.Normal);
                 try
                 {
                     var gcHandleSerial = Object.EndWriteGCHandleAndGetSerial(ptr, newHandlePtr, true);
+                    writeLocked = false;
                     writeCompleted = true;
                     if (staleHandlePtr != 0)
                     {
@@ -80,12 +89,41 @@ public struct ObjectReferenceWrapper
         }
         catch
         {
-            if (!writeCompleted)
+            if (!writeCompleted && writeLocked)
             {
-                Object.EndWriteGCHandle(Ptr, handlePtr, true);
+                Object.EndWriteGCHandle(ptr, handlePtr, true);
             }
 
             throw;
+        }
+
+        T? TryGetExistingManagedObject(nint existingHandlePtr)
+        {
+            if (existingHandlePtr == 0)
+            {
+                return null;
+            }
+
+            var target = GCHandle.FromIntPtr(existingHandlePtr).Target;
+            if (target == null)
+            {
+                return null;
+            }
+
+            EndWrite(existingHandlePtr, true);
+            if (target is T t)
+            {
+                return t;
+            }
+
+            throw new InvalidCastException($"Cannot convert existing managed wrapper type '{target.GetType().FullName}' to '{typeof(T).FullName}'.");
+        }
+
+        void EndWrite(nint nextHandlePtr, bool releaseIntPtr)
+        {
+            Object.EndWriteGCHandle(ptr, nextHandlePtr, releaseIntPtr);
+            writeLocked = false;
+            writeCompleted = releaseIntPtr;
         }
     }
 
