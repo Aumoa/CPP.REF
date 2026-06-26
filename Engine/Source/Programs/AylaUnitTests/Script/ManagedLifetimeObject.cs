@@ -13,8 +13,16 @@ public sealed class ManagedLifetimeObject : Object
     {
     }
 
-    private static nint GetScriptType__Invoke()
+    private static unsafe NativeCallStatus GetScriptType__Invoke(nint* result)
     {
-        return Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);
+        try
+        {
+            *result = Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);
+            return ManagedCallBoundary.Succeed();
+        }
+        catch (Exception ex)
+        {
+            return ManagedCallBoundary.Capture(ex);
+        }
     }
 }

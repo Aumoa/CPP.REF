@@ -54,6 +54,7 @@
 #include "ConstructorNotFoundException.h"
 #include "ObjectDisposedException.h"
 #include "MemberAccessException.h"
+#include "ManagedException.h"
 #include "TaskCanceledException.h"
 #include "AggregateException.h"
 #include "FormatException.h"
@@ -74,6 +75,10 @@
 #include "Marshal/ManagedArrayWrapper.h"
 #include "Marshal/ManagedTypeWrapper.h"
 #include "Marshal/ManagedTaskWrapper.h"
+#include "Marshal/NativeExceptionInterop.h"
+#include "Marshal/ManagedExceptionInterop.h"
+#include "Marshal/NativeCallBoundary.h"
+#include "Marshal/ManagedCallBoundary.h"
 
 #include "Diagnostics/Debug.h"
 #include "Diagnostics/LogMacros.h"

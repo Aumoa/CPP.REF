@@ -1,15 +1,139 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "Tests/ManagedInteropTest.h"
+#include "InvalidOperationException.h"
+#include "ManagedException.h"
+#include "Marshal/ManagedCallBoundary.h"
+#include "Marshal/NativeCallBoundary.h"
+#include "Marshal/NativeExceptionInterop.h"
 #include "ScriptingBackend/ScriptingBackend.h"
+#include <atomic>
 
 namespace Ayla
 {
 	namespace
 	{
+		const String NativeExceptionMessage = TEXT("native exception passport");
+		const String ManagedExceptionMessage = TEXT("managed exception passport");
+		const String ManagedExceptionFallbackMessage = TEXT("Failed to capture managed exception message.");
+		bool GObservedManagedExceptionWrapper = false;
+		bool GObservedThrowingDetailsManagedExceptionWrapper = false;
+		bool GSwallowedManagedExceptionWrapper = false;
+		std::atomic<int32> GConcurrentManagedExceptionWrapperCount = 0;
+
 		int32 MultiplyForManagedCallback(int32 left, int32 right)
 		{
 			return left * right;
+		}
+
+		bool IsManagedInteropSmokeException(const ManagedException& exception)
+		{
+			return exception.GetManagedTypeName().Contains(TEXT("ManagedInteropSmokeException"))
+				&& exception.GetMessage() == ManagedExceptionMessage
+				&& exception.GetManagedExceptionToken() != 0;
+		}
+
+		bool IsThrowingDetailsManagedExceptionWrapper(const ManagedException& exception)
+		{
+			return exception.GetManagedTypeName().Contains(TEXT("ThrowingExceptionDetailsException"))
+				&& exception.GetMessage() == ManagedExceptionFallbackMessage
+				&& exception.GetManagedDetails().Contains(ManagedExceptionFallbackMessage)
+				&& exception.GetManagedExceptionToken() != 0;
+		}
+
+		NativeCallStatus ObserveManagedExceptionThroughNative(ssize_t managedCallback) noexcept
+		{
+			return NativeCallBoundary::Invoke([&]() -> NativeCallStatus
+			{
+				using signature_t = NativeCallStatus(*)();
+				auto callback = reinterpret_cast<signature_t>(managedCallback);
+
+				try
+				{
+					ManagedCallBoundary::ThrowIfFailed(callback());
+				}
+				catch (const ManagedException& ex)
+				{
+					GObservedManagedExceptionWrapper = IsManagedInteropSmokeException(ex);
+					throw;
+				}
+
+				return NativeCallStatus::Succeeded;
+			});
+		}
+
+		NativeCallStatus ObserveThrowingDetailsManagedExceptionThroughNative(ssize_t managedCallback) noexcept
+		{
+			return NativeCallBoundary::Invoke([&]() -> NativeCallStatus
+			{
+				using signature_t = NativeCallStatus(*)();
+				auto callback = reinterpret_cast<signature_t>(managedCallback);
+
+				try
+				{
+					ManagedCallBoundary::ThrowIfFailed(callback());
+				}
+				catch (const ManagedException& ex)
+				{
+					GObservedThrowingDetailsManagedExceptionWrapper = IsThrowingDetailsManagedExceptionWrapper(ex);
+					throw;
+				}
+
+				return NativeCallStatus::Succeeded;
+			});
+		}
+
+		NativeCallStatus ObserveManagedExceptionThroughNativeConcurrently(ssize_t managedCallback) noexcept
+		{
+			return NativeCallBoundary::Invoke([&]() -> NativeCallStatus
+			{
+				using signature_t = NativeCallStatus(*)();
+				auto callback = reinterpret_cast<signature_t>(managedCallback);
+
+				try
+				{
+					ManagedCallBoundary::ThrowIfFailed(callback());
+				}
+				catch (const ManagedException& ex)
+				{
+					if (IsManagedInteropSmokeException(ex))
+					{
+						GConcurrentManagedExceptionWrapperCount.fetch_add(1, std::memory_order_relaxed);
+					}
+
+					throw;
+				}
+
+				return NativeCallStatus::Succeeded;
+			});
+		}
+
+		NativeCallStatus SwallowManagedExceptionInNative(ssize_t managedCallback) noexcept
+		{
+			return NativeCallBoundary::Invoke([&]() -> NativeCallStatus
+			{
+				using signature_t = NativeCallStatus(*)();
+				auto callback = reinterpret_cast<signature_t>(managedCallback);
+
+				try
+				{
+					ManagedCallBoundary::ThrowIfFailed(callback());
+				}
+				catch (const ManagedException& ex)
+				{
+					GSwallowedManagedExceptionWrapper = IsManagedInteropSmokeException(ex);
+				}
+
+				return NativeCallStatus::Succeeded;
+			});
+		}
+
+		NativeCallStatus ThrowNativeExceptionCallback() noexcept
+		{
+			return NativeCallBoundary::Invoke([]() -> NativeCallStatus
+			{
+				throw InvalidOperationException(NativeExceptionMessage);
+			});
 		}
 
 		template<class T>
@@ -73,6 +197,189 @@ namespace Ayla
 						Assert::Equal(10, resetCounter(10));
 						Assert::Equal(15, incrementCounter(5));
 						Assert::Equal(12, incrementCounter(-3));
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Core debug log boundary"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)();
+						auto function = GetManagedInteropFunction<signature_t>("InvokeCoreDebugLog");
+
+						Assert::Equal(1, function());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed exception restores after native frame"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t);
+						auto function = GetManagedInteropFunction<signature_t>("RoundTripManagedExceptionThroughNative");
+
+						GObservedManagedExceptionWrapper = false;
+
+						Assert::Equal(1, function(reinterpret_cast<ssize_t>(&ObserveManagedExceptionThroughNative)));
+						Assert::True(GObservedManagedExceptionWrapper);
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed exception capture tolerates throwing details"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t);
+						auto function = GetManagedInteropFunction<signature_t>("RoundTripManagedExceptionWithThrowingDetailsThroughNative");
+
+						GObservedThrowingDetailsManagedExceptionWrapper = false;
+
+						Assert::Equal(1, function(reinterpret_cast<ssize_t>(&ObserveThrowingDetailsManagedExceptionThroughNative)));
+						Assert::True(GObservedThrowingDetailsManagedExceptionWrapper);
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed exception token releases after native swallow"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t);
+						auto function = GetManagedInteropFunction<signature_t>("MeasureManagedExceptionTokenReleaseAfterNativeSwallow");
+
+						GSwallowedManagedExceptionWrapper = false;
+
+						Assert::Equal(0, function(reinterpret_cast<ssize_t>(&SwallowManagedExceptionInNative)));
+						Assert::True(GSwallowedManagedExceptionWrapper);
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed exception roundtrip is isolated on managed threads"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t, int32, int32);
+						auto function = GetManagedInteropFunction<signature_t>("RoundTripManagedExceptionThroughNativeOnManagedThreads");
+
+						constexpr int32 ThreadCount = 4;
+						constexpr int32 IterationCount = 8;
+						constexpr int32 ExpectedCount = ThreadCount * IterationCount;
+
+						GConcurrentManagedExceptionWrapperCount.store(0, std::memory_order_relaxed);
+
+						Assert::Equal(ExpectedCount, function(
+							reinterpret_cast<ssize_t>(&ObserveManagedExceptionThroughNativeConcurrently),
+							ThreadCount,
+							IterationCount));
+						Assert::Equal(ExpectedCount, GConcurrentManagedExceptionWrapperCount.load(std::memory_order_relaxed));
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Native exception restores after managed frame"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using round_trip_signature_t = NativeCallStatus(*)(ssize_t);
+						using observed_signature_t = int32(*)();
+						auto roundTrip = GetManagedInteropFunction<round_trip_signature_t>("RoundTripNativeExceptionThroughManaged");
+						auto getObservedNativeException = GetManagedInteropFunction<observed_signature_t>("GetObservedNativeExceptionWrapper");
+
+						size_t beforeExceptionCount = NativeExceptionInterop::GetCapturedExceptionCount();
+						bool restoredNativeException = false;
+						try
+						{
+							ManagedCallBoundary::ThrowIfFailed(roundTrip(reinterpret_cast<ssize_t>(&ThrowNativeExceptionCallback)));
+						}
+						catch (const InvalidOperationException& ex)
+						{
+							restoredNativeException = ex.GetMessage() == NativeExceptionMessage;
+						}
+						catch (const ManagedException& ex)
+						{
+							Assert::Fail(String::Format(TEXT("Expected restored native exception, got managed wrapper: {}"), ex.GetManagedTypeName()));
+						}
+
+						Assert::True(restoredNativeException);
+						Assert::Equal(1, getObservedNativeException());
+						Assert::Equal(beforeExceptionCount, NativeExceptionInterop::GetCapturedExceptionCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Native exception token releases after managed swallow"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using consume_signature_t = NativeCallStatus(*)(ssize_t);
+						using observed_signature_t = int32(*)();
+						auto consume = GetManagedInteropFunction<consume_signature_t>("ConsumeNativeExceptionThroughManaged");
+						auto getObservedNativeException = GetManagedInteropFunction<observed_signature_t>("GetObservedNativeExceptionWrapper");
+
+						size_t beforeExceptionCount = NativeExceptionInterop::GetCapturedExceptionCount();
+
+						ManagedCallBoundary::ThrowIfFailed(consume(reinterpret_cast<ssize_t>(&ThrowNativeExceptionCallback)));
+
+						Assert::Equal(1, getObservedNativeException());
+						Assert::Equal(beforeExceptionCount, NativeExceptionInterop::GetCapturedExceptionCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Native exception tokens release on managed threads"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using signature_t = int32(*)(ssize_t, int32, int32);
+						auto function = GetManagedInteropFunction<signature_t>("ConsumeNativeExceptionThroughManagedThreads");
+
+						constexpr int32 ThreadCount = 4;
+						constexpr int32 IterationCount = 8;
+						constexpr int32 ExpectedCount = ThreadCount * IterationCount;
+
+						size_t beforeExceptionCount = NativeExceptionInterop::GetCapturedExceptionCount();
+
+						Assert::Equal(ExpectedCount, function(
+							reinterpret_cast<ssize_t>(&ThrowNativeExceptionCallback),
+							ThreadCount,
+							IterationCount));
+						Assert::Equal(beforeExceptionCount, NativeExceptionInterop::GetCapturedExceptionCount());
 
 						return Task<>::CompletedTask();
 					}

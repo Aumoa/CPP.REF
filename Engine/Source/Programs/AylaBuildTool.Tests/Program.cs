@@ -13,7 +13,10 @@ internal static class Program
         new("Configuration.IsOptimized uses target-wide semantics", ConfigurationIsOptimizedUsesTargetWideSemantics),
         new("FolderPolicy uses effective profiles for module paths", FolderPolicyUsesEffectiveProfilesForModulePaths),
         new("FolderPolicy exposes target configuration paths", FolderPolicyExposesTargetConfigurationPaths),
-        new("FolderPolicy preserves editor suffix for effective profiles", FolderPolicyPreservesEditorSuffixForEffectiveProfiles)
+        new("FolderPolicy preserves editor suffix for effective profiles", FolderPolicyPreservesEditorSuffixForEffectiveProfiles),
+        new("PCH settings use explicit module header", PchSettingsUseExplicitModuleHeader),
+        new("PCH settings require explicit mode and header", PchSettingsRequireExplicitModeAndHeader),
+        new("CppCompileCommand classifies PCH commands", CppCompileCommandClassifiesPchCommands)
     ];
 
     private static int Main()
@@ -180,6 +183,49 @@ internal static class Program
         AssertPath(@"SampleGame\Binaries\Win64\DebugGame-Editor", projectGroup.ModuleOutput(target, projectProfile, FolderPolicy.PathType.Windows));
     }
 
+    private static void PchSettingsUseExplicitModuleHeader()
+    {
+        var environment = CompileEnvironmentFor<PchEnabledRules>("PchEnabledModule");
+        var pchSettings = environment.PchSettings ?? throw new InvalidOperationException("Expected PCH settings.");
+
+        AssertEqual("PCH header", "CoreMinimal.h", pchSettings.HeaderIncludeName);
+        AssertEqual("PCH output name", "PchEnabledModule.pch", pchSettings.OutputName);
+        AssertPath(@"Engine\Intermediate\PchEnabledModule\Win64\Release\PchEnabledModule.pch.cpp", pchSettings.SourceFilePath);
+        AssertPath(@"Engine\Intermediate\PchEnabledModule\Win64\Release\PchEnabledModule.pch", pchSettings.PchFilePath);
+        AssertPath(@"Engine\Intermediate\PchEnabledModule\Win64\Release\PchEnabledModule.pch.pdb", pchSettings.PdbFilePath);
+        AssertPath(@"Engine\Intermediate\PchEnabledModule\Win64\Release\PchEnabledModule.pch.cache", pchSettings.CacheFilePath);
+    }
+
+    private static void PchSettingsRequireExplicitModeAndHeader()
+    {
+        AssertNull("Default PCH usage should not create settings", CompileEnvironmentFor<PchDefaultRules>("PchDefaultModule").PchSettings);
+        AssertNull("Explicit PCH usage without a header should not create settings", CompileEnvironmentFor<PchNoHeaderRules>("PchNoHeaderModule").PchSettings);
+    }
+
+    private static void CppCompileCommandClassifiesPchCommands()
+    {
+        var environment = CompileEnvironmentFor<PchEnabledRules>("PchCommandModule");
+        var pchSettings = environment.PchSettings ?? throw new InvalidOperationException("Expected PCH settings.");
+
+        var pchCommand = CppCompileCommand.CreatePch(environment);
+        AssertEqual("PCH create command", CppPchCommandKind.Create, pchCommand.PchCommandKind);
+        AssertEqual("PCH create command creates PCH", true, pchCommand.CreatesPch);
+        AssertEqual("PCH create command uses PCH", false, pchCommand.UsesPch);
+        AssertEqual("PCH create output", pchSettings.OutputName, pchCommand.OutputName);
+
+        var sourceCommand = new CppCompileCommand(environment, SourceCode(environment, @"Private\Main.cpp", SourceCodeType.SourceCode));
+        AssertEqual("Source command", CppPchCommandKind.Use, sourceCommand.PchCommandKind);
+        AssertEqual("Source command creates PCH", false, sourceCommand.CreatesPch);
+        AssertEqual("Source command uses PCH", true, sourceCommand.UsesPch);
+        AssertSequence(sourceCommand.CacheDependencyFilePaths, pchSettings.CacheFilePath);
+
+        var headerCommand = new CppCompileCommand(environment, SourceCode(environment, @"Public\Main.h", SourceCodeType.Header));
+        AssertEqual("Header command", CppPchCommandKind.None, headerCommand.PchCommandKind);
+        AssertEqual("Header command creates PCH", false, headerCommand.CreatesPch);
+        AssertEqual("Header command uses PCH", false, headerCommand.UsesPch);
+        AssertSequence(headerCommand.CacheDependencyFilePaths);
+    }
+
     private static void Run(string name, List<string> failures, Action test)
     {
         try
@@ -212,6 +258,37 @@ internal static class Program
             Config = configuration,
             Editor = editor
         };
+    }
+
+    private static CppCompileEnvironment CompileEnvironmentFor<TRules>(string moduleName)
+        where TRules : ModuleRules
+    {
+        var target = Target(Configuration.Shipping);
+        var engineGroup = GroupDescriptor.FromRoot("Engine", SourceGroupKind.Engine);
+        var sourceDirectory = Path.Combine("Engine", "Source", "Runtime", moduleName);
+        var project = new ModuleProject(
+            moduleName,
+            engineGroup,
+            sourceDirectory,
+            typeof(TRules),
+            Path.Combine(sourceDirectory, moduleName + ".Module.cs"),
+            ModuleProject.ModuleDeclaration.New());
+        var solution = new Solution(null, [project], engineGroup, engineGroup);
+        var rules = ModuleRules.New(typeof(TRules), target);
+        rules.ThrowErrors();
+        var resolver = new ModuleRulesResolver(target, solution, project, rules);
+
+        return new CppCompileEnvironment(resolver, target, engineGroup);
+    }
+
+    private static SourceCodeDescriptor SourceCode(CppCompileEnvironment environment, string relativePath, SourceCodeType type)
+    {
+        return new SourceCodeDescriptor(
+            environment.Descriptor,
+            environment.Resolver.Name,
+            Path.Combine(environment.Resolver.Project.SourceDirectory, relativePath),
+            relativePath,
+            type);
     }
 
     private static void AssertProfile(BuildConfigurationProfile actual, BuildConfigurationProfile expected)
@@ -248,6 +325,14 @@ internal static class Program
         if (EqualityComparer<T>.Default.Equals(actual, expected) == false)
         {
             throw new InvalidOperationException($"Profile '{profileName}' expected '{expected}', but got '{actual}'.");
+        }
+    }
+
+    private static void AssertNull<T>(string context, T? actual)
+    {
+        if (actual != null)
+        {
+            throw new InvalidOperationException($"{context}: expected null, but got '{actual}'.");
         }
     }
 
@@ -289,6 +374,31 @@ internal static class Program
         public override string OutputFileName(string projectName, ModuleType moduleType)
         {
             return projectName + ".out";
+        }
+    }
+
+    private sealed class PchEnabledRules : ModuleRules
+    {
+        public PchEnabledRules()
+        {
+            PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+            PrivatePchHeaderFile = " CoreMinimal.h ";
+        }
+    }
+
+    private sealed class PchNoHeaderRules : ModuleRules
+    {
+        public PchNoHeaderRules()
+        {
+            PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        }
+    }
+
+    private sealed class PchDefaultRules : ModuleRules
+    {
+        public PchDefaultRules()
+        {
+            PrivatePchHeaderFile = "CoreMinimal.h";
         }
     }
 

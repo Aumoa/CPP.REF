@@ -16,10 +16,10 @@ public struct ObjectReferenceWrapper
             return null;
         }
 
-        var managedType = Object.GetManagedTypeFromPtr__Injected(Ptr);
+        var managedType = Object.GetManagedTypeFromPtr(Ptr);
         var scriptType = managedType.GetScriptType();
 
-        nint handlePtr = Object.BeginWriteGCHandle__Injected(Ptr);
+        nint handlePtr = Object.BeginWriteGCHandle(Ptr);
         GCHandle handle = default;
         try
         {
@@ -28,7 +28,7 @@ public struct ObjectReferenceWrapper
                 handle = GCHandle.FromIntPtr(handlePtr);
                 if (handle.Target is T t)
                 {
-                    Object.EndWriteGCHandle__Injected(Ptr, handlePtr, true);
+                    Object.EndWriteGCHandle(Ptr, handlePtr, true);
                     return t;
                 }
             }
@@ -36,7 +36,7 @@ public struct ObjectReferenceWrapper
             var ptr = Ptr;
             Func<object, nint> locker = @this =>
             {
-                Object.EndWriteGCHandle__Injected(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal), true);
+                Object.EndWriteGCHandle(ptr, (nint)GCHandle.Alloc(@this, GCHandleType.Normal), true);
                 return ptr;
             };
 
@@ -44,7 +44,7 @@ public struct ObjectReferenceWrapper
         }
         catch
         {
-            Object.EndWriteGCHandle__Injected(Ptr, 0, true);
+            Object.EndWriteGCHandle(Ptr, 0, true);
             throw;
         }
     }

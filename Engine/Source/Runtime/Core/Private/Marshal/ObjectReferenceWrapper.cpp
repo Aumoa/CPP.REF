@@ -2,12 +2,11 @@
 
 #include "Marshal/ObjectReferenceWrapper.h"
 #include "Marshal/CoreCLRFunctions.h"
+#include "Marshal/ManagedCallBoundary.h"
 #include "Object.h"
 
 namespace Ayla
 {
-	extern CoreCLRFunctions g_CoreCLRFunctions;
-
 	SharedPtr<Object> ObjectReferenceWrapper::AsNative_Internal() const
 	{
 		auto* ptr = reinterpret_cast<Object*>(Ptr);
@@ -15,7 +14,8 @@ namespace Ayla
 		{
 			if (IntGCHandlePtr)
 			{
-				g_CoreCLRFunctions.FreeGCHandlePtr__Invoke(IntGCHandlePtr);
+				EnsureCoreCLRFunctionsInitialized();
+				ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_FreeGCHandlePtr__Invoke(IntGCHandlePtr));
 			}
 
 			return ptr->AsShared();

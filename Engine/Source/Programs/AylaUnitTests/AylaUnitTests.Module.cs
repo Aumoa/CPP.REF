@@ -7,6 +7,8 @@ public class AylaUnitTests : ModuleRules
     public AylaUnitTests()
     {
         Script.Enabled = true;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
 
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics");

@@ -30,6 +30,12 @@
 - Use tests as self-validation for code that can be isolated without brittle infrastructure, GPU/runtime dependencies, or excessive setup.
 - Before committing feature work with tests, run the relevant tests when practical and report the result.
 
+## Documentation Policy
+
+- Before changing behavior, architecture, build flow, interop contracts, or other documented systems, check the relevant files under `docs/`.
+- When a change invalidates, extends, or clarifies existing documentation, update the relevant document in the same functional unit.
+- Prefer documenting durable contracts, design intent, extension points, and verification steps that future maintainers or AI agents can reuse.
+
 ## Dependency Security Policy
 
 - Before adding or using an external library, make a first-pass judgment that the library is trustworthy, maintained, appropriate for the repository, and aligned with local platform conventions.
