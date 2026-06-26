@@ -23,7 +23,7 @@ namespace Ayla
 		template<class T>
 		inline std::vector<SharedPtr<T>> AsObjectArray() const
 		{
-			auto* ptr = reinterpret_cast<const ObjectReferenceWrapper*>(Data);
+			auto* ptr = reinterpret_cast<ObjectReferenceWrapper*>(const_cast<void*>(Data));
 			std::vector<SharedPtr<T>> output;
 			output.reserve(Length);
 			for (int32 i = 0; i < Length; ++i)

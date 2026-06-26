@@ -58,6 +58,13 @@ public static class ManagedObjectLifetimeSmoke
         return Hold(wrapper);
     }
 
+    public static unsafe void CreateHeldWrapperForNativeConsumption(ObjectReferenceWrapper wrapper, ObjectReferenceWrapper* output)
+    {
+        s_Held = wrapper.AsManaged<ManagedLifetimeObject>()
+            ?? throw new InvalidOperationException("Failed to create managed lifetime wrapper.");
+        *output = s_Held;
+    }
+
     public static void ForceFullCollection()
     {
         GC.Collect();

@@ -17,7 +17,7 @@ namespace Ayla
 		uint64 GCHandleSerial;
 
 		template<class T>
-		inline SharedPtr<T> AsNative() const
+		inline SharedPtr<T> AsNative()
 		{
 			return AsNative_Internal().As<T>();
 		}
@@ -29,7 +29,7 @@ namespace Ayla
 		}
 
 	private:
-		SharedPtr<Object> AsNative_Internal() const;
+		SharedPtr<Object> AsNative_Internal();
 
 		static ObjectReferenceWrapper FromObject_Internal(Object* obj);
 	};

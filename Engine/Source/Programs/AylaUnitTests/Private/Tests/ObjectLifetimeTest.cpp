@@ -268,6 +268,47 @@ namespace Ayla
 						return Task<>::CompletedTask();
 					}
 				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Native wrapper consumption clears intermediate handle"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using create_wrapper_t = void(*)(ObjectReferenceWrapper, ObjectReferenceWrapper*);
+						using dispose_t = void(*)();
+
+						auto createWrapper = GetManagedLifetimeFunction<create_wrapper_t>("CreateHeldWrapperForNativeConsumption");
+						auto disposeHeld = GetManagedLifetimeFunction<dispose_t>("DisposeHeld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto sourceWrapper = ObjectReferenceWrapper::FromObject(object);
+
+						ObjectReferenceWrapper nativeWrapper{};
+						createWrapper(sourceWrapper, &nativeWrapper);
+						Assert::True(nativeWrapper.IntGCHandlePtr != 0);
+
+						{
+							auto firstNative = nativeWrapper.AsNative<LifetimeTestObject>();
+							Assert::NotNull(firstNative.Get());
+							Assert::Equal((ssize_t)0, nativeWrapper.IntGCHandlePtr);
+
+							auto secondNative = nativeWrapper.AsNative<LifetimeTestObject>();
+							Assert::NotNull(secondNative.Get());
+							Assert::True(firstNative.Get() == secondNative.Get());
+						}
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						disposeHeld();
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
 			}
 		};
 	}

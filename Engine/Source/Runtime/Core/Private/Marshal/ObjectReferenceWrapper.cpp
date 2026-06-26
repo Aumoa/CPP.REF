@@ -7,15 +7,17 @@
 
 namespace Ayla
 {
-	SharedPtr<Object> ObjectReferenceWrapper::AsNative_Internal() const
+	SharedPtr<Object> ObjectReferenceWrapper::AsNative_Internal()
 	{
 		auto* ptr = reinterpret_cast<Object*>(Ptr);
 		if (ptr)
 		{
-			if (IntGCHandlePtr)
+			auto intGCHandlePtr = IntGCHandlePtr;
+			IntGCHandlePtr = 0;
+			if (intGCHandlePtr)
 			{
 				EnsureCoreCLRFunctionsInitialized();
-				ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_FreeGCHandlePtr__Invoke(IntGCHandlePtr));
+				ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_FreeGCHandlePtr__Invoke(intGCHandlePtr));
 			}
 
 			return ptr->AsShared();
