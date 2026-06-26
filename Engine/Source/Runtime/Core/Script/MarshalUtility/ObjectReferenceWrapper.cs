@@ -22,6 +22,7 @@ public struct ObjectReferenceWrapper
 
         var handlePtr = Object.BeginWriteGCHandle(Ptr);
         var writeCompleted = false;
+        var staleHandlePtr = nint.Zero;
         try
         {
             if (!typeof(T).IsAssignableFrom(scriptType))
@@ -45,6 +46,8 @@ public struct ObjectReferenceWrapper
 
                     throw new InvalidCastException($"Cannot convert existing managed wrapper type '{target.GetType().FullName}' to '{typeof(T).FullName}'.");
                 }
+
+                staleHandlePtr = handlePtr;
             }
 
             var ptr = Ptr;
@@ -55,6 +58,11 @@ public struct ObjectReferenceWrapper
                 {
                     var gcHandleSerial = Object.EndWriteGCHandleAndGetSerial(ptr, newHandlePtr, true);
                     writeCompleted = true;
+                    if (staleHandlePtr != 0)
+                    {
+                        GCHandle.FromIntPtr(staleHandlePtr).Free();
+                    }
+
                     return new ObjectReferenceWrapper
                     {
                         Ptr = ptr,
@@ -74,7 +82,7 @@ public struct ObjectReferenceWrapper
         {
             if (!writeCompleted)
             {
-                Object.EndWriteGCHandle(Ptr, 0, true);
+                Object.EndWriteGCHandle(Ptr, handlePtr, true);
             }
 
             throw;

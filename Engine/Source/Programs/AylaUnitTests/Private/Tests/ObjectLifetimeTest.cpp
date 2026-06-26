@@ -200,6 +200,37 @@ namespace Ayla
 						return Task<>::CompletedTask();
 					}
 				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed wrapper replaces stale weak handle"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using replace_t = ssize_t(*)(ObjectReferenceWrapper);
+						using dispose_t = void(*)();
+
+						auto replaceStaleWeakHandle = GetManagedLifetimeFunction<replace_t>("ReplaceStaleWeakHandle");
+						auto disposeHeld = GetManagedLifetimeFunction<dispose_t>("DisposeHeld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+						auto wrapper = ObjectReferenceWrapper::FromObject(object);
+
+						Assert::Equal(nativePointer, replaceStaleWeakHandle(wrapper));
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						disposeHeld();
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
 			}
 		};
 	}
