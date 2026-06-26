@@ -110,10 +110,7 @@ public static class ManagedInteropSmoke
         }
         catch (NativeException ex)
         {
-            s_ObservedNativeExceptionWrapper = ex.NativeTypeName.Contains(nameof(InvalidOperationException), StringComparison.Ordinal)
-                && ex.Message == NativeExceptionMessage
-                    ? 1
-                    : -1;
+            s_ObservedNativeExceptionWrapper = IsNativeExceptionWrapper(ex) ? 1 : -1;
 
             return ManagedCallBoundary.Capture(ex);
         }
@@ -124,9 +121,52 @@ public static class ManagedInteropSmoke
         }
     }
 
+    public static NativeCallStatus ConsumeNativeExceptionThroughManaged(nint nativeCallback)
+    {
+        s_ObservedNativeExceptionWrapper = 0;
+
+        try
+        {
+            ConsumeNativeException(nativeCallback);
+            CollectFinalizers();
+            return ManagedCallBoundary.Succeed();
+        }
+        catch (Exception ex)
+        {
+            return ManagedCallBoundary.Capture(ex);
+        }
+    }
+
     public static int GetObservedNativeExceptionWrapper()
     {
         return s_ObservedNativeExceptionWrapper;
+    }
+
+    private static void ConsumeNativeException(nint nativeCallback)
+    {
+        var callback = Marshal.GetDelegateForFunctionPointer<NativeStatusCallback>(nativeCallback);
+
+        try
+        {
+            NativeCallBoundary.ThrowIfFailed(callback());
+        }
+        catch (NativeException ex)
+        {
+            s_ObservedNativeExceptionWrapper = IsNativeExceptionWrapper(ex) ? 1 : -1;
+        }
+    }
+
+    private static bool IsNativeExceptionWrapper(NativeException ex)
+    {
+        return ex.NativeTypeName.Contains(nameof(InvalidOperationException), StringComparison.Ordinal)
+            && ex.Message == NativeExceptionMessage;
+    }
+
+    private static void CollectFinalizers()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
     }
 
     private static int GetCapturedManagedExceptionCount()

@@ -232,6 +232,29 @@ namespace Ayla
 						return Task<>::CompletedTask();
 					}
 				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Native exception token releases after managed swallow"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using consume_signature_t = NativeCallStatus(*)(ssize_t);
+						using observed_signature_t = int32(*)();
+						auto consume = GetManagedInteropFunction<consume_signature_t>("ConsumeNativeExceptionThroughManaged");
+						auto getObservedNativeException = GetManagedInteropFunction<observed_signature_t>("GetObservedNativeExceptionWrapper");
+
+						size_t beforeExceptionCount = NativeExceptionInterop::GetCapturedExceptionCount();
+
+						ManagedCallBoundary::ThrowIfFailed(consume(reinterpret_cast<ssize_t>(&ThrowNativeExceptionCallback)));
+
+						Assert::Equal(1, getObservedNativeException());
+						Assert::Equal(beforeExceptionCount, NativeExceptionInterop::GetCapturedExceptionCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
 			}
 		};
 	}
