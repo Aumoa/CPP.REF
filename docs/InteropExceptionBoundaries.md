@@ -214,6 +214,19 @@ Current wrapper responsibilities:
 The lock/unlock pairing in the GC handle write helpers is ownership-sensitive.
 If a failure is possible between `BeginWriteGCHandle` and `EndWriteGCHandle`, managed code must ensure `EndWriteGCHandle` is called from a `catch` or `finally` path as appropriate.
 
+### RHT Generated Type Metadata
+
+Locations:
+
+- `Engine/Source/Programs/AylaReflectionHeaderTool/RHT/CodeGen/CppClassGenerator.cs`
+- `Engine/Source/Programs/AylaReflectionHeaderTool/RHT/CodeGen/CSharpClassGenerator.cs`
+
+Generated type metadata must follow the same boundary shape as the manual `Object` implementation.
+Native `GetManagedType` exports should return `NativeCallStatus` and write `ManagedTypeWrapper` through an out parameter.
+Generated managed wrappers should call `NativeCallBoundary.ThrowIfFailed` before returning the wrapper to user-facing `StaticClass` calls.
+Generated C++ code that retrieves `GetScriptTypeDelegate` should call a status-returning `GetScriptType__Invoke` helper and pass failures to `ManagedCallBoundary::ThrowIfFailed`.
+Generated C# `GetScriptType__Invoke` helpers should catch managed exceptions and return `ManagedCallBoundary.Capture(exception)`.
+
 ## Paths Intentionally Not Converted
 
 Not every Core P/Invoke should use the full exception boundary contract.

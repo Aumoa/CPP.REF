@@ -68,7 +68,16 @@ internal class CSharpClassGenerator
 
         // GetManagedType method
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
-        m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.ManagedTypeWrapper GetManagedType();");
+        m_SourceCode += m_Parent.IndentedLine($"private static extern global::Ayla.NativeCallStatus GetManagedType__Injected(out global::Ayla.ManagedTypeWrapper result);");
+        m_SourceCode += m_Parent.IndentedLine("");
+        m_SourceCode += m_Parent.IndentedLine($"public static global::Ayla.ManagedTypeWrapper GetManagedType()");
+        m_SourceCode += m_Parent.IndentedLine("{");
+        m_Parent.Indented(() =>
+        {
+            m_SourceCode += m_Parent.IndentedLine("global::Ayla.NativeCallBoundary.ThrowIfFailed(GetManagedType__Injected(out global::Ayla.ManagedTypeWrapper result));");
+            m_SourceCode += m_Parent.IndentedLine("return result;");
+        });
+        m_SourceCode += m_Parent.IndentedLine("}");
 
         // Constructor imports
         for (int i = 0; i < m_Class.Constructors.Count; ++i)
@@ -141,7 +150,27 @@ internal class CSharpClassGenerator
 
         // Static type getter
         m_SourceCode += m_Parent.IndentedLine($"private static readonly global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({classFullName});");
-        m_SourceCode += m_Parent.IndentedLine($"private static nint GetScriptType__Invoke() => global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
+        m_SourceCode += m_Parent.IndentedLine($"private static unsafe global::Ayla.NativeCallStatus GetScriptType__Invoke(nint* result)");
+        m_SourceCode += m_Parent.IndentedLine("{");
+        m_Parent.Indented(() =>
+        {
+            m_SourceCode += m_Parent.IndentedLine("try");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine("*result = global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
+                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedCallBoundary.Succeed();");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
+            m_SourceCode += m_Parent.IndentedLine("catch (global::System.Exception exception)");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedCallBoundary.Capture(exception);");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
+        });
+        m_SourceCode += m_Parent.IndentedLine("}");
 
         // Constructors
         for (int i = 0; i < m_Class.Constructors.Count; ++i)
