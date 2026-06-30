@@ -171,7 +171,7 @@ Current callback responsibilities:
 | --- | --- | --- |
 | `m_AsHardHandle__Invoke` | C++ -> C# | Convert a weak or normal `GCHandle` to a normal handle while preserving the target. |
 | `m_AsWeakHandle__Invoke` | C++ -> C# | Convert a normal `GCHandle` to a weak handle while preserving the target. |
-| `m_CreateManagedInstancePtr__Invoke` | C++ -> C# | Create a managed wrapper instance for a script type and return an `ObjectReferenceWrapper` through an output pointer. |
+| `m_CreateManagedInstancePtr__Invoke` | C++ -> C# | Create a managed wrapper instance for a script type and return a `ManagedObjectReferenceWrapper` through an output pointer so native code can consume it. |
 | `m_FreeGCHandlePtr__Invoke` | C++ -> C# | Free a managed `GCHandle` owned by a wrapper handoff. |
 | `m_ReleaseManagedExceptionPtr__Invoke` | C++ -> C# | Release a managed exception token when C++ consumed the `ManagedException` wrapper instead of returning it to managed code. |
 
@@ -209,11 +209,20 @@ Current wrapper responsibilities:
 | `BeginWriteGCHandle` | `Ayla__Object__BeginWriteGCHandle__Injected` | Lock the native object and read the current managed handle. |
 | `EndWriteGCHandle` | `Ayla__Object__EndWriteGCHandle__Injected` | Replace the handle, update references, unlock, and delete the native object if ownership reaches zero. |
 | `GetManagedType` | `Ayla__Object__GetManagedType__Injected` | Return the native/managed type pair for `Ayla.Object`. |
-| `AsWrapper` | `Ayla__Object__AsWrapper__Injected` | Convert a native object pointer to an `ObjectReferenceWrapper`. |
 | `GetManagedTypeFromPtr` | `Ayla__Object__GetManagedTypeFromPtr__Injected` | Return the native object's runtime managed type wrapper. |
 
 The lock/unlock pairing in the GC handle write helpers is ownership-sensitive.
 If a failure is possible between `BeginWriteGCHandle` and `EndWriteGCHandle`, managed code must ensure `EndWriteGCHandle` is called from a `catch` or `finally` path as appropriate.
+
+Object references must use direction-specific wrapper structs:
+
+| Wrapper | Direction | Responsibility |
+| --- | --- | --- |
+| `NativeObjectReferenceWrapper` | C++ -> C# | Carries a native object reference into managed code and exposes `AsManaged<T>()`. |
+| `ManagedObjectReferenceWrapper` | C# -> C++ | Carries a managed wrapper reference into native code and exposes `AsNative<T>()` on the C++ side. |
+| `BoundObjectReferenceWrapper` | native constructor -> managed constructor | Returns the native pointer and GC handle serial after a managed object has been bound to a newly created native object. |
+
+Do not add new directionless object wrapper types. RHT object binding must choose an explicit interop direction before emitting a binding type name.
 
 ### RHT Generated Type Metadata
 
