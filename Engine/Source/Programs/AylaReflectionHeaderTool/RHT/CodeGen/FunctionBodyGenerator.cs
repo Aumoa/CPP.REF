@@ -34,7 +34,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
                 }
                 else
                 {
-                    scoped.Add($"fixed ({elementType.CSharpBindingName}* {name}_ptr = {name})");
+                    scoped.Add($"fixed ({elementType.CSharpManagedToNativeBindingName}* {name}_ptr = {name})");
                     arguments.Add($"new global::Ayla.ManagedArrayWrapper((nint){name}_ptr, {name}.Length)");
                 }
             }
@@ -53,7 +53,10 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
 
             string source = string.Empty;
-            source += formatLine($"{returnType_.CSharpBindingName} __return_value;");
+            var returnBindingName = returnType_ == TypeName.Object
+                ? returnType_.CSharpBindingName
+                : returnType_.CSharpNativeToManagedBindingName;
+            source += formatLine($"{returnBindingName} __return_value;");
             source += formatLine($"global::Ayla.NativeCallBoundary.ThrowIfFailed({bodyStmt});");
             source += formatLine($"return {FormatCSharpReturnValue(returnType_, "__return_value")};");
             return source;
@@ -106,7 +109,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (returnType_ is SharedPtrTypeName)
             {
-                return formatLine($"return (global::Ayla.ObjectReferenceWrapper){bodyStmt};");
+                return formatLine($"return (global::Ayla.ManagedObjectReferenceWrapper){bodyStmt};");
             }
             else
             {
@@ -162,7 +165,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (returnType_ is SharedPtrTypeName)
             {
-                source += formatLine($"__return_value = (global::Ayla.ObjectReferenceWrapper){bodyStmt};");
+                source += formatLine($"__return_value = (global::Ayla.ManagedObjectReferenceWrapper){bodyStmt};");
             }
             else
             {
@@ -207,7 +210,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (typeName is SharedPtrTypeName)
             {
-                scoped.Add($"auto {name}__wrapper = ::Ayla::ObjectReferenceWrapper::FromObject({name});");
+                scoped.Add($"auto {name}__wrapper = ::Ayla::NativeObjectReferenceWrapper::FromObject({name});");
                 arguments.Add($"{name}__wrapper");
             }
             else
@@ -267,7 +270,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (typeName is SharedPtrTypeName)
             {
-                scoped.Add($"auto {name}__wrapper = ::Ayla::ObjectReferenceWrapper::FromObject({name});");
+                scoped.Add($"auto {name}__wrapper = ::Ayla::NativeObjectReferenceWrapper::FromObject({name});");
                 arguments.Add($"{name}__wrapper");
             }
             else
@@ -279,7 +282,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
         var returnType_ = returnType;
         if (returnType_ != TypeName.Void)
         {
-            formatLine($"{returnType_.CppBindingName} __return_value{{}};");
+            formatLine($"{returnType_.CppManagedToNativeBindingName} __return_value{{}};");
             arguments.Add("&__return_value");
         }
 
@@ -357,7 +360,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (returnType_ is SharedPtrTypeName)
             {
-                formatLine($"return ::Ayla::ObjectReferenceWrapper::FromObject({bodyStmt});");
+                formatLine($"return ::Ayla::NativeObjectReferenceWrapper::FromObject({bodyStmt});");
             }
             else if (returnType_ is PlaceholderName)
             {
@@ -420,7 +423,7 @@ internal readonly struct FunctionBodyGenerator(IParameterCollection collection, 
             }
             else if (returnType_ is SharedPtrTypeName)
             {
-                formatLine($"*__return_value = ::Ayla::ObjectReferenceWrapper::FromObject({bodyStmt});");
+                formatLine($"*__return_value = ::Ayla::NativeObjectReferenceWrapper::FromObject({bodyStmt});");
             }
             else if (returnType_ is PlaceholderName)
             {

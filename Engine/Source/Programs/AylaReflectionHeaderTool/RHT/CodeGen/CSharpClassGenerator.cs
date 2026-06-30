@@ -96,7 +96,7 @@ internal class CSharpClassGenerator
     {
         var constructor = m_Class.Constructors[index];
         var parameters = CollectParameters(constructor.Parameters);
-        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), "global::Ayla.ObjectReferenceWrapper");
+        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), "global::Ayla.ObjectReferenceWrapper");
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{index}__Injected";
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
@@ -112,9 +112,9 @@ internal class CSharpClassGenerator
 
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{index}__Injected";
         string injectParamsDeclare = isStatic
-            ? ParametersGenerator.GenerateCSharpBindings(parameters)
-            : ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
-        injectParamsDeclare = AppendCSharpOutParameter(injectParamsDeclare, returnType);
+            ? ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters)
+            : ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+        injectParamsDeclare = AppendCSharpNativeToManagedOutParameter(injectParamsDeclare, returnType);
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
         m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.NativeCallStatus {function.Name}({injectParamsDeclare});");
@@ -351,8 +351,8 @@ internal class CSharpClassGenerator
 
     private void GenerateVirtualInvokeMethod(SFunction function, TypeName returnType, ParameterCollection parameters)
     {
-        var invokeParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
-        invokeParamsDeclare = AppendCSharpOutParameter(invokeParamsDeclare, returnType);
+        var invokeParamsDeclare = ParametersGenerator.GenerateCSharpNativeToManagedBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
+        invokeParamsDeclare = AppendCSharpManagedToNativeOutParameter(invokeParamsDeclare, returnType);
 
         m_SourceCode += m_Parent.IndentedLine($"private static unsafe global::Ayla.NativeCallStatus {function.Name}__Invoke({invokeParamsDeclare})");
         m_SourceCode += m_Parent.IndentedLine("{");
@@ -398,6 +398,16 @@ internal class CSharpClassGenerator
     private static string AppendCSharpOutParameter(string parametersDeclare, TypeName returnType)
     {
         return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpBindingName);
+    }
+
+    private static string AppendCSharpNativeToManagedOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpNativeToManagedBindingName);
+    }
+
+    private static string AppendCSharpManagedToNativeOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpManagedToNativeBindingName);
     }
 
     private static string AppendCSharpOutParameter(string parametersDeclare, string returnBindingName)

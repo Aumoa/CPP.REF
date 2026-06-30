@@ -6,9 +6,17 @@ internal abstract class TypeName
 
     public abstract string CppBindingName { get; }
 
+    public virtual string CppNativeToManagedBindingName => CppBindingName;
+
+    public virtual string CppManagedToNativeBindingName => CppBindingName;
+
     public abstract string CSharpName { get; }
 
     public abstract string CSharpBindingName { get; }
+
+    public virtual string CSharpNativeToManagedBindingName => CSharpBindingName;
+
+    public virtual string CSharpManagedToNativeBindingName => CSharpBindingName;
 
     public abstract string Id { get; }
 

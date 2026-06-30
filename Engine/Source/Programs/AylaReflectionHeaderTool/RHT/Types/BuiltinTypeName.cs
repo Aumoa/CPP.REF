@@ -52,6 +52,18 @@ internal class BuiltinTypeName : TypeName
         _ => CppName
     };
 
+    public override string CppNativeToManagedBindingName => Kind switch
+    {
+        Kinds.Object => "::Ayla::NativeObjectReferenceWrapper",
+        _ => CppBindingName
+    };
+
+    public override string CppManagedToNativeBindingName => Kind switch
+    {
+        Kinds.Object => "::Ayla::ManagedObjectReferenceWrapper",
+        _ => CppBindingName
+    };
+
     public override string CSharpName => Kind switch
     {
         Kinds.Void => "void",
@@ -84,6 +96,18 @@ internal class BuiltinTypeName : TypeName
         Kinds.Double => "double",
         Kinds.Object => "global::Ayla.ObjectReferenceWrapper",
         _ => throw UnsupportedKind()
+    };
+
+    public override string CSharpNativeToManagedBindingName => Kind switch
+    {
+        Kinds.Object => "global::Ayla.NativeObjectReferenceWrapper",
+        _ => CSharpBindingName
+    };
+
+    public override string CSharpManagedToNativeBindingName => Kind switch
+    {
+        Kinds.Object => "global::Ayla.ManagedObjectReferenceWrapper",
+        _ => CSharpBindingName
     };
 
     public override string Id => Kind switch
