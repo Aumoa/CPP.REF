@@ -96,7 +96,7 @@ internal class CSharpClassGenerator
     {
         var constructor = m_Class.Constructors[index];
         var parameters = CollectParameters(constructor.Parameters);
-        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), "global::Ayla.ObjectReferenceWrapper");
+        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), TypeName.BoundObjectReference.CSharpBindingName);
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{index}__Injected";
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
@@ -143,7 +143,7 @@ internal class CSharpClassGenerator
     private void GenerateInvocableMembers(ClassName @class, string injectFullName, string classFullName)
     {
         // Base constructor
-        m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable(global::System.Func<object, global::Ayla.ObjectReferenceWrapper> locker) : base(locker)");
+        m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable(global::System.Func<object, global::Ayla.BoundObjectReferenceWrapper> locker) : base(locker)");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_SourceCode += m_Parent.IndentedLine("}");
         m_SourceCode += m_Parent.IndentedLine("");
@@ -201,7 +201,7 @@ internal class CSharpClassGenerator
             var codegen = new FunctionBodyGenerator(
                 parameters.AddFirstTemp(PlaceholderName.Value, "(nint)__gchandle"),
                 $"{injectFullName}.ctor_{constructor.Name}",
-                TypeName.Object
+                TypeName.BoundObjectReference
             );
             codegen.GenerateCSharpCSharpToNative(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
             m_Parent.Dedent();
@@ -242,7 +242,7 @@ internal class CSharpClassGenerator
         m_SourceCode += "#pragma warning disable CS8618\n";
 
         // Protected constructor
-        m_SourceCode += m_Parent.IndentedLine($"protected {@class.Name}(global::System.Func<object, global::Ayla.ObjectReferenceWrapper> locker) : base(locker)");
+        m_SourceCode += m_Parent.IndentedLine($"protected {@class.Name}(global::System.Func<object, global::Ayla.BoundObjectReferenceWrapper> locker) : base(locker)");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
@@ -250,7 +250,7 @@ internal class CSharpClassGenerator
         });
         m_SourceCode += m_Parent.IndentedLine("}");
         m_SourceCode += "#pragma warning restore CS8618\n";
-        m_SourceCode += m_Parent.IndentedLine($"partial void OnConstructed(global::System.Func<object, global::Ayla.ObjectReferenceWrapper> locker);");
+        m_SourceCode += m_Parent.IndentedLine($"partial void OnConstructed(global::System.Func<object, global::Ayla.BoundObjectReferenceWrapper> locker);");
         m_SourceCode += m_Parent.IndentedLine("");
 
         // Public constructors

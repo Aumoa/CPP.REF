@@ -8,7 +8,7 @@ public sealed class ManagedLifetimeObject : Object
 {
     private static readonly GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof(ManagedLifetimeObject);
 
-    private ManagedLifetimeObject(Func<object, ObjectReferenceWrapper> locker)
+    private ManagedLifetimeObject(Func<object, BoundObjectReferenceWrapper> locker)
         : base(locker)
     {
     }

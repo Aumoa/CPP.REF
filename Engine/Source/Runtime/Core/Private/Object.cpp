@@ -128,11 +128,11 @@ namespace Ayla
 		}
 	}
 
-	ObjectReferenceWrapper Object::BindGCHandle__Unsafe(ssize_t gcHandlePtr)
+	BoundObjectReferenceWrapper Object::BindGCHandle__Unsafe(ssize_t gcHandlePtr)
 	{
 		auto lock = std::unique_lock{ m_Spinlock };
 		SetGCHandle__Unsafe(gcHandlePtr);
-		return AsWrapper__Unsafe();
+		return AsBoundWrapper__Unsafe();
 	}
 
 	ObjectReferenceWrapper Object::AsWrapper()
@@ -161,6 +161,15 @@ namespace Ayla
 		{
 			.Ptr = reinterpret_cast<ssize_t>(this),
 			.IntGCHandlePtr = 0,
+			.GCHandleSerial = m_GCHandleSerial
+		};
+	}
+
+	BoundObjectReferenceWrapper Object::AsBoundWrapper__Unsafe()
+	{
+		return BoundObjectReferenceWrapper
+		{
+			.Ptr = reinterpret_cast<ssize_t>(this),
 			.GCHandleSerial = m_GCHandleSerial
 		};
 	}

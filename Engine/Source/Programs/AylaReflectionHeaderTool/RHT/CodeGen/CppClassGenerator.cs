@@ -198,7 +198,7 @@ internal class CppClassGenerator
             string constructorFullName = $"{@namespace.Replace("::", "__")}__{className}__{constructor.Name}__{i}__Injected";
             string callable = $"::Ayla::Object::ScriptNew<{classType.CppName}>";
             var codeGen = new FunctionBodyGenerator(parameters, callable, PlaceholderName.Value);
-            parametersDeclare = AppendCppOutParameter(parametersDeclare, "::Ayla::ObjectReferenceWrapper");
+            parametersDeclare = AppendCppOutParameter(parametersDeclare, TypeName.BoundObjectReference.CppBindingName);
 
             m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {constructorFullName}({parametersDeclare}) noexcept");
             m_Parent.WriteIndentedLine("{");

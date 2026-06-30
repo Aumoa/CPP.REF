@@ -10,7 +10,7 @@ public partial class Object : IDisposable, IStaticObject
         public static ThreadLocal<InternalCreation> ThreadLocal = new(() => new InternalCreation());
     }
 
-    protected Object(Func<object, ObjectReferenceWrapper> locker)
+    protected Object(Func<object, BoundObjectReferenceWrapper> locker)
     {
         var wrapper = locker(this);
         m_NativePointer = wrapper.Ptr;

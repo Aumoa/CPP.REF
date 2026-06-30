@@ -24,6 +24,13 @@ public struct ManagedObjectReferenceWrapper
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
+public struct BoundObjectReferenceWrapper
+{
+    public nint Ptr;
+    public ulong GCHandleSerial;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
 public struct ObjectReferenceWrapper
 {
     public nint Ptr;
@@ -85,7 +92,7 @@ internal static class ObjectReferenceMarshaller
                 }
             }
 
-            Func<object, ObjectReferenceWrapper> locker = @this =>
+            Func<object, BoundObjectReferenceWrapper> locker = @this =>
             {
                 var newHandlePtr = (nint)GCHandle.Alloc(@this, GCHandleType.Normal);
                 try
@@ -98,7 +105,7 @@ internal static class ObjectReferenceMarshaller
                         GCHandle.FromIntPtr(staleHandlePtr).Free();
                     }
 
-                    return new ObjectReferenceWrapper
+                    return new BoundObjectReferenceWrapper
                     {
                         Ptr = ptr,
                         GCHandleSerial = gcHandleSerial

@@ -42,6 +42,12 @@ namespace Ayla
 		SharedPtr<Object> AsNative_Internal();
 	};
 
+	struct CORE_API BoundObjectReferenceWrapper
+	{
+		ssize_t Ptr;
+		uint64 GCHandleSerial;
+	};
+
 	struct CORE_API ObjectReferenceWrapper
 	{
 		ssize_t Ptr;
