@@ -49,7 +49,7 @@ public partial class Object : IDisposable, IStaticObject
 
     public nint NativePointer => m_NativePointer;
 
-    internal ObjectReferenceWrapper AsWrapper()
+    internal ManagedObjectReferenceWrapper AsManagedObjectReferenceWrapper()
     {
         var nativePointer = NativePointer;
         if (nativePointer == 0)
@@ -57,20 +57,11 @@ public partial class Object : IDisposable, IStaticObject
             throw new ObjectDisposedException(GetType().FullName);
         }
 
-        return AsWrapper(nativePointer) with
-        {
-            IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal)
-        };
-    }
-
-    internal ManagedObjectReferenceWrapper AsManagedObjectReferenceWrapper()
-    {
-        var wrapper = AsWrapper();
         return new ManagedObjectReferenceWrapper
         {
-            Ptr = wrapper.Ptr,
-            IntGCHandlePtr = wrapper.IntGCHandlePtr,
-            GCHandleSerial = wrapper.GCHandleSerial
+            Ptr = nativePointer,
+            IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal),
+            GCHandleSerial = m_GCHandleSerial
         };
     }
 
@@ -124,12 +115,6 @@ public partial class Object : IDisposable, IStaticObject
         return result;
     }
 
-    internal static ObjectReferenceWrapper AsWrapper(nint instancePtr)
-    {
-        NativeCallBoundary.ThrowIfFailed(AsWrapper__Injected(instancePtr, out ObjectReferenceWrapper result));
-        return result;
-    }
-
     internal static ManagedTypeWrapper GetManagedTypeFromPtr(nint instancePtr)
     {
         NativeCallBoundary.ThrowIfFailed(GetManagedTypeFromPtr__Injected(instancePtr, out ManagedTypeWrapper result));
@@ -147,9 +132,6 @@ public partial class Object : IDisposable, IStaticObject
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedType__Injected")]
     private static extern NativeCallStatus GetManagedType__Injected(out ManagedTypeWrapper result);
-
-    [DllImport("Core", EntryPoint = "Ayla__Object__AsWrapper__Injected")]
-    private static extern NativeCallStatus AsWrapper__Injected(nint instancePtr, out ObjectReferenceWrapper result);
 
     [DllImport("Core", EntryPoint = "Ayla__Object__GetManagedTypeFromPtr__Injected")]
     private static extern NativeCallStatus GetManagedTypeFromPtr__Injected(nint instancePtr, out ManagedTypeWrapper result);

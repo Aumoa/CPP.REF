@@ -92,7 +92,7 @@ namespace Ayla
 		void AddRef();
 		void ReleaseRef();
 		BoundObjectReferenceWrapper BindGCHandle__Unsafe(ssize_t gcHandlePtr);
-		ObjectReferenceWrapper AsWrapper();
+		NativeObjectReferenceWrapper AsNativeObjectReferenceWrapper();
 
 		template<std::derived_from<Object> T = Object>
 		auto AsShared()
@@ -159,7 +159,7 @@ namespace Ayla
 	private:
 		static void ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<void()> action);
 		uint64 SetGCHandle__Unsafe(ssize_t gcHandlePtr);
-		ObjectReferenceWrapper AsWrapper__Unsafe();
+		NativeObjectReferenceWrapper AsNativeObjectReferenceWrapper__Unsafe();
 		BoundObjectReferenceWrapper AsBoundWrapper__Unsafe();
 	};
 

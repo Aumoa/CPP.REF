@@ -30,18 +30,6 @@ public struct BoundObjectReferenceWrapper
     public ulong GCHandleSerial;
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-public struct ObjectReferenceWrapper
-{
-    public nint Ptr;
-    public nint IntGCHandlePtr;
-    public ulong GCHandleSerial;
-
-    public T? AsManaged<T>() where T : Object => ObjectReferenceMarshaller.AsManaged<T>(Ptr);
-
-    public static implicit operator ObjectReferenceWrapper(Object? obj) => obj?.AsWrapper() ?? default;
-}
-
 internal static class ObjectReferenceMarshaller
 {
     public static T? AsManaged<T>(nint ptr) where T : Object

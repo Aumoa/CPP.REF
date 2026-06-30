@@ -17,7 +17,7 @@ internal class ClassName : TypeName
 
     public override string CppName => Namespace.Cpp(Name);
 
-    public override string CppBindingName => "::Ayla::ObjectReferenceWrapper";
+    public override string CppBindingName => throw AmbiguousObjectBindingDirection();
 
     public override string CppNativeToManagedBindingName => "::Ayla::NativeObjectReferenceWrapper";
 
@@ -25,7 +25,7 @@ internal class ClassName : TypeName
 
     public override string CSharpName => Namespace.CSharp(Name);
 
-    public override string CSharpBindingName => "global::Ayla.ObjectReferenceWrapper";
+    public override string CSharpBindingName => throw AmbiguousObjectBindingDirection();
 
     public override string CSharpNativeToManagedBindingName => "global::Ayla.NativeObjectReferenceWrapper";
 
@@ -34,4 +34,7 @@ internal class ClassName : TypeName
     public override string Id => CSharpName;
 
     public override bool IsGenericTypeDefinition => false;
+
+    private static InvalidOperationException AmbiguousObjectBindingDirection()
+        => new InvalidOperationException("Object binding requires an explicit interop direction.");
 }

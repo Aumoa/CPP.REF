@@ -135,10 +135,10 @@ namespace Ayla
 		return AsBoundWrapper__Unsafe();
 	}
 
-	ObjectReferenceWrapper Object::AsWrapper()
+	NativeObjectReferenceWrapper Object::AsNativeObjectReferenceWrapper()
 	{
 		auto lock = std::unique_lock{ m_Spinlock };
-		return AsWrapper__Unsafe();
+		return AsNativeObjectReferenceWrapper__Unsafe();
 	}
 
 	uint64 Object::SetGCHandle__Unsafe(ssize_t gcHandlePtr)
@@ -155,9 +155,9 @@ namespace Ayla
 		return m_GCHandleSerial;
 	}
 
-	ObjectReferenceWrapper Object::AsWrapper__Unsafe()
+	NativeObjectReferenceWrapper Object::AsNativeObjectReferenceWrapper__Unsafe()
 	{
-		return ObjectReferenceWrapper
+		return NativeObjectReferenceWrapper
 		{
 			.Ptr = reinterpret_cast<ssize_t>(this),
 			.IntGCHandlePtr = 0,
@@ -261,15 +261,6 @@ extern "C"
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			*result = ::Ayla::Object::GetManagedType();
-			return ::Ayla::NativeCallStatus::Succeeded;
-		});
-	}
-
-	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__AsWrapper__Injected(::Ayla::Object* self, ::Ayla::ObjectReferenceWrapper* result) noexcept
-	{
-		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
-		{
-			*result = self->AsWrapper();
 			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}

@@ -11,7 +11,7 @@ internal class SharedPtrTypeName : TypeName
 
     public override string CppName => $"::Ayla::SharedPtr<{ElementType.CppName}>";
 
-    public override string CppBindingName => "::Ayla::ObjectReferenceWrapper";
+    public override string CppBindingName => throw AmbiguousObjectBindingDirection();
 
     public override string CppNativeToManagedBindingName => "::Ayla::NativeObjectReferenceWrapper";
 
@@ -19,7 +19,7 @@ internal class SharedPtrTypeName : TypeName
 
     public override string CSharpName => ElementType.CSharpName;
 
-    public override string CSharpBindingName => "global::Ayla.ObjectReferenceWrapper";
+    public override string CSharpBindingName => throw AmbiguousObjectBindingDirection();
 
     public override string CSharpNativeToManagedBindingName => "global::Ayla.NativeObjectReferenceWrapper";
 
@@ -32,4 +32,7 @@ internal class SharedPtrTypeName : TypeName
     public static readonly SharedPtrTypeName GenericTypeDefinition = new(PlaceholderName.Value);
 
     public static readonly SharedPtrTypeName SharedObject = new(TypeName.Object);
+
+    private static InvalidOperationException AmbiguousObjectBindingDirection()
+        => new InvalidOperationException("Object binding requires an explicit interop direction.");
 }

@@ -48,7 +48,7 @@ internal class BuiltinTypeName : TypeName
     {
         Kinds.Void => "void",
         Kinds.String => "::Ayla::ManagedStringWrapper",
-        Kinds.Object => "::Ayla::ObjectReferenceWrapper",
+        Kinds.Object => throw AmbiguousObjectBindingDirection(),
         _ => CppName
     };
 
@@ -94,7 +94,7 @@ internal class BuiltinTypeName : TypeName
         Kinds.String => "global::Ayla.ManagedStringWrapper",
         Kinds.Single => "float",
         Kinds.Double => "double",
-        Kinds.Object => "global::Ayla.ObjectReferenceWrapper",
+        Kinds.Object => throw AmbiguousObjectBindingDirection(),
         _ => throw UnsupportedKind()
     };
 
@@ -130,4 +130,7 @@ internal class BuiltinTypeName : TypeName
     public override bool IsGenericTypeDefinition => false;
 
     private InvalidOperationException UnsupportedKind() => new InvalidOperationException($"Unsupported builtin type kind '{Kind}'.");
+
+    private static InvalidOperationException AmbiguousObjectBindingDirection()
+        => new InvalidOperationException("Object binding requires an explicit interop direction.");
 }
