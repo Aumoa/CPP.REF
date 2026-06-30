@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Ayla;
@@ -20,7 +20,7 @@ internal unsafe struct CoreCLRFunctions
             {
                 m_AsHardHandlePtr = (delegate* unmanaged[Cdecl]<nint*, NativeCallStatus>)&AsHardHandle__Invoke,
                 m_AsWeakHandlePtr = (delegate* unmanaged[Cdecl]<nint*, NativeCallStatus>)&AsWeakHandle__Invoke,
-                m_CreateManagedInstancePtr = (delegate* unmanaged[Cdecl]<nint, ObjectReferenceWrapper*, NativeCallStatus>)&CreateManagedInstance__Invoke,
+                m_CreateManagedInstancePtr = (delegate* unmanaged[Cdecl]<nint, ManagedObjectReferenceWrapper*, NativeCallStatus>)&CreateManagedInstance__Invoke,
                 m_FreeGCHandlePtr = (delegate* unmanaged[Cdecl]<nint, NativeCallStatus>)&FreeGCHandle__Invoke,
                 m_ReleaseManagedExceptionPtr = (delegate* unmanaged[Cdecl]<ulong, void>)&ReleaseManagedException__Invoke
             };
@@ -82,14 +82,14 @@ internal unsafe struct CoreCLRFunctions
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-    private static NativeCallStatus CreateManagedInstance__Invoke(nint scriptTypeGetter, ObjectReferenceWrapper* wrapper)
+    private static NativeCallStatus CreateManagedInstance__Invoke(nint scriptTypeGetter, ManagedObjectReferenceWrapper* wrapper)
     {
         try
         {
             var scriptType = Marshal.GetDelegateForFunctionPointer<GetScriptTypeDelegate>(scriptTypeGetter)();
             var obj = (Object?)Activator.CreateInstance(scriptType)
                 ?? throw new InvalidOperationException("Failed to create instance: Type does not have a default constructor or is not assignable to Object.");
-            *wrapper = obj.AsWrapper();
+            *wrapper = obj.AsManagedObjectReferenceWrapper();
 
             return ManagedCallBoundary.Succeed();
         }

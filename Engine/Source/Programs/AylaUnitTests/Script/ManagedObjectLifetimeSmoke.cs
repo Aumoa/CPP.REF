@@ -18,7 +18,7 @@ public static class ManagedObjectLifetimeSmoke
 
     private static ManagedLifetimeObject? s_Held;
 
-    public static nint Hold(ObjectReferenceWrapper wrapper)
+    public static nint Hold(NativeObjectReferenceWrapper wrapper)
     {
         s_Held = wrapper.AsManaged<ManagedLifetimeObject>()
             ?? throw new InvalidOperationException("Failed to create managed lifetime wrapper.");
@@ -32,33 +32,33 @@ public static class ManagedObjectLifetimeSmoke
         ForceFullCollection();
     }
 
-    public static nint CreateUnheld(ObjectReferenceWrapper wrapper)
+    public static nint CreateUnheld(NativeObjectReferenceWrapper wrapper)
     {
         var nativePointer = CreateUnheldNoInlining(wrapper);
         ForceFullCollection();
         return nativePointer;
     }
 
-    public static nint CreatePendingFinalizer(ObjectReferenceWrapper wrapper)
+    public static nint CreatePendingFinalizer(NativeObjectReferenceWrapper wrapper)
     {
         var nativePointer = CreateUnheldNoInlining(wrapper);
         GC.Collect();
         return nativePointer;
     }
 
-    public static nint HoldAfterPendingFinalizer(ObjectReferenceWrapper wrapper)
+    public static nint HoldAfterPendingFinalizer(NativeObjectReferenceWrapper wrapper)
     {
         GC.Collect();
         return Hold(wrapper);
     }
 
-    public static nint ReplaceStaleWeakHandle(ObjectReferenceWrapper wrapper)
+    public static nint ReplaceStaleWeakHandle(NativeObjectReferenceWrapper wrapper)
     {
         InstallCollectedWeakHandle(wrapper.Ptr);
         return Hold(wrapper);
     }
 
-    public static unsafe void CreateHeldWrapperForNativeConsumption(ObjectReferenceWrapper wrapper, ObjectReferenceWrapper* output)
+    public static unsafe void CreateHeldWrapperForNativeConsumption(NativeObjectReferenceWrapper wrapper, ManagedObjectReferenceWrapper* output)
     {
         s_Held = wrapper.AsManaged<ManagedLifetimeObject>()
             ?? throw new InvalidOperationException("Failed to create managed lifetime wrapper.");
@@ -73,7 +73,7 @@ public static class ManagedObjectLifetimeSmoke
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static nint CreateUnheldNoInlining(ObjectReferenceWrapper wrapper)
+    private static nint CreateUnheldNoInlining(NativeObjectReferenceWrapper wrapper)
     {
         var instance = wrapper.AsManaged<ManagedLifetimeObject>()
             ?? throw new InvalidOperationException("Failed to create managed lifetime wrapper.");

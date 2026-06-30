@@ -10,7 +10,7 @@ namespace Ayla
 	{
 		EnsureCoreCLRFunctionsInitialized();
 
-		ObjectReferenceWrapper wrapper{};
+		ManagedObjectReferenceWrapper wrapper{};
 		ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_CreateManagedInstancePtr__Invoke((ssize_t)type.ScriptTypeGetter, &wrapper));
 		return wrapper.AsNative<Object>();
 	}

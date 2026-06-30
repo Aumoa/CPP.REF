@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 namespace Ayla;
 
@@ -60,6 +60,17 @@ public partial class Object : IDisposable, IStaticObject
         return AsWrapper(nativePointer) with
         {
             IntGCHandlePtr = (nint)GCHandle.Alloc(this, GCHandleType.Normal)
+        };
+    }
+
+    internal ManagedObjectReferenceWrapper AsManagedObjectReferenceWrapper()
+    {
+        var wrapper = AsWrapper();
+        return new ManagedObjectReferenceWrapper
+        {
+            Ptr = wrapper.Ptr,
+            IntGCHandlePtr = wrapper.IntGCHandlePtr,
+            GCHandleSerial = wrapper.GCHandleSerial
         };
     }
 

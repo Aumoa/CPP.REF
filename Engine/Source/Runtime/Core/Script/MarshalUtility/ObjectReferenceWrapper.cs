@@ -1,7 +1,27 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Ayla;
+
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+public struct NativeObjectReferenceWrapper
+{
+    public nint Ptr;
+    public nint IntGCHandlePtr;
+    public ulong GCHandleSerial;
+
+    public T? AsManaged<T>() where T : Object => ObjectReferenceMarshaller.AsManaged<T>(Ptr);
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+public struct ManagedObjectReferenceWrapper
+{
+    public nint Ptr;
+    public nint IntGCHandlePtr;
+    public ulong GCHandleSerial;
+
+    public static implicit operator ManagedObjectReferenceWrapper(Object? obj) => obj?.AsManagedObjectReferenceWrapper() ?? default;
+}
 
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 public struct ObjectReferenceWrapper
@@ -10,9 +30,15 @@ public struct ObjectReferenceWrapper
     public nint IntGCHandlePtr;
     public ulong GCHandleSerial;
 
-    public T? AsManaged<T>() where T : Object
+    public T? AsManaged<T>() where T : Object => ObjectReferenceMarshaller.AsManaged<T>(Ptr);
+
+    public static implicit operator ObjectReferenceWrapper(Object? obj) => obj?.AsWrapper() ?? default;
+}
+
+internal static class ObjectReferenceMarshaller
+{
+    public static T? AsManaged<T>(nint ptr) where T : Object
     {
-        var ptr = Ptr;
         if (ptr == 0)
         {
             return null;
@@ -126,6 +152,4 @@ public struct ObjectReferenceWrapper
             writeCompleted = releaseIntPtr;
         }
     }
-
-    public static implicit operator ObjectReferenceWrapper(Object? obj) => obj?.AsWrapper() ?? default;
 }

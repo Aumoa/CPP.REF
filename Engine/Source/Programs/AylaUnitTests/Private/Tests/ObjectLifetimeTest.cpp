@@ -146,7 +146,7 @@ namespace Ayla
 				{
 					[](std::stop_token)
 					{
-						using hold_t = ssize_t(*)(ObjectReferenceWrapper);
+						using hold_t = ssize_t(*)(NativeObjectReferenceWrapper);
 						using dispose_t = void(*)();
 
 						auto hold = GetManagedLifetimeFunction<hold_t>("Hold");
@@ -155,7 +155,7 @@ namespace Ayla
 						LifetimeTestObject::ResetCounters();
 						auto object = Object::New<LifetimeTestObject>();
 						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
-						auto wrapper = ObjectReferenceWrapper::FromObject(object);
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
 
 						Assert::Equal(nativePointer, hold(wrapper));
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
@@ -177,7 +177,7 @@ namespace Ayla
 				{
 					[](std::stop_token)
 					{
-						using create_unheld_t = ssize_t(*)(ObjectReferenceWrapper);
+						using create_unheld_t = ssize_t(*)(NativeObjectReferenceWrapper);
 						using collect_t = void(*)();
 
 						auto createUnheld = GetManagedLifetimeFunction<create_unheld_t>("CreateUnheld");
@@ -186,7 +186,7 @@ namespace Ayla
 						LifetimeTestObject::ResetCounters();
 						auto object = Object::New<LifetimeTestObject>();
 						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
-						auto wrapper = ObjectReferenceWrapper::FromObject(object);
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
 
 						Assert::Equal(nativePointer, createUnheld(wrapper));
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
@@ -208,7 +208,7 @@ namespace Ayla
 				{
 					[](std::stop_token)
 					{
-						using replace_t = ssize_t(*)(ObjectReferenceWrapper);
+						using replace_t = ssize_t(*)(NativeObjectReferenceWrapper);
 						using dispose_t = void(*)();
 
 						auto replaceStaleWeakHandle = GetManagedLifetimeFunction<replace_t>("ReplaceStaleWeakHandle");
@@ -217,7 +217,7 @@ namespace Ayla
 						LifetimeTestObject::ResetCounters();
 						auto object = Object::New<LifetimeTestObject>();
 						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
-						auto wrapper = ObjectReferenceWrapper::FromObject(object);
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
 
 						Assert::Equal(nativePointer, replaceStaleWeakHandle(wrapper));
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
@@ -239,8 +239,8 @@ namespace Ayla
 				{
 					[](std::stop_token)
 					{
-						using create_pending_t = ssize_t(*)(ObjectReferenceWrapper);
-						using hold_after_pending_t = ssize_t(*)(ObjectReferenceWrapper);
+						using create_pending_t = ssize_t(*)(NativeObjectReferenceWrapper);
+						using hold_after_pending_t = ssize_t(*)(NativeObjectReferenceWrapper);
 						using dispose_t = void(*)();
 
 						auto createPendingFinalizer = GetManagedLifetimeFunction<create_pending_t>("CreatePendingFinalizer");
@@ -251,11 +251,11 @@ namespace Ayla
 						auto object = Object::New<LifetimeTestObject>();
 						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
 
-						auto firstWrapper = ObjectReferenceWrapper::FromObject(object);
+						auto firstWrapper = NativeObjectReferenceWrapper::FromObject(object);
 						Assert::Equal(nativePointer, createPendingFinalizer(firstWrapper));
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
 
-						auto secondWrapper = ObjectReferenceWrapper::FromObject(object);
+						auto secondWrapper = NativeObjectReferenceWrapper::FromObject(object);
 						Assert::Equal(nativePointer, holdAfterPendingFinalizer(secondWrapper));
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
 
@@ -276,7 +276,7 @@ namespace Ayla
 				{
 					[](std::stop_token)
 					{
-						using create_wrapper_t = void(*)(ObjectReferenceWrapper, ObjectReferenceWrapper*);
+						using create_wrapper_t = void(*)(NativeObjectReferenceWrapper, ManagedObjectReferenceWrapper*);
 						using dispose_t = void(*)();
 
 						auto createWrapper = GetManagedLifetimeFunction<create_wrapper_t>("CreateHeldWrapperForNativeConsumption");
@@ -284,9 +284,9 @@ namespace Ayla
 
 						LifetimeTestObject::ResetCounters();
 						auto object = Object::New<LifetimeTestObject>();
-						auto sourceWrapper = ObjectReferenceWrapper::FromObject(object);
+						auto sourceWrapper = NativeObjectReferenceWrapper::FromObject(object);
 
-						ObjectReferenceWrapper nativeWrapper{};
+						ManagedObjectReferenceWrapper nativeWrapper{};
 						createWrapper(sourceWrapper, &nativeWrapper);
 						Assert::True(nativeWrapper.IntGCHandlePtr != 0);
 
