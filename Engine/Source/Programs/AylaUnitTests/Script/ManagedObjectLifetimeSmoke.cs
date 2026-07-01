@@ -39,6 +39,27 @@ public static class ManagedObjectLifetimeSmoke
         return nativePointer;
     }
 
+    public static nint FailConstructionAfterBinding(NativeObjectReferenceWrapper wrapper)
+    {
+        bool caught = false;
+        ManagedLifetimeObject.SetThrowAfterBinding(true);
+        try
+        {
+            _ = wrapper.AsManaged<ManagedLifetimeObject>();
+        }
+        catch
+        {
+            caught = true;
+        }
+        finally
+        {
+            ManagedLifetimeObject.SetThrowAfterBinding(false);
+        }
+
+        ForceFullCollection();
+        return caught ? wrapper.Ptr : 0;
+    }
+
     public static nint CreatePendingFinalizer(NativeObjectReferenceWrapper wrapper)
     {
         var nativePointer = CreateUnheldNoInlining(wrapper);

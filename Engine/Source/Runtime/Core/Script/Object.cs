@@ -109,6 +109,18 @@ public partial class Object : IDisposable, IStaticObject
         return handle;
     }
 
+    internal void DetachNativePointerAfterFailedConstruction(nint nativePointer, ulong gcHandleSerial)
+    {
+        if (m_NativePointer != nativePointer || m_GCHandleSerial != gcHandleSerial)
+        {
+            return;
+        }
+
+        m_NativePointer = 0;
+        m_GCHandleSerial = 0;
+        GC.SuppressFinalize(this);
+    }
+
     internal static ManagedTypeWrapper GetManagedType()
     {
         NativeCallBoundary.ThrowIfFailed(GetManagedType__Injected(out ManagedTypeWrapper result));

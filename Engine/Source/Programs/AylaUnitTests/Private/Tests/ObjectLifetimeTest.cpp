@@ -203,6 +203,58 @@ namespace Ayla
 			},
 			TestCase
 			{
+				.Name = TEXT("Managed finalizer releases native-returned object without native owner"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using create_unheld_t = ssize_t(*)(NativeObjectReferenceWrapper);
+
+						auto createUnheld = GetManagedLifetimeFunction<create_unheld_t>("CreateUnheld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						Assert::Equal(nativePointer, createUnheld(wrapper));
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed construction failure clears bound native handle"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using fail_construction_t = ssize_t(*)(NativeObjectReferenceWrapper);
+
+						auto failConstructionAfterBinding = GetManagedLifetimeFunction<fail_construction_t>("FailConstructionAfterBinding");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						Assert::Equal(nativePointer, failConstructionAfterBinding(wrapper));
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
 				.Name = TEXT("Managed wrapper replaces stale weak handle"),
 				.TestFuncs =
 				{

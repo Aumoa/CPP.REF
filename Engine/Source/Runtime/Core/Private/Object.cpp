@@ -206,6 +206,7 @@ extern "C"
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			auto self_ = (::Ayla::Object*)self;
+			auto lock = std::unique_lock{ self_->m_Spinlock, std::adopt_lock };
 			auto serial = self_->SetGCHandle__Unsafe(handle);
 			if (gcHandleSerial != nullptr)
 			{
@@ -217,13 +218,18 @@ extern "C"
 				--self_->m_Refs;
 				check(self_->m_Refs >= 0);
 			}
-			if (self_->m_Refs == 0 && handle == 0)
+			if (releaseIntPtr && self_->m_Refs == 0)
 			{
-				self_->m_Spinlock.unlock();
-				delete self_;
-				return ::Ayla::NativeCallStatus::Succeeded;
+				if (handle == 0)
+				{
+					lock.unlock();
+					delete self_;
+					return ::Ayla::NativeCallStatus::Succeeded;
+				}
+
+				::Ayla::ManagedCallBoundary::ThrowIfFailed(::Ayla::g_CoreCLRFunctions.m_AsWeakHandle__Invoke(&self_->m_GCHandle));
 			}
-			self_->m_Spinlock.unlock();
+			lock.unlock();
 			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}

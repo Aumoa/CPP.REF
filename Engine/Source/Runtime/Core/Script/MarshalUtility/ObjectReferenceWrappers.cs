@@ -46,6 +46,8 @@ internal static class ObjectReferenceMarshaller
         var writeLocked = true;
         var writeCompleted = false;
         var staleHandlePtr = nint.Zero;
+        Object? boundObject = null;
+        ulong boundGCHandleSerial = 0;
         try
         {
             if (!typeof(T).IsAssignableFrom(scriptType))
@@ -82,12 +84,15 @@ internal static class ObjectReferenceMarshaller
 
             Func<object, BoundObjectReferenceWrapper> locker = @this =>
             {
+                var objectThis = (Object)@this;
                 var newHandlePtr = (nint)GCHandle.Alloc(@this, GCHandleType.Normal);
                 try
                 {
                     var gcHandleSerial = Object.EndWriteGCHandleAndGetSerial(ptr, newHandlePtr, true);
                     writeLocked = false;
                     writeCompleted = true;
+                    boundObject = objectThis;
+                    boundGCHandleSerial = gcHandleSerial;
                     if (staleHandlePtr != 0)
                     {
                         GCHandle.FromIntPtr(staleHandlePtr).Free();
@@ -106,10 +111,23 @@ internal static class ObjectReferenceMarshaller
                 }
             };
 
-            return (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
+            var result = (T?)Activator.CreateInstance(scriptType, BindingFlags.NonPublic | BindingFlags.Instance, null, [locker], null);
+            boundObject = null;
+            boundGCHandleSerial = 0;
+            return result;
         }
         catch
         {
+            if (boundGCHandleSerial != 0)
+            {
+                var boundHandlePtr = Object.ClearGCHandle(ptr, boundGCHandleSerial);
+                if (boundHandlePtr != 0)
+                {
+                    boundObject?.DetachNativePointerAfterFailedConstruction(ptr, boundGCHandleSerial);
+                    GCHandle.FromIntPtr(boundHandlePtr).Free();
+                }
+            }
+
             if (!writeCompleted && writeLocked)
             {
                 Object.EndWriteGCHandle(ptr, handlePtr, true);
