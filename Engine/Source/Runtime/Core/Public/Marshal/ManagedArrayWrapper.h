@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IntegralTypes.h"
-#include "ObjectReferenceWrapper.h"
+#include "ObjectReferenceWrappers.h"
 #include "SharedPtr.h"
 
 namespace Ayla

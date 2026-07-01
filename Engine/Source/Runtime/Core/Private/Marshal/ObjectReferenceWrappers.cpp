@@ -1,6 +1,6 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Marshal/CoreCLRFunctions.h"
 #include "Marshal/ManagedCallBoundary.h"
 #include "Object.h"

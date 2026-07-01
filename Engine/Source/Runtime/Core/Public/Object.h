@@ -11,7 +11,7 @@
 #include "Platform/PlatformMacros.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Marshal/ManagedTypeWrapper.h"
 #include "Marshal/NativeExceptionInterop.h"
 #include "Threading/Spinlock.h"

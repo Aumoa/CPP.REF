@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IntegralTypes.h"
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Marshal/NativeExceptionInterop.h"
 
 namespace Ayla

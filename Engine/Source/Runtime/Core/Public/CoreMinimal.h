@@ -70,7 +70,7 @@
 #include "Reflection/ConstructorInfo.h"
 #include "Reflection/ReflectionMacros.h"
 
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Marshal/ManagedStringWrapper.h"
 #include "Marshal/ManagedArrayWrapper.h"
 #include "Marshal/ManagedTypeWrapper.h"

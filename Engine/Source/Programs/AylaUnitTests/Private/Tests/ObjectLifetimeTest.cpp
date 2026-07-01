@@ -4,7 +4,7 @@
 #include "Tests/LifetimeTestObject.h"
 #include "Activator.h"
 #include "ManagedException.h"
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Reflection/TypeCollector.h"
 #include "ScriptingBackend/ScriptingBackend.h"
 #include "Type.h"

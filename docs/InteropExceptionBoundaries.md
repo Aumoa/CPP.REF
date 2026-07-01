@@ -194,7 +194,7 @@ Locations:
 - `Engine/Source/Runtime/Core/Public/Object.h`
 - `Engine/Source/Runtime/Core/Private/Object.cpp`
 - `Engine/Source/Runtime/Core/Script/Object.cs`
-- `Engine/Source/Runtime/Core/Script/MarshalUtility/ObjectReferenceWrapper.cs`
+- `Engine/Source/Runtime/Core/Script/MarshalUtility/ObjectReferenceWrappers.cs`
 
 `Object` is the main foundational class where manual C++/C# interop exists below RHT.
 Its native exports are now status-returning boundary functions.
