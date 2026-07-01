@@ -8,10 +8,12 @@ public class LinuxAPI : ModuleRules
 	public LinuxAPI()
 	{
 		Script.Enabled = true;
+		PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+		PrivatePchHeaderFile = "CoreMinimal.h";
+
 		AddPublicIncludePaths("Public");
 		AddPrivateIncludePaths("Private");
 		AddPublicDependencyModuleNames("ApplicationCore");
 		AddPrivateAdditionalLibraries("X11");
 	}
 }
-

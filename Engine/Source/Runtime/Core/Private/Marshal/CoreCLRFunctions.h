@@ -4,21 +4,29 @@
 
 #include "IntegralTypes.h"
 #include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/NativeExceptionInterop.h"
 
 namespace Ayla
 {
 	struct CoreCLRFunctions
 	{
-		using signature__AsHardHandle__Invoke__t = void(*)(ssize_t*);
-		signature__AsHardHandle__Invoke__t AsHardHandle__Invoke;
+		using signature__AsHardHandle__Invoke__t = NativeCallStatus(*)(ssize_t*);
+		signature__AsHardHandle__Invoke__t m_AsHardHandle__Invoke;
 
-		using signature__AsWeakHandle__Invoke__t = void(*)(ssize_t*);
-		signature__AsWeakHandle__Invoke__t AsWeakHandle__Invoke;
+		using signature__AsWeakHandle__Invoke__t = NativeCallStatus(*)(ssize_t*);
+		signature__AsWeakHandle__Invoke__t m_AsWeakHandle__Invoke;
 
-		using signature__CreateManagedInstancePtr__Invoke__t = ObjectReferenceWrapper(*)(ssize_t);
-		signature__CreateManagedInstancePtr__Invoke__t CreateManagedInstancePtr__Invoke;
+		using signature__CreateManagedInstancePtr__Invoke__t = NativeCallStatus(*)(ssize_t, ObjectReferenceWrapper*);
+		signature__CreateManagedInstancePtr__Invoke__t m_CreateManagedInstancePtr__Invoke;
 
-		using signature__FreeGCHandlePtr__Invoke__t = void(*)(ssize_t);
-		signature__FreeGCHandlePtr__Invoke__t FreeGCHandlePtr__Invoke;
+		using signature__FreeGCHandlePtr__Invoke__t = NativeCallStatus(*)(ssize_t);
+		signature__FreeGCHandlePtr__Invoke__t m_FreeGCHandlePtr__Invoke;
+
+		using signature__ReleaseManagedExceptionPtr__Invoke__t = void(*)(uint64);
+		signature__ReleaseManagedExceptionPtr__Invoke__t m_ReleaseManagedExceptionPtr__Invoke;
 	};
+
+	extern CoreCLRFunctions g_CoreCLRFunctions;
+
+	void EnsureCoreCLRFunctionsInitialized();
 }

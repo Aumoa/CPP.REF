@@ -8,6 +8,9 @@ public class RenderCore : ModuleRules
     public RenderCore()
     {
         Script.Enabled = true;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core", "Numerics", "ApplicationCore");

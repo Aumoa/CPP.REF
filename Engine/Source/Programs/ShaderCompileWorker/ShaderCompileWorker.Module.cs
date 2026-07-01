@@ -8,10 +8,13 @@ public class ShaderCompileWorker : ModuleRules
 {
     public ShaderCompileWorker()
     {
+        Type = ModuleType.Console;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("Core");
-        Type = ModuleType.Console;
 
         string? vulkanSdk = Environment.GetEnvironmentVariable("VULKAN_SDK");
         if (string.IsNullOrEmpty(vulkanSdk))

@@ -4,15 +4,6 @@ namespace AylaEngine;
 
 internal abstract class CppCompiler
 {
-    public readonly struct CompileItem
-    {
-        public ModuleRulesResolver Resolver { get; init; }
-
-        public SourceCodeDescriptor SourceCode { get; init; }
-
-        public GroupDescriptor Descriptor { get; init; }
-    }
-
     protected readonly struct ScopedAccess : IDisposable
     {
         private readonly SemaphoreSlim? m_Instance;
@@ -43,7 +34,36 @@ internal abstract class CppCompiler
         s_Access = new SemaphoreSlim(hardwareConcurrency);
     }
 
-    public abstract ValueTask<Terminal.Output> CompileAsync(CompileItem item, CancellationToken cancellationToken = default);
+    public abstract ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken = default);
+
+    public virtual string[] GetCompileOutputFilePaths(CppCompileCommand command)
+    {
+        if (command.CreatesPch)
+        {
+            var pchSettings = command.PchSettings
+                ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+            return [pchSettings.PchFilePath];
+        }
+
+        return [command.ObjectFilePath];
+    }
+
+    public virtual string[] GetPchCleanupFilePaths(CppPchSettings pchSettings)
+    {
+        var intermediateDirectory = Path.GetDirectoryName(pchSettings.SourceFilePath)
+            ?? throw new InvalidOperationException("PCH source file path does not have a directory.");
+
+        return
+        [
+            pchSettings.SourceFilePath,
+            pchSettings.PchFilePath,
+            pchSettings.PdbFilePath,
+            Path.Combine(intermediateDirectory, pchSettings.OutputName + ".o"),
+            Path.Combine(intermediateDirectory, pchSettings.OutputName + ".deps"),
+            pchSettings.CacheFilePath
+        ];
+    }
 
     protected static ValueTask<ScopedAccess> GetAccess(CancellationToken cancellationToken = default)
     {

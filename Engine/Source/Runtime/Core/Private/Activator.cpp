@@ -2,14 +2,16 @@
 
 #include "Activator.h"
 #include "Marshal/CoreCLRFunctions.h"
+#include "Marshal/ManagedCallBoundary.h"
 
 namespace Ayla
 {
-	extern CoreCLRFunctions g_CoreCLRFunctions;
-
 	SharedPtr<Object> Activator::CreateInstance(ManagedTypeWrapper type)
 	{
-		auto wrapper = g_CoreCLRFunctions.CreateManagedInstancePtr__Invoke((ssize_t)type.ScriptTypeGetter);
+		EnsureCoreCLRFunctionsInitialized();
+
+		ObjectReferenceWrapper wrapper{};
+		ManagedCallBoundary::ThrowIfFailed(g_CoreCLRFunctions.m_CreateManagedInstancePtr__Invoke((ssize_t)type.ScriptTypeGetter, &wrapper));
 		return wrapper.AsNative<Object>();
 	}
 }

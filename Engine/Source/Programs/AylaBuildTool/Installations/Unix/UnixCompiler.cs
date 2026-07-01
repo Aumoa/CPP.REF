@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace AylaEngine;
 
@@ -18,8 +18,36 @@ internal abstract class UnixCompiler : CppCompiler
         return ValueTask.FromResult<string[]>([]);
     }
 
-    public override async ValueTask<Terminal.Output> CompileAsync(CompileItem item, CancellationToken cancellationToken = default)
+    protected abstract string GetPchOutputFilePath(CppPchSettings pchSettings);
+
+    protected abstract string[] GetCreatePchArguments(CppPchSettings pchSettings);
+
+    protected abstract string[] GetUsePchArguments(CppPchSettings pchSettings);
+
+    public override string[] GetCompileOutputFilePaths(CppCompileCommand command)
     {
+        if (command.CreatesPch == false)
+        {
+            return base.GetCompileOutputFilePaths(command);
+        }
+
+        var pchSettings = command.PchSettings
+            ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
+        return [GetPchOutputFilePath(pchSettings)];
+    }
+
+    public override string[] GetPchCleanupFilePaths(CppPchSettings pchSettings)
+    {
+        return [.. base.GetPchCleanupFilePaths(pchSettings), GetPchOutputFilePath(pchSettings)];
+    }
+
+    public override async ValueTask<Terminal.Output> CompileAsync(CppCompileCommand command, CancellationToken cancellationToken = default)
+    {
+        var pchSettings = command.PchCommandKind == CppPchCommandKind.None
+            ? null
+            : command.PchSettings ?? throw new InvalidOperationException("PCH compile command does not have PCH settings.");
+
         var options = new Terminal.Options
         {
             Executable = await m_Installation.GetCompilerPath(m_TargetInfo, cancellationToken),
@@ -40,20 +68,24 @@ internal abstract class UnixCompiler : CppCompiler
             AddCompilerCommands(argument);
         }
 
-        switch (m_TargetInfo.Config)
+        var profile = command.Resolver.BuildProfile;
+        switch (profile.Optimization)
         {
-            case Configuration.Debug:
-            case Configuration.DebugGame:
-                AddCompilerCommands("-Og", "-ggdb", "-fno-omit-frame-pointer", "-fno-inline", "-D_GLIBCXX_DEBUG");
+            case OptimizationMode.Debug:
+                AddCompilerCommands("-Og", "-ggdb", "-fno-omit-frame-pointer", "-fno-inline");
                 break;
-            case Configuration.Development:
-            case Configuration.Shipping:
+            case OptimizationMode.Release:
                 AddCompilerCommands("-O3");
                 break;
         }
 
+        if (profile.UsesDebugAbi)
+        {
+            AddCompilerCommands("-D_GLIBCXX_DEBUG");
+        }
+
         List<string> includes = [];
-        foreach (var includeDirectory in item.Resolver.IncludePaths)
+        foreach (var includeDirectory in command.Environment.IncludePaths)
         {
             includes.Add($"-I\"{includeDirectory}\"");
         }
@@ -61,7 +93,7 @@ internal abstract class UnixCompiler : CppCompiler
         AddCompilerCommands(includes.ToArray());
 
         List<string> macros = [];
-        foreach (var macro in item.Resolver.AdditionalMacros)
+        foreach (var macro in command.Environment.AdditionalMacros)
         {
             if (macro.Value == null)
             {
@@ -75,20 +107,27 @@ internal abstract class UnixCompiler : CppCompiler
 
         AddCompilerCommands(macros.ToArray());
 
-        var fileName = Path.GetFileName(item.SourceCode.FilePath);
-        var intermediateDirectory = item.Descriptor.Intermediate(item.Resolver.Name, m_TargetInfo, FolderPolicy.PathType.Current);
-        var objectFileName = Path.Combine(intermediateDirectory, fileName + ".o");
-        var depsFileName = Path.Combine(intermediateDirectory, fileName + ".deps");
-        var cacheFileName = Path.Combine(intermediateDirectory, fileName + ".cache");
-
-        Directory.CreateDirectory(intermediateDirectory);
+        Directory.CreateDirectory(command.IntermediateDirectory);
 
         AddCompilerCommands("-c");
 
-        AddCompilerCommands($"{item.SourceCode.FilePath}");
+        if (command.CreatesPch)
+        {
+            AddCompilerCommands(GetCreatePchArguments(pchSettings!));
+        }
+        else if (command.UsesPch)
+        {
+            AddCompilerCommands(GetUsePchArguments(pchSettings!));
+        }
 
-        AddCompilerCommands($"-o\"{objectFileName}\"");
-        AddCompilerCommands($"-MMD -MF\"{depsFileName}\"");
+        AddCompilerCommands($"\"{command.SourceCode.FilePath}\"");
+
+        var outputFilePath = command.CreatesPch && pchSettings != null
+            ? GetPchOutputFilePath(pchSettings)
+            : command.ObjectFilePath;
+
+        AddCompilerCommands($"-o\"{outputFilePath}\"");
+        AddCompilerCommands($"-MMD -MF\"{command.DependenciesFilePath}\"");
 
         Terminal.Output output;
         using (await GetAccess(cancellationToken))
@@ -98,8 +137,8 @@ internal abstract class UnixCompiler : CppCompiler
 
         if (output.ExitCode == 0)
         {
-            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, item.SourceCode.FilePath, item.Resolver.RuleFilePath, depsFileName, item.Resolver.DependRuleFilePaths, cancellationToken);
-            cached.SaveCached(cacheFileName);
+            var cached = await SourceCodeCache.MakeCachedAsync(m_Installation, command.SourceCode.FilePath, command.Resolver.RuleFilePath, command.DependenciesFilePath, command.Resolver.DependRuleFilePaths, command.CacheDependencyFilePaths, cancellationToken);
+            cached.SaveCached(command.CacheFilePath);
         }
 
         return output;

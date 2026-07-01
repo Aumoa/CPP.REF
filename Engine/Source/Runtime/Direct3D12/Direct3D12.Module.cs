@@ -9,6 +9,9 @@ public class Direct3D12 : ModuleRules
     public Direct3D12()
     {
         Script.Enabled = true;
+        PchUsage = PchUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePchHeaderFile = "CoreMinimal.h";
+
         AddPublicIncludePaths("Public");
         AddPrivateIncludePaths("Private");
         AddPublicDependencyModuleNames("RenderCore", "ApplicationCore");

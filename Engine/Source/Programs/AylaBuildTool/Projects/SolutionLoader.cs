@@ -28,7 +28,7 @@ internal sealed class SolutionLoader
         var normalizedProjectFile = projectFile == null ? null : Path.GetFullPath(projectFile);
         string? gameFolder = normalizedProjectFile == null ? null : Path.GetDirectoryName(normalizedProjectFile);
 
-        GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, true);
+        GroupDescriptor engineGroup = GroupDescriptor.FromRoot(engineFolder, SourceGroupKind.Engine);
         GroupDescriptor primaryGroup = engineGroup;
 
         var engineCandidatesTask = m_ProjectScanner.ScanAsync(
@@ -38,7 +38,7 @@ internal sealed class SolutionLoader
         Task<IReadOnlyList<ProjectCandidate>> gameCandidatesTask = Task.FromResult<IReadOnlyList<ProjectCandidate>>([]);
         if (string.IsNullOrEmpty(gameFolder) == false)
         {
-            primaryGroup = GroupDescriptor.FromRoot(gameFolder, false);
+            primaryGroup = GroupDescriptor.FromRoot(gameFolder, SourceGroupKind.Project);
             EnsureGameDirectories(primaryGroup);
             gameCandidatesTask = m_ProjectScanner.ScanAsync(
                 primaryGroup,

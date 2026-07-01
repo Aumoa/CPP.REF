@@ -1,20 +1,18 @@
-﻿using System.Diagnostics;
-using static AylaEngine.CppCompiler;
-
+using System.Diagnostics;
 namespace AylaEngine;
 
 internal static partial class BuildRunner
 {
-    private class ModuleTask : ITask
+    internal class ModuleTask : ITask
     {
         public readonly ModuleRulesResolver Resolver;
         public readonly CompileTask[] NeedCompileTasks;
 
         private readonly Installation m_Installation;
-        private readonly CompileItem[] m_AllCompiles;
+        private readonly CppCompileCommand[] m_AllCompiles;
         private readonly TaskCompletionSource m_CompletionSource = new();
 
-        public ModuleTask(Installation installation, ModuleRulesResolver resolver, CompileItem[] allCompiles, CompileTask[] needCompiles)
+        public ModuleTask(Installation installation, ModuleRulesResolver resolver, CppCompileCommand[] allCompiles, CompileTask[] needCompiles)
         {
             Resolver = resolver;
             NeedCompileTasks = needCompiles;
@@ -29,7 +27,7 @@ internal static partial class BuildRunner
                 return true;
             }
 
-            var outputFileName = Resolver.Group.OutputFileName(m_Installation, targetInfo, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
+            var outputFileName = Resolver.Group.ModuleOutputFileName(m_Installation, targetInfo, Resolver.BuildProfile, Resolver.Name, Resolver.Rules.Type, FolderPolicy.PathType.Current);
             if (File.Exists(outputFileName) == false)
             {
                 return true;
@@ -54,8 +52,8 @@ internal static partial class BuildRunner
             };
 
             var cmakeSource = Path.GetFullPath(Path.Combine(project.SourceDirectory, rule.ThirdParty.CMakeSource));
-            var cmakeIntDir = project.Group.Intermediate(project.Name, targetInfo.Platform, FolderPolicy.PathType.Current);
-            var cmakeOutDir = project.Group.Output(targetInfo, FolderPolicy.PathType.Current);
+            var cmakeIntDir = project.Group.PlatformIntermediate(project.Name, targetInfo.Platform, FolderPolicy.PathType.Current);
+            var cmakeOutDir = project.Group.ModuleOutput(targetInfo, BuildProfileResolver.Resolve(project, targetInfo), FolderPolicy.PathType.Current);
             string[] ps =
             [
                 $"-S \"{cmakeSource}\"",
@@ -80,7 +78,7 @@ internal static partial class BuildRunner
             m_CompletionSource.SetResult();
         }
 
-        public async Task<Terminal.Output> LinkAsync(IList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
+        public async Task<Terminal.Output> LinkAsync(IReadOnlyList<ModuleTask> moduleTasks, Installation installation, TargetInfo targetInfo, CancellationToken cancellationToken)
         {
             try
             {

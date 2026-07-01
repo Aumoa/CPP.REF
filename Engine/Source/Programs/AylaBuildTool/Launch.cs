@@ -9,9 +9,10 @@ Console.CancelKeyPress += OnCancelKeyPress;
 
 try
 {
-    var pass = Parser.Default.ParseArguments<GenerateOptions, BuildOptions, BootstrapOptions>(args);
+    var pass = Parser.Default.ParseArguments<GenerateOptions, BuildOptions, TestOptions, BootstrapOptions>(args);
     pass = await pass.WithParsedAsync<GenerateOptions>(options => GenerateRunner.RunAsync(options, cts.Token).AsTask());
     pass = await pass.WithParsedAsync<BuildOptions>(options => BuildRunner.RunAsync(options, cts.Token).AsTask());
+    pass = await pass.WithParsedAsync<TestOptions>(options => TestRunner.RunAsync(options, cts.Token).AsTask());
     pass = await pass.WithParsedAsync<BootstrapOptions>(options => BootstrapRunner.RunAsync(options, cts.Token).AsTask());
     return pass.Errors.Any() ? 1 : 0;
 }

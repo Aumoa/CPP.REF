@@ -34,6 +34,13 @@ When the current changes do not touch shader code, shader assets, ShaderCompileW
 
 Preserve user-requested configuration, editor, platform, or target options when they are provided.
 
+## Test Checks
+
+- When a dedicated unit test target, test command, or focused executable test exists for the touched subsystem, run it after refreshing AylaBuildTool if the build tool changed.
+- Add or update focused tests for deterministic logic that is practical to isolate, such as math utilities, parsers, serializers, build graph decisions, module rule resolution, reflection metadata, interop marshalling, lifetime management, and state transformations.
+- If a change is not practical to cover with focused tests, use the nearest build, generation, integration, runtime, or platform check and report that rationale.
+- When tests exist and current changes do not touch shader-related code or assets, keep `--skip-shaders` on test-driven AylaBuildTool checks when the command supports it.
+
 ## Generation Checks
 
 Use generation checks when changes affect project scanning, rules, generated code, reflection headers, shaders, or solution/materialization flows:
@@ -44,9 +51,26 @@ dotnet Engine/Binaries/DotNET/AylaBuildTool.dll generate --project SampleGame/Sa
 
 When SampleGame is absent, inspect the current repository targets and choose the engine project path that matches the requested workflow.
 
+## Unit Test Checks
+
+Use the AylaBuildTool `test` command for native unit test execution. It builds the selected test module first, then runs the produced executable:
+
+```powershell
+dotnet Engine/Binaries/DotNET/AylaBuildTool.dll test --target AylaUnitTests --config Shipping --skip-shaders
+```
+
+When the current changes do not touch shader-related code or assets, keep `--skip-shaders` on unit test checks.
+
+Use the `AylaBuildTool.Tests` project for deterministic C# build system policy tests:
+
+```powershell
+dotnet run --project Engine/Source/Programs/AylaBuildTool.Tests/AylaBuildTool.Tests.csproj
+```
+
 ## Verification Notes
 
 - Prefer focused checks that match the touched subsystem.
+- Before committing feature work with tests, run the relevant tests when practical and report the result.
 - Report when a build or generation command cannot be run.
 - Keep generated C++ IDE projects out of normal native build verification unless the user asks for diagnostics from them.
 - When `gh` is available and a relevant GitHub Actions run exists, verify compile results for Windows, macOS, and Linux at the job level.
@@ -56,3 +80,4 @@ When SampleGame is absent, inspect the current repository targets and choose the
 - On clearly isolated task branches, especially branches whose names start with `codex/`, Codex may push that branch at its own discretion when doing so is useful for build or Actions validation.
 - Destructive or broad shared-state actions still require explicit user approval. If branch ownership is unclear, treat the branch as shared.
 - Branch-local workflow or CI trigger changes may be used for validation on isolated task branches, but remove or revert those temporary settings before merging into protected shared branches.
+- Permanent CI policy changes, such as enabling pull request compile checks for protected branch targets, are allowed when intentionally requested and should be reviewed as normal workflow changes.

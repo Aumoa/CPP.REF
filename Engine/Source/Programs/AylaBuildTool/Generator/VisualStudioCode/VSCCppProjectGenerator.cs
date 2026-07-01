@@ -140,6 +140,40 @@ internal static class VSCCppProjectGenerator
         WriteIndented = true
     };
 
+    private static string[] CreateTaskArguments(
+        string currentAssemblyLocation,
+        string[] projectArgs,
+        string projectName,
+        TargetInfo targetInfo,
+        string? cleanMode = null)
+    {
+        List<string> arguments =
+        [
+            currentAssemblyLocation,
+            "build",
+            .. projectArgs,
+            "--target",
+            projectName,
+            "--config",
+            targetInfo.Config.ToString(),
+            "--generator",
+            "VisualStudioCode"
+        ];
+
+        if (targetInfo.Editor)
+        {
+            arguments.Add("--editor");
+        }
+
+        if (cleanMode != null)
+        {
+            arguments.Add("--clean");
+            arguments.Add(cleanMode);
+        }
+
+        return arguments.ToArray();
+    }
+
     public static async ValueTask GenerateAsync(Solution solution, ModuleRulesResolverFactory resolverFactory, ModuleProject project, List<string> outputFolders, CancellationToken cancellationToken)
     {
         string vscode_FullName = Path.Combine(project.SourceDirectory, ".vscode");
@@ -168,7 +202,7 @@ internal static class VSCCppProjectGenerator
                 string compilerPath = await installation.GetCompilerPath(targetInfo, cancellationToken);
                 string intelliSenseMode = await installation.GetIntelliSenseMode(targetInfo, cancellationToken);
                 var rule = resolver.Rules;
-                var outputFileName = project.Group.OutputFileName(installation, targetInfo, project.Name, rule.Type, FolderPolicy.PathType.Linux);
+                var outputFileName = project.Group.ModuleOutputFileName(installation, targetInfo, resolver.BuildProfile, project.Name, rule.Type, FolderPolicy.PathType.Linux);
                 var fileName = Path.GetFileName(outputFileName);
                 if (fileName.StartsWith("lib") && fileName.EndsWith(".so"))
                 {
@@ -181,7 +215,7 @@ internal static class VSCCppProjectGenerator
                 {
                     Name = FormatTargetName(targetInfo),
                     IncludePath = resolver.IncludePaths.ToArray(),
-                    Defines = AppendPlatformMacros(resolver.AdditionalMacros).Select(FormatMacro).ToArray(),
+                    Defines = AppendPlatformMacros(resolver.AdditionalMacros, resolver.BuildProfile).Select(FormatMacro).ToArray(),
                     CompilerPath = compilerPath,
                     CStandard = "c11",
                     CppStandard = "c++23",
@@ -195,14 +229,7 @@ internal static class VSCCppProjectGenerator
                     Label = project.Name + " Build " + FormatTargetName(targetInfo),
                     Type = "shell",
                     Command = "dotnet",
-                    Arguments = [
-                        currentAssemblyLocation, "build",
-                        .. projectArgs,
-                        "--target", project.Name,
-                        "--config", targetInfo.Config.ToString(),
-                        "--generator", "VisualStudioCode",
-                        targetInfo.Editor ? "--editor" : string.Empty
-                    ],
+                    Arguments = CreateTaskArguments(currentAssemblyLocation, projectArgs, project.Name, targetInfo),
                     Group = new()
                     {
                         Kind = "build",
@@ -218,15 +245,7 @@ internal static class VSCCppProjectGenerator
                     Label = project.Name + " Clean " + FormatTargetName(targetInfo),
                     Type = "shell",
                     Command = "dotnet",
-                    Arguments = [
-                        currentAssemblyLocation, "build",
-                        .. projectArgs,
-                        "--target", project.Name,
-                        "--config", targetInfo.Config.ToString(),
-                        "--generator", "VisualStudioCode",
-                        targetInfo.Editor ? "--editor" : string.Empty,
-                        "--clean", "CleanOnly"
-                    ],
+                    Arguments = CreateTaskArguments(currentAssemblyLocation, projectArgs, project.Name, targetInfo, "CleanOnly"),
                     Group = new()
                     {
                         Kind = "clean",
@@ -242,15 +261,7 @@ internal static class VSCCppProjectGenerator
                     Label = project.Name + " Generate " + FormatTargetName(targetInfo),
                     Type = "shell",
                     Command = "dotnet",
-                    Arguments = [
-                        currentAssemblyLocation, "build",
-                        .. projectArgs,
-                        "--target", project.Name,
-                        "--config", targetInfo.Config.ToString(),
-                        "--generator", "VisualStudioCode",
-                        targetInfo.Editor ? "--editor" : string.Empty,
-                        "--clean", "GenerateOnly"
-                    ],
+                    Arguments = CreateTaskArguments(currentAssemblyLocation, projectArgs, project.Name, targetInfo, "GenerateOnly"),
                     Group = new()
                     {
                         Kind = "generate",
@@ -272,10 +283,10 @@ internal static class VSCCppProjectGenerator
                     Name = FormatTargetName(targetInfo),
                     Type = "cppdbg",
                     Request = "launch",
-                    Program = Path.Combine(solution.EngineGroup.Output(targetInfo, FolderPolicy.PathType.Linux)) + "/Launch",
+                    Program = Path.Combine(solution.EngineGroup.ModuleOutput(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)) + "/Launch",
                     Arguments = [.. args],
                     StopAtEntry = false,
-                    WorkingDirectory = Path.Combine(solution.EngineGroup.Output(targetInfo, FolderPolicy.PathType.Linux)),
+                    WorkingDirectory = Path.Combine(solution.EngineGroup.ModuleOutput(targetInfo, BuildProfileResolver.Resolve(solution.EngineGroup, targetInfo), FolderPolicy.PathType.Linux)),
                     Environment = [
                         new LaunchConfigurationEnvironment
                         {
@@ -289,7 +300,7 @@ internal static class VSCCppProjectGenerator
                 });
             }
 
-            IEnumerable<MacroSet> AppendPlatformMacros(IEnumerable<MacroSet> set)
+            IEnumerable<MacroSet> AppendPlatformMacros(IEnumerable<MacroSet> set, BuildConfigurationProfile profile)
             {
                 switch (targetInfo.Platform.Group)
                 {
@@ -304,7 +315,7 @@ internal static class VSCCppProjectGenerator
                         break;
                 }
 
-                if (targetInfo.Config != AylaEngine.Configuration.Shipping)
+                if (profile.EnablesAssertions)
                 {
                     set = set.Append("DO_CHECK=1");
                 }

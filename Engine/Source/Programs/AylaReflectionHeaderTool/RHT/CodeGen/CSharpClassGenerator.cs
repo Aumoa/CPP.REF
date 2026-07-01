@@ -68,7 +68,16 @@ internal class CSharpClassGenerator
 
         // GetManagedType method
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{@class.CppName[2..].Replace("::", "__")}__GetManagedType\")]");
-        m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.ManagedTypeWrapper GetManagedType();");
+        m_SourceCode += m_Parent.IndentedLine($"private static extern global::Ayla.NativeCallStatus GetManagedType__Injected(out global::Ayla.ManagedTypeWrapper result);");
+        m_SourceCode += m_Parent.IndentedLine("");
+        m_SourceCode += m_Parent.IndentedLine($"public static global::Ayla.ManagedTypeWrapper GetManagedType()");
+        m_SourceCode += m_Parent.IndentedLine("{");
+        m_Parent.Indented(() =>
+        {
+            m_SourceCode += m_Parent.IndentedLine("global::Ayla.NativeCallBoundary.ThrowIfFailed(GetManagedType__Injected(out global::Ayla.ManagedTypeWrapper result));");
+            m_SourceCode += m_Parent.IndentedLine("return result;");
+        });
+        m_SourceCode += m_Parent.IndentedLine("}");
 
         // Constructor imports
         for (int i = 0; i < m_Class.Constructors.Count; ++i)
@@ -87,11 +96,11 @@ internal class CSharpClassGenerator
     {
         var constructor = m_Class.Constructors[index];
         var parameters = CollectParameters(constructor.Parameters);
-        var injectParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
+        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), "nint");
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{index}__Injected";
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-        m_SourceCode += m_Parent.IndentedLine($"public static extern nint ctor_{constructor.Name}({injectParamsDeclare});");
+        m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.NativeCallStatus ctor_{constructor.Name}({injectParamsDeclare});");
     }
 
     private void GenerateInjectedFunction(int index, ClassName @class)
@@ -105,9 +114,10 @@ internal class CSharpClassGenerator
         string injectParamsDeclare = isStatic
             ? ParametersGenerator.GenerateCSharpBindings(parameters)
             : ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+        injectParamsDeclare = AppendCSharpOutParameter(injectParamsDeclare, returnType);
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
-        m_SourceCode += m_Parent.IndentedLine($"public static extern {returnType.CSharpBindingName} {function.Name}({injectParamsDeclare});");
+        m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.NativeCallStatus {function.Name}({injectParamsDeclare});");
     }
 
     private void GenerateInvocableClass(ClassName @class, string injectFullName, string invocableClassName, string classFullName)
@@ -140,7 +150,27 @@ internal class CSharpClassGenerator
 
         // Static type getter
         m_SourceCode += m_Parent.IndentedLine($"private static readonly global::Ayla.GetScriptTypeDelegate s_GetScriptType__Delegate = () => typeof({classFullName});");
-        m_SourceCode += m_Parent.IndentedLine($"private static nint GetScriptType__Invoke() => global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
+        m_SourceCode += m_Parent.IndentedLine($"private static unsafe global::Ayla.NativeCallStatus GetScriptType__Invoke(nint* result)");
+        m_SourceCode += m_Parent.IndentedLine("{");
+        m_Parent.Indented(() =>
+        {
+            m_SourceCode += m_Parent.IndentedLine("try");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine("*result = global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(s_GetScriptType__Delegate);");
+                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedCallBoundary.Succeed();");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
+            m_SourceCode += m_Parent.IndentedLine("catch (global::System.Exception exception)");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedCallBoundary.Capture(exception);");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
+        });
+        m_SourceCode += m_Parent.IndentedLine("}");
 
         // Constructors
         for (int i = 0; i < m_Class.Constructors.Count; ++i)
@@ -166,12 +196,32 @@ internal class CSharpClassGenerator
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
+            m_SourceCode += m_Parent.IndentedLine("var __gchandle = global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak);");
+            m_SourceCode += m_Parent.IndentedLine("try");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indent();
             var codegen = new FunctionBodyGenerator(
-                parameters.AddFirstTemp(PlaceholderName.Value, "(nint)global::System.Runtime.InteropServices.GCHandle.Alloc(@this, global::System.Runtime.InteropServices.GCHandleType.Weak)"),
+                parameters.AddFirstTemp(PlaceholderName.Value, "(nint)__gchandle"),
                 $"{injectFullName}.ctor_{constructor.Name}",
-                TypeName.Object
+                TypeName.IntPtr
             );
             codegen.GenerateCSharpCSharpToNative(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            m_Parent.Dedent();
+            m_SourceCode += m_Parent.IndentedLine("}");
+            m_SourceCode += m_Parent.IndentedLine("catch");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine("if (__gchandle.IsAllocated)");
+                m_SourceCode += m_Parent.IndentedLine("{");
+                m_Parent.Indented(() =>
+                {
+                    m_SourceCode += m_Parent.IndentedLine("__gchandle.Free();");
+                });
+                m_SourceCode += m_Parent.IndentedLine("}");
+                m_SourceCode += m_Parent.IndentedLine("throw;");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
         });
         m_SourceCode += m_Parent.IndentedLine("})");
         m_SourceCode += m_Parent.IndentedLine("{");
@@ -304,14 +354,34 @@ internal class CSharpClassGenerator
     private void GenerateVirtualInvokeMethod(SFunction function, TypeName returnType, ParameterCollection parameters)
     {
         var invokeParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
-        m_SourceCode += m_Parent.IndentedLine($"private static unsafe {returnType.CSharpBindingName} {function.Name}__Invoke({invokeParamsDeclare})");
+        invokeParamsDeclare = AppendCSharpOutParameter(invokeParamsDeclare, returnType);
+
+        m_SourceCode += m_Parent.IndentedLine($"private static unsafe global::Ayla.NativeCallStatus {function.Name}__Invoke({invokeParamsDeclare})");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
-            m_SourceCode += m_Parent.IndentedLine($"var self = self_.AsManaged<{m_Class.Class.Name}>()!;");
-            string callable = $"self.{function.Name}";
-            var codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
-            codeGen.GenerateCSharpNativeToCSharp(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            m_SourceCode += m_Parent.IndentedLine("try");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                m_SourceCode += m_Parent.IndentedLine($"var self = self_.AsManaged<{m_Class.Class.Name}>()!;");
+                string callable = $"self.{function.Name}";
+                var codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
+                codeGen.GenerateCSharpNativeToCSharpStatus(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
+            m_SourceCode += m_Parent.IndentedLine("catch (global::System.Exception exception)");
+            m_SourceCode += m_Parent.IndentedLine("{");
+            m_Parent.Indented(() =>
+            {
+                if (returnType != TypeName.Void)
+                {
+                    m_SourceCode += m_Parent.IndentedLine("__return_value = default;");
+                }
+
+                m_SourceCode += m_Parent.IndentedLine("return global::Ayla.ManagedCallBoundary.Capture(exception);");
+            });
+            m_SourceCode += m_Parent.IndentedLine("}");
         });
         m_SourceCode += m_Parent.IndentedLine("}");
     }
@@ -325,5 +395,16 @@ internal class CSharpClassGenerator
             collection.Add(paramType, param.Variable.Name);
         }
         return collection;
+    }
+
+    private static string AppendCSharpOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpBindingName);
+    }
+
+    private static string AppendCSharpOutParameter(string parametersDeclare, string returnBindingName)
+    {
+        string outParameter = $"out {returnBindingName} __return_value";
+        return string.IsNullOrEmpty(parametersDeclare) ? outParameter : $"{parametersDeclare}, {outParameter}";
     }
 }
