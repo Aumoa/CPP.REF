@@ -48,8 +48,20 @@ internal class BuiltinTypeName : TypeName
     {
         Kinds.Void => "void",
         Kinds.String => "::Ayla::ManagedStringWrapper",
-        Kinds.Object => "::Ayla::ObjectReferenceWrapper",
+        Kinds.Object => throw AmbiguousObjectBindingDirection(),
         _ => CppName
+    };
+
+    public override string CppNativeToManagedBindingName => Kind switch
+    {
+        Kinds.Object => "::Ayla::NativeObjectReferenceWrapper",
+        _ => CppBindingName
+    };
+
+    public override string CppManagedToNativeBindingName => Kind switch
+    {
+        Kinds.Object => "::Ayla::ManagedObjectReferenceWrapper",
+        _ => CppBindingName
     };
 
     public override string CSharpName => Kind switch
@@ -82,8 +94,20 @@ internal class BuiltinTypeName : TypeName
         Kinds.String => "global::Ayla.ManagedStringWrapper",
         Kinds.Single => "float",
         Kinds.Double => "double",
-        Kinds.Object => "global::Ayla.ObjectReferenceWrapper",
+        Kinds.Object => throw AmbiguousObjectBindingDirection(),
         _ => throw UnsupportedKind()
+    };
+
+    public override string CSharpNativeToManagedBindingName => Kind switch
+    {
+        Kinds.Object => "global::Ayla.NativeObjectReferenceWrapper",
+        _ => CSharpBindingName
+    };
+
+    public override string CSharpManagedToNativeBindingName => Kind switch
+    {
+        Kinds.Object => "global::Ayla.ManagedObjectReferenceWrapper",
+        _ => CSharpBindingName
     };
 
     public override string Id => Kind switch
@@ -106,4 +130,7 @@ internal class BuiltinTypeName : TypeName
     public override bool IsGenericTypeDefinition => false;
 
     private InvalidOperationException UnsupportedKind() => new InvalidOperationException($"Unsupported builtin type kind '{Kind}'.");
+
+    private static InvalidOperationException AmbiguousObjectBindingDirection()
+        => new InvalidOperationException("Object binding requires an explicit interop direction.");
 }

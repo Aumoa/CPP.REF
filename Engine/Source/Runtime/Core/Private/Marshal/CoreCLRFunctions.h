@@ -3,7 +3,7 @@
 #pragma once
 
 #include "IntegralTypes.h"
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Marshal/NativeExceptionInterop.h"
 
 namespace Ayla
@@ -16,7 +16,7 @@ namespace Ayla
 		using signature__AsWeakHandle__Invoke__t = NativeCallStatus(*)(ssize_t*);
 		signature__AsWeakHandle__Invoke__t m_AsWeakHandle__Invoke;
 
-		using signature__CreateManagedInstancePtr__Invoke__t = NativeCallStatus(*)(ssize_t, ObjectReferenceWrapper*);
+		using signature__CreateManagedInstancePtr__Invoke__t = NativeCallStatus(*)(ssize_t, ManagedObjectReferenceWrapper*);
 		signature__CreateManagedInstancePtr__Invoke__t m_CreateManagedInstancePtr__Invoke;
 
 		using signature__FreeGCHandlePtr__Invoke__t = NativeCallStatus(*)(ssize_t);

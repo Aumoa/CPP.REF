@@ -4,7 +4,7 @@ public partial class GenericApplication
 {
     private static GenericApplication? s_App;
 
-    partial void OnConstructed(Func<object, nint> locker)
+    partial void OnConstructed(Func<object, BoundObjectReferenceWrapper> locker)
     {
         s_App = this;
     }

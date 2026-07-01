@@ -130,8 +130,8 @@ internal class CppClassGenerator
             m_Parent.WriteIndentedLine("{");
             m_Parent.Indented(() =>
             {
-                var invokeParametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
-                invokeParametersDeclare = AppendCppOutParameter(invokeParametersDeclare, returnType);
+                var invokeParametersDeclare = ParametersGenerator.GenerateCppNativeToManagedBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
+                invokeParametersDeclare = AppendCppManagedToNativeOutParameter(invokeParametersDeclare, returnType);
                 m_Parent.WriteIndentedLine($"using signature_t = ::Ayla::NativeCallStatus(*)({invokeParametersDeclare});");
                 m_Parent.WriteIndentedLine($"static auto callable = reinterpret_cast<signature_t>(::Ayla::ScriptingBackend::Get().GetFunctionPointer(\"{m_Parent.Context.ScriptAssemblyName}\", \"{classType.CSharpName["global::".Length..]}__Invocable\", \"{function.Name}__Invoke\"));");
                 m_Parent.WriteIndentedLine($"auto self = AsShared();");
@@ -194,11 +194,11 @@ internal class CppClassGenerator
         {
             var constructor = m_Class.Constructors[i];
             var parameters = CollectParameters(constructor.Parameters);
-            var parametersDeclare = ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
+            var parametersDeclare = ParametersGenerator.GenerateCppManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
             string constructorFullName = $"{@namespace.Replace("::", "__")}__{className}__{constructor.Name}__{i}__Injected";
             string callable = $"::Ayla::Object::ScriptNew<{classType.CppName}>";
             var codeGen = new FunctionBodyGenerator(parameters, callable, PlaceholderName.Value);
-            parametersDeclare = AppendCppOutParameter(parametersDeclare, "void*");
+            parametersDeclare = AppendCppOutParameter(parametersDeclare, TypeName.BoundObjectReference.CppBindingName);
 
             m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {constructorFullName}({parametersDeclare}) noexcept");
             m_Parent.WriteIndentedLine("{");
@@ -227,9 +227,9 @@ internal class CppClassGenerator
 
             FunctionBodyGenerator codeGen = new FunctionBodyGenerator(parameters, callable, returnType);
             string parametersDeclare = isStatic
-                ? ParametersGenerator.GenerateCppBindings(parameters)
-                : ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
-            parametersDeclare = AppendCppOutParameter(parametersDeclare, returnType);
+                ? ParametersGenerator.GenerateCppManagedToNativeBindings(parameters)
+                : ParametersGenerator.GenerateCppManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+            parametersDeclare = AppendCppNativeToManagedOutParameter(parametersDeclare, returnType);
 
             m_Parent.WriteIndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {functionFullName}({parametersDeclare}) noexcept");
             m_Parent.WriteIndentedLine("{");
@@ -255,6 +255,16 @@ internal class CppClassGenerator
     private static string AppendCppOutParameter(string parametersDeclare, TypeName returnType)
     {
         return returnType == TypeName.Void ? parametersDeclare : AppendCppOutParameter(parametersDeclare, returnType.CppBindingName);
+    }
+
+    private static string AppendCppNativeToManagedOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCppOutParameter(parametersDeclare, returnType.CppNativeToManagedBindingName);
+    }
+
+    private static string AppendCppManagedToNativeOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCppOutParameter(parametersDeclare, returnType.CppManagedToNativeBindingName);
     }
 
     private static string AppendCppOutParameter(string parametersDeclare, string returnBindingName)

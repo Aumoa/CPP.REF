@@ -45,9 +45,9 @@ internal class HeaderClassGenerator
                 var parameters = CollectParameters(function.Parameters);
                 string functionFullName = $"{@namespace.Replace("::", "__")}__{className}__{function.Name}__{i}__Injected";
                 string paramsDeclare = function.Flags.HasFlag(SFunction.FFlags.Static)
-                    ? ParametersGenerator.GenerateCppBindings(parameters)
-                    : ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
-                paramsDeclare = AppendCppOutParameter(paramsDeclare, returnType);
+                    ? ParametersGenerator.GenerateCppManagedToNativeBindings(parameters)
+                    : ParametersGenerator.GenerateCppManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+                paramsDeclare = AppendCppNativeToManagedOutParameter(paramsDeclare, returnType);
 
                 m_Parent.HeaderText += m_Parent.IndentedLine($"PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus {functionFullName}({paramsDeclare}) noexcept;");
                 friends.Add($"friend ::Ayla::NativeCallStatus (::{functionFullName})({paramsDeclare}) noexcept;");
@@ -289,9 +289,9 @@ internal class HeaderClassGenerator
                 var parameters = CollectParameters(function.Parameters);
                 string functionFullName = $"{@namespace.Replace("::", "__")}__{className}__{function.Name}__{i}__Injected";
                 string paramsDeclare = function.Flags.HasFlag(SFunction.FFlags.Static)
-                    ? ParametersGenerator.GenerateCppBindings(parameters)
-                    : ParametersGenerator.GenerateCppBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
-                paramsDeclare = AppendCppOutParameter(paramsDeclare, returnType);
+                    ? ParametersGenerator.GenerateCppManagedToNativeBindings(parameters)
+                    : ParametersGenerator.GenerateCppManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+                paramsDeclare = AppendCppNativeToManagedOutParameter(paramsDeclare, returnType);
                 
                 m_Parent.HeaderText += m_Parent.IndentedMacroLine($"friend ::Ayla::NativeCallStatus (::{functionFullName})({paramsDeclare}) noexcept;");
             }
@@ -317,6 +317,11 @@ internal class HeaderClassGenerator
     private static string AppendCppOutParameter(string parametersDeclare, TypeName returnType)
     {
         return returnType == TypeName.Void ? parametersDeclare : AppendCppOutParameter(parametersDeclare, returnType.CppBindingName);
+    }
+
+    private static string AppendCppNativeToManagedOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCppOutParameter(parametersDeclare, returnType.CppNativeToManagedBindingName);
     }
 
     private static string AppendCppOutParameter(string parametersDeclare, string returnBindingName)

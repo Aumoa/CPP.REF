@@ -44,6 +44,7 @@ namespace Ayla
 
 	thread_local Object::CreationHack Object::CreationHack::s_Hack;
 	size_t Object::s_LiveObjects;
+	volatile uint64 Object::s_NextGCHandleSerial;
 	CoreCLRFunctions g_CoreCLRFunctions;
 
 	void EnsureCoreCLRFunctionsInitialized()
@@ -127,18 +128,49 @@ namespace Ayla
 		}
 	}
 
-	void* Object::BindGCHandle__Unsafe(ssize_t gcHandlePtr)
+	BoundObjectReferenceWrapper Object::BindGCHandle__Unsafe(ssize_t gcHandlePtr)
 	{
-		m_GCHandle = gcHandlePtr;
-		return this;
+		auto lock = std::unique_lock{ m_Spinlock };
+		SetGCHandle__Unsafe(gcHandlePtr);
+		return AsBoundWrapper__Unsafe();
 	}
 
-	ObjectReferenceWrapper Object::AsWrapper()
+	NativeObjectReferenceWrapper Object::AsNativeObjectReferenceWrapper()
 	{
-		return ObjectReferenceWrapper
+		auto lock = std::unique_lock{ m_Spinlock };
+		return AsNativeObjectReferenceWrapper__Unsafe();
+	}
+
+	uint64 Object::SetGCHandle__Unsafe(ssize_t gcHandlePtr)
+	{
+		if (m_GCHandle == gcHandlePtr && (gcHandlePtr == 0 || m_GCHandleSerial != 0))
+		{
+			return m_GCHandleSerial;
+		}
+
+		m_GCHandle = gcHandlePtr;
+		m_GCHandleSerial = gcHandlePtr != 0
+			? PlatformAtomics::InterlockedIncrement(&s_NextGCHandleSerial)
+			: 0;
+		return m_GCHandleSerial;
+	}
+
+	NativeObjectReferenceWrapper Object::AsNativeObjectReferenceWrapper__Unsafe()
+	{
+		return NativeObjectReferenceWrapper
 		{
 			.Ptr = reinterpret_cast<ssize_t>(this),
-			.IntGCHandlePtr = 0
+			.IntGCHandlePtr = 0,
+			.GCHandleSerial = m_GCHandleSerial
+		};
+	}
+
+	BoundObjectReferenceWrapper Object::AsBoundWrapper__Unsafe()
+	{
+		return BoundObjectReferenceWrapper
+		{
+			.Ptr = reinterpret_cast<ssize_t>(this),
+			.GCHandleSerial = m_GCHandleSerial
 		};
 	}
 
@@ -169,23 +201,62 @@ extern "C"
 		});
 	}
 
-	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr) noexcept
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr, ::Ayla::uint64* gcHandleSerial) noexcept
 	{
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			auto self_ = (::Ayla::Object*)self;
-			self_->m_GCHandle = handle;
+			auto lock = std::unique_lock{ self_->m_Spinlock, std::adopt_lock };
+			auto serial = self_->SetGCHandle__Unsafe(handle);
+			if (gcHandleSerial != nullptr)
+			{
+				*gcHandleSerial = serial;
+			}
+
 			if (releaseIntPtr)
 			{
 				--self_->m_Refs;
-				check(self_->m_Refs != 0 || self_->m_GCHandle);
+				check(self_->m_Refs >= 0);
 			}
-			if (self_->m_Refs == 0 && handle == 0)
+			if (releaseIntPtr && self_->m_Refs == 0)
+			{
+				if (handle == 0)
+				{
+					lock.unlock();
+					delete self_;
+					return ::Ayla::NativeCallStatus::Succeeded;
+				}
+
+				::Ayla::ManagedCallBoundary::ThrowIfFailed(::Ayla::g_CoreCLRFunctions.m_AsWeakHandle__Invoke(&self_->m_GCHandle));
+			}
+			lock.unlock();
+			return ::Ayla::NativeCallStatus::Succeeded;
+		});
+	}
+
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__ClearGCHandle__Injected(void* self, ::Ayla::uint64 gcHandleSerial, ::Ayla::ssize_t* handle) noexcept
+	{
+		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
+		{
+			auto self_ = (::Ayla::Object*)self;
+			self_->m_Spinlock.lock();
+			if (gcHandleSerial == 0 || self_->m_GCHandleSerial != gcHandleSerial)
+			{
+				*handle = 0;
+				self_->m_Spinlock.unlock();
+				return ::Ayla::NativeCallStatus::Succeeded;
+			}
+
+			auto gcHandle = self_->m_GCHandle;
+			self_->SetGCHandle__Unsafe(0);
+			*handle = gcHandle;
+			if (self_->m_Refs == 0)
 			{
 				self_->m_Spinlock.unlock();
 				delete self_;
 				return ::Ayla::NativeCallStatus::Succeeded;
 			}
+
 			self_->m_Spinlock.unlock();
 			return ::Ayla::NativeCallStatus::Succeeded;
 		});
@@ -196,15 +267,6 @@ extern "C"
 		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
 		{
 			*result = ::Ayla::Object::GetManagedType();
-			return ::Ayla::NativeCallStatus::Succeeded;
-		});
-	}
-
-	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__AsWrapper__Injected(::Ayla::Object* self, ::Ayla::ObjectReferenceWrapper* result) noexcept
-	{
-		return ::Ayla::NativeCallBoundary::Invoke([&]() -> ::Ayla::NativeCallStatus
-		{
-			*result = self->AsWrapper();
 			return ::Ayla::NativeCallStatus::Succeeded;
 		});
 	}

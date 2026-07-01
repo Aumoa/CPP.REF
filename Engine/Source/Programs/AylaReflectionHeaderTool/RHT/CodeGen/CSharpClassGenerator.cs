@@ -96,7 +96,7 @@ internal class CSharpClassGenerator
     {
         var constructor = m_Class.Constructors[index];
         var parameters = CollectParameters(constructor.Parameters);
-        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), "nint");
+        var injectParamsDeclare = AppendCSharpOutParameter(ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr")), TypeName.BoundObjectReference.CSharpBindingName);
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{constructor.Name}__{index}__Injected";
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
@@ -112,9 +112,9 @@ internal class CSharpClassGenerator
 
         string nativeFunctionName = $"{string.Join("__", @class.Namespace.Names)}__{@class.Name}__{function.Name}__{index}__Injected";
         string injectParamsDeclare = isStatic
-            ? ParametersGenerator.GenerateCSharpBindings(parameters)
-            : ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
-        injectParamsDeclare = AppendCSharpOutParameter(injectParamsDeclare, returnType);
+            ? ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters)
+            : ParametersGenerator.GenerateCSharpManagedToNativeBindings(parameters.AddFirstTemp(TypeName.IntPtr, "self"));
+        injectParamsDeclare = AppendCSharpNativeToManagedOutParameter(injectParamsDeclare, returnType);
 
         m_SourceCode += m_Parent.IndentedLine($"[{kDllImport}(\"{m_Parent.ModuleName}\", EntryPoint = \"{nativeFunctionName}\")]");
         m_SourceCode += m_Parent.IndentedLine($"public static extern global::Ayla.NativeCallStatus {function.Name}({injectParamsDeclare});");
@@ -143,7 +143,7 @@ internal class CSharpClassGenerator
     private void GenerateInvocableMembers(ClassName @class, string injectFullName, string classFullName)
     {
         // Base constructor
-        m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable(global::System.Func<object, nint> locker) : base(locker)");
+        m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable(global::System.Func<object, global::Ayla.BoundObjectReferenceWrapper> locker) : base(locker)");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_SourceCode += m_Parent.IndentedLine("}");
         m_SourceCode += m_Parent.IndentedLine("");
@@ -175,7 +175,7 @@ internal class CSharpClassGenerator
         // Constructors
         for (int i = 0; i < m_Class.Constructors.Count; ++i)
         {
-            GenerateInvocableConstructor(i, @class, injectFullName);
+            GenerateInvocableConstructor(i, injectFullName);
         }
 
         m_SourceCode += m_Parent.IndentedLine("");
@@ -184,13 +184,11 @@ internal class CSharpClassGenerator
         GenerateFunctionBodies(true);
     }
 
-    private void GenerateInvocableConstructor(int index, ClassName @class, string injectFullName)
+    private void GenerateInvocableConstructor(int index, string injectFullName)
     {
         var constructor = m_Class.Constructors[index];
-        var returnType = (SharedPtrTypeName)Activator.CreateInstance(typeof(SharedPtrTypeName), @class)!;
         var parameters = CollectParameters(constructor.Parameters);
         var csharpParamsDeclare = ParametersGenerator.GenerateCSharp(parameters);
-        var callArguments = FunctionBodyGenerator.GeneratePassArguments(parameters.AddFirstTemp(TypeName.IntPtr, "__gchandle_ptr"));
 
         m_SourceCode += m_Parent.IndentedLine($"protected {m_Class.Class.Name}__Invocable({csharpParamsDeclare}) : this(@this =>");
         m_SourceCode += m_Parent.IndentedLine("{");
@@ -203,7 +201,7 @@ internal class CSharpClassGenerator
             var codegen = new FunctionBodyGenerator(
                 parameters.AddFirstTemp(PlaceholderName.Value, "(nint)__gchandle"),
                 $"{injectFullName}.ctor_{constructor.Name}",
-                TypeName.IntPtr
+                TypeName.BoundObjectReference
             );
             codegen.GenerateCSharpCSharpToNative(ref m_SourceCode, ref m_Parent.IndentRef, m_Parent.IndentedLine);
             m_Parent.Dedent();
@@ -244,7 +242,7 @@ internal class CSharpClassGenerator
         m_SourceCode += "#pragma warning disable CS8618\n";
 
         // Protected constructor
-        m_SourceCode += m_Parent.IndentedLine($"protected {@class.Name}(global::System.Func<object, nint> locker) : base(locker)");
+        m_SourceCode += m_Parent.IndentedLine($"protected {@class.Name}(global::System.Func<object, global::Ayla.BoundObjectReferenceWrapper> locker) : base(locker)");
         m_SourceCode += m_Parent.IndentedLine("{");
         m_Parent.Indented(() =>
         {
@@ -252,7 +250,7 @@ internal class CSharpClassGenerator
         });
         m_SourceCode += m_Parent.IndentedLine("}");
         m_SourceCode += "#pragma warning restore CS8618\n";
-        m_SourceCode += m_Parent.IndentedLine($"partial void OnConstructed(global::System.Func<object, nint> locker);");
+        m_SourceCode += m_Parent.IndentedLine($"partial void OnConstructed(global::System.Func<object, global::Ayla.BoundObjectReferenceWrapper> locker);");
         m_SourceCode += m_Parent.IndentedLine("");
 
         // Public constructors
@@ -353,8 +351,8 @@ internal class CSharpClassGenerator
 
     private void GenerateVirtualInvokeMethod(SFunction function, TypeName returnType, ParameterCollection parameters)
     {
-        var invokeParamsDeclare = ParametersGenerator.GenerateCSharpBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
-        invokeParamsDeclare = AppendCSharpOutParameter(invokeParamsDeclare, returnType);
+        var invokeParamsDeclare = ParametersGenerator.GenerateCSharpNativeToManagedBindings(parameters.AddFirstTemp(TypeName.Object, "self_"));
+        invokeParamsDeclare = AppendCSharpManagedToNativeOutParameter(invokeParamsDeclare, returnType);
 
         m_SourceCode += m_Parent.IndentedLine($"private static unsafe global::Ayla.NativeCallStatus {function.Name}__Invoke({invokeParamsDeclare})");
         m_SourceCode += m_Parent.IndentedLine("{");
@@ -400,6 +398,16 @@ internal class CSharpClassGenerator
     private static string AppendCSharpOutParameter(string parametersDeclare, TypeName returnType)
     {
         return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpBindingName);
+    }
+
+    private static string AppendCSharpNativeToManagedOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpNativeToManagedBindingName);
+    }
+
+    private static string AppendCSharpManagedToNativeOutParameter(string parametersDeclare, TypeName returnType)
+    {
+        return returnType == TypeName.Void ? parametersDeclare : AppendCSharpOutParameter(parametersDeclare, returnType.CSharpManagedToNativeBindingName);
     }
 
     private static string AppendCSharpOutParameter(string parametersDeclare, string returnBindingName)

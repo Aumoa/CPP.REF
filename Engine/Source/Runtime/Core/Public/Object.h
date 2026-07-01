@@ -11,7 +11,7 @@
 #include "Platform/PlatformMacros.h"
 #include "Reflection/PropertyCollector.h"
 #include "Reflection/ReflectionMacros.h"
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Marshal/ManagedTypeWrapper.h"
 #include "Marshal/NativeExceptionInterop.h"
 #include "Threading/Spinlock.h"
@@ -23,7 +23,8 @@
 extern "C"
 {
 	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__BeginWriteGCHandle__Injected(void* self, ::Ayla::ssize_t* handle) noexcept;
-	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr) noexcept;
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__EndWriteGCHandle__Injected(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr, ::Ayla::uint64* gcHandleSerial) noexcept;
+	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__ClearGCHandle__Injected(void* self, ::Ayla::uint64 gcHandleSerial, ::Ayla::ssize_t* handle) noexcept;
 	PLATFORM_SHARED_EXPORT ::Ayla::NativeCallStatus Ayla__Object__GetManagedType__Injected(::Ayla::ManagedTypeWrapper* result) noexcept;
 }
 
@@ -40,7 +41,8 @@ namespace Ayla
 		friend Type;
 		friend RuntimeType;
 		friend ::Ayla::NativeCallStatus (::Ayla__Object__BeginWriteGCHandle__Injected)(void* self, ::Ayla::ssize_t* handle) noexcept;
-		friend ::Ayla::NativeCallStatus (::Ayla__Object__EndWriteGCHandle__Injected)(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr) noexcept;
+		friend ::Ayla::NativeCallStatus (::Ayla__Object__EndWriteGCHandle__Injected)(void* self, ::Ayla::ssize_t handle, bool releaseIntPtr, ::Ayla::uint64* gcHandleSerial) noexcept;
+		friend ::Ayla::NativeCallStatus (::Ayla__Object__ClearGCHandle__Injected)(void* self, ::Ayla::uint64 gcHandleSerial, ::Ayla::ssize_t* handle) noexcept;
 		friend ::Ayla::NativeCallStatus (::Ayla__Object__GetManagedType__Injected)(::Ayla::ManagedTypeWrapper* result) noexcept;
 
 	public:
@@ -63,12 +65,14 @@ namespace Ayla
 
 	private:
 		static size_t s_LiveObjects;
+		static volatile uint64 s_NextGCHandleSerial;
 
 		Spinlock m_Spinlock;
 		Type* m_Type;
 		CreationFlags m_Flags;
 		int32 m_Refs = 0;
 		ssize_t m_GCHandle = 0;
+		uint64 m_GCHandleSerial = 0;
 
 	protected:
 		static void GatherProperties(PropertyCollector& collection)
@@ -87,8 +91,8 @@ namespace Ayla
 
 		void AddRef();
 		void ReleaseRef();
-		void* BindGCHandle__Unsafe(ssize_t gcHandlePtr);
-		ObjectReferenceWrapper AsWrapper();
+		BoundObjectReferenceWrapper BindGCHandle__Unsafe(ssize_t gcHandlePtr);
+		NativeObjectReferenceWrapper AsNativeObjectReferenceWrapper();
 
 		template<std::derived_from<Object> T = Object>
 		auto AsShared()
@@ -154,6 +158,9 @@ namespace Ayla
 
 	private:
 		static void ConfigureNew(const std::type_info& typeInfo, CreationFlags flags, std::function<void()> action);
+		uint64 SetGCHandle__Unsafe(ssize_t gcHandlePtr);
+		NativeObjectReferenceWrapper AsNativeObjectReferenceWrapper__Unsafe();
+		BoundObjectReferenceWrapper AsBoundWrapper__Unsafe();
 	};
 
 	template<class T>

@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Ayla;
@@ -37,7 +37,7 @@ public readonly struct ManagedArrayWrapper : IDisposable
 
     public unsafe T[] AsObjectArray<T>() where T : Object
     {
-        var input = (ObjectReferenceWrapper*)Data;
+        var input = (NativeObjectReferenceWrapper*)Data;
         T[] output = new T[Length];
         for (int i = 0; i < Length; ++i)
         {
@@ -76,10 +76,10 @@ public readonly struct ManagedArrayWrapper : IDisposable
 
     public static unsafe ManagedArrayWrapper FromObjectArray<T>(T[] array) where T : Object
     {
-        var output = (ObjectReferenceWrapper*)Marshal.AllocHGlobal(sizeof(ObjectReferenceWrapper) * array.Length);
+        var output = (ManagedObjectReferenceWrapper*)Marshal.AllocHGlobal(sizeof(ManagedObjectReferenceWrapper) * array.Length);
         for (int i = 0; i < array.Length; ++i)
         {
-            output[i] = array[i]?.AsWrapper() ?? default;
+            output[i] = array[i]?.AsManagedObjectReferenceWrapper() ?? default;
         }
 
         return new ManagedArrayWrapper((nint)output, array.Length);

@@ -4,7 +4,7 @@
 #include "Tests/LifetimeTestObject.h"
 #include "Activator.h"
 #include "ManagedException.h"
-#include "Marshal/ObjectReferenceWrapper.h"
+#include "Marshal/ObjectReferenceWrappers.h"
 #include "Reflection/TypeCollector.h"
 #include "ScriptingBackend/ScriptingBackend.h"
 #include "Type.h"
@@ -146,7 +146,7 @@ namespace Ayla
 				{
 					[](std::stop_token)
 					{
-						using hold_t = ssize_t(*)(ObjectReferenceWrapper);
+						using hold_t = ssize_t(*)(NativeObjectReferenceWrapper);
 						using dispose_t = void(*)();
 
 						auto hold = GetManagedLifetimeFunction<hold_t>("Hold");
@@ -155,7 +155,7 @@ namespace Ayla
 						LifetimeTestObject::ResetCounters();
 						auto object = Object::New<LifetimeTestObject>();
 						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
-						auto wrapper = ObjectReferenceWrapper::FromObject(object);
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
 
 						Assert::Equal(nativePointer, hold(wrapper));
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
@@ -177,7 +177,7 @@ namespace Ayla
 				{
 					[](std::stop_token)
 					{
-						using create_unheld_t = ssize_t(*)(ObjectReferenceWrapper);
+						using create_unheld_t = ssize_t(*)(NativeObjectReferenceWrapper);
 						using collect_t = void(*)();
 
 						auto createUnheld = GetManagedLifetimeFunction<create_unheld_t>("CreateUnheld");
@@ -186,7 +186,7 @@ namespace Ayla
 						LifetimeTestObject::ResetCounters();
 						auto object = Object::New<LifetimeTestObject>();
 						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
-						auto wrapper = ObjectReferenceWrapper::FromObject(object);
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
 
 						Assert::Equal(nativePointer, createUnheld(wrapper));
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
@@ -195,6 +195,167 @@ namespace Ayla
 						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
 
 						forceFullCollection();
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed finalizer releases native-returned object without native owner"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using create_unheld_t = ssize_t(*)(NativeObjectReferenceWrapper);
+
+						auto createUnheld = GetManagedLifetimeFunction<create_unheld_t>("CreateUnheld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						Assert::Equal(nativePointer, createUnheld(wrapper));
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed construction failure clears bound native handle"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using fail_construction_t = ssize_t(*)(NativeObjectReferenceWrapper);
+
+						auto failConstructionAfterBinding = GetManagedLifetimeFunction<fail_construction_t>("FailConstructionAfterBinding");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						Assert::Equal(nativePointer, failConstructionAfterBinding(wrapper));
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed wrapper replaces stale weak handle"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using replace_t = ssize_t(*)(NativeObjectReferenceWrapper);
+						using dispose_t = void(*)();
+
+						auto replaceStaleWeakHandle = GetManagedLifetimeFunction<replace_t>("ReplaceStaleWeakHandle");
+						auto disposeHeld = GetManagedLifetimeFunction<dispose_t>("DisposeHeld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+						auto wrapper = NativeObjectReferenceWrapper::FromObject(object);
+
+						Assert::Equal(nativePointer, replaceStaleWeakHandle(wrapper));
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						disposeHeld();
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Managed wrapper replacement waits for pending finalizer"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using create_pending_t = ssize_t(*)(NativeObjectReferenceWrapper);
+						using hold_after_pending_t = ssize_t(*)(NativeObjectReferenceWrapper);
+						using dispose_t = void(*)();
+
+						auto createPendingFinalizer = GetManagedLifetimeFunction<create_pending_t>("CreatePendingFinalizer");
+						auto holdAfterPendingFinalizer = GetManagedLifetimeFunction<hold_after_pending_t>("HoldAfterPendingFinalizer");
+						auto disposeHeld = GetManagedLifetimeFunction<dispose_t>("DisposeHeld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto nativePointer = reinterpret_cast<ssize_t>(object.Get());
+
+						auto firstWrapper = NativeObjectReferenceWrapper::FromObject(object);
+						Assert::Equal(nativePointer, createPendingFinalizer(firstWrapper));
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						auto secondWrapper = NativeObjectReferenceWrapper::FromObject(object);
+						Assert::Equal(nativePointer, holdAfterPendingFinalizer(secondWrapper));
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						disposeHeld();
+						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
+
+						return Task<>::CompletedTask();
+					}
+				}
+			},
+			TestCase
+			{
+				.Name = TEXT("Native wrapper consumption clears intermediate handle"),
+				.TestFuncs =
+				{
+					[](std::stop_token)
+					{
+						using create_wrapper_t = void(*)(NativeObjectReferenceWrapper, ManagedObjectReferenceWrapper*);
+						using dispose_t = void(*)();
+
+						auto createWrapper = GetManagedLifetimeFunction<create_wrapper_t>("CreateHeldWrapperForNativeConsumption");
+						auto disposeHeld = GetManagedLifetimeFunction<dispose_t>("DisposeHeld");
+
+						LifetimeTestObject::ResetCounters();
+						auto object = Object::New<LifetimeTestObject>();
+						auto sourceWrapper = NativeObjectReferenceWrapper::FromObject(object);
+
+						ManagedObjectReferenceWrapper nativeWrapper{};
+						createWrapper(sourceWrapper, &nativeWrapper);
+						Assert::True(nativeWrapper.IntGCHandlePtr != 0);
+
+						{
+							auto firstNative = nativeWrapper.AsNative<LifetimeTestObject>();
+							Assert::NotNull(firstNative.Get());
+							Assert::Equal((ssize_t)0, nativeWrapper.IntGCHandlePtr);
+
+							auto secondNative = nativeWrapper.AsNative<LifetimeTestObject>();
+							Assert::NotNull(secondNative.Get());
+							Assert::True(firstNative.Get() == secondNative.Get());
+						}
+
+						object.Release();
+						Assert::Equal(0, LifetimeTestObject::GetDestroyedCount());
+
+						disposeHeld();
 						Assert::Equal(1, LifetimeTestObject::GetDestroyedCount());
 
 						return Task<>::CompletedTask();
