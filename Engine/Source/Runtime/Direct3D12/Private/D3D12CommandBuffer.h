@@ -23,9 +23,6 @@ namespace Ayla
 		std::array<ComPtr<ID3D12GraphicsCommandList4>, Graphics::kMaxFramesInFlight> m_CommandBuffers;
 		uint64 m_FenceValue;
 
-		ComPtr<ID3D12Resource> m_VertexBuffer;
-		ComPtr<ID3D12Resource> m_IndexBuffer;
-
 	public:
 		D3D12CommandBuffer(D3D12Graphics* graphics);
 		virtual ~D3D12CommandBuffer() noexcept override;
@@ -37,7 +34,7 @@ namespace Ayla
 		virtual void BeginRenderPass(RenderTexture* renderTexture) override;
 		virtual void EndRenderPass(RenderTexture* renderTexture) override;
 		virtual void SetRenderPipeline(RenderPipeline* renderPipeline) override;
-		virtual void Draw() override;
+		virtual void Draw(Buffer* vertexBuffer, Buffer* indexBuffer) override;
 		virtual void DispatchRays(RenderTexture* renderTexture) override;
 		virtual void WaitForCompletion(const TimeSpan& timeout) override;
 

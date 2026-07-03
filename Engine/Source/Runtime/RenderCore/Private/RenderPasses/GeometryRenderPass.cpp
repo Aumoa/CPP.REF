@@ -7,9 +7,11 @@
 
 namespace Ayla
 {
-	GeometryRenderPass::GeometryRenderPass(GraphicsRenderPipeline* renderPipeline, RenderTexture* renderTexture)
+	GeometryRenderPass::GeometryRenderPass(GraphicsRenderPipeline* renderPipeline, RenderTexture* renderTexture, Buffer* vertexBuffer, Buffer* indexBuffer)
 		: m_RenderPipeline(renderPipeline)
 		, m_RenderTexture(renderTexture)
+		, m_VertexBuffer(vertexBuffer)
+		, m_IndexBuffer(indexBuffer)
 	{
 	}
 
@@ -26,7 +28,7 @@ namespace Ayla
 		commandBuffer->BeginRenderPass(m_RenderTexture);
 		commandBuffer->SetRenderPipeline(m_RenderPipeline);
 		m_RenderPipeline->SetCameraBufferView(commandBuffer, sceneView.CameraBuffer, sceneView.CameraBufferOffset);
-		commandBuffer->Draw();
+		commandBuffer->Draw(m_VertexBuffer, m_IndexBuffer);
 		commandBuffer->EndRenderPass(m_RenderTexture);
 	}
 }

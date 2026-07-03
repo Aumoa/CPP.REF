@@ -131,6 +131,13 @@ Backend pipeline implementations derive from `GraphicsRenderPipeline` or
 render passes declare the pipeline capability they require. Command recording is
 still shared through `CommandBuffer` and can be split in a later pass.
 
+Raster draw geometry is no longer owned by backend command buffers.
+`CommandBuffer::Draw` now accepts caller-owned vertex and index buffers, and
+the D3D12 and Vulkan command buffer implementations bind those backend buffer
+objects instead of constructing sample triangle resources internally. The
+existing geometry render pass now declares the buffer inputs it needs, keeping
+sample or scene geometry ownership outside the command recording object.
+
 ## Recommended Direction
 
 ### Introduce a presentable target abstraction
@@ -219,7 +226,7 @@ materials, textures, and per-pass outputs are no longer hardcoded.
    graphics or raytracing use is known.
 5. Done: split graphics and raytracing pipeline abstractions before adding more
    render features.
-6. Next: move sample triangle geometry out of command buffer implementations.
+6. Done: move sample triangle geometry out of command buffer implementations.
 
 ## Design Guardrails
 
