@@ -25,6 +25,7 @@
 #include "Rendering/PositionColorVertexFactory.h"
 #include "Rendering/CameraBuffer.h"
 #include "RenderPasses/GeometryRenderPass.h"
+#include "RenderPasses/RaytracingRenderPass.h"
 #include "Misc/DefaultVectors.h"
 #include "Ticking/TickTiming.h"
 #include "IO/File.h"
@@ -212,7 +213,7 @@ namespace Ayla
 			graphics = m_Graphics,
 			commandBuffer = m_CommandBuffer,
 			self = m_RenderThread.Get(),
-			renderPipeline = m_DefaultGeometryRenderPipeline.Get(),
+			renderPipeline = m_DefaultRaytracingRenderPipeline.Get(),
 			views = &m_Scratch.AllCameraViews,
 			cameraBuffer = m_Scratch.CameraBuffers,
 			cameraBufferPtr
@@ -238,8 +239,8 @@ namespace Ayla
 
 			SceneRenderer renderer;
 
-			GeometryRenderPass geometryPass(renderPipeline, rt.Get());
-			renderer.AddPass(&geometryPass);
+			RaytracingRenderPass raytracingPass(renderPipeline, rt.Get());
+			renderer.AddPass(&raytracingPass);
 
 			size_t viewIndex = 0;
 			for (auto& view : *views)
