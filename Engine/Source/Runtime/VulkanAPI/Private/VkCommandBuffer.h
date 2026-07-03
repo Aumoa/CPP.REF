@@ -10,6 +10,7 @@
 namespace Ayla
 {
 	class VkGraphics;
+	class VkRaytracingRenderPipeline;
 
 	ACLASS()
 	class VkCommandBuffer : public CommandBuffer
@@ -24,6 +25,7 @@ namespace Ayla
 		std::vector<VkSemaphore> m_WaitSemaphores;
 		bool m_HasBegun{ false };
 		std::vector<VkFence> m_Fences;
+		VkRaytracingRenderPipeline* m_CurrentRaytracingRenderPipeline = nullptr;
 
 		::VkBuffer m_VertexBuffer = VK_NULL_HANDLE;
 		VkDeviceMemory m_VertexMemory = VK_NULL_HANDLE;

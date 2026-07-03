@@ -210,10 +210,12 @@ namespace Ayla
 		if (auto* pso = dynamic_cast<VkRaytracingRenderPipeline*>(renderPipeline))
 		{
 			vkCmdBindPipeline(GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pso->GetPipeline());
+			m_CurrentRaytracingRenderPipeline = pso;
 		}
 		else if (auto* ps = dynamic_cast<VkGeometryRenderPipeline*>(renderPipeline))
 		{
 			vkCmdBindPipeline(GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, ps->GetPipeline());
+			m_CurrentRaytracingRenderPipeline = nullptr;
 		}
 		else
 		{
@@ -231,7 +233,22 @@ namespace Ayla
 
 	void VkCommandBuffer::DispatchRays(RenderTexture* renderTexture)
 	{
-		throw InvalidOperationException(TEXT("Vulkan ray dispatch is not implemented yet."));
+		if (m_CurrentRaytracingRenderPipeline == nullptr)
+		{
+			throw InvalidOperationException(TEXT("A Vulkan raytracing pipeline must be bound before dispatching rays."));
+		}
+
+		auto size = renderTexture->GetSize();
+		m_Graphics->GetCmdTraceRaysKHRFunction()(
+			GetVkCommandBuffer(),
+			&m_CurrentRaytracingRenderPipeline->GetRayGenerationShaderBindingTable(),
+			&m_CurrentRaytracingRenderPipeline->GetMissShaderBindingTable(),
+			&m_CurrentRaytracingRenderPipeline->GetHitShaderBindingTable(),
+			&m_CurrentRaytracingRenderPipeline->GetCallableShaderBindingTable(),
+			static_cast<uint32_t>(size.X),
+			static_cast<uint32_t>(size.Y),
+			1
+		);
 	}
 
 	void VkCommandBuffer::WaitForCompletion(const TimeSpan& timeout)
