@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "MoveOnlyFunction.h"
 #include "RenderThread.gen.h"
+#include <exception>
 
 namespace Ayla
 {
@@ -29,6 +30,7 @@ namespace Ayla
 		std::queue<function_t<void()>> m_Jobs;
 		std::queue<function_t<void()>> m_CompletionActions;
 		std::queue<function_t<void()>> m_AfterCompletedActions;
+		std::exception_ptr m_Exception;
 		std::atomic<bool> m_StopRequested = false;
 
 	public:

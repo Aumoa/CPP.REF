@@ -21,13 +21,28 @@ namespace Ayla
 	void RenderThread::Add(function_t<void()> job)
 	{
 		auto lock = std::unique_lock{ m_Mtx };
+		if (m_Exception)
+		{
+			std::rethrow_exception(m_Exception);
+		}
+
 		m_Jobs.emplace(std::move(job));
 	}
 
 	void RenderThread::Dispatch(function_t<void()> completionAction)
 	{
 		auto lock = std::unique_lock{ m_Mtx };
-		m_Notify.wait(lock, [&]() { return m_CompletionActions.size() < 2; });
+		if (m_Exception)
+		{
+			std::rethrow_exception(m_Exception);
+		}
+
+		m_Notify.wait(lock, [&]() { return m_CompletionActions.size() < 2 || m_Exception || m_StopRequested; });
+		if (m_Exception)
+		{
+			std::rethrow_exception(m_Exception);
+		}
+
 		m_CompletionActions.emplace(std::move(completionAction));
 		m_Request.notify_one();
 	}
@@ -35,6 +50,11 @@ namespace Ayla
 	void RenderThread::AddAfterCompleted(function_t<void()> completionAction)
 	{
 		auto lock = std::unique_lock{ m_Mtx };
+		if (m_Exception)
+		{
+			std::rethrow_exception(m_Exception);
+		}
+
 		m_AfterCompletedActions.emplace(std::move(completionAction));
 	}
 
@@ -79,40 +99,52 @@ namespace Ayla
 	{
 		Thread::GetCurrentThread().SetDescription(TEXT("Render Thread #0"));
 
-		while (m_StopRequested == false)
+		try
+		{
+			while (m_StopRequested == false)
+			{
+				auto lock = std::unique_lock{ m_Mtx };
+				m_Request.wait(lock, [&]() { return !m_CompletionActions.empty() || m_StopRequested; });
+				if (m_StopRequested)
+				{
+					break;
+				}
+
+				auto completionAction = std::move(m_CompletionActions.front());
+				m_CompletionActions.pop();
+
+				lock.unlock();
+
+				completionAction();
+
+				lock.lock();
+				static std::queue<function_t<void()>> afterCompletedActions;
+				while (m_AfterCompletedActions.empty() == false)
+				{
+					afterCompletedActions.emplace(std::move(m_AfterCompletedActions.front()));
+					m_AfterCompletedActions.pop();
+				}
+
+				lock.unlock();
+
+				for (size_t i = 0; i < afterCompletedActions.size(); i++)
+				{
+					afterCompletedActions.front()();
+					afterCompletedActions.pop();
+				}
+
+				lock.lock();
+				m_Notify.notify_one();
+			}
+		}
+		catch (...)
 		{
 			auto lock = std::unique_lock{ m_Mtx };
-			m_Request.wait(lock, [&]() { return !m_CompletionActions.empty() || m_StopRequested; });
-			if (m_StopRequested)
-			{
-				break;
-			}
-
-			auto completionAction = std::move(m_CompletionActions.front());
-			m_CompletionActions.pop();
-
+			m_Exception = std::current_exception();
+			m_StopRequested = true;
 			lock.unlock();
-
-			completionAction();
-
-			lock.lock();
-			static std::queue<function_t<void()>> afterCompletedActions;
-			while (m_AfterCompletedActions.empty() == false)
-			{
-				afterCompletedActions.emplace(std::move(m_AfterCompletedActions.front()));
-				m_AfterCompletedActions.pop();
-			}
-
-			lock.unlock();
-
-			for (size_t i = 0; i < afterCompletedActions.size(); i++)
-			{
-				afterCompletedActions.front()();
-				afterCompletedActions.pop();
-			}
-
-			lock.lock();
-			m_Notify.notify_one();
+			m_Notify.notify_all();
+			m_Request.notify_all();
 		}
 	}
 }
