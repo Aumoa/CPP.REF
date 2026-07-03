@@ -9,6 +9,11 @@ namespace Ayla
 {
 	namespace
 	{
+		VkDeviceSize AlignUp(VkDeviceSize value, VkDeviceSize alignment) noexcept
+		{
+			return alignment > 0 ? ((value + alignment - 1) / alignment) * alignment : value;
+		}
+
 		struct TemporaryShaderModule
 		{
 			VkDevice m_Device = VK_NULL_HANDLE;
@@ -132,6 +137,17 @@ namespace Ayla
 				.anyHitShader = anyHitShaderIndex,
 				.intersectionShader = VK_SHADER_UNUSED_KHR,
 			};
+		}
+
+		VkDeviceAddress GetBufferDeviceAddress(VkGraphics* graphics, ::VkBuffer buffer)
+		{
+			VkBufferDeviceAddressInfo addressInfo
+			{
+				.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO,
+				.buffer = buffer,
+			};
+
+			return graphics->GetBufferDeviceAddressFunction()(graphics->GetDevice(), &addressInfo);
 		}
 	}
 
@@ -265,6 +281,7 @@ namespace Ayla
 		};
 
 		VKR(graphics->GetCreateRayTracingPipelinesKHRFunction()(device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline));
+		CreateShaderBindingTable(static_cast<uint32>(shaderGroups.size()));
 	}
 
 	VkRaytracingRenderPipeline::~VkRaytracingRenderPipeline() noexcept
@@ -274,6 +291,14 @@ namespace Ayla
 		if (m_Pipeline != VK_NULL_HANDLE)
 		{
 			vkDestroyPipeline(device, m_Pipeline, nullptr);
+		}
+		if (m_ShaderBindingTableBuffer != VK_NULL_HANDLE)
+		{
+			vkDestroyBuffer(device, m_ShaderBindingTableBuffer, nullptr);
+		}
+		if (m_ShaderBindingTableMemory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(device, m_ShaderBindingTableMemory, nullptr);
 		}
 		if (m_PipelineLayout != VK_NULL_HANDLE)
 		{
@@ -287,5 +312,112 @@ namespace Ayla
 
 	void VkRaytracingRenderPipeline::SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset)
 	{
+	}
+
+	void VkRaytracingRenderPipeline::CreateShaderBindingTable(uint32 shaderGroupCount)
+	{
+		auto device = m_Graphics->GetDevice();
+		const auto& properties = m_Graphics->GetRaytracingPipelineProperties();
+
+		const uint32 shaderGroupHandleSize = properties.shaderGroupHandleSize;
+		const VkDeviceSize shaderGroupHandleAlignment = properties.shaderGroupHandleAlignment;
+		const VkDeviceSize shaderGroupBaseAlignment = properties.shaderGroupBaseAlignment;
+		const VkDeviceSize shaderGroupHandleSizeAligned = AlignUp(shaderGroupHandleSize, shaderGroupHandleAlignment);
+
+		m_RayGenerationShaderBindingTable.stride = AlignUp(shaderGroupHandleSizeAligned, shaderGroupBaseAlignment);
+		m_RayGenerationShaderBindingTable.size = m_RayGenerationShaderBindingTable.stride;
+
+		m_MissShaderBindingTable.stride = shaderGroupHandleSizeAligned;
+		m_MissShaderBindingTable.size = AlignUp(shaderGroupHandleSizeAligned, shaderGroupBaseAlignment);
+
+		if (m_HitGroupIndex != VK_SHADER_UNUSED_KHR)
+		{
+			m_HitShaderBindingTable.stride = shaderGroupHandleSizeAligned;
+			m_HitShaderBindingTable.size = AlignUp(shaderGroupHandleSizeAligned, shaderGroupBaseAlignment);
+		}
+
+		const VkDeviceSize rayGenerationOffset = 0;
+		const VkDeviceSize missOffset = rayGenerationOffset + m_RayGenerationShaderBindingTable.size;
+		const VkDeviceSize hitOffset = missOffset + m_MissShaderBindingTable.size;
+		const VkDeviceSize shaderBindingTableSize = hitOffset + m_HitShaderBindingTable.size;
+
+		std::vector<uint8> shaderGroupHandles(static_cast<size_t>(shaderGroupCount) * shaderGroupHandleSize);
+		VKR(m_Graphics->GetRayTracingShaderGroupHandlesKHRFunction()(
+			device,
+			m_Pipeline,
+			0,
+			shaderGroupCount,
+			shaderGroupHandles.size(),
+			shaderGroupHandles.data()
+		));
+
+		VkBufferCreateInfo bufferInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+			.size = shaderBindingTableSize,
+			.usage = VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		};
+
+		VKR(vkCreateBuffer(device, &bufferInfo, nullptr, &m_ShaderBindingTableBuffer));
+
+		VkMemoryRequirements memoryRequirements;
+		vkGetBufferMemoryRequirements(device, m_ShaderBindingTableBuffer, &memoryRequirements);
+
+		uint32 memoryTypeIndex = m_Graphics->FindMemoryType(
+			memoryRequirements.memoryTypeBits,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+		);
+
+		if (memoryTypeIndex == UINT32_MAX)
+		{
+			throw InvalidOperationException(TEXT("Could not find host visible memory for the Vulkan shader binding table."));
+		}
+
+		VkMemoryAllocateFlagsInfo allocateFlagsInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO,
+			.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT,
+		};
+
+		VkMemoryAllocateInfo allocateInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.pNext = &allocateFlagsInfo,
+			.allocationSize = memoryRequirements.size,
+			.memoryTypeIndex = memoryTypeIndex,
+		};
+
+		VKR(vkAllocateMemory(device, &allocateInfo, nullptr, &m_ShaderBindingTableMemory));
+		VKR(vkBindBufferMemory(device, m_ShaderBindingTableBuffer, m_ShaderBindingTableMemory, 0));
+
+		void* mappedData = nullptr;
+		VKR(vkMapMemory(device, m_ShaderBindingTableMemory, 0, shaderBindingTableSize, 0, &mappedData));
+		std::memset(mappedData, 0, static_cast<size_t>(shaderBindingTableSize));
+
+		auto copyShaderGroupHandle = [&](uint32 shaderGroupIndex, VkDeviceSize destinationOffset)
+		{
+			if (shaderGroupIndex == VK_SHADER_UNUSED_KHR)
+			{
+				return;
+			}
+
+			const uint8* source = shaderGroupHandles.data() + static_cast<size_t>(shaderGroupIndex) * shaderGroupHandleSize;
+			uint8* destination = static_cast<uint8*>(mappedData) + destinationOffset;
+			std::memcpy(destination, source, shaderGroupHandleSize);
+		};
+
+		copyShaderGroupHandle(m_RayGenerationGroupIndex, rayGenerationOffset);
+		copyShaderGroupHandle(m_MissGroupIndex, missOffset);
+		copyShaderGroupHandle(m_HitGroupIndex, hitOffset);
+		vkUnmapMemory(device, m_ShaderBindingTableMemory);
+
+		m_ShaderBindingTableAddress = GetBufferDeviceAddress(m_Graphics, m_ShaderBindingTableBuffer);
+		m_RayGenerationShaderBindingTable.deviceAddress = m_ShaderBindingTableAddress + rayGenerationOffset;
+		m_MissShaderBindingTable.deviceAddress = m_ShaderBindingTableAddress + missOffset;
+		if (m_HitShaderBindingTable.size > 0)
+		{
+			m_HitShaderBindingTable.deviceAddress = m_ShaderBindingTableAddress + hitOffset;
+		}
 	}
 }
