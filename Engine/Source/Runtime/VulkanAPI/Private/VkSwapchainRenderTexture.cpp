@@ -7,6 +7,11 @@
 
 namespace Ayla
 {
+	namespace
+	{
+		constexpr VkPipelineStageFlags kAcquireWaitStage = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+	}
+
 	VkSwapchainRenderTexture::VkSwapchainRenderTexture(VkSwapchainExt* swapchain, VkGraphics* graphics)
 		: m_Swapchain(swapchain)
 		, m_Graphics(graphics)
@@ -118,7 +123,7 @@ namespace Ayla
 
 		m_SwapchainImageFirstRender |= (1 << m_CurrentImageIndex);
 		vkCmd->AddSignalSemaphore(m_RenderCompletedSemaphores[m_CurrentImageIndex]);
-		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()], kAcquireWaitStage);
 		return PresentableFrame(this, this);
 	}
 

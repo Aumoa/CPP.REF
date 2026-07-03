@@ -118,6 +118,13 @@ frame acquisition instead of creating an invalid swapchain, and
 `VK_ERROR_OUT_OF_DATE_KHR` or `VK_SUBOPTIMAL_KHR` from acquire/present requests
 a swapchain recreation on the next frame.
 
+The Vulkan acquire wait stage was reviewed after the presentable target split.
+It remains a conservative all-commands wait because frame acquisition still
+records layout transitions before the command buffer knows whether the first
+use will be a graphics pass or raytracing dispatch. Narrowing this should happen
+when image first-use synchronization moves into typed graphics and raytracing
+paths.
+
 ## Recommended Direction
 
 ### Introduce a presentable target abstraction
@@ -200,10 +207,11 @@ materials, textures, and per-pass outputs are no longer hardcoded.
    invalidation after swapchain recreation.
 3. Done: handle Vulkan resize edge cases explicitly, including zero-size windows,
    `VK_ERROR_OUT_OF_DATE_KHR`, and `VK_SUBOPTIMAL_KHR`.
-4. Next: revisit wait semaphore stage masks for raytracing output. The current
-   Vulkan command submission uses color attachment output as the wait stage,
-   which does not naturally describe raytracing writes.
-5. Split graphics and raytracing pipeline abstractions before adding more
+4. Done: revisit wait semaphore stage masks for raytracing output. The current
+   Vulkan command submission keeps a conservative all-commands acquire wait
+   because acquisition still records layout transitions before the first
+   graphics or raytracing use is known.
+5. Next: split graphics and raytracing pipeline abstractions before adding more
    render features.
 6. Move sample triangle geometry out of command buffer implementations.
 
