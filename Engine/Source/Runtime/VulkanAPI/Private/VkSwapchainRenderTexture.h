@@ -20,7 +20,7 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
-		const VkSwapchainExt* m_Swapchain;
+		VkSwapchainExt* m_Swapchain;
 		VkGraphics* m_Graphics;
 		std::vector<VkImage> m_SwapchainImages;
 		std::vector<VkImageView> m_SwapchainImageViews;

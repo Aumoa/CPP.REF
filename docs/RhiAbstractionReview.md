@@ -113,6 +113,11 @@ presentable target contract. Vulkan resize now invalidates cached swapchain
 images, image views, framebuffers, and first-render state before recreating the
 swapchain, so stale swapchain resources cannot survive a resize.
 
+Vulkan resize edge cases are now explicit. Zero-size surface extents suspend
+frame acquisition instead of creating an invalid swapchain, and
+`VK_ERROR_OUT_OF_DATE_KHR` or `VK_SUBOPTIMAL_KHR` from acquire/present requests
+a swapchain recreation on the next frame.
+
 ## Recommended Direction
 
 ### Introduce a presentable target abstraction
@@ -193,9 +198,9 @@ materials, textures, and per-pass outputs are no longer hardcoded.
    acquire, present, resize invalidation, and current size handling into it.
 2. Done: fix the Vulkan resize bug through that abstraction, including cache
    invalidation after swapchain recreation.
-3. Next: handle Vulkan resize edge cases explicitly, including zero-size windows,
+3. Done: handle Vulkan resize edge cases explicitly, including zero-size windows,
    `VK_ERROR_OUT_OF_DATE_KHR`, and `VK_SUBOPTIMAL_KHR`.
-4. Revisit wait semaphore stage masks for raytracing output. The current
+4. Next: revisit wait semaphore stage masks for raytracing output. The current
    Vulkan command submission uses color attachment output as the wait stage,
    which does not naturally describe raytracing writes.
 5. Split graphics and raytracing pipeline abstractions before adding more

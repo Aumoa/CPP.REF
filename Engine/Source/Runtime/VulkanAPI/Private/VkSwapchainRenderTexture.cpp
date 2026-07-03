@@ -53,6 +53,11 @@ namespace Ayla
 
 	PresentableFrame VkSwapchainRenderTexture::AcquireFrame(CommandBuffer* commandBuffer)
 	{
+		if (m_Swapchain->IsPresentable() == false)
+		{
+			return {};
+		}
+
 		if (m_SwapchainImages.size() == 0)
 		{
 			ReallocateSwapchainImages();
@@ -62,7 +67,18 @@ namespace Ayla
 
 		auto graphics = m_Swapchain->GetOwner();
 		auto imageReadySemaphore = m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()];
-		VKR(vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, imageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex));
+		VkResult acquireResult = vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, imageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex);
+		if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR)
+		{
+			m_CurrentImageIndex = 0xFFFFFFFF;
+			m_Swapchain->RequestRecreate();
+			return {};
+		}
+		VKR(acquireResult, VK_SUBOPTIMAL_KHR);
+		if (acquireResult == VK_SUBOPTIMAL_KHR)
+		{
+			m_Swapchain->RequestRecreate();
+		}
 
 		auto* vkCmd = (VkCommandBuffer*)commandBuffer;
 
@@ -143,6 +159,7 @@ namespace Ayla
 		check(m_CurrentImageIndex != 0xFFFFFFFF);
 		auto semaphore = m_RenderCompletedSemaphores[m_CurrentImageIndex];
 		auto swapchain = m_Swapchain->GetSwapchain();
+		uint32 imageIndex = m_CurrentImageIndex;
 		VkPresentInfoKHR presentInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
@@ -150,11 +167,17 @@ namespace Ayla
 			.pWaitSemaphores = &semaphore,
 			.swapchainCount = 1,
 			.pSwapchains = &swapchain,
-			.pImageIndices = &m_CurrentImageIndex
+			.pImageIndices = &imageIndex
 		};
 
-		VKR(vkQueuePresentKHR(m_Swapchain->GetPresentQueue(), &presentInfo), VK_ERROR_SURFACE_LOST_KHR, VK_ERROR_OUT_OF_DATE_KHR, VK_SUBOPTIMAL_KHR);
+		VkResult presentResult = vkQueuePresentKHR(m_Swapchain->GetPresentQueue(), &presentInfo);
 		m_CurrentImageIndex = 0xFFFFFFFF;
+		if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
+		{
+			m_Swapchain->RequestRecreate();
+			return;
+		}
+		VKR(presentResult, VK_ERROR_SURFACE_LOST_KHR);
 	}
 
 	VkFramebuffer VkSwapchainRenderTexture::GetCurrentFramebuffer() const noexcept

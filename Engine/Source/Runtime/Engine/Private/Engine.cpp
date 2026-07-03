@@ -234,6 +234,13 @@ namespace Ayla
 
 			// Camera: Overlay, Display #0
 			auto presentableFrame = swapchainExtensions[0]->GetPresentableRenderTarget()->AcquireFrame(commandBuffer.Get());
+			if (!presentableFrame)
+			{
+				commandBuffer->EndCommands();
+				graphics->EndRenderFrame();
+				return;
+			}
+
 			auto rt = presentableFrame.GetRenderTexture();
 			auto rtSize = presentableFrame.GetSize();
 			auto defaultAspectRatio = rtSize.X / (float)rtSize.Y;
