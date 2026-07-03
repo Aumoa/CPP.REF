@@ -615,6 +615,17 @@ namespace Ayla
 			throw new InvalidOperationException(TEXT("No suitable queue found for swapchain."));
         }
 
+        constexpr VkImageUsageFlags requiredSwapchainUsage =
+            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+            VK_IMAGE_USAGE_STORAGE_BIT;
+
+        if ((caps.supportedUsageFlags & requiredSwapchainUsage) != requiredSwapchainUsage)
+        {
+            throw InvalidOperationException(TEXT("The Vulkan surface does not support storage image swapchain usage required for raytracing output."));
+        }
+
+        swapchainCreateInfo.imageUsage = requiredSwapchainUsage;
+
         VkSwapchainKHR swapchain;
         VKR(vkCreateSwapchainKHR(m_Device, &swapchainCreateInfo, nullptr, &swapchain));
 

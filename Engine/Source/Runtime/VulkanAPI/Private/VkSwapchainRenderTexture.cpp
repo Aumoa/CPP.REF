@@ -162,6 +162,24 @@ namespace Ayla
 		return VK_NULL_HANDLE;
 	}
 
+	VkImage VkSwapchainRenderTexture::GetCurrentImage() const noexcept
+	{
+		if (m_CurrentImageIndex < m_SwapchainImages.size())
+		{
+			return m_SwapchainImages[m_CurrentImageIndex];
+		}
+		return VK_NULL_HANDLE;
+	}
+
+	VkImageView VkSwapchainRenderTexture::GetCurrentImageView() const noexcept
+	{
+		if (m_CurrentImageIndex < m_SwapchainImageViews.size())
+		{
+			return m_SwapchainImageViews[m_CurrentImageIndex];
+		}
+		return VK_NULL_HANDLE;
+	}
+
 	void VkSwapchainRenderTexture::ReallocateSwapchainImages()
 	{
 		DestroyFramebufferResources();
