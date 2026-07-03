@@ -38,6 +38,7 @@ namespace Ayla
 		virtual void EndRenderPass(RenderTexture* renderTexture) override;
 		virtual void SetRenderPipeline(RenderPipeline* renderPipeline) override;
 		virtual void Draw() override;
+		virtual void DispatchRays(RenderTexture* renderTexture) override;
 		virtual void WaitForCompletion(const TimeSpan& timeout) override;
 
 		ID3D12GraphicsCommandList* GetCommandBuffer() const noexcept;

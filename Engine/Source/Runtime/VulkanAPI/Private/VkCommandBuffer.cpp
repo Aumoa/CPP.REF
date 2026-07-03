@@ -229,6 +229,11 @@ namespace Ayla
 		vkCmdDrawIndexed(GetVkCommandBuffer(), 3, 1, 0, 0, 0);
 	}
 
+	void VkCommandBuffer::DispatchRays(RenderTexture* renderTexture)
+	{
+		throw InvalidOperationException(TEXT("Vulkan ray dispatch is not implemented yet."));
+	}
+
 	void VkCommandBuffer::WaitForCompletion(const TimeSpan& timeout)
 	{
 		if (m_Fences.empty())

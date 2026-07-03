@@ -42,6 +42,7 @@ namespace Ayla
 		virtual void EndRenderPass(RenderTexture* renderTexture) override;
 		virtual void SetRenderPipeline(RenderPipeline* renderPipeline) override;
 		virtual void Draw() override;
+		virtual void DispatchRays(RenderTexture* renderTexture) override;
 		virtual void WaitForCompletion(const TimeSpan& timeout) override;
 
 		void AddSignalSemaphore(VkSemaphore semaphore);
