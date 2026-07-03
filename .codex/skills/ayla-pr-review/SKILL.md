@@ -78,6 +78,16 @@ Ayla PR reviews should protect correctness, build health, and the repository's i
 - Prefer one cohesive implementation for repeated behavior that must evolve together.
 - Avoid demanding abstractions for small incidental duplication when the abstraction would be noisier than the repeated code.
 
+## Rendering And RHI Abstraction
+
+- For rendering changes, first identify whether the concept is an engine-level rendering contract or an API-specific backend detail.
+- Vulkan and DirectX 12 should share RHI or RenderCore abstractions for portable engine concepts that need consistent behavior across backends.
+- Do not force Vulkan and DirectX 12 implementations into one abstraction when the APIs expose genuinely different concepts, ownership models, synchronization rules, descriptor or binding models, memory behavior, or performance constraints.
+- Flag duplicated backend code only when it represents the same engine policy or lifecycle rule and would realistically need to evolve together.
+- Accept backend-specific implementations when they preserve the shared engine contract while expressing API-native behavior clearly.
+- A good RHI abstraction should make common engine behavior portable without hiding important backend semantics or turning API-specific constraints into vague lowest-common-denominator code.
+- When reviewing backend-specific code, check that the boundary is explicit: what is shared by RHI, what is intentionally API-specific, and why.
+
 ## Engine Boundary And Safety
 
 - Prioritize issues that can corrupt object lifetime, cross C++/C# ownership boundaries incorrectly, expose invalid generated metadata, execute unintended build steps, load files from unintended locations, or let one runtime/platform backend make assumptions that another backend does not satisfy.
