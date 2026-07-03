@@ -80,10 +80,12 @@ namespace Ayla
 	void VkCommandBuffer::BeginCommands_Implementation()
 	{
 		auto frameIndex = m_Graphics->GetFrameIndex();
+		auto device = m_Graphics->GetDevice();
 
 		if (m_Fences.size() > 0)
 		{
-			VKR(vkResetFences(m_Graphics->GetDevice(), 1, &m_Fences[frameIndex]));
+			VKR(vkWaitForFences(device, 1, &m_Fences[frameIndex], VK_TRUE, UINT64_MAX));
+			VKR(vkResetFences(device, 1, &m_Fences[frameIndex]));
 		}
 
 		m_SignalSemaphores.clear();
@@ -97,7 +99,7 @@ namespace Ayla
 
 		auto commandBuffer = m_CommandBuffers[frameIndex];
 
-		vkResetCommandBuffer(commandBuffer, 0);
+		VKR(vkResetCommandBuffer(commandBuffer, 0));
 		VKR(vkBeginCommandBuffer(commandBuffer, &beginInfo));
 	}
 

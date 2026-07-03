@@ -138,6 +138,11 @@ objects instead of constructing sample triangle resources internally. The
 existing geometry render pass now declares the buffer inputs it needs, keeping
 sample or scene geometry ownership outside the command recording object.
 
+Vulkan command buffer reuse now waits on the per-frame command buffer fence
+before resetting the fence and beginning command recording for that frame slot.
+This keeps command buffers from being reset or re-recorded while still pending
+on the graphics queue.
+
 ## Recommended Direction
 
 ### Introduce a presentable target abstraction
