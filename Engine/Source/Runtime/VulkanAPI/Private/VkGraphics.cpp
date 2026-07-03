@@ -7,6 +7,7 @@
 #include "VkCommandQueue.h"
 #include "VkShader.h"
 #include "VkGeometryRenderPipeline.h"
+#include "VkRaytracingRenderPipeline.h"
 #include "Linq/Concat.h"
 #include <algorithm>
 #include <ranges>
@@ -629,7 +630,7 @@ namespace Ayla
 
     SharedPtr<RenderPipeline> VkGraphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
     {
-        throw InvalidOperationException(TEXT("Raytracing render pipeline is not yet implemented for Vulkan."));
+        return New<VkRaytracingRenderPipeline>(this, std::move(shader));
     }
 
     SharedPtr<Shader> VkGraphics::CreateShader(ShaderCreationInfo shaderCreationInfo)

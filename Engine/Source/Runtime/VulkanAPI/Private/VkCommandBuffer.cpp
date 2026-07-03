@@ -5,6 +5,7 @@
 #include "VkCommandQueue.h"
 #include "VkSwapchainRenderTexture.h"
 #include "VkGeometryRenderPipeline.h"
+#include "VkRaytracingRenderPipeline.h"
 #include "Misc/PositionColorVertex.h"
 
 namespace Ayla
@@ -206,7 +207,11 @@ namespace Ayla
 
 	void VkCommandBuffer::SetRenderPipeline(RenderPipeline* renderPipeline)
 	{
-		if (auto* ps = dynamic_cast<VkGeometryRenderPipeline*>(renderPipeline))
+		if (auto* pso = dynamic_cast<VkRaytracingRenderPipeline*>(renderPipeline))
+		{
+			vkCmdBindPipeline(GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pso->GetPipeline());
+		}
+		else if (auto* ps = dynamic_cast<VkGeometryRenderPipeline*>(renderPipeline))
 		{
 			vkCmdBindPipeline(GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, ps->GetPipeline());
 		}
