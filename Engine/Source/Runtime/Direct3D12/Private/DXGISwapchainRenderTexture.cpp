@@ -43,9 +43,22 @@ namespace Ayla
 		return Vector2N((int32)bd.Width, (int32)bd.Height);
 	}
 
-	void DXGISwapchainRenderTexture::Acquire(CommandBuffer* cmd)
+	PresentableFrame DXGISwapchainRenderTexture::AcquireFrame(CommandBuffer* commandBuffer)
 	{
+		PLATFORM_UNREFERENCED_PARAMETER(commandBuffer);
 		m_CurrentBackBufferIndex = (uint32)m_Swapchain->GetCurrentBackBufferIndex();
+		return PresentableFrame(this, this);
+	}
+
+	void DXGISwapchainRenderTexture::Present(CommandBuffer* commandBuffer)
+	{
+		PLATFORM_UNREFERENCED_PARAMETER(commandBuffer);
+		HR(m_Swapchain->Present(1, 0));
+	}
+
+	void DXGISwapchainRenderTexture::Invalidate()
+	{
+		ReleaseResources();
 	}
 
 	void DXGISwapchainRenderTexture::ReleaseResources()

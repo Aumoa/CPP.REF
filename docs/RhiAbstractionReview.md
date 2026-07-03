@@ -100,6 +100,19 @@ The small fix is to invalidate the render texture cache when the swapchain is
 recreated. The architectural fix is to make presentable image acquisition,
 resize, invalidation, and presentation explicit in the RHI.
 
+## Implementation Status
+
+The first implementation pass introduced `PresentableRenderTarget` and
+`PresentableFrame` in RenderCore. Swapchain-backed render textures now own
+frame acquisition, presentation, invalidation, and current size reporting
+through that interface, while generic `RenderTexture` no longer exposes
+swapchain acquire semantics.
+
+Direct3D 12 and Vulkan swapchain render textures both implement the new
+presentable target contract. Vulkan resize now invalidates cached swapchain
+images, image views, framebuffers, and first-render state before recreating the
+swapchain, so stale swapchain resources cannot survive a resize.
+
 ## Recommended Direction
 
 ### Introduce a presentable target abstraction
@@ -176,11 +189,11 @@ materials, textures, and per-pass outputs are no longer hardcoded.
 
 ## Suggested Follow-Up Order
 
-1. Add a narrow presentable target abstraction and move swapchain acquire,
-   present, resize invalidation, and current size handling into it.
-2. Fix the Vulkan resize bug through that abstraction, including cache
+1. Done: add a narrow presentable target abstraction and move swapchain
+   acquire, present, resize invalidation, and current size handling into it.
+2. Done: fix the Vulkan resize bug through that abstraction, including cache
    invalidation after swapchain recreation.
-3. Handle Vulkan resize edge cases explicitly, including zero-size windows,
+3. Next: handle Vulkan resize edge cases explicitly, including zero-size windows,
    `VK_ERROR_OUT_OF_DATE_KHR`, and `VK_SUBOPTIMAL_KHR`.
 4. Revisit wait semaphore stage masks for raytracing output. The current
    Vulkan command submission uses color attachment output as the wait stage,

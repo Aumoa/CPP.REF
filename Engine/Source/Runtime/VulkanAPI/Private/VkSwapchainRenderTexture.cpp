@@ -51,7 +51,7 @@ namespace Ayla
 		return m_Swapchain->GetSize();
 	}
 
-	void VkSwapchainRenderTexture::Acquire(CommandBuffer* cmd)
+	PresentableFrame VkSwapchainRenderTexture::AcquireFrame(CommandBuffer* commandBuffer)
 	{
 		if (m_SwapchainImages.size() == 0)
 		{
@@ -64,7 +64,7 @@ namespace Ayla
 		auto imageReadySemaphore = m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()];
 		VKR(vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, imageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex));
 
-		auto* vkCmd = (VkCommandBuffer*)cmd;
+		auto* vkCmd = (VkCommandBuffer*)commandBuffer;
 
 		bool isFirstRender = (m_SwapchainImageFirstRender & (1 << m_CurrentImageIndex)) == 0;
 		if (isFirstRender)
@@ -103,6 +103,7 @@ namespace Ayla
 		m_SwapchainImageFirstRender |= (1 << m_CurrentImageIndex);
 		vkCmd->AddSignalSemaphore(m_RenderCompletedSemaphores[m_CurrentImageIndex]);
 		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+		return PresentableFrame(this, this);
 	}
 
 	void VkSwapchainRenderTexture::Dispose()
@@ -132,10 +133,13 @@ namespace Ayla
 	{
 		DestroyFramebufferResources();
 		m_SwapchainImages.clear();
+		m_CurrentImageIndex = 0xFFFFFFFF;
+		m_SwapchainImageFirstRender = 0;
 	}
 
-	void VkSwapchainRenderTexture::Present(VkQueue queue, VkCommandBuffer* vkCmd)
+	void VkSwapchainRenderTexture::Present(CommandBuffer* commandBuffer)
 	{
+		PLATFORM_UNREFERENCED_PARAMETER(commandBuffer);
 		check(m_CurrentImageIndex != 0xFFFFFFFF);
 		auto semaphore = m_RenderCompletedSemaphores[m_CurrentImageIndex];
 		auto swapchain = m_Swapchain->GetSwapchain();
@@ -149,7 +153,7 @@ namespace Ayla
 			.pImageIndices = &m_CurrentImageIndex
 		};
 
-		VKR(vkQueuePresentKHR(queue, &presentInfo), VK_ERROR_SURFACE_LOST_KHR, VK_ERROR_OUT_OF_DATE_KHR);
+		VKR(vkQueuePresentKHR(m_Swapchain->GetPresentQueue(), &presentInfo), VK_ERROR_SURFACE_LOST_KHR, VK_ERROR_OUT_OF_DATE_KHR, VK_SUBOPTIMAL_KHR);
 		m_CurrentImageIndex = 0xFFFFFFFF;
 	}
 

@@ -33,8 +33,7 @@ namespace Ayla
         VkSwapchainExt(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain, const VkSwapchainCreateInfoKHR& swapchainCreateInfo, VkQueue suitableQueue);
         virtual ~VkSwapchainExt() noexcept override;
 
-        virtual SharedPtr<RenderTexture> GetRenderTexture() override;
-        virtual void Present(CommandBuffer* commandBuffer) override;
+        virtual PresentableRenderTarget* GetPresentableRenderTarget() override;
         virtual void Destroy() override;
         virtual void DoResize() override;
 
@@ -42,6 +41,7 @@ namespace Ayla
 
         VkGraphics* GetOwner() const noexcept { return m_Owner; }
         VkSwapchainKHR GetSwapchain() const noexcept { return m_Swapchain; }
+        VkQueue GetPresentQueue() const noexcept { return m_SuitableQueue; }
         Vector2N GetSize() const;
 
     private:

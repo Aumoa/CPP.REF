@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "VkCommon.h"
+#include "Rendering/PresentableRenderTarget.h"
 #include "Rendering/RenderTexture.h"
 #include "VkSwapchainRenderTexture.gen.h"
 
@@ -14,7 +15,7 @@ namespace Ayla
 	class VkGraphics;
 
 	ACLASS()
-	class VkSwapchainRenderTexture : public RenderTexture
+	class VkSwapchainRenderTexture : public RenderTexture, public PresentableRenderTarget
 	{
 		GENERATED_BODY()
 
@@ -44,11 +45,11 @@ namespace Ayla
 
 		virtual Vector2N GetSize() const override;
 
-		virtual void Acquire(CommandBuffer* cmd) override;
+		virtual PresentableFrame AcquireFrame(CommandBuffer* commandBuffer) override;
+		virtual void Present(CommandBuffer* commandBuffer) override;
+		virtual void Invalidate() override;
 
 		void Dispose();
-		void Invalidate();
-		void Present(VkQueue queue, VkCommandBuffer* vkCmd);
 
 		VkRenderPass GetRenderPass() const noexcept { return m_RenderPass; }
 		VkFramebuffer GetCurrentFramebuffer() const noexcept;

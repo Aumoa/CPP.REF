@@ -17,14 +17,9 @@ namespace Ayla
 	{
 	}
 
-	SharedPtr<RenderTexture> DXGISwapchainExt::GetRenderTexture()
+	PresentableRenderTarget* DXGISwapchainExt::GetPresentableRenderTarget()
 	{
-		return m_SwapchainRenderTexture;
-	}
-
-	void DXGISwapchainExt::Present(CommandBuffer* commandBuffer)
-	{
-		HR(m_Swapchain->Present(1, 0));
+		return m_SwapchainRenderTexture.Get();
 	}
 
 	void DXGISwapchainExt::Destroy()
@@ -49,7 +44,7 @@ namespace Ayla
 		DXGI_SWAP_CHAIN_DESC desc;
 		HR(m_Swapchain->GetDesc(&desc));
 
-		m_SwapchainRenderTexture->ReleaseResources();
+		m_SwapchainRenderTexture->Invalidate();
 		HR(m_Swapchain->ResizeBuffers(0, (UINT)newSize.X, (UINT)newSize.Y, desc.BufferDesc.Format, 0));
 		m_SwapchainRenderTexture->AllocateResources(true);
 	}

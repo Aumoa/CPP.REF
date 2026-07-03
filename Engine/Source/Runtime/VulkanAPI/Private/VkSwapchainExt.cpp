@@ -22,21 +22,15 @@ namespace Ayla
         checkf(m_Surface == nullptr, TEXT("Swapchain does not destroyed."));
     }
 
-    SharedPtr<RenderTexture> VkSwapchainExt::GetRenderTexture()
+    PresentableRenderTarget* VkSwapchainExt::GetPresentableRenderTarget()
     {
-        return m_SwapchainRenderTexture;
-    }
-
-    void VkSwapchainExt::Present(CommandBuffer* commandBuffer)
-    {
-        m_SwapchainRenderTexture->Present(m_SuitableQueue, (VkCommandBuffer*)commandBuffer);
+        return m_SwapchainRenderTexture.Get();
     }
 
     void VkSwapchainExt::Destroy()
     {
-        CleanupSwapchain();
-
         m_SwapchainRenderTexture->Dispose();
+        CleanupSwapchain();
         vkDestroySurfaceKHR(m_Owner->GetInstance(), m_Surface, nullptr);
         m_Surface = nullptr;
     }
@@ -60,6 +54,7 @@ namespace Ayla
             return;
         }
 
+        m_SwapchainRenderTexture->Invalidate();
         CleanupSwapchain();
 
         m_SwapchainCreateInfoCache.imageExtent = newExtent;

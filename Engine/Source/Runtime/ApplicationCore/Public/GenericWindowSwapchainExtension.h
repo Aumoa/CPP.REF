@@ -8,8 +8,7 @@
 
 namespace Ayla
 {
-    class CommandBuffer;
-    class RenderTexture;
+    class PresentableRenderTarget;
 
     ACLASS()
     class APPLICATIONCORE_API GenericWindowSwapchainExtension : public GenericWindowExtension
@@ -22,8 +21,7 @@ namespace Ayla
     public:
         virtual ~GenericWindowSwapchainExtension() noexcept;
 
-        virtual SharedPtr<RenderTexture> GetRenderTexture() = 0;
-        virtual void Present(CommandBuffer* commandBuffer) = 0;
+        virtual PresentableRenderTarget* GetPresentableRenderTarget() = 0;
         virtual void Destroy() = 0;
         virtual void DoResize() = 0;
     };

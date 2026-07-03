@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "D3D12Common.h"
+#include "Rendering/PresentableRenderTarget.h"
 #include "Rendering/RenderTexture.h"
 #include "DXGISwapchainRenderTexture.gen.h"
 
 namespace Ayla
 {
 	ACLASS()
-	class DXGISwapchainRenderTexture : public RenderTexture
+	class DXGISwapchainRenderTexture : public RenderTexture, public PresentableRenderTarget
 	{
 		GENERATED_BODY()
 
@@ -31,7 +32,9 @@ namespace Ayla
 
 		virtual Vector2N GetSize() const override;
 
-		virtual void Acquire(CommandBuffer* cmd) override;
+		virtual PresentableFrame AcquireFrame(CommandBuffer* commandBuffer) override;
+		virtual void Present(CommandBuffer* commandBuffer) override;
+		virtual void Invalidate() override;
 
 		void ReleaseResources();
 		void AllocateResources(bool resize);
