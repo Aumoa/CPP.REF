@@ -20,12 +20,28 @@ namespace Ayla
 		GENERATED_BODY()
 
 	private:
+		struct BufferAllocation
+		{
+			::VkBuffer m_Buffer = VK_NULL_HANDLE;
+			VkDeviceMemory m_Memory = VK_NULL_HANDLE;
+			VkDeviceSize m_Size = 0;
+		};
+
+	private:
 		VkGraphics* m_Graphics;
 		VkDescriptorSetLayout m_DescriptorSetLayout = VK_NULL_HANDLE;
 		VkPipelineLayout m_PipelineLayout = VK_NULL_HANDLE;
 		VkPipeline m_Pipeline = VK_NULL_HANDLE;
 		VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;
 		std::vector<VkDescriptorSet> m_DescriptorSets;
+		BufferAllocation m_TriangleVertexBuffer;
+		BufferAllocation m_TriangleIndexBuffer;
+		BufferAllocation m_BottomLevelAccelerationStructureBuffer;
+		BufferAllocation m_TopLevelAccelerationStructureBuffer;
+		BufferAllocation m_InstanceBuffer;
+		BufferAllocation m_ScratchBuffer;
+		VkAccelerationStructureKHR m_BottomLevelAccelerationStructure = VK_NULL_HANDLE;
+		VkAccelerationStructureKHR m_TopLevelAccelerationStructure = VK_NULL_HANDLE;
 		::VkBuffer m_ShaderBindingTableBuffer = VK_NULL_HANDLE;
 		VkDeviceMemory m_ShaderBindingTableMemory = VK_NULL_HANDLE;
 		VkDeviceAddress m_ShaderBindingTableAddress = 0;
@@ -55,7 +71,13 @@ namespace Ayla
 		void BindOutputTexture(VkCommandBuffer* cmd, VkSwapchainRenderTexture* renderTexture);
 
 	private:
+		void CreateTestTriangleAccelerationStructures();
 		void CreateDescriptorSets();
 		void CreateShaderBindingTable(uint32 shaderGroupCount);
+		void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, BufferAllocation* outBuffer);
+		void DestroyBuffer(BufferAllocation* buffer) noexcept;
+		void UploadBuffer(BufferAllocation* buffer, std::span<const byte> data);
+		VkDeviceAddress GetBufferDeviceAddress(const BufferAllocation& buffer) const;
+		VkDeviceAddress GetAccelerationStructureDeviceAddress(VkAccelerationStructureKHR accelerationStructure) const;
 	};
 }
