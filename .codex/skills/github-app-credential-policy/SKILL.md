@@ -58,11 +58,12 @@ Local `git commit` does not require GitHub credentials. Apply this policy when a
 
 ## App Commit Identity
 
-- For new commits on isolated work branches that will be pushed, associated with a pull request, or otherwise used in a GitHub App-authenticated or bot-authored remote workflow, require the broker-provided App identity for the commit author and committer by default.
+- For new commits on isolated work branches that will be pushed, associated with a pull request, or otherwise used in a GitHub App-authenticated or bot-authored remote workflow, prefer the broker-provided App identity for the commit author and committer.
 - If the user explicitly directs using an ordinary user account for a specific commit or workflow, that user instruction overrides the default App identity requirement for that scope.
 - Resolve identity through the broker or client flow, and use the returned `gitUserName` and `gitUserEmail` with per-command git config.
 - Do not rewrite existing commits solely to change author identity unless the user asks for that rewrite.
-- If the broker identity endpoint is unavailable, stop before creating the commit and report the blocker unless the user explicitly authorizes using the normal local git identity for that commit.
+- If resolving or applying the App identity appears to fail because of sandbox, credential-broker, or network permission limits, retry the identity-resolution step with appropriate escalated permission before falling back or reporting a blocker.
+- If the broker identity endpoint remains unavailable after an appropriate retry, stop before creating the commit and report the blocker unless the user explicitly authorizes using the normal local git identity for that commit.
 - Do not silently fall back to an ordinary user identity, and do not invent a bot email.
 
 ## Approval Rules
