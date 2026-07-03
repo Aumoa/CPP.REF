@@ -134,6 +134,18 @@ namespace Ayla
 		::OutputDebugStringW(InMessage.c_str());
 	}
 
+	String WindowsPlatformProcess::FindExecutableDirectory()
+	{
+		TCHAR Buf[1024];
+		DWORD Len = GetModuleFileNameW(nullptr, Buf, 1024);
+		if (Len == 0)
+		{
+			return String::GetEmpty();
+		}
+
+		return Path::GetDirectoryName(String(Buf, Len));
+	}
+
 	String WindowsPlatformProcess::FindEngineDirectory()
 	{
 		// Find 'Core.dll' library.

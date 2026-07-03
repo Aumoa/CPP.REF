@@ -9,6 +9,8 @@
 #include "Version.h"
 #include "InvalidOperationException.h"
 #include "Environment.h"
+#include "Platform/PlatformProcess.h"
+#include <algorithm>
 
 namespace Ayla
 {
@@ -52,6 +54,19 @@ namespace Ayla
 #endif
 
 			return candidates;
+		}
+
+		void AddAssemblySearchDirectory(std::vector<String>& directories, String directory)
+		{
+			if (directory.IsEmpty() || Directory::Exists(directory) == false)
+			{
+				return;
+			}
+
+			if (std::ranges::find(directories, directory) == directories.end())
+			{
+				directories.emplace_back(std::move(directory));
+			}
 		}
 
 		String ResolveCoreCLRPath()
@@ -136,14 +151,20 @@ namespace Ayla
 			throw InvalidOperationException(TEXT("Failed to load CoreCLR hosting functions."));
 		}
 
+		std::vector<String> assemblySearchDirectories;
+		AddAssemblySearchDirectory(assemblySearchDirectories, assemblyBasePath);
+		AddAssemblySearchDirectory(assemblySearchDirectories, PlatformProcess::FindExecutableDirectory());
+		AddAssemblySearchDirectory(assemblySearchDirectories, Environment::GetCurrentDirectory());
+
 		std::vector<String> tpaList;
-		auto files = Directory::GetFiles(assemblyBasePath, SearchOption::TopDirectoryOnly)
-			| Linq::Concat(Directory::GetFiles(Environment::GetCurrentDirectory(), SearchOption::TopDirectoryOnly));
-		for (const auto& file : files)
+		for (const String& directory : assemblySearchDirectories)
 		{
-			if (file.EndsWith(TEXT("Script.dll"), StringComparison::CurrentCultureIgnoreCase))
+			for (const auto& file : Directory::GetFiles(directory, SearchOption::TopDirectoryOnly))
 			{
-				tpaList.emplace_back(file);
+				if (file.EndsWith(TEXT("Script.dll"), StringComparison::CurrentCultureIgnoreCase))
+				{
+					tpaList.emplace_back(file);
+				}
 			}
 		}
 
@@ -159,13 +180,15 @@ namespace Ayla
 
 #if PLATFORM_WINDOWS
 		String tpaList_s = String::Join(TEXT(";"), tpaList);
+		String appPaths_s = String::Join(TEXT(";"), assemblySearchDirectories);
 #elif PLATFORM_LINUX || PLATFORM_OSX
 		String tpaList_s = String::Join(TEXT(":"), tpaList);
+		String appPaths_s = String::Join(TEXT(":"), assemblySearchDirectories);
 #else
 #error TODO: Add other platform support.
 #endif
 		std::string tpaList_a = tpaList_s.string();
-		std::string assemblyBasePath_a = assemblyBasePath.string();
+		std::string appPaths_a = appPaths_s.string();
 		const char* propertyKeys[] =
 		{
 			"TRUSTED_PLATFORM_ASSEMBLIES",
@@ -179,9 +202,9 @@ namespace Ayla
 		const char* propertyValues[] =
 		{
 			tpaList_a.c_str(),
-			assemblyBasePath_a.c_str(),
-			assemblyBasePath_a.c_str(),
-			assemblyBasePath_a.c_str(),
+			appPaths_a.c_str(),
+			appPaths_a.c_str(),
+			appPaths_a.c_str(),
 			"true",
 			"true"
 		};
@@ -190,7 +213,7 @@ namespace Ayla
 		int hr = m_Functions->coreclr_initialize(
 			"GameAssembly.dll",
 			"DefaultDomain",
-			2,
+			static_cast<int>(AE_ARRAYSIZE(propertyKeys)),
 			propertyKeys,
 			propertyValues,
 			&m_HostHandle,
