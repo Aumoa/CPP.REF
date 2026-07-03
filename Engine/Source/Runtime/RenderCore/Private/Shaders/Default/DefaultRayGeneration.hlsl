@@ -3,7 +3,7 @@
 #include "DefaultCommon.hlsli"
 
 RWTexture2D<float4> u_OutputTexture : register(u0);
-RaytracingAccelerationStructure t_Scene : register(t0);
+RaytracingAccelerationStructure t_Scene : register(t1);
 
 [shader("raygeneration")]
 void DefaultRayGeneration()
