@@ -238,6 +238,44 @@ namespace Ayla
 			throw InvalidOperationException(TEXT("A Vulkan raytracing pipeline must be bound before dispatching rays."));
 		}
 
+		auto* rt = dynamic_cast<VkSwapchainRenderTexture*>(renderTexture);
+		if (rt == nullptr)
+		{
+			throw InvalidOperationException(TEXT("Vulkan ray dispatch requires a Vulkan swapchain render texture."));
+		}
+
+		VkImageMemoryBarrier prepareStorageWriteBarrier
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.srcAccessMask = 0,
+			.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+			.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.newLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = rt->GetCurrentImage(),
+			.subresourceRange =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+		};
+
+		vkCmdPipelineBarrier(
+			GetVkCommandBuffer(),
+			VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &prepareStorageWriteBarrier
+		);
+
+		m_CurrentRaytracingRenderPipeline->BindOutputTexture(this, rt);
+
 		auto size = renderTexture->GetSize();
 		m_Graphics->GetCmdTraceRaysKHRFunction()(
 			GetVkCommandBuffer(),
@@ -248,6 +286,36 @@ namespace Ayla
 			static_cast<uint32_t>(size.X),
 			static_cast<uint32_t>(size.Y),
 			1
+		);
+
+		VkImageMemoryBarrier preparePresentBarrier
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+			.dstAccessMask = 0,
+			.oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = rt->GetCurrentImage(),
+			.subresourceRange =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+		};
+
+		vkCmdPipelineBarrier(
+			GetVkCommandBuffer(),
+			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &preparePresentBarrier
 		);
 	}
 

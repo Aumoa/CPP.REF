@@ -1,8 +1,10 @@
 // Copyright 2020-2025 Aumoa.lib. All right reserved.
 
 #include "VkRaytracingRenderPipeline.h"
+#include "VkCommandBuffer.h"
 #include "VkGraphics.h"
 #include "VkShader.h"
+#include "VkSwapchainRenderTexture.h"
 #include "Rendering/ShaderType.h"
 
 namespace Ayla
@@ -200,6 +202,7 @@ namespace Ayla
 		};
 
 		VKR(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout));
+		CreateDescriptorSets();
 
 		std::vector<TemporaryShaderModule> modules;
 		modules.reserve(4);
@@ -300,6 +303,10 @@ namespace Ayla
 		{
 			vkFreeMemory(device, m_ShaderBindingTableMemory, nullptr);
 		}
+		if (m_DescriptorPool != VK_NULL_HANDLE)
+		{
+			vkDestroyDescriptorPool(device, m_DescriptorPool, nullptr);
+		}
 		if (m_PipelineLayout != VK_NULL_HANDLE)
 		{
 			vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
@@ -312,6 +319,78 @@ namespace Ayla
 
 	void VkRaytracingRenderPipeline::SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset)
 	{
+	}
+
+	void VkRaytracingRenderPipeline::BindOutputTexture(VkCommandBuffer* cmd, VkSwapchainRenderTexture* renderTexture)
+	{
+		auto descriptorSet = m_DescriptorSets[m_Graphics->GetFrameIndex()];
+		VkDescriptorImageInfo imageInfo
+		{
+			.imageView = renderTexture->GetCurrentImageView(),
+			.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
+		};
+
+		VkWriteDescriptorSet write
+		{
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = descriptorSet,
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+			.pImageInfo = &imageInfo,
+		};
+
+		vkUpdateDescriptorSets(m_Graphics->GetDevice(), 1, &write, 0, nullptr);
+		vkCmdBindDescriptorSets(
+			cmd->GetVkCommandBuffer(),
+			VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
+			m_PipelineLayout,
+			0,
+			1,
+			&descriptorSet,
+			0,
+			nullptr
+		);
+	}
+
+	void VkRaytracingRenderPipeline::CreateDescriptorSets()
+	{
+		std::array<VkDescriptorPoolSize, 2> poolSizes =
+		{
+			VkDescriptorPoolSize
+			{
+				.type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+				.descriptorCount = static_cast<uint32>(Graphics::kMaxFramesInFlight),
+			},
+			VkDescriptorPoolSize
+			{
+				.type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR,
+				.descriptorCount = static_cast<uint32>(Graphics::kMaxFramesInFlight),
+			},
+		};
+
+		VkDescriptorPoolCreateInfo poolInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+			.maxSets = static_cast<uint32>(Graphics::kMaxFramesInFlight),
+			.poolSizeCount = static_cast<uint32>(poolSizes.size()),
+			.pPoolSizes = poolSizes.data(),
+		};
+
+		VKR(vkCreateDescriptorPool(m_Graphics->GetDevice(), &poolInfo, nullptr, &m_DescriptorPool));
+
+		std::vector<VkDescriptorSetLayout> layouts(Graphics::kMaxFramesInFlight, m_DescriptorSetLayout);
+		VkDescriptorSetAllocateInfo allocateInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+			.descriptorPool = m_DescriptorPool,
+			.descriptorSetCount = static_cast<uint32>(layouts.size()),
+			.pSetLayouts = layouts.data(),
+		};
+
+		m_DescriptorSets.resize(Graphics::kMaxFramesInFlight);
+		VKR(vkAllocateDescriptorSets(m_Graphics->GetDevice(), &allocateInfo, m_DescriptorSets.data()));
 	}
 
 	void VkRaytracingRenderPipeline::CreateShaderBindingTable(uint32 shaderGroupCount)

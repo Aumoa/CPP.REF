@@ -10,7 +10,9 @@
 namespace Ayla
 {
 	class Shader;
+	class VkCommandBuffer;
 	class VkGraphics;
+	class VkSwapchainRenderTexture;
 
 	ACLASS()
 	class VkRaytracingRenderPipeline : public RenderPipeline
@@ -22,6 +24,8 @@ namespace Ayla
 		VkDescriptorSetLayout m_DescriptorSetLayout = VK_NULL_HANDLE;
 		VkPipelineLayout m_PipelineLayout = VK_NULL_HANDLE;
 		VkPipeline m_Pipeline = VK_NULL_HANDLE;
+		VkDescriptorPool m_DescriptorPool = VK_NULL_HANDLE;
+		std::vector<VkDescriptorSet> m_DescriptorSets;
 		::VkBuffer m_ShaderBindingTableBuffer = VK_NULL_HANDLE;
 		VkDeviceMemory m_ShaderBindingTableMemory = VK_NULL_HANDLE;
 		VkDeviceAddress m_ShaderBindingTableAddress = 0;
@@ -48,8 +52,10 @@ namespace Ayla
 		uint32 GetRayGenerationGroupIndex() const noexcept { return m_RayGenerationGroupIndex; }
 		uint32 GetMissGroupIndex() const noexcept { return m_MissGroupIndex; }
 		uint32 GetHitGroupIndex() const noexcept { return m_HitGroupIndex; }
+		void BindOutputTexture(VkCommandBuffer* cmd, VkSwapchainRenderTexture* renderTexture);
 
 	private:
+		void CreateDescriptorSets();
 		void CreateShaderBindingTable(uint32 shaderGroupCount);
 	};
 }
