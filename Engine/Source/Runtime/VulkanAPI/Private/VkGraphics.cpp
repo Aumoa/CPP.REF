@@ -809,12 +809,12 @@ namespace Ayla
         return extension;
     }
 
-    SharedPtr<RenderPipeline> VkGraphics::CreateGeometryRenderPipeline(SharedPtr<Shader> shader)
+    SharedPtr<GraphicsRenderPipeline> VkGraphics::CreateGeometryRenderPipeline(SharedPtr<Shader> shader)
     {
         return New<VkGeometryRenderPipeline>(this, std::move(shader));
     }
 
-    SharedPtr<RenderPipeline> VkGraphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
+    SharedPtr<RaytracingRenderPipeline> VkGraphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
     {
         return New<VkRaytracingRenderPipeline>(this, std::move(shader));
     }

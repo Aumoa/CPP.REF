@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-	GeometryRenderPass::GeometryRenderPass(RenderPipeline* renderPipeline, RenderTexture* renderTexture)
+	GeometryRenderPass::GeometryRenderPass(GraphicsRenderPipeline* renderPipeline, RenderTexture* renderTexture)
 		: m_RenderPipeline(renderPipeline)
 		, m_RenderTexture(renderTexture)
 	{

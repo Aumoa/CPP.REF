@@ -12,7 +12,7 @@ namespace Ayla
 	class Shader;
 
 	ACLASS()
-	class D3D12RaytracingRenderPipeline : public RenderPipeline
+	class D3D12RaytracingRenderPipeline : public RaytracingRenderPipeline
 	{
 		GENERATED_BODY()
 

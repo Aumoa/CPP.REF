@@ -12,7 +12,7 @@ namespace Ayla
 	class Shader;
 
 	ACLASS()
-	class D3D12GeometryRenderPipeline : public RenderPipeline
+	class D3D12GeometryRenderPipeline : public GraphicsRenderPipeline
 	{
 		GENERATED_BODY()
 

@@ -125,6 +125,12 @@ use will be a graphics pass or raytracing dispatch. Narrowing this should happen
 when image first-use synchronization moves into typed graphics and raytracing
 paths.
 
+Graphics and raytracing pipelines now have separate RenderCore API types.
+Backend pipeline implementations derive from `GraphicsRenderPipeline` or
+`RaytracingRenderPipeline`, graphics factories return the typed pipeline, and
+render passes declare the pipeline capability they require. Command recording is
+still shared through `CommandBuffer` and can be split in a later pass.
+
 ## Recommended Direction
 
 ### Introduce a presentable target abstraction
@@ -211,9 +217,9 @@ materials, textures, and per-pass outputs are no longer hardcoded.
    Vulkan command submission keeps a conservative all-commands acquire wait
    because acquisition still records layout transitions before the first
    graphics or raytracing use is known.
-5. Next: split graphics and raytracing pipeline abstractions before adding more
+5. Done: split graphics and raytracing pipeline abstractions before adding more
    render features.
-6. Move sample triangle geometry out of command buffer implementations.
+6. Next: move sample triangle geometry out of command buffer implementations.
 
 ## Design Guardrails
 

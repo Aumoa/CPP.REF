@@ -7,16 +7,16 @@
 
 namespace Ayla
 {
-	class RenderPipeline;
+	class RaytracingRenderPipeline;
 	class RenderTexture;
 
 	class RENDERCORE_API RaytracingRenderPass : public RenderPass
 	{
-		RenderPipeline* m_RenderPipeline;
+		RaytracingRenderPipeline* m_RenderPipeline;
 		RenderTexture* m_RenderTexture;
 
 	public:
-		RaytracingRenderPass(RenderPipeline* renderPipeline, RenderTexture* renderTexture);
+		RaytracingRenderPass(RaytracingRenderPipeline* renderPipeline, RenderTexture* renderTexture);
 		virtual ~RaytracingRenderPass() noexcept override;
 
 		virtual void Setup() override;
