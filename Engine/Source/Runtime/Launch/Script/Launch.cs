@@ -8,13 +8,21 @@ public partial class Launch
 
     public override int GuardedMain(LaunchOptions options)
     {
-        LoadPlatformAssembly(options.GetPlatformAssemblyName());
-        using (var engine = new Engine(options))
+        try
         {
-            engine.Initialize();
-            engine.GuardedLoop();
+            LoadPlatformAssembly(options.GetPlatformAssemblyName());
+            using (var engine = new Engine(options))
+            {
+                engine.Initialize();
+                engine.GuardedLoop();
+            }
+            return 0;
         }
-        return 0;
+        catch (Exception ex)
+        {
+            WriteUnhandledExceptionLog(ex);
+            throw;
+        }
     }
 
     private void LoadPlatformAssembly(string platform)
@@ -30,5 +38,17 @@ public partial class Launch
         }
         
         m_App = (GenericApplication)constructor.Invoke([]);
+    }
+
+    private static void WriteUnhandledExceptionLog(Exception ex)
+    {
+        try
+        {
+            var logPath = Path.Combine(AppContext.BaseDirectory, "Launch.error.log");
+            File.WriteAllText(logPath, ex.ToString());
+        }
+        catch
+        {
+        }
     }
 }
