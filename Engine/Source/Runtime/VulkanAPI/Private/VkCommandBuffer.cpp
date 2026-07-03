@@ -111,6 +111,7 @@ namespace Ayla
 
 		m_SignalSemaphores.clear();
 		m_WaitSemaphores.clear();
+		m_WaitSemaphoreStages.clear();
 
 		VkCommandBufferBeginInfo beginInfo
 		{
@@ -139,9 +140,7 @@ namespace Ayla
 		submitInfo.signalSemaphoreCount = (uint32_t)m_SignalSemaphores.size();
 		submitInfo.pSignalSemaphores = m_SignalSemaphores.data();
 
-		static thread_local std::vector<VkPipelineStageFlags> sStages;
-		sStages.resize(m_WaitSemaphores.size(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-		submitInfo.pWaitDstStageMask = sStages.data();
+		submitInfo.pWaitDstStageMask = m_WaitSemaphoreStages.data();
 		submitInfo.waitSemaphoreCount = (uint32_t)m_WaitSemaphores.size();
 		submitInfo.pWaitSemaphores = m_WaitSemaphores.data();
 		auto fence = m_Fences.size() > 0 ? m_Fences[frameIndex] : VK_NULL_HANDLE;
@@ -335,9 +334,10 @@ namespace Ayla
 		m_SignalSemaphores.emplace_back(semaphore);
 	}
 
-	void VkCommandBuffer::AddWaitSemaphore(VkSemaphore semaphore)
+	void VkCommandBuffer::AddWaitSemaphore(VkSemaphore semaphore, VkPipelineStageFlags stage)
 	{
 		m_WaitSemaphores.emplace_back(semaphore);
+		m_WaitSemaphoreStages.emplace_back(stage);
 	}
 
 	::VkCommandBuffer VkCommandBuffer::GetVkCommandBuffer() const noexcept
