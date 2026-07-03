@@ -143,6 +143,17 @@ before resetting the fence and beginning command recording for that frame slot.
 This keeps command buffers from being reset or re-recorded while still pending
 on the graphics queue.
 
+Vulkan raytracing output no longer writes directly into the swapchain image.
+The default ray generation shader writes to an offscreen
+`VK_FORMAT_R32G32B32A32_SFLOAT` storage image that matches the shader's typed
+`RWTexture2D<float4>` access, then the command buffer blits that image into the
+`VK_FORMAT_B8G8R8A8_UNORM` presentable image. The swapchain now requires
+transfer-destination support instead of storage-image support for this path.
+Direct3D 12 does not currently hit the same runtime path because ray dispatch is
+still unimplemented there; its eventual raytracing output should follow the same
+offscreen-output-then-present contract instead of writing directly to the
+swapchain buffer.
+
 ## Recommended Direction
 
 ### Introduce a presentable target abstraction

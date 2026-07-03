@@ -253,6 +253,7 @@ namespace Ayla
 		}
 
 		CreateDepthResources();
+		CreateRaytracingOutputResources();
 		CreateFramebuffers();
 	}
 
@@ -382,6 +383,61 @@ namespace Ayla
 		VKR(vkCreateImageView(device, &viewInfo, nullptr, &m_DepthImageView));
 	}
 
+	void VkSwapchainRenderTexture::CreateRaytracingOutputResources()
+	{
+		auto device = m_Graphics->GetDevice();
+		auto size = GetSize();
+
+		VkImageCreateInfo imageInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+			.imageType = VK_IMAGE_TYPE_2D,
+			.format = kRaytracingOutputFormat,
+			.extent = { (uint32_t)size.X, (uint32_t)size.Y, 1 },
+			.mipLevels = 1,
+			.arrayLayers = 1,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.tiling = VK_IMAGE_TILING_OPTIMAL,
+			.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		};
+
+		VKR(vkCreateImage(device, &imageInfo, nullptr, &m_RaytracingOutputImage));
+
+		VkMemoryRequirements memReq;
+		vkGetImageMemoryRequirements(device, m_RaytracingOutputImage, &memReq);
+
+		VkMemoryAllocateInfo allocInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.allocationSize = memReq.size,
+			.memoryTypeIndex = m_Graphics->FindMemoryType(memReq.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT),
+		};
+
+		VKR(vkAllocateMemory(device, &allocInfo, nullptr, &m_RaytracingOutputMemory));
+		VKR(vkBindImageMemory(device, m_RaytracingOutputImage, m_RaytracingOutputMemory, 0));
+
+		VkImageViewCreateInfo viewInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.image = m_RaytracingOutputImage,
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = kRaytracingOutputFormat,
+			.subresourceRange =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			}
+		};
+
+		VKR(vkCreateImageView(device, &viewInfo, nullptr, &m_RaytracingOutputImageView));
+		m_RaytracingOutputImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	}
+
 	void VkSwapchainRenderTexture::CreateFramebuffers()
 	{
 		auto device = m_Graphics->GetDevice();
@@ -434,6 +490,25 @@ namespace Ayla
 			vkFreeMemory(device, m_DepthMemory, nullptr);
 			m_DepthMemory = VK_NULL_HANDLE;
 		}
+
+		if (m_RaytracingOutputImageView != VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(device, m_RaytracingOutputImageView, nullptr);
+			m_RaytracingOutputImageView = VK_NULL_HANDLE;
+		}
+
+		if (m_RaytracingOutputImage != VK_NULL_HANDLE)
+		{
+			vkDestroyImage(device, m_RaytracingOutputImage, nullptr);
+			m_RaytracingOutputImage = VK_NULL_HANDLE;
+		}
+
+		if (m_RaytracingOutputMemory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(device, m_RaytracingOutputMemory, nullptr);
+			m_RaytracingOutputMemory = VK_NULL_HANDLE;
+		}
+		m_RaytracingOutputImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 		for (auto& view : m_SwapchainImageViews)
 		{

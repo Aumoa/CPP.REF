@@ -31,9 +31,10 @@ namespace Ayla
         };
 
         constexpr VkFormat kRequiredSwapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
+        constexpr VkFormat kRequiredRaytracingOutputFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
         constexpr VkImageUsageFlags kRequiredSwapchainUsage =
             VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
-            VK_IMAGE_USAGE_STORAGE_BIT;
+            VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
         bool HasDeviceExtension(const std::vector<VkExtensionProperties>& extensions, const char* requiredExtensionName)
         {
@@ -351,6 +352,13 @@ namespace Ayla
             return false;
         }
 
+        bool SupportsOptimalFormatFeatures(VkPhysicalDevice physicalDevice, VkFormat format, VkFormatFeatureFlags requiredFeatures)
+        {
+            VkFormatProperties properties;
+            vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &properties);
+            return (properties.optimalTilingFeatures & requiredFeatures) == requiredFeatures;
+        }
+
         bool SupportsRequiredSwapchainSurface(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSurfaceCapabilitiesKHR* outCaps = nullptr, VkSurfaceFormatKHR* outFormat = nullptr)
         {
             VkSurfaceCapabilitiesKHR caps;
@@ -363,6 +371,16 @@ namespace Ayla
 
             VkSurfaceFormatKHR chosenFormat;
             if (TryChooseRequiredSwapchainFormat(physicalDevice, surface, chosenFormat) == false)
+            {
+                return false;
+            }
+
+            if (SupportsOptimalFormatFeatures(physicalDevice, chosenFormat.format, VK_FORMAT_FEATURE_BLIT_DST_BIT) == false)
+            {
+                return false;
+            }
+
+            if (SupportsOptimalFormatFeatures(physicalDevice, kRequiredRaytracingOutputFormat, VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT | VK_FORMAT_FEATURE_BLIT_SRC_BIT) == false)
             {
                 return false;
             }
@@ -519,7 +537,7 @@ namespace Ayla
 
             if (SupportsRequiredSwapchainSurface(physicalDevice, surface) == false)
             {
-                LogVulkan::Verbose(TEXT("  Skipped: missing required swapchain surface format or storage image usage support."));
+                LogVulkan::Verbose(TEXT("  Skipped: missing required swapchain format, transfer destination, or raytracing output support."));
                 continue;
             }
 
@@ -535,7 +553,7 @@ namespace Ayla
 
         if (selectedPhysicalDevice == VK_NULL_HANDLE)
         {
-            throw InvalidOperationException(TEXT("No Vulkan physical device supports required raytracing, presentation, and swapchain storage image capabilities."));
+            throw InvalidOperationException(TEXT("No Vulkan physical device supports required raytracing, presentation, and swapchain transfer capabilities."));
         }
 
         ValidateRequiredDeviceExtensions(selectedPhysicalDevice, selectedPhysicalDeviceProps.deviceName);
@@ -755,7 +773,7 @@ namespace Ayla
         VkSurfaceFormatKHR chosenFormat;
         if (SupportsRequiredSwapchainSurface(m_PhysicalDevice, surface, &caps, &chosenFormat) == false)
         {
-            throw InvalidOperationException(TEXT("The Vulkan surface does not support the required swapchain format or storage image usage."));
+            throw InvalidOperationException(TEXT("The Vulkan surface does not support the required swapchain format or transfer usage."));
         }
 
         VkCompositeAlphaFlagBitsKHR compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;

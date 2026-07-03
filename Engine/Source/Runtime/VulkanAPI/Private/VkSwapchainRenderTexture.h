@@ -34,11 +34,17 @@ namespace Ayla
 		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
 		std::vector<VkFramebuffer> m_Framebuffers;
 
+		VkImage m_RaytracingOutputImage = VK_NULL_HANDLE;
+		VkDeviceMemory m_RaytracingOutputMemory = VK_NULL_HANDLE;
+		VkImageView m_RaytracingOutputImageView = VK_NULL_HANDLE;
+		VkImageLayout m_RaytracingOutputImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
 		uint32 m_CurrentImageIndex = 0xFFFFFFFF;
 		uint8 m_SwapchainImageFirstRender = 0;
 
 		static constexpr VkFormat kColorFormat = VK_FORMAT_B8G8R8A8_UNORM;
 		static constexpr VkFormat kDepthFormat = VK_FORMAT_D32_SFLOAT;
+		static constexpr VkFormat kRaytracingOutputFormat = VK_FORMAT_R32G32B32A32_SFLOAT;
 
 	public:
 		VkSwapchainRenderTexture(VkSwapchainExt* swapchain, VkGraphics* graphics);
@@ -55,13 +61,19 @@ namespace Ayla
 		VkFramebuffer GetCurrentFramebuffer() const noexcept;
 		VkImage GetCurrentImage() const noexcept;
 		VkImageView GetCurrentImageView() const noexcept;
+		VkImage GetRaytracingOutputImage() const noexcept { return m_RaytracingOutputImage; }
+		VkImageView GetRaytracingOutputImageView() const noexcept { return m_RaytracingOutputImageView; }
+		VkImageLayout GetRaytracingOutputImageLayout() const noexcept { return m_RaytracingOutputImageLayout; }
+		void SetRaytracingOutputImageLayout(VkImageLayout layout) noexcept { m_RaytracingOutputImageLayout = layout; }
 
 		static VkFormat GetColorFormat() noexcept { return kColorFormat; }
 		static VkFormat GetDepthFormat() noexcept { return kDepthFormat; }
+		static VkFormat GetRaytracingOutputFormat() noexcept { return kRaytracingOutputFormat; }
 
 	private:
 		void ReallocateSwapchainImages();
 		void CreateRenderPass();
+		void CreateRaytracingOutputResources();
 		void CreateDepthResources();
 		void CreateFramebuffers();
 		void DestroyFramebufferResources();

@@ -242,16 +242,30 @@ namespace Ayla
 			throw InvalidOperationException(TEXT("Vulkan ray dispatch requires a Vulkan swapchain render texture."));
 		}
 
+		if (rt->GetRaytracingOutputImage() == VK_NULL_HANDLE || rt->GetRaytracingOutputImageView() == VK_NULL_HANDLE)
+		{
+			throw InvalidOperationException(TEXT("Vulkan ray dispatch requires an allocated raytracing output image."));
+		}
+
+		auto raytracingOutputImageLayout = rt->GetRaytracingOutputImageLayout();
+		VkPipelineStageFlags raytracingOutputSourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		VkAccessFlags raytracingOutputSourceAccess = 0;
+		if (raytracingOutputImageLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+		{
+			raytracingOutputSourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			raytracingOutputSourceAccess = VK_ACCESS_TRANSFER_READ_BIT;
+		}
+
 		VkImageMemoryBarrier prepareStorageWriteBarrier
 		{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.srcAccessMask = 0,
+			.srcAccessMask = raytracingOutputSourceAccess,
 			.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
-			.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.oldLayout = raytracingOutputImageLayout,
 			.newLayout = VK_IMAGE_LAYOUT_GENERAL,
 			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = rt->GetCurrentImage(),
+			.image = rt->GetRaytracingOutputImage(),
 			.subresourceRange =
 			{
 				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -264,13 +278,14 @@ namespace Ayla
 
 		vkCmdPipelineBarrier(
 			GetVkCommandBuffer(),
-			VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+			raytracingOutputSourceStage,
 			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
 			0,
 			0, nullptr,
 			0, nullptr,
 			1, &prepareStorageWriteBarrier
 		);
+		rt->SetRaytracingOutputImageLayout(VK_IMAGE_LAYOUT_GENERAL);
 
 		m_CurrentRaytracingRenderPipeline->BindOutputTexture(this, rt);
 
@@ -286,12 +301,101 @@ namespace Ayla
 			1
 		);
 
+		std::array<VkImageMemoryBarrier, 2> prepareBlitBarriers =
+		{
+			VkImageMemoryBarrier
+			{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+				.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+				.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+				.oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+				.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+				.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.image = rt->GetRaytracingOutputImage(),
+				.subresourceRange =
+				{
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1,
+				},
+			},
+			VkImageMemoryBarrier
+			{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+				.srcAccessMask = 0,
+				.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+				.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+				.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.image = rt->GetCurrentImage(),
+				.subresourceRange =
+				{
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1,
+				},
+			},
+		};
+
+		vkCmdPipelineBarrier(
+			GetVkCommandBuffer(),
+			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			VK_PIPELINE_STAGE_TRANSFER_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			static_cast<uint32_t>(prepareBlitBarriers.size()), prepareBlitBarriers.data()
+		);
+		rt->SetRaytracingOutputImageLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+		VkImageBlit blitRegion
+		{
+			.srcSubresource =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+			.srcOffsets =
+			{
+				VkOffset3D { 0, 0, 0 },
+				VkOffset3D { static_cast<int32_t>(size.X), static_cast<int32_t>(size.Y), 1 },
+			},
+			.dstSubresource =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+			.dstOffsets =
+			{
+				VkOffset3D { 0, 0, 0 },
+				VkOffset3D { static_cast<int32_t>(size.X), static_cast<int32_t>(size.Y), 1 },
+			},
+		};
+
+		vkCmdBlitImage(
+			GetVkCommandBuffer(),
+			rt->GetRaytracingOutputImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			rt->GetCurrentImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			1, &blitRegion,
+			VK_FILTER_NEAREST
+		);
+
 		VkImageMemoryBarrier preparePresentBarrier
 		{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+			.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
 			.dstAccessMask = 0,
-			.oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 			.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -308,7 +412,7 @@ namespace Ayla
 
 		vkCmdPipelineBarrier(
 			GetVkCommandBuffer(),
-			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			VK_PIPELINE_STAGE_TRANSFER_BIT,
 			VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 			0,
 			0, nullptr,
