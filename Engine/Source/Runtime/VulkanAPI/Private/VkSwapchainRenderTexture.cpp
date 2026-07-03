@@ -102,7 +102,7 @@ namespace Ayla
 
 		m_SwapchainImageFirstRender |= (1 << m_CurrentImageIndex);
 		vkCmd->AddSignalSemaphore(m_RenderCompletedSemaphores[m_CurrentImageIndex]);
-		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()]);
+		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 	}
 
 	void VkSwapchainRenderTexture::Dispose()
@@ -158,6 +158,24 @@ namespace Ayla
 		if (m_CurrentImageIndex < m_Framebuffers.size())
 		{
 			return m_Framebuffers[m_CurrentImageIndex];
+		}
+		return VK_NULL_HANDLE;
+	}
+
+	VkImage VkSwapchainRenderTexture::GetCurrentImage() const noexcept
+	{
+		if (m_CurrentImageIndex < m_SwapchainImages.size())
+		{
+			return m_SwapchainImages[m_CurrentImageIndex];
+		}
+		return VK_NULL_HANDLE;
+	}
+
+	VkImageView VkSwapchainRenderTexture::GetCurrentImageView() const noexcept
+	{
+		if (m_CurrentImageIndex < m_SwapchainImageViews.size())
+		{
+			return m_SwapchainImageViews[m_CurrentImageIndex];
 		}
 		return VK_NULL_HANDLE;
 	}

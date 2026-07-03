@@ -31,6 +31,7 @@ namespace Ayla
 		virtual void EndRenderPass(RenderTexture* renderTexture) = 0;
 		virtual void SetRenderPipeline(RenderPipeline* renderPipeline) = 0;
 		virtual void Draw() = 0;
+		virtual void DispatchRays(RenderTexture* renderTexture) = 0;
 		virtual void WaitForCompletion(const TimeSpan& timeout) = 0;
 	};
 }

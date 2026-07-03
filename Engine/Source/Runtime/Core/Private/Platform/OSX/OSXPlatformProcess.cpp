@@ -48,19 +48,33 @@ namespace Ayla
 		Console::Write(InMessage);
 	}
 
-	String OSXPlatformProcess::FindEngineDirectory()
+	String OSXPlatformProcess::FindExecutableDirectory()
 	{
 		char buf[1024] = {};
 		uint32_t bufSize = sizeof(buf);
 		if (_NSGetExecutablePath(buf, &bufSize) != 0)
+		{
 			return String::GetEmpty();
+		}
 
 		char realBuf[1024] = {};
 		if (realpath(buf, realBuf) == nullptr)
+		{
 			return String::GetEmpty();
+		}
 
 		String exePath = String::FromLiteral(realBuf);
-		String binDir = Path::GetDirectoryName(exePath);
+		return Path::GetDirectoryName(exePath);
+	}
+
+	String OSXPlatformProcess::FindEngineDirectory()
+	{
+		String binDir = FindExecutableDirectory();
+		if (binDir.IsEmpty())
+		{
+			return String::GetEmpty();
+		}
+
 		String engineDir = Path::Combine(binDir, TEXT(".."), TEXT(".."), TEXT(".."));
 		engineDir = Path::GetFullPath(engineDir);
 		return engineDir;

@@ -19,11 +19,13 @@
 #include "Rendering/RenderTexture.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Shader.h"
+#include "Rendering/ShaderBinaryPathResolver.h"
 #include "Rendering/ShaderType.h"
 #include "Rendering/RenderPipeline.h"
 #include "Rendering/PositionColorVertexFactory.h"
 #include "Rendering/CameraBuffer.h"
 #include "RenderPasses/GeometryRenderPass.h"
+#include "RenderPasses/RaytracingRenderPass.h"
 #include "Misc/DefaultVectors.h"
 #include "Ticking/TickTiming.h"
 #include "IO/File.h"
@@ -46,27 +48,28 @@ namespace Ayla
 
 		m_Graphics = InitializeGraphics();
 		m_RenderThread = New<RenderThread>(m_Graphics);
-		m_CommandBuffer = m_Graphics->CreateCommandBuffer();
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
+		m_CommandBuffer = m_Graphics->CreateCommandBuffer();
 
 		m_GameInstance = InitializeGameInstance();
 		m_GameInstance->Initialize(m_MainActivity->GetMainWindow().Get());
 
-		auto applicationDirectory = GenericApplication::Get().GetApplicationDirectory();
+		auto shaderDirectory = GenericApplication::Get().GetApplicationDirectory().GetChild(TEXT("Shaders"));
+		auto shaderBinaryFeature = m_Graphics->GetCurrentRenderFeature();
 
 		std::vector<Task<>> tasks;
-		tasks.emplace_back(Task<>::Create([this, &applicationDirectory]() -> Task<>
+		tasks.emplace_back(Task<>::Create([this, shaderDirectory, shaderBinaryFeature]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};
 			sci.m_VertexFactory = std::make_shared<PositionColorVertexFactory>();
 			std::vector<Task<>> tasks;
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultVertex.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultVertex"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.m_VertexShader.Bytecode = std::move(bytecode);
 				sci.m_VertexShader.EntrypointName = TEXT("main");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultPixel.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultPixel"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.m_FragmentShader.Bytecode = std::move(bytecode);
@@ -77,23 +80,23 @@ namespace Ayla
 			auto shader = m_Graphics->CreateShader(std::move(sci));
 			m_DefaultGeometryRenderPipeline = m_Graphics->CreateGeometryRenderPipeline(shader);
 		}));
-		tasks.emplace_back(Task<>::Create([this, &applicationDirectory]() -> Task<>
+		tasks.emplace_back(Task<>::Create([this, shaderDirectory, shaderBinaryFeature]() -> Task<>
 		{
 			ShaderCreationInfo sci = {};
 			std::vector<Task<>> tasks;
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultRayGeneration.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultRayGeneration"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.m_RayGenerationShader.Bytecode = std::move(bytecode);
 				sci.m_RayGenerationShader.EntrypointName = TEXT("DefaultRayGeneration");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultHit.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultHit"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.m_ClosestHitShader.Bytecode = std::move(bytecode);
 				sci.m_ClosestHitShader.EntrypointName = TEXT("DefaultClosestHit");
 			}));
-			tasks.emplace_back(File::ReadAllBytesAsync(applicationDirectory.GetFile(TEXT("Shaders/DefaultMiss.cso"))).ContinueWith([&](auto r)
+			tasks.emplace_back(File::ReadAllBytesAsync(ShaderBinaryPathResolver::GetFile(shaderDirectory, TEXT("DefaultMiss"), shaderBinaryFeature)).ContinueWith([&](auto r)
 			{
 				auto& bytecode = r.GetResult();
 				sci.m_MissShader.Bytecode = std::move(bytecode);
@@ -210,7 +213,7 @@ namespace Ayla
 			graphics = m_Graphics,
 			commandBuffer = m_CommandBuffer,
 			self = m_RenderThread.Get(),
-			renderPipeline = m_DefaultGeometryRenderPipeline.Get(),
+			renderPipeline = m_DefaultRaytracingRenderPipeline.Get(),
 			views = &m_Scratch.AllCameraViews,
 			cameraBuffer = m_Scratch.CameraBuffers,
 			cameraBufferPtr
@@ -236,8 +239,8 @@ namespace Ayla
 
 			SceneRenderer renderer;
 
-			GeometryRenderPass geometryPass(renderPipeline, rt.Get());
-			renderer.AddPass(&geometryPass);
+			RaytracingRenderPass raytracingPass(renderPipeline, rt.Get());
+			renderer.AddPass(&raytracingPass);
 
 			size_t viewIndex = 0;
 			for (auto& view : *views)

@@ -243,6 +243,11 @@ namespace Ayla
 		m_CommandBuffers[pi]->DrawIndexedInstanced(3, 1, 0, 0, 0);
 	}
 
+	void D3D12CommandBuffer::DispatchRays(RenderTexture* renderTexture)
+	{
+		throw InvalidOperationException(TEXT("Direct3D12 ray dispatch is not implemented yet."));
+	}
+
 	void D3D12CommandBuffer::WaitForCompletion(const TimeSpan& timeout)
 	{
 		auto& queue = m_Graphics->GetCommandQueue();

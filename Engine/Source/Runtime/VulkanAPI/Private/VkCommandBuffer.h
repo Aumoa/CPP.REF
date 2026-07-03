@@ -10,6 +10,7 @@
 namespace Ayla
 {
 	class VkGraphics;
+	class VkRaytracingRenderPipeline;
 
 	ACLASS()
 	class VkCommandBuffer : public CommandBuffer
@@ -22,8 +23,10 @@ namespace Ayla
 		std::vector<::VkCommandBuffer> m_CommandBuffers;
 		std::vector<VkSemaphore> m_SignalSemaphores;
 		std::vector<VkSemaphore> m_WaitSemaphores;
+		std::vector<VkPipelineStageFlags> m_WaitSemaphoreStages;
 		bool m_HasBegun{ false };
 		std::vector<VkFence> m_Fences;
+		VkRaytracingRenderPipeline* m_CurrentRaytracingRenderPipeline = nullptr;
 
 		::VkBuffer m_VertexBuffer = VK_NULL_HANDLE;
 		VkDeviceMemory m_VertexMemory = VK_NULL_HANDLE;
@@ -42,10 +45,11 @@ namespace Ayla
 		virtual void EndRenderPass(RenderTexture* renderTexture) override;
 		virtual void SetRenderPipeline(RenderPipeline* renderPipeline) override;
 		virtual void Draw() override;
+		virtual void DispatchRays(RenderTexture* renderTexture) override;
 		virtual void WaitForCompletion(const TimeSpan& timeout) override;
 
 		void AddSignalSemaphore(VkSemaphore semaphore);
-		void AddWaitSemaphore(VkSemaphore semaphore);
+		void AddWaitSemaphore(VkSemaphore semaphore, VkPipelineStageFlags stage);
 
 		::VkCommandBuffer GetVkCommandBuffer() const noexcept;
 		VkFence GetFence() const noexcept;

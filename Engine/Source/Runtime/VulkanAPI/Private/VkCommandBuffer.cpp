@@ -5,6 +5,7 @@
 #include "VkCommandQueue.h"
 #include "VkSwapchainRenderTexture.h"
 #include "VkGeometryRenderPipeline.h"
+#include "VkRaytracingRenderPipeline.h"
 #include "Misc/PositionColorVertex.h"
 
 namespace Ayla
@@ -110,6 +111,7 @@ namespace Ayla
 
 		m_SignalSemaphores.clear();
 		m_WaitSemaphores.clear();
+		m_WaitSemaphoreStages.clear();
 
 		VkCommandBufferBeginInfo beginInfo
 		{
@@ -138,9 +140,7 @@ namespace Ayla
 		submitInfo.signalSemaphoreCount = (uint32_t)m_SignalSemaphores.size();
 		submitInfo.pSignalSemaphores = m_SignalSemaphores.data();
 
-		static thread_local std::vector<VkPipelineStageFlags> sStages;
-		sStages.resize(m_WaitSemaphores.size(), VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-		submitInfo.pWaitDstStageMask = sStages.data();
+		submitInfo.pWaitDstStageMask = m_WaitSemaphoreStages.data();
 		submitInfo.waitSemaphoreCount = (uint32_t)m_WaitSemaphores.size();
 		submitInfo.pWaitSemaphores = m_WaitSemaphores.data();
 		auto fence = m_Fences.size() > 0 ? m_Fences[frameIndex] : VK_NULL_HANDLE;
@@ -206,9 +206,15 @@ namespace Ayla
 
 	void VkCommandBuffer::SetRenderPipeline(RenderPipeline* renderPipeline)
 	{
-		if (auto* ps = dynamic_cast<VkGeometryRenderPipeline*>(renderPipeline))
+		if (auto* pso = dynamic_cast<VkRaytracingRenderPipeline*>(renderPipeline))
+		{
+			vkCmdBindPipeline(GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pso->GetPipeline());
+			m_CurrentRaytracingRenderPipeline = pso;
+		}
+		else if (auto* ps = dynamic_cast<VkGeometryRenderPipeline*>(renderPipeline))
 		{
 			vkCmdBindPipeline(GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, ps->GetPipeline());
+			m_CurrentRaytracingRenderPipeline = nullptr;
 		}
 		else
 		{
@@ -222,6 +228,94 @@ namespace Ayla
 		vkCmdBindVertexBuffers(GetVkCommandBuffer(), 0, 1, &m_VertexBuffer, &offset);
 		vkCmdBindIndexBuffer(GetVkCommandBuffer(), m_IndexBuffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdDrawIndexed(GetVkCommandBuffer(), 3, 1, 0, 0, 0);
+	}
+
+	void VkCommandBuffer::DispatchRays(RenderTexture* renderTexture)
+	{
+		if (m_CurrentRaytracingRenderPipeline == nullptr)
+		{
+			throw InvalidOperationException(TEXT("A Vulkan raytracing pipeline must be bound before dispatching rays."));
+		}
+
+		auto* rt = dynamic_cast<VkSwapchainRenderTexture*>(renderTexture);
+		if (rt == nullptr)
+		{
+			throw InvalidOperationException(TEXT("Vulkan ray dispatch requires a Vulkan swapchain render texture."));
+		}
+
+		VkImageMemoryBarrier prepareStorageWriteBarrier
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.srcAccessMask = 0,
+			.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+			.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.newLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = rt->GetCurrentImage(),
+			.subresourceRange =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+		};
+
+		vkCmdPipelineBarrier(
+			GetVkCommandBuffer(),
+			VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &prepareStorageWriteBarrier
+		);
+
+		m_CurrentRaytracingRenderPipeline->BindOutputTexture(this, rt);
+
+		auto size = renderTexture->GetSize();
+		m_Graphics->GetCmdTraceRaysKHRFunction()(
+			GetVkCommandBuffer(),
+			&m_CurrentRaytracingRenderPipeline->GetRayGenerationShaderBindingTable(),
+			&m_CurrentRaytracingRenderPipeline->GetMissShaderBindingTable(),
+			&m_CurrentRaytracingRenderPipeline->GetHitShaderBindingTable(),
+			&m_CurrentRaytracingRenderPipeline->GetCallableShaderBindingTable(),
+			static_cast<uint32_t>(size.X),
+			static_cast<uint32_t>(size.Y),
+			1
+		);
+
+		VkImageMemoryBarrier preparePresentBarrier
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+			.dstAccessMask = 0,
+			.oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = rt->GetCurrentImage(),
+			.subresourceRange =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+		};
+
+		vkCmdPipelineBarrier(
+			GetVkCommandBuffer(),
+			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &preparePresentBarrier
+		);
 	}
 
 	void VkCommandBuffer::WaitForCompletion(const TimeSpan& timeout)
@@ -240,9 +334,10 @@ namespace Ayla
 		m_SignalSemaphores.emplace_back(semaphore);
 	}
 
-	void VkCommandBuffer::AddWaitSemaphore(VkSemaphore semaphore)
+	void VkCommandBuffer::AddWaitSemaphore(VkSemaphore semaphore, VkPipelineStageFlags stage)
 	{
 		m_WaitSemaphores.emplace_back(semaphore);
+		m_WaitSemaphoreStages.emplace_back(stage);
 	}
 
 	::VkCommandBuffer VkCommandBuffer::GetVkCommandBuffer() const noexcept

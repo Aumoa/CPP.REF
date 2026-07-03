@@ -52,6 +52,8 @@ namespace Ayla
 
 		VkRenderPass GetRenderPass() const noexcept { return m_RenderPass; }
 		VkFramebuffer GetCurrentFramebuffer() const noexcept;
+		VkImage GetCurrentImage() const noexcept;
+		VkImageView GetCurrentImageView() const noexcept;
 
 		static VkFormat GetColorFormat() noexcept { return kColorFormat; }
 		static VkFormat GetDepthFormat() noexcept { return kDepthFormat; }

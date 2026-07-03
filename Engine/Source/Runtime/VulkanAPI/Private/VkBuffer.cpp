@@ -166,7 +166,7 @@ namespace Ayla
 			.buffer = m_Buffer
 		};
 
-		return vkGetBufferDeviceAddress(m_Graphics->GetDevice(), &addrInfo);
+		return m_Graphics->GetBufferDeviceAddressFunction()(m_Graphics->GetDevice(), &addrInfo);
 	}
 
 	void* VkBuffer::Map() const

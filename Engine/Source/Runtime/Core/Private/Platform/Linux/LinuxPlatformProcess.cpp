@@ -42,15 +42,27 @@ namespace Ayla
 		Console::Write(InMessage);
 	}
 
-	String LinuxPlatformProcess::FindEngineDirectory()
+	String LinuxPlatformProcess::FindExecutableDirectory()
 	{
 		char buf[1024] = {};
 		ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
 		if (len <= 0)
+		{
 			return String::GetEmpty();
+		}
 
 		String exePath = String::FromLiteral(std::string_view(buf, (size_t)len));
-		String binDir = Path::GetDirectoryName(exePath);
+		return Path::GetDirectoryName(exePath);
+	}
+
+	String LinuxPlatformProcess::FindEngineDirectory()
+	{
+		String binDir = FindExecutableDirectory();
+		if (binDir.IsEmpty())
+		{
+			return String::GetEmpty();
+		}
+
 		String engineDir = Path::Combine(binDir, TEXT(".."), TEXT(".."), TEXT(".."));
 		engineDir = Path::GetFullPath(engineDir);
 		return engineDir;

@@ -22,6 +22,7 @@ namespace Ayla
         static bool IsDebuggerPresent() noexcept;
         static void OutputDebugString(String InMessage) noexcept;
 
+        static String FindExecutableDirectory();
         static String FindEngineDirectory();
 
         static void* AllocateCurrentThreadHandle() noexcept;
