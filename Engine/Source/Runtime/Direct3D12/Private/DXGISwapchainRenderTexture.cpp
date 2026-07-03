@@ -30,6 +30,16 @@ namespace Ayla
 		HR(m_Device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DSVHeap)));
 		DXSetName(m_DSVHeap);
 
+		D3D12_DESCRIPTOR_HEAP_DESC raytracingOutputUAVHeapDesc =
+		{
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			.NumDescriptors = 1,
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+			.NodeMask = 0
+		};
+		HR(m_Device->CreateDescriptorHeap(&raytracingOutputUAVHeapDesc, IID_PPV_ARGS(&m_RaytracingOutputUAVHeap)));
+		DXSetName(m_RaytracingOutputUAVHeap);
+
 		AllocateResources(false);
 	}
 
@@ -64,6 +74,9 @@ namespace Ayla
 	void DXGISwapchainRenderTexture::ReleaseResources()
 	{
 		m_SwapchainResources.clear();
+		m_DepthStencilResource.Reset();
+		m_RaytracingOutputResource.Reset();
+		m_RaytracingOutputState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	}
 
 	void DXGISwapchainRenderTexture::AllocateResources(bool resize)
@@ -127,11 +140,58 @@ namespace Ayla
 		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		m_Device->CreateDepthStencilView(m_DepthStencilResource.Get(), &dsvDesc, m_DSVHeap->GetCPUDescriptorHandleForHeapStart());
+
+		D3D12_FEATURE_DATA_FORMAT_SUPPORT raytracingOutputFormatSupport =
+		{
+			.Format = m_SwapchainDesc.BufferDesc.Format
+		};
+		HR(m_Device->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &raytracingOutputFormatSupport, sizeof(raytracingOutputFormatSupport)));
+		if ((raytracingOutputFormatSupport.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE) == 0)
+		{
+			throw InvalidOperationException(TEXT("Direct3D12 raytracing output requires typed UAV stores for the swapchain format."));
+		}
+
+		D3D12_RESOURCE_DESC raytracingOutputDesc =
+		{
+			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+			.Alignment = 0,
+			.Width = m_SwapchainDesc.BufferDesc.Width,
+			.Height = m_SwapchainDesc.BufferDesc.Height,
+			.DepthOrArraySize = 1,
+			.MipLevels = 1,
+			.Format = m_SwapchainDesc.BufferDesc.Format,
+			.SampleDesc =
+			{
+				.Count = 1,
+				.Quality = 0
+			},
+			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
+			.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS
+		};
+
+		HR(m_Device->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &raytracingOutputDesc, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, nullptr, IID_PPV_ARGS(&m_RaytracingOutputResource)));
+		DXSetName(m_RaytracingOutputResource);
+		m_RaytracingOutputState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
+		D3D12_UNORDERED_ACCESS_VIEW_DESC raytracingOutputUAVDesc = {};
+		raytracingOutputUAVDesc.Format = m_SwapchainDesc.BufferDesc.Format;
+		raytracingOutputUAVDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+		m_Device->CreateUnorderedAccessView(m_RaytracingOutputResource.Get(), nullptr, &raytracingOutputUAVDesc, m_RaytracingOutputUAVHeap->GetCPUDescriptorHandleForHeapStart());
 	}
 
 	ID3D12Resource* DXGISwapchainRenderTexture::GetCurrentBackBuffer() const
 	{
 		return m_SwapchainResources[m_CurrentBackBufferIndex].Get();
+	}
+
+	ID3D12Resource* DXGISwapchainRenderTexture::GetRaytracingOutputResource() const
+	{
+		return m_RaytracingOutputResource.Get();
+	}
+
+	ID3D12DescriptorHeap* DXGISwapchainRenderTexture::GetRaytracingOutputDescriptorHeap() const
+	{
+		return m_RaytracingOutputUAVHeap.Get();
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE DXGISwapchainRenderTexture::GetRTVDescriptorHandle() const
@@ -144,5 +204,10 @@ namespace Ayla
 	D3D12_CPU_DESCRIPTOR_HANDLE DXGISwapchainRenderTexture::GetDSVDescriptorHandle() const
 	{
 		return m_DSVHeap->GetCPUDescriptorHandleForHeapStart();
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE DXGISwapchainRenderTexture::GetRaytracingOutputUAVGPUDescriptorHandle() const
+	{
+		return m_RaytracingOutputUAVHeap->GetGPUDescriptorHandleForHeapStart();
 	}
 }

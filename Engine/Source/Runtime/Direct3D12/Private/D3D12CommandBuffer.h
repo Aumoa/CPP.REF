@@ -11,6 +11,7 @@
 namespace Ayla
 {
 	class D3D12Graphics;
+	class D3D12RaytracingRenderPipeline;
 
 	ACLASS()
 	class D3D12CommandBuffer : public CommandBuffer
@@ -21,6 +22,7 @@ namespace Ayla
 		D3D12Graphics* m_Graphics;
 		ComPtr<ID3D12CommandAllocator> m_CommandPool;
 		std::array<ComPtr<ID3D12GraphicsCommandList4>, Graphics::kMaxFramesInFlight> m_CommandBuffers;
+		D3D12RaytracingRenderPipeline* m_CurrentRaytracingRenderPipeline = nullptr;
 		uint64 m_FenceValue;
 
 	public:
