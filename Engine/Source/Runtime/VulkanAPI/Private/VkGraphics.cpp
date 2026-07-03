@@ -153,6 +153,178 @@ namespace Ayla
 
             return function;
         }
+
+        struct QueueFamilyInfo
+        {
+            uint32_t FamilyIndex;
+            int32 SupportsCount;
+            VkQueueFlags Flags;
+        };
+
+        constexpr uint32_t kInvalidQueueFamilyIndex = (uint32_t)-1;
+
+        QueueFamilyInfo MakeInvalidQueueFamilyInfo()
+        {
+            return QueueFamilyInfo{ kInvalidQueueFamilyIndex, -1, 0 };
+        }
+
+        String FormatDeviceType(VkPhysicalDeviceType deviceType)
+        {
+            switch (deviceType)
+            {
+            case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+                return TEXT("INTEGRATED_GPU");
+            case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+                return TEXT("DISCRETE_GPU");
+            case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+                return TEXT("VIRTUAL_GPU");
+            case VK_PHYSICAL_DEVICE_TYPE_CPU:
+                return TEXT("CPU");
+            }
+
+            return TEXT("UNKNOWN");
+        }
+
+        int32 ScorePhysicalDevice(const VkPhysicalDeviceProperties& properties)
+        {
+            switch (properties.deviceType)
+            {
+            case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+                return 400;
+            case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+                return 300;
+            case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+                return 200;
+            case VK_PHYSICAL_DEVICE_TYPE_CPU:
+                return 100;
+            default:
+                return 0;
+            }
+        }
+
+        bool SupportsRequiredDeviceExtensions(VkPhysicalDevice physicalDevice)
+        {
+            uint32_t extensionsCount = 0;
+            VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionsCount, nullptr));
+
+            std::vector<VkExtensionProperties> extensions{ (size_t)extensionsCount };
+            VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionsCount, extensions.data()));
+
+            for (const char* requiredExtensionName : kRequiredDeviceExtensions)
+            {
+                if (HasDeviceExtension(extensions, requiredExtensionName) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool SupportsRequiredRaytracingFeatures(VkPhysicalDevice physicalDevice)
+        {
+            VkPhysicalDeviceTimelineSemaphoreFeatures timelineFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES
+            };
+
+            VkPhysicalDeviceBufferDeviceAddressFeatures bufferAddressFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES
+            };
+
+            VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES
+            };
+
+            VkPhysicalDeviceRayTracingPipelineFeaturesKHR raytracingPipelineFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR
+            };
+
+            VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR
+            };
+
+            timelineFeatures.pNext = &bufferAddressFeatures;
+            bufferAddressFeatures.pNext = &descriptorIndexingFeatures;
+            descriptorIndexingFeatures.pNext = &raytracingPipelineFeatures;
+            raytracingPipelineFeatures.pNext = &accelerationStructureFeatures;
+
+            VkPhysicalDeviceFeatures2 features =
+            {
+                .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+                .pNext = &timelineFeatures
+            };
+
+            vkGetPhysicalDeviceFeatures2(physicalDevice, &features);
+
+            return timelineFeatures.timelineSemaphore != VK_FALSE
+                && bufferAddressFeatures.bufferDeviceAddress != VK_FALSE
+                && descriptorIndexingFeatures.runtimeDescriptorArray != VK_FALSE
+                && raytracingPipelineFeatures.rayTracingPipeline != VK_FALSE
+                && accelerationStructureFeatures.accelerationStructure != VK_FALSE;
+        }
+
+        bool TryFindQueueFamilies(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, std::array<QueueFamilyInfo, 3>& queueFamilyInfos)
+        {
+            uint32_t queueCount;
+            vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueCount, nullptr);
+            std::vector<VkQueueFamilyProperties> queueFamilies((size_t)queueCount);
+            vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueCount, queueFamilies.data());
+
+            queueFamilyInfos =
+            {
+                MakeInvalidQueueFamilyInfo(),
+                MakeInvalidQueueFamilyInfo(),
+                MakeInvalidQueueFamilyInfo()
+            };
+
+            QueueFamilyInfo& bestPrimaryQueueFamily = queueFamilyInfos[0];
+            QueueFamilyInfo& bestComputeQueueFamily = queueFamilyInfos[1];
+            QueueFamilyInfo& bestTransferQueueFamily = queueFamilyInfos[2];
+
+            for (uint32_t i = 0; i < queueCount; ++i)
+            {
+                VkBool32 supportsSurface = VK_FALSE;
+                VKR(vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &supportsSurface));
+
+                bool supportsGraphics = (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0;
+                bool supportsCompute = (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0;
+                bool supportsTransfer = (queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT) != 0;
+                int32 supportsCount = (supportsGraphics ? 1 : 0) + (supportsCompute ? 1 : 0) + (supportsTransfer ? 1 : 0);
+
+                if (supportsGraphics && supportsTransfer && supportsSurface)
+                {
+                    if (bestPrimaryQueueFamily.FamilyIndex == kInvalidQueueFamilyIndex || supportsCount > bestPrimaryQueueFamily.SupportsCount)
+                    {
+                        bestPrimaryQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
+                    }
+                }
+
+                if (supportsCompute)
+                {
+                    if (bestComputeQueueFamily.FamilyIndex == kInvalidQueueFamilyIndex || supportsCount < bestComputeQueueFamily.SupportsCount)
+                    {
+                        bestComputeQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
+                    }
+                }
+
+                if (supportsTransfer)
+                {
+                    if (bestTransferQueueFamily.FamilyIndex == kInvalidQueueFamilyIndex || supportsCount < bestTransferQueueFamily.SupportsCount)
+                    {
+                        bestTransferQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
+                    }
+                }
+            }
+
+            return bestPrimaryQueueFamily.FamilyIndex != kInvalidQueueFamilyIndex
+                && bestComputeQueueFamily.FamilyIndex != kInvalidQueueFamilyIndex
+                && bestTransferQueueFamily.FamilyIndex != kInvalidQueueFamilyIndex;
+        }
     }
 
     VkGraphics::VkGraphics()
@@ -224,54 +396,88 @@ namespace Ayla
             }
 		};
 
+    }
+
+    void VkGraphics::InitializeDevice(VkSurfaceKHR surface)
+    {
+        if (m_Device.Get() != VK_NULL_HANDLE)
+        {
+            return;
+        }
+
         uint32_t gpuCount = 0;
         VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, nullptr));
+        if (gpuCount == 0)
+        {
+            throw InvalidOperationException(TEXT("No Vulkan physical devices were found."));
+        }
 
         std::vector<VkPhysicalDevice> physicalDevices{ gpuCount };
         VKR(vkEnumeratePhysicalDevices(m_Instance, &gpuCount, physicalDevices.data()));
 
-        auto formatDeviceType = [](VkPhysicalDeviceType dt)
+        VkPhysicalDevice selectedPhysicalDevice = VK_NULL_HANDLE;
+        VkPhysicalDeviceProperties selectedPhysicalDeviceProps = {};
+        std::array<QueueFamilyInfo, 3> selectedQueueFamilyInfos =
         {
-            switch (dt)
-            {
-                case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-                    return TEXT("INTEGRATED_GPU");
-                case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-                    return TEXT("DISCRETE_GPU");
-                case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-                    return TEXT("VIRTUAL_GPU");
-                case VK_PHYSICAL_DEVICE_TYPE_CPU:
-                    return TEXT("CPU");
-            }
-
-            return TEXT("UNKNOWN");
+            MakeInvalidQueueFamilyInfo(),
+            MakeInvalidQueueFamilyInfo(),
+            MakeInvalidQueueFamilyInfo()
         };
+        int32 selectedDeviceScore = -1;
 
-        std::vector<VkPhysicalDeviceProperties> physicalDeviceProps;
-        physicalDeviceProps.reserve(physicalDevices.size());
         for (size_t i = 0; i < physicalDevices.size(); ++i)
         {
-            auto& pd = physicalDevices[i];
+            auto physicalDevice = physicalDevices[i];
             VkPhysicalDeviceProperties props;
-            vkGetPhysicalDeviceProperties(pd, &props);
-            physicalDeviceProps.emplace_back(props);
-            LogVulkan::Verbose(TEXT("Physical Device #{}: {} ({})"), i, String::FromCodepage(props.deviceName), formatDeviceType(props.deviceType));
+            vkGetPhysicalDeviceProperties(physicalDevice, &props);
+            LogVulkan::Verbose(TEXT("Physical Device #{}: {} ({})"), i, String::FromCodepage(props.deviceName), FormatDeviceType(props.deviceType));
 
             uint32_t extensionsCount = 0;
-            VKR(vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, nullptr));
+            VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionsCount, nullptr));
 
             std::vector<VkExtensionProperties> pdExtensions{ (size_t)extensionsCount };
-            VKR(vkEnumerateDeviceExtensionProperties(pd, nullptr, &extensionsCount, pdExtensions.data()));
+            VKR(vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionsCount, pdExtensions.data()));
 
             LogVulkan::Verbose(TEXT("  Extensions: "));
             for (auto& extension : pdExtensions)
             {
                 LogVulkan::Verbose(TEXT("    {}"), String::FromCodepage(extension.extensionName));
             }
+
+            if (SupportsRequiredDeviceExtensions(physicalDevice) == false)
+            {
+                LogVulkan::Verbose(TEXT("  Skipped: missing required Vulkan raytracing device extension."));
+                continue;
+            }
+
+            if (SupportsRequiredRaytracingFeatures(physicalDevice) == false)
+            {
+                LogVulkan::Verbose(TEXT("  Skipped: missing required Vulkan raytracing feature."));
+                continue;
+            }
+
+            std::array<QueueFamilyInfo, 3> queueFamilyInfos;
+            if (TryFindQueueFamilies(physicalDevice, surface, queueFamilyInfos) == false)
+            {
+                LogVulkan::Verbose(TEXT("  Skipped: missing required graphics, compute, transfer, or present queue support."));
+                continue;
+            }
+
+            int32 score = ScorePhysicalDevice(props);
+            if (selectedPhysicalDevice == VK_NULL_HANDLE || score > selectedDeviceScore)
+            {
+                selectedPhysicalDevice = physicalDevice;
+                selectedPhysicalDeviceProps = props;
+                selectedQueueFamilyInfos = queueFamilyInfos;
+                selectedDeviceScore = score;
+            }
         }
 
-        VkPhysicalDevice selectedPhysicalDevice = physicalDevices[0];
-        const VkPhysicalDeviceProperties& selectedPhysicalDeviceProps = physicalDeviceProps[0];
+        if (selectedPhysicalDevice == VK_NULL_HANDLE)
+        {
+            throw InvalidOperationException(TEXT("No Vulkan physical device supports required raytracing features and presentation."));
+        }
+
         ValidateRequiredDeviceExtensions(selectedPhysicalDevice, selectedPhysicalDeviceProps.deviceName);
         ValidateRequiredRaytracingFeatures(selectedPhysicalDevice, selectedPhysicalDeviceProps.deviceName);
 
@@ -293,79 +499,14 @@ namespace Ayla
         vkGetPhysicalDeviceProperties2(selectedPhysicalDevice, &selectedDeviceProperties);
         m_RaytracingPipelineProperties.pNext = nullptr;
 
-        // Find a queue family that supports VK_QUEUE_GRAPHICS_BIT
-        uint32_t queueCount;
-        vkGetPhysicalDeviceQueueFamilyProperties(selectedPhysicalDevice, &queueCount, nullptr);
-        std::vector<VkQueueFamilyProperties> queueFamilies((size_t)queueCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(selectedPhysicalDevice, &queueCount, queueFamilies.data());
-
-        struct QueueFamilyInfo
-        {
-            uint32_t FamilyIndex;
-            int32 SupportsCount;
-            VkQueueFlags Flags;
-        };
-
-        std::array<QueueFamilyInfo, 3> queueFamilyInfos =
-        {
-            QueueFamilyInfo{ (uint32_t)-1, -1, 0 },
-            QueueFamilyInfo{ (uint32_t)-1, -1, 0 },
-            QueueFamilyInfo{ (uint32_t)-1, -1, 0 }
-        };
+        std::array<QueueFamilyInfo, 3> queueFamilyInfos = selectedQueueFamilyInfos;
         QueueFamilyInfo& bestPrimaryQueueFamily = queueFamilyInfos[0];
-		QueueFamilyInfo& bestComputeQueueFamily = queueFamilyInfos[1];
-		QueueFamilyInfo& bestTransferQueueFamily = queueFamilyInfos[2];
+        QueueFamilyInfo& bestComputeQueueFamily = queueFamilyInfos[1];
+        QueueFamilyInfo& bestTransferQueueFamily = queueFamilyInfos[2];
 
-        for (uint32_t i = 0; i < queueCount; ++i)
-        {
-			bool supportsGraphics = (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0;
-			bool supportsCompute = (queueFamilies[i].queueFlags & VK_QUEUE_COMPUTE_BIT) != 0;
-			bool supportsTransfer = (queueFamilies[i].queueFlags & VK_QUEUE_TRANSFER_BIT) != 0;
-			int32 supportsCount = (supportsGraphics ? 1 : 0) + (supportsCompute ? 1 : 0) + (supportsTransfer ? 1 : 0);
-
-            if (supportsGraphics && supportsTransfer)
-            {
-                if (bestPrimaryQueueFamily.FamilyIndex == (uint32_t)-1 || supportsCount > bestPrimaryQueueFamily.SupportsCount)
-                {
-                    bestPrimaryQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
-				}
-            }
-
-            if (supportsCompute)
-            {
-                if (bestComputeQueueFamily.FamilyIndex == (uint32_t)-1 || supportsCount < bestComputeQueueFamily.SupportsCount)
-                {
-                    bestComputeQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
-				}
-            }
-
-            if (supportsTransfer)
-            {
-                if (bestTransferQueueFamily.FamilyIndex == (uint32_t)-1 || supportsCount < bestTransferQueueFamily.SupportsCount)
-                {
-                    bestTransferQueueFamily = { i, supportsCount, queueFamilies[i].queueFlags };
-                }
-            }
-        }
-
-        if (bestPrimaryQueueFamily.FamilyIndex == (uint32_t)-1)
-        {
-			throw std::runtime_error("No queue family supports VK_QUEUE_GRAPHICS_BIT and VK_QUEUE_TRANSFER_BIT");
-		}
-
-        if (bestComputeQueueFamily.FamilyIndex == (uint32_t)-1)
-        {
-            throw std::runtime_error("No queue family supports VK_QUEUE_COMPUTE_BIT");
-		}
-
-        if (bestTransferQueueFamily.FamilyIndex == (uint32_t)-1)
-        {
-            throw std::runtime_error("No queue family supports VK_QUEUE_TRANSFER_BIT");
-		}
-
-		LogVulkan::Verbose(TEXT("Graphics queue family index: {} (supports {})"), bestPrimaryQueueFamily.FamilyIndex, bestPrimaryQueueFamily.SupportsCount);
-		LogVulkan::Verbose(TEXT("Compute queue family index: {} (supports {})"), bestComputeQueueFamily.FamilyIndex, bestComputeQueueFamily.SupportsCount);
-		LogVulkan::Verbose(TEXT("Transfer queue family index: {} (supports {})"), bestTransferQueueFamily.FamilyIndex, bestTransferQueueFamily.SupportsCount);
+        LogVulkan::Verbose(TEXT("Graphics queue family index: {} (supports {})"), bestPrimaryQueueFamily.FamilyIndex, bestPrimaryQueueFamily.SupportsCount);
+        LogVulkan::Verbose(TEXT("Compute queue family index: {} (supports {})"), bestComputeQueueFamily.FamilyIndex, bestComputeQueueFamily.SupportsCount);
+        LogVulkan::Verbose(TEXT("Transfer queue family index: {} (supports {})"), bestTransferQueueFamily.FamilyIndex, bestTransferQueueFamily.SupportsCount);
 
         struct QueueCreateInfo
         {
@@ -547,6 +688,8 @@ namespace Ayla
         VkSurfaceKHR surface;
 		VKR(vkCreateWin32SurfaceKHR(m_Instance, &surfaceInfo, nullptr, &surface));
 #endif
+
+        InitializeDevice(surface);
         
         VkSurfaceCapabilitiesKHR caps;
         VKR(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_PhysicalDevice, surface, &caps));

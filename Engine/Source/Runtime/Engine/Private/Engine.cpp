@@ -48,8 +48,8 @@ namespace Ayla
 
 		m_Graphics = InitializeGraphics();
 		m_RenderThread = New<RenderThread>(m_Graphics);
-		m_CommandBuffer = m_Graphics->CreateCommandBuffer();
 		m_SwapchainExtensions.emplace_back(m_Graphics->InstallSwapChain(m_MainActivity->GetMainWindow()));
+		m_CommandBuffer = m_Graphics->CreateCommandBuffer();
 
 		m_GameInstance = InitializeGameInstance();
 		m_GameInstance->Initialize(m_MainActivity->GetMainWindow().Get());
