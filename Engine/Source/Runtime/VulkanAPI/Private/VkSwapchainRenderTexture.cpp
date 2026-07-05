@@ -7,6 +7,11 @@
 
 namespace Ayla
 {
+	namespace
+	{
+		constexpr VkPipelineStageFlags kAcquireWaitStage = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+	}
+
 	VkSwapchainRenderTexture::VkSwapchainRenderTexture(VkSwapchainExt* swapchain, VkGraphics* graphics)
 		: m_Swapchain(swapchain)
 		, m_Graphics(graphics)
@@ -51,8 +56,13 @@ namespace Ayla
 		return m_Swapchain->GetSize();
 	}
 
-	void VkSwapchainRenderTexture::Acquire(CommandBuffer* cmd)
+	PresentableFrame VkSwapchainRenderTexture::AcquireFrame(CommandBuffer* commandBuffer)
 	{
+		if (m_Swapchain->IsPresentable() == false)
+		{
+			return {};
+		}
+
 		if (m_SwapchainImages.size() == 0)
 		{
 			ReallocateSwapchainImages();
@@ -62,9 +72,20 @@ namespace Ayla
 
 		auto graphics = m_Swapchain->GetOwner();
 		auto imageReadySemaphore = m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()];
-		VKR(vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, imageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex));
+		VkResult acquireResult = vkAcquireNextImageKHR(graphics->GetDevice(), m_Swapchain->GetSwapchain(), UINT64_MAX, imageReadySemaphore, VK_NULL_HANDLE, &m_CurrentImageIndex);
+		if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR)
+		{
+			m_CurrentImageIndex = 0xFFFFFFFF;
+			m_Swapchain->RequestRecreate();
+			return {};
+		}
+		VKR(acquireResult, VK_SUBOPTIMAL_KHR);
+		if (acquireResult == VK_SUBOPTIMAL_KHR)
+		{
+			m_Swapchain->RequestRecreate();
+		}
 
-		auto* vkCmd = (VkCommandBuffer*)cmd;
+		auto* vkCmd = (VkCommandBuffer*)commandBuffer;
 
 		bool isFirstRender = (m_SwapchainImageFirstRender & (1 << m_CurrentImageIndex)) == 0;
 		if (isFirstRender)
@@ -102,7 +123,8 @@ namespace Ayla
 
 		m_SwapchainImageFirstRender |= (1 << m_CurrentImageIndex);
 		vkCmd->AddSignalSemaphore(m_RenderCompletedSemaphores[m_CurrentImageIndex]);
-		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+		vkCmd->AddWaitSemaphore(m_PresentCompletedSemaphores[m_Graphics->GetFrameIndex()], kAcquireWaitStage);
+		return PresentableFrame(this, this);
 	}
 
 	void VkSwapchainRenderTexture::Dispose()
@@ -132,13 +154,17 @@ namespace Ayla
 	{
 		DestroyFramebufferResources();
 		m_SwapchainImages.clear();
+		m_CurrentImageIndex = 0xFFFFFFFF;
+		m_SwapchainImageFirstRender = 0;
 	}
 
-	void VkSwapchainRenderTexture::Present(VkQueue queue, VkCommandBuffer* vkCmd)
+	void VkSwapchainRenderTexture::Present(CommandBuffer* commandBuffer)
 	{
+		PLATFORM_UNREFERENCED_PARAMETER(commandBuffer);
 		check(m_CurrentImageIndex != 0xFFFFFFFF);
 		auto semaphore = m_RenderCompletedSemaphores[m_CurrentImageIndex];
 		auto swapchain = m_Swapchain->GetSwapchain();
+		uint32 imageIndex = m_CurrentImageIndex;
 		VkPresentInfoKHR presentInfo
 		{
 			.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
@@ -146,11 +172,17 @@ namespace Ayla
 			.pWaitSemaphores = &semaphore,
 			.swapchainCount = 1,
 			.pSwapchains = &swapchain,
-			.pImageIndices = &m_CurrentImageIndex
+			.pImageIndices = &imageIndex
 		};
 
-		VKR(vkQueuePresentKHR(queue, &presentInfo), VK_ERROR_SURFACE_LOST_KHR, VK_ERROR_OUT_OF_DATE_KHR);
+		VkResult presentResult = vkQueuePresentKHR(m_Swapchain->GetPresentQueue(), &presentInfo);
 		m_CurrentImageIndex = 0xFFFFFFFF;
+		if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
+		{
+			m_Swapchain->RequestRecreate();
+			return;
+		}
+		VKR(presentResult, VK_ERROR_SURFACE_LOST_KHR);
 	}
 
 	VkFramebuffer VkSwapchainRenderTexture::GetCurrentFramebuffer() const noexcept
@@ -221,6 +253,7 @@ namespace Ayla
 		}
 
 		CreateDepthResources();
+		CreateRaytracingOutputResources();
 		CreateFramebuffers();
 	}
 
@@ -350,6 +383,61 @@ namespace Ayla
 		VKR(vkCreateImageView(device, &viewInfo, nullptr, &m_DepthImageView));
 	}
 
+	void VkSwapchainRenderTexture::CreateRaytracingOutputResources()
+	{
+		auto device = m_Graphics->GetDevice();
+		auto size = GetSize();
+
+		VkImageCreateInfo imageInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+			.imageType = VK_IMAGE_TYPE_2D,
+			.format = kRaytracingOutputFormat,
+			.extent = { (uint32_t)size.X, (uint32_t)size.Y, 1 },
+			.mipLevels = 1,
+			.arrayLayers = 1,
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.tiling = VK_IMAGE_TILING_OPTIMAL,
+			.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		};
+
+		VKR(vkCreateImage(device, &imageInfo, nullptr, &m_RaytracingOutputImage));
+
+		VkMemoryRequirements memReq;
+		vkGetImageMemoryRequirements(device, m_RaytracingOutputImage, &memReq);
+
+		VkMemoryAllocateInfo allocInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+			.allocationSize = memReq.size,
+			.memoryTypeIndex = m_Graphics->FindMemoryType(memReq.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT),
+		};
+
+		VKR(vkAllocateMemory(device, &allocInfo, nullptr, &m_RaytracingOutputMemory));
+		VKR(vkBindImageMemory(device, m_RaytracingOutputImage, m_RaytracingOutputMemory, 0));
+
+		VkImageViewCreateInfo viewInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+			.image = m_RaytracingOutputImage,
+			.viewType = VK_IMAGE_VIEW_TYPE_2D,
+			.format = kRaytracingOutputFormat,
+			.subresourceRange =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.baseMipLevel = 0,
+				.levelCount = 1,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			}
+		};
+
+		VKR(vkCreateImageView(device, &viewInfo, nullptr, &m_RaytracingOutputImageView));
+		m_RaytracingOutputImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	}
+
 	void VkSwapchainRenderTexture::CreateFramebuffers()
 	{
 		auto device = m_Graphics->GetDevice();
@@ -402,6 +490,25 @@ namespace Ayla
 			vkFreeMemory(device, m_DepthMemory, nullptr);
 			m_DepthMemory = VK_NULL_HANDLE;
 		}
+
+		if (m_RaytracingOutputImageView != VK_NULL_HANDLE)
+		{
+			vkDestroyImageView(device, m_RaytracingOutputImageView, nullptr);
+			m_RaytracingOutputImageView = VK_NULL_HANDLE;
+		}
+
+		if (m_RaytracingOutputImage != VK_NULL_HANDLE)
+		{
+			vkDestroyImage(device, m_RaytracingOutputImage, nullptr);
+			m_RaytracingOutputImage = VK_NULL_HANDLE;
+		}
+
+		if (m_RaytracingOutputMemory != VK_NULL_HANDLE)
+		{
+			vkFreeMemory(device, m_RaytracingOutputMemory, nullptr);
+			m_RaytracingOutputMemory = VK_NULL_HANDLE;
+		}
+		m_RaytracingOutputImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 		for (auto& view : m_SwapchainImageViews)
 		{

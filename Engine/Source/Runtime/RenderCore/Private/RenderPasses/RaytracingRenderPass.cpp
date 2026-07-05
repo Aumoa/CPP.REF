@@ -7,7 +7,7 @@
 
 namespace Ayla
 {
-	RaytracingRenderPass::RaytracingRenderPass(RenderPipeline* renderPipeline, RenderTexture* renderTexture)
+	RaytracingRenderPass::RaytracingRenderPass(RaytracingRenderPipeline* renderPipeline, RenderTexture* renderTexture)
 		: m_RenderPipeline(renderPipeline)
 		, m_RenderTexture(renderTexture)
 	{

@@ -6,7 +6,7 @@
 #include "VkSwapchainRenderTexture.h"
 #include "VkGeometryRenderPipeline.h"
 #include "VkRaytracingRenderPipeline.h"
-#include "Misc/PositionColorVertex.h"
+#include "VkBuffer.h"
 
 namespace Ayla
 {
@@ -47,8 +47,6 @@ namespace Ayla
 				VKR(vkCreateFence(graphics->GetDevice(), &fenceCreateInfo, nullptr, &m_Fences[i]));
 			}
 		}
-
-		CreateTriangleBuffers();
 	}
 
 	VkCommandBuffer::~VkCommandBuffer() noexcept
@@ -59,27 +57,6 @@ namespace Ayla
 	void VkCommandBuffer::Dispose() noexcept
 	{
 		auto device = m_Graphics->GetDevice();
-
-		if (m_VertexBuffer != VK_NULL_HANDLE)
-		{
-			vkDestroyBuffer(device, m_VertexBuffer, nullptr);
-			m_VertexBuffer = VK_NULL_HANDLE;
-		}
-		if (m_VertexMemory != VK_NULL_HANDLE)
-		{
-			vkFreeMemory(device, m_VertexMemory, nullptr);
-			m_VertexMemory = VK_NULL_HANDLE;
-		}
-		if (m_IndexBuffer != VK_NULL_HANDLE)
-		{
-			vkDestroyBuffer(device, m_IndexBuffer, nullptr);
-			m_IndexBuffer = VK_NULL_HANDLE;
-		}
-		if (m_IndexMemory != VK_NULL_HANDLE)
-		{
-			vkFreeMemory(device, m_IndexMemory, nullptr);
-			m_IndexMemory = VK_NULL_HANDLE;
-		}
 
 		for (auto& fence : m_Fences)
 		{
@@ -103,10 +80,12 @@ namespace Ayla
 	void VkCommandBuffer::BeginCommands_Implementation()
 	{
 		auto frameIndex = m_Graphics->GetFrameIndex();
+		auto device = m_Graphics->GetDevice();
 
 		if (m_Fences.size() > 0)
 		{
-			VKR(vkResetFences(m_Graphics->GetDevice(), 1, &m_Fences[frameIndex]));
+			VKR(vkWaitForFences(device, 1, &m_Fences[frameIndex], VK_TRUE, UINT64_MAX));
+			VKR(vkResetFences(device, 1, &m_Fences[frameIndex]));
 		}
 
 		m_SignalSemaphores.clear();
@@ -120,7 +99,7 @@ namespace Ayla
 
 		auto commandBuffer = m_CommandBuffers[frameIndex];
 
-		vkResetCommandBuffer(commandBuffer, 0);
+		VKR(vkResetCommandBuffer(commandBuffer, 0));
 		VKR(vkBeginCommandBuffer(commandBuffer, &beginInfo));
 	}
 
@@ -222,12 +201,32 @@ namespace Ayla
 		}
 	}
 
-	void VkCommandBuffer::Draw()
+	void VkCommandBuffer::Draw(Buffer* vertexBuffer, Buffer* indexBuffer)
 	{
+		auto* vkVertexBuffer = dynamic_cast<VkBuffer*>(vertexBuffer);
+		if (vkVertexBuffer == nullptr || vkVertexBuffer->GetUsage() != BufferUsage::VertexBuffer)
+		{
+			throw InvalidOperationException(TEXT("Vulkan draw requires a Vulkan vertex buffer."));
+		}
+
+		auto* vkIndexBuffer = dynamic_cast<VkBuffer*>(indexBuffer);
+		if (vkIndexBuffer == nullptr || vkIndexBuffer->GetUsage() != BufferUsage::IndexBuffer)
+		{
+			throw InvalidOperationException(TEXT("Vulkan draw requires a Vulkan index buffer."));
+		}
+
+		const size_t indexStride = vkIndexBuffer->GetStride();
+		if (indexStride != sizeof(uint16) && indexStride != sizeof(uint32))
+		{
+			throw InvalidOperationException(TEXT("Vulkan draw requires a 16-bit or 32-bit index buffer."));
+		}
+
 		VkDeviceSize offset = 0;
-		vkCmdBindVertexBuffers(GetVkCommandBuffer(), 0, 1, &m_VertexBuffer, &offset);
-		vkCmdBindIndexBuffer(GetVkCommandBuffer(), m_IndexBuffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdDrawIndexed(GetVkCommandBuffer(), 3, 1, 0, 0, 0);
+		::VkBuffer nativeVertexBuffer = vkVertexBuffer->GetVkBuffer();
+		const VkIndexType indexType = (indexStride == sizeof(uint16)) ? VK_INDEX_TYPE_UINT16 : VK_INDEX_TYPE_UINT32;
+		vkCmdBindVertexBuffers(GetVkCommandBuffer(), 0, 1, &nativeVertexBuffer, &offset);
+		vkCmdBindIndexBuffer(GetVkCommandBuffer(), vkIndexBuffer->GetVkBuffer(), 0, indexType);
+		vkCmdDrawIndexed(GetVkCommandBuffer(), static_cast<uint32_t>(vkIndexBuffer->GetCount()), 1, 0, 0, 0);
 	}
 
 	void VkCommandBuffer::DispatchRays(RenderTexture* renderTexture)
@@ -243,16 +242,30 @@ namespace Ayla
 			throw InvalidOperationException(TEXT("Vulkan ray dispatch requires a Vulkan swapchain render texture."));
 		}
 
+		if (rt->GetRaytracingOutputImage() == VK_NULL_HANDLE || rt->GetRaytracingOutputImageView() == VK_NULL_HANDLE)
+		{
+			throw InvalidOperationException(TEXT("Vulkan ray dispatch requires an allocated raytracing output image."));
+		}
+
+		auto raytracingOutputImageLayout = rt->GetRaytracingOutputImageLayout();
+		VkPipelineStageFlags raytracingOutputSourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		VkAccessFlags raytracingOutputSourceAccess = 0;
+		if (raytracingOutputImageLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+		{
+			raytracingOutputSourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			raytracingOutputSourceAccess = VK_ACCESS_TRANSFER_READ_BIT;
+		}
+
 		VkImageMemoryBarrier prepareStorageWriteBarrier
 		{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.srcAccessMask = 0,
+			.srcAccessMask = raytracingOutputSourceAccess,
 			.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
-			.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			.oldLayout = raytracingOutputImageLayout,
 			.newLayout = VK_IMAGE_LAYOUT_GENERAL,
 			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-			.image = rt->GetCurrentImage(),
+			.image = rt->GetRaytracingOutputImage(),
 			.subresourceRange =
 			{
 				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -265,13 +278,14 @@ namespace Ayla
 
 		vkCmdPipelineBarrier(
 			GetVkCommandBuffer(),
-			VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+			raytracingOutputSourceStage,
 			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
 			0,
 			0, nullptr,
 			0, nullptr,
 			1, &prepareStorageWriteBarrier
 		);
+		rt->SetRaytracingOutputImageLayout(VK_IMAGE_LAYOUT_GENERAL);
 
 		m_CurrentRaytracingRenderPipeline->BindOutputTexture(this, rt);
 
@@ -287,12 +301,101 @@ namespace Ayla
 			1
 		);
 
+		std::array<VkImageMemoryBarrier, 2> prepareBlitBarriers =
+		{
+			VkImageMemoryBarrier
+			{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+				.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+				.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+				.oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+				.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+				.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.image = rt->GetRaytracingOutputImage(),
+				.subresourceRange =
+				{
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1,
+				},
+			},
+			VkImageMemoryBarrier
+			{
+				.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+				.srcAccessMask = 0,
+				.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+				.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+				.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+				.image = rt->GetCurrentImage(),
+				.subresourceRange =
+				{
+					.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+					.baseMipLevel = 0,
+					.levelCount = 1,
+					.baseArrayLayer = 0,
+					.layerCount = 1,
+				},
+			},
+		};
+
+		vkCmdPipelineBarrier(
+			GetVkCommandBuffer(),
+			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			VK_PIPELINE_STAGE_TRANSFER_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			static_cast<uint32_t>(prepareBlitBarriers.size()), prepareBlitBarriers.data()
+		);
+		rt->SetRaytracingOutputImageLayout(VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+		VkImageBlit blitRegion
+		{
+			.srcSubresource =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+			.srcOffsets =
+			{
+				VkOffset3D { 0, 0, 0 },
+				VkOffset3D { static_cast<int32_t>(size.X), static_cast<int32_t>(size.Y), 1 },
+			},
+			.dstSubresource =
+			{
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = 0,
+				.layerCount = 1,
+			},
+			.dstOffsets =
+			{
+				VkOffset3D { 0, 0, 0 },
+				VkOffset3D { static_cast<int32_t>(size.X), static_cast<int32_t>(size.Y), 1 },
+			},
+		};
+
+		vkCmdBlitImage(
+			GetVkCommandBuffer(),
+			rt->GetRaytracingOutputImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+			rt->GetCurrentImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			1, &blitRegion,
+			VK_FILTER_NEAREST
+		);
+
 		VkImageMemoryBarrier preparePresentBarrier
 		{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+			.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
 			.dstAccessMask = 0,
-			.oldLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 			.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
 			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
 			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -309,7 +412,7 @@ namespace Ayla
 
 		vkCmdPipelineBarrier(
 			GetVkCommandBuffer(),
-			VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+			VK_PIPELINE_STAGE_TRANSFER_BIT,
 			VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
 			0,
 			0, nullptr,
@@ -348,83 +451,6 @@ namespace Ayla
 	VkFence VkCommandBuffer::GetFence() const noexcept
 	{
 		return m_Fences[m_Graphics->GetFrameIndex()];
-	}
-
-	void VkCommandBuffer::CreateTriangleBuffers()
-	{
-		auto device = m_Graphics->GetDevice();
-
-		// Create vertex buffer (host visible, like D3D12's upload heap)
-		PositionColorVertex vertices[3] =
-		{
-			{ Vector3F(0, 1.0f, 0), NamedColors::Red },
-			{ Vector3F(1.0f, -1.0f, 0), NamedColors::Green },
-			{ Vector3F(-1.0f, -1.0f, 0), NamedColors::Blue },
-		};
-
-		VkBufferCreateInfo vertexBufferInfo
-		{
-			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-			.size = sizeof(vertices),
-			.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		};
-
-		VKR(vkCreateBuffer(device, &vertexBufferInfo, nullptr, &m_VertexBuffer));
-
-		VkMemoryRequirements vertexMemReq;
-		vkGetBufferMemoryRequirements(device, m_VertexBuffer, &vertexMemReq);
-
-		VkMemoryAllocateInfo vertexAllocInfo
-		{
-			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-			.allocationSize = vertexMemReq.size,
-			.memoryTypeIndex = FindMemoryType(vertexMemReq.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-		};
-
-		VKR(vkAllocateMemory(device, &vertexAllocInfo, nullptr, &m_VertexMemory));
-		VKR(vkBindBufferMemory(device, m_VertexBuffer, m_VertexMemory, 0));
-
-		void* vertexData;
-		VKR(vkMapMemory(device, m_VertexMemory, 0, sizeof(vertices), 0, &vertexData));
-		std::memcpy(vertexData, vertices, sizeof(vertices));
-		vkUnmapMemory(device, m_VertexMemory);
-
-		// Create index buffer (host visible, like D3D12's upload heap)
-		uint32 indices[3] = { 0, 1, 2 };
-
-		VkBufferCreateInfo indexBufferInfo
-		{
-			.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-			.size = sizeof(indices),
-			.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-			.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-		};
-
-		VKR(vkCreateBuffer(device, &indexBufferInfo, nullptr, &m_IndexBuffer));
-
-		VkMemoryRequirements indexMemReq;
-		vkGetBufferMemoryRequirements(device, m_IndexBuffer, &indexMemReq);
-
-		VkMemoryAllocateInfo indexAllocInfo
-		{
-			.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-			.allocationSize = indexMemReq.size,
-			.memoryTypeIndex = FindMemoryType(indexMemReq.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT),
-		};
-
-		VKR(vkAllocateMemory(device, &indexAllocInfo, nullptr, &m_IndexMemory));
-		VKR(vkBindBufferMemory(device, m_IndexBuffer, m_IndexMemory, 0));
-
-		void* indexData;
-		VKR(vkMapMemory(device, m_IndexMemory, 0, sizeof(indices), 0, &indexData));
-		std::memcpy(indexData, indices, sizeof(indices));
-		vkUnmapMemory(device, m_IndexMemory);
-	}
-
-	uint32_t VkCommandBuffer::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
-	{
-		return m_Graphics->FindMemoryType(typeFilter, properties);
 	}
 
 	SharedPtr<CommandBuffer> VkGraphics::CreateCommandBuffer()

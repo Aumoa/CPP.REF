@@ -26,6 +26,8 @@ namespace Ayla
         VkQueue m_SuitableQueue;
         SharedPtr<VkSwapchainRenderTexture> m_SwapchainRenderTexture;
 
+        bool m_IsPresentable = true;
+        bool m_RecreateRequested = false;
         int64 m_PendingFrameNumber = -1;
         std::optional<Vector2N> m_PendingResize;
 
@@ -33,8 +35,7 @@ namespace Ayla
         VkSwapchainExt(VkGraphics* owner, VkSurfaceKHR surface, VkSwapchainKHR swapchain, const VkSwapchainCreateInfoKHR& swapchainCreateInfo, VkQueue suitableQueue);
         virtual ~VkSwapchainExt() noexcept override;
 
-        virtual SharedPtr<RenderTexture> GetRenderTexture() override;
-        virtual void Present(CommandBuffer* commandBuffer) override;
+        virtual PresentableRenderTarget* GetPresentableRenderTarget() override;
         virtual void Destroy() override;
         virtual void DoResize() override;
 
@@ -42,6 +43,9 @@ namespace Ayla
 
         VkGraphics* GetOwner() const noexcept { return m_Owner; }
         VkSwapchainKHR GetSwapchain() const noexcept { return m_Swapchain; }
+        VkQueue GetPresentQueue() const noexcept { return m_SuitableQueue; }
+        bool IsPresentable() const noexcept { return m_IsPresentable && m_Swapchain != VK_NULL_HANDLE; }
+        void RequestRecreate();
         Vector2N GetSize() const;
 
     private:

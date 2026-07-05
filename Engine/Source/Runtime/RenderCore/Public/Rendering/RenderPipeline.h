@@ -18,4 +18,16 @@ namespace Ayla
 	public:
 		virtual void SetCameraBufferView(CommandBuffer* cmd, Buffer* buffer, size_t offset) = 0;
 	};
+
+	ACLASS()
+	class RENDERCORE_API GraphicsRenderPipeline : public RenderPipeline
+	{
+		GENERATED_BODY()
+	};
+
+	ACLASS()
+	class RENDERCORE_API RaytracingRenderPipeline : public RenderPipeline
+	{
+		GENERATED_BODY()
+	};
 }

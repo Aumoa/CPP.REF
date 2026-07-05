@@ -15,7 +15,7 @@ namespace Ayla
 	class VkSwapchainRenderTexture;
 
 	ACLASS()
-	class VkRaytracingRenderPipeline : public RenderPipeline
+	class VkRaytracingRenderPipeline : public RaytracingRenderPipeline
 	{
 		GENERATED_BODY()
 

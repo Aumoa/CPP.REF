@@ -13,7 +13,7 @@ namespace Ayla
 	class VkGraphics;
 
 	ACLASS()
-	class VkGeometryRenderPipeline : public RenderPipeline
+	class VkGeometryRenderPipeline : public GraphicsRenderPipeline
 	{
 		GENERATED_BODY()
 

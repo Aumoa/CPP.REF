@@ -16,6 +16,7 @@
 #include "Rendering/RenderThread.h"
 #include "Rendering/SceneRenderer.h"
 #include "Rendering/SceneView.h"
+#include "Rendering/PresentableRenderTarget.h"
 #include "Rendering/RenderTexture.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Shader.h"
@@ -232,14 +233,21 @@ namespace Ayla
 			commandBuffer->BeginCommands();
 
 			// Camera: Overlay, Display #0
-			auto rt = swapchainExtensions[0]->GetRenderTexture();
-			rt->Acquire(commandBuffer.Get());
-			auto rtSize = rt->GetSize();
+			auto presentableFrame = swapchainExtensions[0]->GetPresentableRenderTarget()->AcquireFrame(commandBuffer.Get());
+			if (!presentableFrame)
+			{
+				commandBuffer->EndCommands();
+				graphics->EndRenderFrame();
+				return;
+			}
+
+			auto rt = presentableFrame.GetRenderTexture();
+			auto rtSize = presentableFrame.GetSize();
 			auto defaultAspectRatio = rtSize.X / (float)rtSize.Y;
 
 			SceneRenderer renderer;
 
-			RaytracingRenderPass raytracingPass(renderPipeline, rt.Get());
+			RaytracingRenderPass raytracingPass(renderPipeline, rt);
 			renderer.AddPass(&raytracingPass);
 
 			size_t viewIndex = 0;
@@ -266,10 +274,7 @@ namespace Ayla
 
 			commandBuffer->EndCommands();
 
-			for (auto& swapchainExt : swapchainExtensions)
-			{
-				swapchainExt->Present(commandBuffer.Get());
-			}
+			presentableFrame.Present(commandBuffer.Get());
 
 			graphics->EndRenderFrame();
 		});

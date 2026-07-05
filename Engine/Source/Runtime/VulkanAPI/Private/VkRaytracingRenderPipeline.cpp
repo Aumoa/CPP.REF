@@ -348,7 +348,7 @@ namespace Ayla
 		auto descriptorSet = m_DescriptorSets[m_Graphics->GetFrameIndex()];
 		VkDescriptorImageInfo imageInfo
 		{
-			.imageView = renderTexture->GetCurrentImageView(),
+			.imageView = renderTexture->GetRaytracingOutputImageView(),
 			.imageLayout = VK_IMAGE_LAYOUT_GENERAL,
 		};
 

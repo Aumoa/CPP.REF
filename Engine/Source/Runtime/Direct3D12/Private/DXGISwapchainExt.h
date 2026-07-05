@@ -30,8 +30,7 @@ namespace Ayla
 		DXGISwapchainExt(D3D12Graphics* owner, ComPtr<IDXGISwapChain3> swapchain);
 		virtual ~DXGISwapchainExt() noexcept override;
 
-		virtual SharedPtr<RenderTexture> GetRenderTexture() override;
-		virtual void Present(CommandBuffer* commandBuffer) override;
+		virtual PresentableRenderTarget* GetPresentableRenderTarget() override;
 		virtual void Destroy() override;
 		virtual void DoResize() override;
 

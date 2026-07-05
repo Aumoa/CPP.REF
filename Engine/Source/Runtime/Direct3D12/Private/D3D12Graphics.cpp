@@ -109,12 +109,12 @@ namespace Ayla
 		return New<D3D12CommandBuffer>(this);
 	}
 
-	SharedPtr<RenderPipeline> D3D12Graphics::CreateGeometryRenderPipeline(SharedPtr<Shader> shader)
+	SharedPtr<GraphicsRenderPipeline> D3D12Graphics::CreateGeometryRenderPipeline(SharedPtr<Shader> shader)
 	{
 		return New<D3D12GeometryRenderPipeline>(m_Device.Get(), std::move(shader));
 	}
 
-	SharedPtr<RenderPipeline> D3D12Graphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
+	SharedPtr<RaytracingRenderPipeline> D3D12Graphics::CreateRaytracingRenderPipeline(SharedPtr<Shader> shader)
 	{
 		return New<D3D12RaytracingRenderPipeline>(m_Device.Get(), std::move(shader));
 	}

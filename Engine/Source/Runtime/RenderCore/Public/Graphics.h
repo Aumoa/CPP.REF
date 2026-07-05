@@ -15,7 +15,8 @@ namespace Ayla
     class GenericWindowSwapchainExtension;
     class CommandBuffer;
     class Buffer;
-    class RenderPipeline;
+    class GraphicsRenderPipeline;
+    class RaytracingRenderPipeline;
     class Shader;
     enum class ShaderType;
 
@@ -44,8 +45,8 @@ namespace Ayla
 
         virtual SharedPtr<GenericWindowSwapchainExtension> InstallSwapChain(SharedPtr<GenericWindow> targetWindow) = 0;
         virtual SharedPtr<CommandBuffer> CreateCommandBuffer() = 0;
-        virtual SharedPtr<RenderPipeline> CreateGeometryRenderPipeline(SharedPtr<Shader> shader) = 0;
-        virtual SharedPtr<RenderPipeline> CreateRaytracingRenderPipeline(SharedPtr<Shader> shader) = 0;
+        virtual SharedPtr<GraphicsRenderPipeline> CreateGeometryRenderPipeline(SharedPtr<Shader> shader) = 0;
+        virtual SharedPtr<RaytracingRenderPipeline> CreateRaytracingRenderPipeline(SharedPtr<Shader> shader) = 0;
         virtual SharedPtr<Shader> CreateShader(ShaderCreationInfo shaderCreationInfo) = 0;
         virtual SharedPtr<Buffer> CreateUploadBuffer(size_t sizeInBytes) = 0;
         virtual SharedPtr<Buffer> CreateBuffer(std::span<const byte> data, size_t stride, BufferUsage usage) = 0;

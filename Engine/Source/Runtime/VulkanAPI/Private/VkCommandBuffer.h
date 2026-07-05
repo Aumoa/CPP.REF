@@ -28,11 +28,6 @@ namespace Ayla
 		std::vector<VkFence> m_Fences;
 		VkRaytracingRenderPipeline* m_CurrentRaytracingRenderPipeline = nullptr;
 
-		::VkBuffer m_VertexBuffer = VK_NULL_HANDLE;
-		VkDeviceMemory m_VertexMemory = VK_NULL_HANDLE;
-		::VkBuffer m_IndexBuffer = VK_NULL_HANDLE;
-		VkDeviceMemory m_IndexMemory = VK_NULL_HANDLE;
-
 	public:
 		VkCommandBuffer(VkGraphics* graphics, bool fence);
 		virtual ~VkCommandBuffer() noexcept override;
@@ -44,7 +39,7 @@ namespace Ayla
 		virtual void BeginRenderPass(RenderTexture* renderTexture) override;
 		virtual void EndRenderPass(RenderTexture* renderTexture) override;
 		virtual void SetRenderPipeline(RenderPipeline* renderPipeline) override;
-		virtual void Draw() override;
+		virtual void Draw(Buffer* vertexBuffer, Buffer* indexBuffer) override;
 		virtual void DispatchRays(RenderTexture* renderTexture) override;
 		virtual void WaitForCompletion(const TimeSpan& timeout) override;
 
@@ -53,9 +48,5 @@ namespace Ayla
 
 		::VkCommandBuffer GetVkCommandBuffer() const noexcept;
 		VkFence GetFence() const noexcept;
-
-	private:
-		void CreateTriangleBuffers();
-		uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	};
 }

@@ -5,8 +5,8 @@
 #include "CommandQueue.h"
 #include "D3D12RaytracingRenderPipeline.h"
 #include "D3D12GeometryRenderPipeline.h"
+#include "D3D12Buffer.h"
 #include "DXGISwapchainRenderTexture.h"
-#include "Misc/PositionColorVertex.h"
 
 namespace Ayla
 {
@@ -23,41 +23,6 @@ namespace Ayla
 			HR(m_CommandBuffers[i]->Close());
 		}
 
-		D3D12_HEAP_PROPERTIES heapProp = { D3D12_HEAP_TYPE_UPLOAD };
-		D3D12_RESOURCE_DESC resourceDesc =
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = 0,
-			.Width = sizeof(PositionColorVertex) * 3,
-			.Height = 1,
-			.DepthOrArraySize = 1,
-			.MipLevels = 1,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc =
-			{
-				 .Count = 1,
-				 .Quality = 0
-			},
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE
-		};
-
-		m_Graphics->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_VertexBuffer));
-		DXSetName(m_VertexBuffer);
-		PositionColorVertex* vertexPtr;
-		HR(m_VertexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&vertexPtr)));
-		vertexPtr[0] = { Vector3F(0, 5.0f, 0), NamedColors::Red };
-		vertexPtr[1] = { Vector3F(5.0f, -5.0f, 0), NamedColors::Green };
-		vertexPtr[2] = { Vector3F(-5.0f, -5.0f, 0), NamedColors::Blue };
-
-		resourceDesc.Width = sizeof(uint32) * 3;
-		m_Graphics->GetDevice()->CreateCommittedResource(&heapProp, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&m_IndexBuffer));
-		DXSetName(m_IndexBuffer);
-		uint32* indexPtr;
-		HR(m_IndexBuffer->Map(0, nullptr, reinterpret_cast<void**>(&indexPtr)));
-		indexPtr[0] = 0;
-		indexPtr[1] = 1;
-		indexPtr[2] = 2;
 	}
 
 	D3D12CommandBuffer::~D3D12CommandBuffer() noexcept
@@ -66,8 +31,6 @@ namespace Ayla
 
 	void D3D12CommandBuffer::Dispose() noexcept
 	{
-		m_VertexBuffer.Reset();
-		m_IndexBuffer.Reset();
 		m_CommandPool.Reset();
 		for (auto& commandBuffer : m_CommandBuffers)
 		{
@@ -78,6 +41,7 @@ namespace Ayla
 	void D3D12CommandBuffer::BeginCommands_Implementation()
 	{
 		auto pi = m_Graphics->GetFramePageIndex();
+		m_CurrentRaytracingRenderPipeline = nullptr;
 		HR(m_CommandPool->Reset());
 		HR(m_CommandBuffers[pi]->Reset(m_CommandPool.Get(), nullptr));
 	}
@@ -205,6 +169,7 @@ namespace Ayla
 		{
 			auto pi = m_Graphics->GetFramePageIndex();
 			m_CommandBuffers[pi]->SetPipelineState1(pso1->GetPipelineStateObject());
+			m_CurrentRaytracingRenderPipeline = pso1;
 			return;
 		}
 		else if (auto* ps = dynamic_cast<D3D12GeometryRenderPipeline*>(renderPipeline))
@@ -212,6 +177,7 @@ namespace Ayla
 			auto pi = m_Graphics->GetFramePageIndex();
 			m_CommandBuffers[pi]->SetGraphicsRootSignature(ps->GetRootSignature());
 			m_CommandBuffers[pi]->SetPipelineState(ps->GetPipelineState());
+			m_CurrentRaytracingRenderPipeline = nullptr;
 			return;
 		}
 		else
@@ -220,32 +186,136 @@ namespace Ayla
 		}
 	}
 
-	void D3D12CommandBuffer::Draw()
+	void D3D12CommandBuffer::Draw(Buffer* vertexBuffer, Buffer* indexBuffer)
 	{
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView =
+		auto* d3d12VertexBuffer = dynamic_cast<D3D12Buffer*>(vertexBuffer);
+		if (d3d12VertexBuffer == nullptr || d3d12VertexBuffer->GetUsage() != BufferUsage::VertexBuffer)
 		{
-			.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress(),
-			.SizeInBytes = sizeof(PositionColorVertex) * 3,
-			.StrideInBytes = sizeof(PositionColorVertex)
-		};
+			throw InvalidOperationException(TEXT("Direct3D12 draw requires a Direct3D12 vertex buffer."));
+		}
 
-		D3D12_INDEX_BUFFER_VIEW indexBufferView =
+		auto* d3d12IndexBuffer = dynamic_cast<D3D12Buffer*>(indexBuffer);
+		if (d3d12IndexBuffer == nullptr || d3d12IndexBuffer->GetUsage() != BufferUsage::IndexBuffer)
 		{
-			.BufferLocation = m_IndexBuffer->GetGPUVirtualAddress(),
-			.SizeInBytes = sizeof(uint32) * 3,
-			.Format = DXGI_FORMAT_R32_UINT
-		};
+			throw InvalidOperationException(TEXT("Direct3D12 draw requires a Direct3D12 index buffer."));
+		}
+
+		const size_t indexStride = d3d12IndexBuffer->GetStride();
+		if (indexStride != sizeof(uint16) && indexStride != sizeof(uint32))
+		{
+			throw InvalidOperationException(TEXT("Direct3D12 draw requires a 16-bit or 32-bit index buffer."));
+		}
+
+		auto vertexBufferView = d3d12VertexBuffer->GetVertexBufferView();
+		auto indexBufferView = d3d12IndexBuffer->GetIndexBufferView();
 		
 		auto pi = m_Graphics->GetFramePageIndex();
 		m_CommandBuffers[pi]->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_CommandBuffers[pi]->IASetVertexBuffers(0, 1, &vertexBufferView);
 		m_CommandBuffers[pi]->IASetIndexBuffer(&indexBufferView);
-		m_CommandBuffers[pi]->DrawIndexedInstanced(3, 1, 0, 0, 0);
+		m_CommandBuffers[pi]->DrawIndexedInstanced(static_cast<UINT>(d3d12IndexBuffer->GetCount()), 1, 0, 0, 0);
 	}
 
 	void D3D12CommandBuffer::DispatchRays(RenderTexture* renderTexture)
 	{
-		throw InvalidOperationException(TEXT("Direct3D12 ray dispatch is not implemented yet."));
+		if (m_CurrentRaytracingRenderPipeline == nullptr)
+		{
+			throw InvalidOperationException(TEXT("A Direct3D12 raytracing pipeline must be bound before dispatching rays."));
+		}
+
+		auto* rt = dynamic_cast<DXGISwapchainRenderTexture*>(renderTexture);
+		if (rt == nullptr)
+		{
+			throw InvalidOperationException(TEXT("Direct3D12 ray dispatch requires a Direct3D12 swapchain render texture."));
+		}
+
+		if (rt->GetRaytracingOutputResource() == nullptr || rt->GetRaytracingOutputDescriptorHeap() == nullptr)
+		{
+			throw InvalidOperationException(TEXT("Direct3D12 ray dispatch requires an allocated raytracing output resource."));
+		}
+
+		auto pi = m_Graphics->GetFramePageIndex();
+		auto* commandList = m_CommandBuffers[pi].Get();
+
+		D3D12_RESOURCE_STATES outputState = rt->GetRaytracingOutputState();
+		if (outputState != D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
+		{
+			D3D12_RESOURCE_BARRIER prepareOutputBarrier =
+			{
+				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+				.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+				.Transition =
+				{
+					.pResource = rt->GetRaytracingOutputResource(),
+					.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+					.StateBefore = outputState,
+					.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+				}
+			};
+			commandList->ResourceBarrier(1, &prepareOutputBarrier);
+			rt->SetRaytracingOutputState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		}
+
+		m_CurrentRaytracingRenderPipeline->BuildAccelerationStructures(commandList);
+
+		ID3D12DescriptorHeap* descriptorHeaps[] = { rt->GetRaytracingOutputDescriptorHeap() };
+		commandList->SetDescriptorHeaps(static_cast<UINT>(AE_ARRAYSIZE(descriptorHeaps)), descriptorHeaps);
+		commandList->SetComputeRootSignature(m_CurrentRaytracingRenderPipeline->GetGlobalRootSignature());
+		commandList->SetComputeRootDescriptorTable(0, rt->GetRaytracingOutputUAVGPUDescriptorHandle());
+		commandList->SetComputeRootShaderResourceView(1, m_CurrentRaytracingRenderPipeline->GetTopLevelAccelerationStructureGPUVirtualAddress());
+
+		auto size = renderTexture->GetSize();
+		D3D12_DISPATCH_RAYS_DESC dispatchDesc = m_CurrentRaytracingRenderPipeline->GetDispatchRaysDescTemplate();
+		dispatchDesc.Width = static_cast<UINT>(size.X);
+		dispatchDesc.Height = static_cast<UINT>(size.Y);
+		dispatchDesc.Depth = 1;
+		commandList->DispatchRays(&dispatchDesc);
+
+		std::array<D3D12_RESOURCE_BARRIER, 2> prepareCopyBarriers =
+		{
+			D3D12_RESOURCE_BARRIER
+			{
+				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+				.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+				.Transition =
+				{
+					.pResource = rt->GetRaytracingOutputResource(),
+					.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+					.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+					.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE
+				}
+			},
+			D3D12_RESOURCE_BARRIER
+			{
+				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+				.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+				.Transition =
+				{
+					.pResource = rt->GetCurrentBackBuffer(),
+					.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+					.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
+					.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST
+				}
+			}
+		};
+		commandList->ResourceBarrier(static_cast<UINT>(prepareCopyBarriers.size()), prepareCopyBarriers.data());
+		rt->SetRaytracingOutputState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+		commandList->CopyResource(rt->GetCurrentBackBuffer(), rt->GetRaytracingOutputResource());
+
+		D3D12_RESOURCE_BARRIER preparePresentBarrier =
+		{
+			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+			.Transition =
+			{
+				.pResource = rt->GetCurrentBackBuffer(),
+				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST,
+				.StateAfter = D3D12_RESOURCE_STATE_PRESENT
+			}
+		};
+		commandList->ResourceBarrier(1, &preparePresentBarrier);
 	}
 
 	void D3D12CommandBuffer::WaitForCompletion(const TimeSpan& timeout)

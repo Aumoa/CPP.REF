@@ -18,7 +18,8 @@ namespace Ayla
 	class GameInstance;
 	class Camera;
 	class Shader;
-	class RenderPipeline;
+	class GraphicsRenderPipeline;
+	class RaytracingRenderPipeline;
 	class Buffer;
 
 	ACLASS()
@@ -37,8 +38,8 @@ namespace Ayla
 		double m_FrameTime = 0;
 		size_t m_FrameCount = 0;
 
-		SharedPtr<RenderPipeline> m_DefaultGeometryRenderPipeline;
-		SharedPtr<RenderPipeline> m_DefaultRaytracingRenderPipeline;
+		SharedPtr<GraphicsRenderPipeline> m_DefaultGeometryRenderPipeline;
+		SharedPtr<RaytracingRenderPipeline> m_DefaultRaytracingRenderPipeline;
 
 		struct Scratch
 		{
